@@ -33,6 +33,10 @@ export default defineConfig({
     ]),
     renderer(),
   ],
+  test: {
+    // Allows us to render components in tests
+    environment: 'happy-dom',
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
