@@ -47,6 +47,10 @@ jobs:
         working-directory: ./client
         run: pnpm i --frozen-lockfile
 
+      - name: Run linting
+        working-directory: ./client
+        run: pnpm run lint
+
       - name: Run test
         working-directory: ./client
         run: pnpm run test

@@ -1,7 +1,5 @@
 import {
   getFirestore,
-  collection,
-  addDoc,
   doc,
   setDoc,
   getDoc,
@@ -15,6 +13,7 @@ const db = getFirestore(firebaseApp);
 // Function to upload a document
 export async function uploadDocument(
   documentId: string,
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   data: Record<string, any>,
 ) {
   try {
