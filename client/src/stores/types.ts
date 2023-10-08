@@ -4,6 +4,7 @@
  */
 
 /** Type of any store (a record of string-key to any-value pairs) */
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export type GenericStore = Record<string, any>;
 
 /**

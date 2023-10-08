@@ -1,6 +1,11 @@
 {
   "editor.formatOnSave": true,
-  "files.associations": {
-    "*.json": "jsonc"
-  }
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "javascriptreact",
+    "html",
+    "typescriptreact"
+  ],
+  "eslint.lintTask.enable": true
 }

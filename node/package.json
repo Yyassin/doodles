@@ -8,7 +8,8 @@
     "emulator-test": "npx firebase emulators:exec --only firestore \"npm run test\" || exit 0",
     "test": "set TEST=1 && mocha -r ts-node/register --exit 'test/**/*.test.ts'",
     "posttest": "npx kill-port 8000 8080",
-    "dev": "nodemon --esm ./src/app.ts"
+    "dev": "nodemon --esm ./src/app.ts",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,7 @@
     "@types/mocha": "^10.0.2",
     "@types/multer": "^1.4.8",
     "@types/node": "^20.8.3",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
     "chai": "^4.3.10",
     "eslint": "^8.48.0",
     "eslint-config-airbnb-base": "^15.0.0",
