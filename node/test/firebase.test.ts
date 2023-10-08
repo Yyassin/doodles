@@ -1,8 +1,9 @@
-import { uploadDocument, readDocument } from '../src/app';
+import { uploadDocument, readDocument, uploadImageToStorage } from '../src/app';
 import { describe, it } from 'mocha';
-import { expect } from 'chai'; // Import Chai's expect function
+import { expect } from 'chai';
+import fs from 'fs'; // Import the 'fs' module
 
-describe('Firestore Document Tests', () => {
+describe('Firestore Document and Image Upload Tests', () => {
   it('should upload and read a document', async () => {
     const documentId1 = 'id-1';
     const data1 = {
@@ -18,5 +19,22 @@ describe('Firestore Document Tests', () => {
 
     // Perform assertions using Chai
     expect(documentData).to.deep.equal(data1);
+  });
+
+  it('should upload an image successfully', async () => {
+    // Read a sample image file for testing (adjust the path as needed)
+    const imageFilePath = 'imageSamples/cat.png';
+    const imageBuffer = fs.readFileSync(imageFilePath);
+
+    // Specify the destination path for the image
+    const destinationPath =
+      'gs://doodles-68ce9.appspot.com/testing/testingibro.png';
+
+    // Upload the image to Firebase Storage
+    await uploadImageToStorage(imageBuffer, destinationPath);
+
+    // You can add assertions here to check if the image was uploaded successfully
+    // For example, you can assert that the image exists in the storage bucket
+    // or check its metadata.
   });
 });

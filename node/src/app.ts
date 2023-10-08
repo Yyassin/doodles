@@ -1,5 +1,7 @@
 import express from 'express';
-import { firebaseApp } from './firebase/firebase'; // Import your Firebase app instance
+import { firebaseApp } from './firebase/firebase';
+import multer from 'multer';
+import { getStorage, ref, uploadBytes } from 'firebase/storage';
 import {
   getFirestore,
   collection,
@@ -13,8 +15,46 @@ import {
 const app = express();
 const port = 3005;
 
-// Create a Firestore instance using your Firebase app
+// Create a Firestore instance
 const db = getFirestore(firebaseApp);
+
+// Create a Firebase Storage instance
+const storage = getStorage(firebaseApp);
+
+// Multer middleware to handle file uploads
+const storageMulter = multer({ storage: multer.memoryStorage() });
+
+// Function to upload an image to Firebase Storage
+export async function uploadImageToStorage(fileBuffer, destinationPath) {
+  try {
+    const storageRef = ref(storage, destinationPath);
+    await uploadBytes(storageRef, fileBuffer);
+    console.log('Image uploaded successfully.');
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+}
+
+// Endpoint to handle image upload
+app.post('/upload-image', storageMulter.single('image'), async (req, res) => {
+  try {
+    // Get the uploaded image data from req.file
+    const imageBuffer = (req as any).file.buffer;
+
+    // Specify the destination path in Firebase Storage where you want to store the image
+    const destinationPath =
+      req.body.destinationPath || 'node/imageSamples/cat.png';
+
+    // Upload the image to Firebase Storage
+    await uploadImageToStorage(imageBuffer, destinationPath);
+
+    res.status(200).json({ message: 'Image uploaded successfully' });
+  } catch (error) {
+    console.error('Error handling image upload:', error);
+    res.status(500).json({ error: 'Image upload failed' });
+  }
+});
 
 // Function to upload a document
 export async function uploadDocument(
