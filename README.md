@@ -19,3 +19,10 @@ We also use [tailwindcss](https://tailwindcss.com/docs/guides/vite) for most sty
 ### Server
 
 Doesn't matter yet.
+
+### Firebase Emulator
+
+- Install the Firebase CLI tools: `npm install -g firebase-tools`.
+- Check that the install worked correctly by running `firebase --version`.
+- Login to your account: `firebase login`
+- If you have Java < v11, uninstall it and download a [version 11.0.15](https://www.oracle.com/ca-en/java/technologies/javase/jdk11-archive-downloads.html)
