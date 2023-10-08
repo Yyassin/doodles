@@ -1,4 +1,11 @@
-import { uploadDocument, readDocument, uploadImageToStorage } from '../src/app';
+import {
+  uploadDocument,
+  readDocument,
+  uploadImageToStorage,
+  deleteDocument,
+  deleteImageFromStorage,
+  checkImageExistsInStorage,
+} from '../src/app';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import fs from 'fs'; // Import the 'fs' module
@@ -19,6 +26,9 @@ describe('Firestore Document and Image Upload Tests', () => {
 
     // Perform assertions using Chai
     expect(documentData).to.deep.equal(data1);
+
+    // Delete the document
+    await deleteDocument(documentId1);
   });
 
   it('should upload an image successfully', async () => {
@@ -33,8 +43,14 @@ describe('Firestore Document and Image Upload Tests', () => {
     // Upload the image to Firebase Storage
     await uploadImageToStorage(imageBuffer, destinationPath);
 
-    // You can add assertions here to check if the image was uploaded successfully
-    // For example, you can assert that the image exists in the storage bucket
-    // or check its metadata.
+    // Check if the image exists before deleting it
+    const imageExists = await checkImageExistsInStorage(destinationPath);
+
+    if (imageExists) {
+      // Delete the image from Firebase Storage
+      await deleteImageFromStorage(destinationPath);
+    } else {
+      console.log('Image does not exist, skipping deletion.');
+    }
   });
 });

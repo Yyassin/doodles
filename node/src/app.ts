@@ -1,7 +1,13 @@
 import express from 'express';
 import { firebaseApp } from './firebase/firebase';
 import multer from 'multer';
-import { getStorage, ref, uploadBytes } from 'firebase/storage';
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  deleteObject,
+  getMetadata,
+} from 'firebase/storage';
 import {
   getFirestore,
   collection,
@@ -10,6 +16,7 @@ import {
   setDoc,
   getDoc,
   DocumentSnapshot,
+  deleteDoc,
 } from 'firebase/firestore';
 
 const app = express();
@@ -87,6 +94,42 @@ export async function readDocument(documentId: string) {
   } catch (error) {
     console.error('Error reading document:', error);
     return null;
+  }
+}
+
+// Function to delete a document
+export async function deleteDocument(documentId: string) {
+  try {
+    const docRef = doc(db, 'documents', documentId);
+    await deleteDoc(docRef);
+    console.log('Document deleted successfully.');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+}
+
+// Function to delete an image from Firebase Storage
+export async function deleteImageFromStorage(imagePath: string) {
+  try {
+    const storageRef = ref(storage, imagePath);
+    await deleteObject(storageRef);
+    console.log('Image deleted successfully.');
+  } catch (error) {
+    console.error('Error deleting image:', error);
+  }
+}
+
+// Function to check if an image exists in Firebase Storage
+export async function checkImageExistsInStorage(
+  imagePath: string,
+): Promise<boolean> {
+  try {
+    const storageRef = ref(storage, imagePath);
+    const metadata = await getMetadata(storageRef);
+    return !!metadata;
+  } catch (error) {
+    console.error('Error checking image existence:', error);
+    return false;
   }
 }
 
