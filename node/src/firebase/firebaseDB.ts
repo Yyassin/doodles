@@ -32,6 +32,7 @@ export const storage = getStorage(firebaseApp);
 // Function to upload a document
 export async function uploadDocument(
   documentId: string,
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   data: Record<string, any>,
 ) {
   try {
