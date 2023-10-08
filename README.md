@@ -18,4 +18,25 @@ We also use [tailwindcss](https://tailwindcss.com/docs/guides/vite) for most sty
 
 ### Server
 
-Doesn't matter yet.
+```json
+"scripts": {
+    // Start emulators
+    "emulator:start": "npx firebase emulators:start --only firestore",
+    // We add exit 0 so force closing the emulator doesn't throw.
+    // This will still throw if the tests fail.
+    "emulator-test": "npx firebase emulators:exec --only firestore \"npm run test\" || exit 0",
+    // Run tests
+    "test": "set TEST=1 && mocha -r ts-node/register --exit 'test/**/*.test.ts'",
+    // Close emulators
+    "posttest": "npx kill-port 8000 8080",
+    // Start the backend
+    "dev": "nodemon --esm ./src/app.ts"
+}
+```
+
+### Firebase Emulator
+
+- Install the Firebase CLI tools: `npm install -g firebase-tools`.
+- Check that the install worked correctly by running `firebase --version`.
+- Login to your account: `firebase login`
+- If you have Java < v11, uninstall it and download a [version 11.0.15](https://www.oracle.com/ca-en/java/technologies/javase/jdk11-archive-downloads.html)
