@@ -20,6 +20,14 @@ import {
 } from 'firebase/auth';
 import { firebaseApp } from '../firebaseDB/firebase';
 
+/**
+ * It is the sign in page where user either inputs email and password or
+ * sign in through google. We use firebase auth for both
+ * @author Zakariyya Almalki
+ */
+
+// function that uses firebase sign in method, takes email and pass
+// function is here for ease of testing
 export function signin(email: string, password: string) {
   return signInWithEmailAndPassword(getAuth(firebaseApp), email, password);
 }
@@ -27,30 +35,32 @@ export function signin(email: string, password: string) {
 export default function SignInPage() {
   const emailRef = useRef();
   const passwordRef = useRef();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // State to disable sign in button while loading
   const [error, setError] = useState(''); // State for error message
   const navigate = useNavigate();
 
+  // where we handle regular email/pass sign in
   const handleSignUp = async (e) => {
     e.preventDefault();
 
     try {
       setLoading(true);
       await signin(emailRef.current.value, passwordRef.current.value);
-      navigate('/dashboard');
+      navigate('/dashboard'); //bring user to dashboard page if sign in complete
     } catch (error) {
-      setError(error.message);
+      setError(error.message); //if error thrown, setState and will display on page
     }
     setLoading(false);
   };
 
+  // where we handle google in
   const handleGoogleSignIn = async () => {
     const auth = getAuth(firebaseApp);
     const provider = new GoogleAuthProvider();
 
     try {
       await signInWithPopup(auth, provider);
-      navigate('/dashboard');
+      navigate('/dashboard'); //bring user to dashboard page if sign in complete
     } catch (error) {
       setError(error.message);
     }
