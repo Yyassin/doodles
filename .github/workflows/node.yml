@@ -52,7 +52,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./node
-        run: pnpm ci --ignore-scripts
+        run: pnpm i --frozen-lockfile
 
       - name: Run test
         working-directory: ./node
