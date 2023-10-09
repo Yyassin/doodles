@@ -2,10 +2,13 @@ import React from 'react';
 import SignUp from './views/SignUpPage';
 import Dashboard from './views/Dashboard';
 import LoginPage from './views/SignInPage';
+// import DropDownMenu from './views/DropDownMenu';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
+  // return <DropDownMenu />; //For some reason menu doesnt show when I use router
+
   return (
     <>
       <Router>
