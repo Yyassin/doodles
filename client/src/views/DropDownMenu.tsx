@@ -5,6 +5,8 @@ import save_icon from '/images/save_icon.png';
 import live_icon from '/images/live_icon.png';
 import reset_icon from '/images/reset_icon.png';
 import info_icon from '/images/info_icon.png';
+import open_icon from '/images/open_icon.png';
+import canvasStyle_icon from '/images/canvasStyle_icon.png';
 
 export default function DropDownMenu() {
   const [open, setOpen] = useState(false);
@@ -38,6 +40,11 @@ export default function DropDownMenu() {
     console.log('Info...');
   }
 
+  function handleOpen() {
+    // Add code to handle info functionality
+    console.log('Opening...');
+  }
+
   function handleShare() {
     // Add code to handle share functionality
     console.log('Sharing...');
@@ -46,6 +53,11 @@ export default function DropDownMenu() {
   function handleReset() {
     // Add code to handle reset functionality
     console.log('Resetting...');
+  }
+
+  function handleStyle() {
+    // Add code to handle save functionality
+    console.log('Editing Canvas...');
   }
 
   return (
@@ -61,6 +73,13 @@ export default function DropDownMenu() {
         </div>
         <div className={`dropdown-menu ${open ? 'active' : 'inactive'}`}>
           <ul>
+            <DropdownItem
+              img={open_icon}
+              text={'Open'}
+              onClick={() => {
+                handleOpen();
+              }}
+            />
             <DropdownItem
               img={export_icon}
               text={'Export'}
@@ -94,6 +113,13 @@ export default function DropDownMenu() {
               text={'Reset'}
               onClick={() => {
                 handleReset();
+              }}
+            />
+            <DropdownItem
+              img={canvasStyle_icon}
+              text={'Edit Canvas'}
+              onClick={() => {
+                handleStyle();
               }}
             />
           </ul>
