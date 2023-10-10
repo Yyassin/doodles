@@ -33,22 +33,25 @@ export function signin(email: string, password: string) {
 }
 
 export default function SignInPage() {
-  const emailRef = useRef();
-  const passwordRef = useRef();
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false); // State to disable sign in button while loading
   const [error, setError] = useState(''); // State for error message
   const navigate = useNavigate();
 
   // where we handle regular email/pass sign in
-  const handleSignUp = async (e) => {
+  const handleSignUp = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     try {
       setLoading(true);
-      await signin(emailRef.current.value, passwordRef.current.value);
+      await signin(
+        emailRef.current?.value ?? '',
+        passwordRef.current?.value ?? '',
+      );
       navigate('/dashboard'); //bring user to dashboard page if sign in complete
-    } catch (error) {
-      setError(error.message); //if error thrown, setState and will display on page
+    } catch (error: unknown) {
+      setError((error as Error).message); //if error thrown, setState and will display on page
     }
     setLoading(false);
   };
@@ -61,8 +64,8 @@ export default function SignInPage() {
     try {
       await signInWithPopup(auth, provider);
       navigate('/dashboard'); //bring user to dashboard page if sign in complete
-    } catch (error) {
-      setError(error.message);
+    } catch (error: unknown) {
+      setError((error as Error).message);
     }
   };
 
