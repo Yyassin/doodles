@@ -19,6 +19,7 @@ interface AppState {
 interface AppActions {
   // Reducer to set the app mode
   setMode: (mode: AppMode) => void;
+  // Reducer to set the app theme
   setTheme: (theme: AppTheme) => void;
 }
 type AppStore = AppState & AppActions;

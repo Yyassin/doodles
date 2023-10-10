@@ -33,14 +33,14 @@ export function signup(email: string, password: string) {
 }
 
 export default function SignUp() {
-  const emailRef = useRef();
-  const passwordRef = useRef();
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false); // State to disable sign up button
   const [error, setError] = useState(''); // State for error message
   const navigate = useNavigate();
 
   // where we handle regular email/pass sign in
-  const handleSignUp = async (e) => {
+  const handleSignUp = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     try {
@@ -48,10 +48,13 @@ export default function SignUp() {
       //we want to disable sign up button from user so
       //firebase doesnt create many accounts if button click multiple times
       setLoading(true);
-      await signup(emailRef.current.value, passwordRef.current.value);
+      await signup(
+        emailRef.current?.value ?? '',
+        passwordRef.current?.value ?? '',
+      );
       navigate('/dashboard'); //bring user to dashboard page if sign in complete
-    } catch (error) {
-      setError(error.message); //if error thrown, setState and will display on page
+    } catch (error: unknown) {
+      setError((error as Error).message); //if error thrown, setState and will display on page
     }
     setLoading(false);
   };
@@ -63,8 +66,8 @@ export default function SignUp() {
     try {
       await signInWithPopup(auth, provider);
       navigate('/dashboard'); //bring user to dashboard page if sign in complete
-    } catch (error) {
-      setError(error.message);
+    } catch (error: unknown) {
+      setError((error as Error).message);
     }
   };
 
