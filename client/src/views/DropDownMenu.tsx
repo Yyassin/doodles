@@ -8,6 +8,10 @@ import info_icon from '/images/info_icon.png';
 import open_icon from '/images/open_icon.png';
 import canvasStyle_icon from '/images/canvasStyle_icon.png';
 
+/**
+ * DropDown Menu
+ * @author Dana El Sherif
+ */
 export default function DropDownMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef();
