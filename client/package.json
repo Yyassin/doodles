@@ -6,7 +6,9 @@
     "dev": "vite",
     "test": "vitest",
     "build": "tsc && vite build && electron-builder",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "check-types": "tsc --noemit",
+    "eslint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "pnpm run eslint && pnpm run check-types",
     "preview": "vite preview"
   },
   "dependencies": {
