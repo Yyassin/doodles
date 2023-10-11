@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -9,159 +9,69 @@
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
- 
+
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
- 
+
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
- 
+
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
- 
+
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
- 
+
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
- 
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
- 
+
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
- 
+
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
- 
+
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
- 
+
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
- 
+
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
- 
+
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
- 
+
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
- 
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
- 
+
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
-
-ul{
-  list-style: none;
-}
-
-a {
-  text-decoration: none;
-}
-
-.menu-trigger img{
-  position: absolute;
-  top: -10px;
-  right: -120px;
-  height: 60px;
-  width: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
-  background-color: #fff;
-}
-
-.dropdown-menu{
-  position: absolute;
-  top: 75px;
-  right: -100px;
-  background-color: #fff;
-  border-radius: var(--border-radius);
-  padding: 1px 20px;
-  width: 200px;
-}
-
-
-.dropdown-menu::before{
-  content: '';
-  position: absolute;
-  top: -5px;
-  right: 20px;
-  height: 20px;
-  width: 20px;
-  background: var(--secondary-bg);
-  transform: rotate(45deg);
-}
-
-.dropdown-menu ul li{
-  padding: 10px  0;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.dropdown-menu ul li:hover a{
-  color: rgb(191, 64, 191);
-  cursor: pointer;
-}
-
-.dropdown-menu ul li:hover img{
-  opacity: 1;
-  cursor: pointer;
-}
-
-.dropdownItem{
-  display: flex;
-  margin: 1px auto;
-}
-
-.dropdownItem img{
-  max-width: 30px;
-  margin-right: 10px;
-  opacity: 0.5;
-  transition: var(--speed);
-}
-
-.dropdownItem a{
-  max-width: 100px;
-  margin-left: 10px;
-  transition: var(--speed);
-}
-
-.dropdown-menu.active{
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  transition: var(--speed) ease;
-}
-
-.dropdown-menu.inactive{
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-20px);
-  transition: var(--speed) ease;
-}
-
-
