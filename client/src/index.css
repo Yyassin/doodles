@@ -75,22 +75,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-.toolbar {
-  background-color: #f5f5f5aa;
-  padding: 10px;
-  height: 60px;
-}
-
-.toolbaritems {
-  display: flex;
-  margin: 10px auto;
-}
-
-.toolbaritems img {
-  max-width: 40px;
-  margin-left: 50px;
-  margin-top: -10px;
-  opacity: 1;
-  transition: var(--speed);
-}
