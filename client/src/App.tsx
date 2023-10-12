@@ -3,9 +3,10 @@ import SignUp from './views/SignUpPage';
 import Dashboard from './views/Dashboard';
 import LoginPage from './views/SignInPage';
 import Toolbar from './views/ToolBar';
+import DropDownMenu from './views/DropDownMenu';
+import Canvas from './views/Canvas';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Canvas from './views/Canvas';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/toolbar" Component={Toolbar} />
           <Route path="/canvas" Component={Canvas} />
           <Route path="/signup" Component={SignUp} />
+          <Route path="/dropdownmenu" Component={DropDownMenu} />
           <Route path="/signin" Component={LoginPage} />
         </Routes>
       </Router>
