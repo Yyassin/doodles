@@ -9,17 +9,20 @@
     "test": "set TEST=1 && mocha -r ts-node/register --exit 'test/**/*.test.ts'",
     "posttest": "npx kill-port 8000 8080",
     "dev": "nodemon --esm ./src/app.ts",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "check-types": "tsc --noemit",
+    "eslint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "pnpm run eslint && pnpm run check-types"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/ws": "^8.5.6",
     "express": "^4.18.2",
     "firebase": "^10.4.0",
     "firebase-admin": "^11.11.0",
     "multer": "1.4.5-lts.1",
-    "socket.io": "^4.7.2"
+    "ws": "^8.14.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.6",
@@ -27,7 +30,7 @@
     "@types/mocha": "^10.0.2",
     "@types/multer": "^1.4.8",
     "@types/node": "^20.8.3",
-    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/eslint-plugin": "^6.7.5",
     "chai": "^4.3.10",
     "eslint": "^8.48.0",
     "eslint-config-airbnb-base": "^15.0.0",
