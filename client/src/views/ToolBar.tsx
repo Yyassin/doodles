@@ -64,66 +64,73 @@ const ToolBar = () => {
   return (
     <Toolbar.Root
       className="flex p-[10px] w-full min-w-max rounded-md bg-white shadow-[0_2px_10px] shadow-blackA4"
-      style={{ position: 'absolute', right: 400, top: -5, width: 8 }}
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        margin: 'auto',
+        top: -5,
+        width: 'fit-content',
+      }}
     >
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[px] items-center justify-center focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[px] items-center justify-center focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handleSelect}
       >
         <CursorArrowIcon />
       </Toolbar.Button>
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center  focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center  focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handlePan}
       >
         <HandIcon />
       </Toolbar.Button>
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[10px]" />
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handleText}
       >
         <TextIcon />
       </Toolbar.Button>
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handleDraw}
       >
         <Pencil1Icon />
       </Toolbar.Button>
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handleRectangle}
       >
         <SquareIcon />
       </Toolbar.Button>
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handleLine}
       >
         <MinusIcon />
       </Toolbar.Button>
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handleImage}
       >
         <ImageIcon />
       </Toolbar.Button>
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px] items-center justify-center focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handleErase}
       >
         <EraserIcon />
       </Toolbar.Button>
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[10px]" />
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px]  items-center justify-center  focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px]  items-center justify-center  focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handleZoomIn}
       >
         <ZoomInIcon />
       </Toolbar.Button>
       <Toolbar.Button
-        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px]  items-center justify-center  focus:relative focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-teal-500"
+        className="px-[15px] text-violet11 bg-violet9 flex-shrink-0 flex-grow-0 basis-auto h-[25px] rounded inline-flex text-[13px]  items-center justify-center  focus:relative focus:bg-teal-500 hover:bg-teal-300"
         onClick={handleZoomOut}
       >
         <ZoomOutIcon />
