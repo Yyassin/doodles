@@ -1,4 +1,5 @@
 import { ObjectValues } from '@/lib/misc';
+import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useLayoutEffect } from 'react';
 import rough from 'roughjs';
@@ -10,11 +11,14 @@ import rough from 'roughjs';
  * @author Yousef Yassin
  */
 const useDrawElements = () => {
+  const { appHeight, appWidth } = useAppStore(['appHeight', 'appWidth']);
   const { roughElements } = useCanvasElementStore(['roughElements']);
 
   // Effect fires after DOM is mounted
   useLayoutEffect(() => {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    if (canvas === null) return;
+
     const ctx = canvas.getContext('2d');
     if (ctx === null) return;
 
@@ -26,7 +30,7 @@ const useDrawElements = () => {
     ObjectValues(roughElements).forEach((roughElement) =>
       roughCanvas.draw(roughElement),
     );
-  }, [roughElements]);
+  }, [roughElements, appWidth, appHeight]);
 };
 
 export default useDrawElements;

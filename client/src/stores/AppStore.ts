@@ -17,6 +17,10 @@ interface AppState {
   tool: AppTool;
   // The current app theme
   theme: AppTheme;
+  // Viewport width
+  appWidth: number;
+  // Viewport Height
+  appHeight: number;
 }
 interface AppActions {
   // Reducer to set the app mode
@@ -25,6 +29,8 @@ interface AppActions {
   setTool: (tool: AppTool) => void;
   // Reducer to set the app theme
   setTheme: (theme: AppTheme) => void;
+  //
+  setAppDimensions: (width: number, height: number) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -33,6 +39,8 @@ export const initialAppState: AppState = {
   mode: 'signin',
   tool: 'line',
   theme: 'dark',
+  appWidth: window.innerWidth,
+  appHeight: window.innerHeight,
 };
 
 /** Actions / Reducers */
@@ -43,6 +51,9 @@ const setMode = (set: SetState<AppStore>) => (mode: AppMode) =>
   set(() => ({ mode }));
 const setTheme = (set: SetState<AppStore>) => (theme: AppTheme) =>
   set(() => ({ theme }));
+const setAppDimensions =
+  (set: SetState<AppStore>) => (width: number, height: number) =>
+    set(() => ({ appWidth: width, appHeight: height }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
@@ -50,5 +61,6 @@ const appStore = create<AppStore>()((set) => ({
   setTool: setTool(set),
   setMode: setMode(set),
   setTheme: setTheme(set),
+  setAppDimensions: setAppDimensions(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);
