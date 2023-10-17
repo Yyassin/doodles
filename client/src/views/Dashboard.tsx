@@ -1,6 +1,12 @@
 import React from 'react';
-import Canvas from './Canvas';
+import { useAppStore } from '@/stores/AppStore';
 
 export default function Dashboard() {
-  return <Canvas />;
+  const { setMode } = useAppStore(['setMode']);
+  return (
+    <div>
+      <h1>Dashboard dummy text</h1>
+      <button onClick={() => setMode('canvas')}>Canvas</button>
+    </div>
+  );
 }

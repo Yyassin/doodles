@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,6 +18,7 @@ import {
   GoogleAuthProvider,
 } from 'firebase/auth';
 import { firebaseApp } from '../firebaseDB/firebase';
+import { useAppStore } from '@/stores/AppStore';
 
 /**
  * It is the sign up page where user either inputs email and password or
@@ -33,11 +33,11 @@ export function signup(email: string, password: string) {
 }
 
 export default function SignUp() {
+  const { setMode } = useAppStore(['setMode']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false); // State to disable sign up button
   const [error, setError] = useState(''); // State for error message
-  const navigate = useNavigate();
 
   // where we handle regular email/pass sign in
   const handleSignUp = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -52,7 +52,7 @@ export default function SignUp() {
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
       );
-      navigate('/dashboard'); //bring user to dashboard page if sign in complete
+      setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message); //if error thrown, setState and will display on page
     }
@@ -65,7 +65,7 @@ export default function SignUp() {
 
     try {
       await signInWithPopup(auth, provider);
-      navigate('/dashboard'); //bring user to dashboard page if sign in complete
+      setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message);
     }
@@ -127,7 +127,9 @@ export default function SignUp() {
       </CardContent>
       <CardFooter>
         <div className="w-100 text-center mt-2">
-          <Link to="/signin">Already Have an Account? Log In!</Link>
+          <a onClick={() => setMode('signin')}>
+            Already Have an Account? Log In!
+          </a>
         </div>
       </CardFooter>
     </Card>

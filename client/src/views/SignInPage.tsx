@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,12 +18,15 @@ import {
   GoogleAuthProvider,
 } from 'firebase/auth';
 import { firebaseApp } from '../firebaseDB/firebase';
+import { useAppStore } from '@/stores/AppStore';
 
 /**
  * It is the sign in page where user either inputs email and password or
  * sign in through google. We use firebase auth for both
  * @author Zakariyya Almalki
  */
+
+// TODO: Add a loading state for google popup, disable button.
 
 // function that uses firebase sign in method, takes email and pass
 // function is here for ease of testing
@@ -33,11 +35,11 @@ export function signin(email: string, password: string) {
 }
 
 export default function SignInPage() {
+  const { setMode } = useAppStore(['setMode']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false); // State to disable sign in button while loading
   const [error, setError] = useState(''); // State for error message
-  const navigate = useNavigate();
 
   // where we handle regular email/pass sign in
   const handleSignUp = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -49,7 +51,7 @@ export default function SignInPage() {
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
       );
-      navigate('/dashboard'); //bring user to dashboard page if sign in complete
+      setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message); //if error thrown, setState and will display on page
     }
@@ -63,7 +65,7 @@ export default function SignInPage() {
 
     try {
       await signInWithPopup(auth, provider);
-      navigate('/dashboard'); //bring user to dashboard page if sign in complete
+      setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message);
     }
@@ -123,7 +125,9 @@ export default function SignInPage() {
       </CardContent>
       <CardFooter>
         <div className="w-100 text-center mt-2">
-          <Link to="/signup">Need an Account? Sign Up Here!</Link>
+          <button onClick={() => setMode('signup')}>
+            Need an Account? Sign Up Here!
+          </button>
         </div>
       </CardFooter>
     </Card>

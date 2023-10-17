@@ -4,6 +4,8 @@ import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { CanvasElementType } from '@/types';
 import React, { MouseEvent, useState } from 'react';
+import ToolBar from './ToolBar';
+import DropDownMenu from './DropDownMenu';
 
 /**
  * Main Canvas View
@@ -15,7 +17,11 @@ import React, { MouseEvent, useState } from 'react';
 type Action = 'none' | 'drawing';
 
 export default function Canvas() {
-  const { mode, setMode } = useAppStore(['mode', 'setMode']);
+  const { tool, setMode, setTool } = useAppStore([
+    'tool',
+    'setMode',
+    'setTool',
+  ]);
   const { addCanvasElement, editCanvasElement, p1 } = useCanvasElementStore([
     'addCanvasElement',
     'editCanvasElement',
@@ -43,12 +49,12 @@ export default function Canvas() {
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     // TODO: Not good
-    if (mode !== 'line' && mode !== 'rectangle') return;
+    if (tool !== 'line' && tool !== 'rectangle') return;
     const { clientX, clientY } = e;
 
     // Create a new element, initially just a point where we clicked
     const id = crypto.randomUUID();
-    const element = createElement(id, clientX, clientY, clientX, clientY, mode);
+    const element = createElement(id, clientX, clientY, clientX, clientY, tool);
 
     // Add the element
     addCanvasElement(element);
@@ -61,31 +67,34 @@ export default function Canvas() {
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (mode !== 'line' && mode !== 'rectangle') return;
+    if (tool !== 'line' && tool !== 'rectangle') return;
     const { clientX, clientY } = e;
 
     if (action !== 'drawing') return;
     const { x: x1, y: y1 } = p1[currentDrawingElemId];
 
-    updateElement(currentDrawingElemId, x1, y1, clientX, clientY, mode);
+    updateElement(currentDrawingElemId, x1, y1, clientX, clientY, tool);
   };
 
   return (
     <div>
+      <ToolBar />
+      <DropDownMenu />
+      <button onClick={() => setMode('dashboard')}>Dashboard</button>
       {/*TODO: Will replace with dropdown */}
       <div style={{ position: 'fixed' }}>
         <input
           type="radio"
           id="line"
-          checked={mode === 'line'}
-          onChange={() => setMode('line')}
+          checked={tool === 'line'}
+          onChange={() => setTool('line')}
         />
         <label htmlFor="line">Line</label>
         <input
           type="radio"
           id="rectangle"
-          checked={mode === 'rectangle'}
-          onChange={() => setMode('rectangle')}
+          checked={tool === 'rectangle'}
+          onChange={() => setTool('rectangle')}
         />
         <label htmlFor="line">Rectangle</label>
       </div>
