@@ -5,7 +5,7 @@ import SignInPage from './views/SignInPage';
 import Dashboard from './views/Dashboard';
 import useDrawElements from './hooks/useDrawElements';
 import useWindowResize from './hooks/useWindowResize';
-import Viewport from './views/ViewPort';
+import Viewport from './views/Viewport';
 
 /**
  * Layout component that handles routing between pages, and

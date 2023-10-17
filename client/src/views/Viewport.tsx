@@ -1,8 +1,8 @@
+import React from 'react';
 import Canvas from '@/components/lib/Canvas';
 import DropDownMenu from '@/components/lib/DropDownMenu';
 import ToolBar from '@/components/lib/ToolBar';
 import { useAppStore } from '@/stores/AppStore';
-import React from 'react';
 
 /**
  * Primary viewport that houses the canvas
