@@ -64,7 +64,8 @@ describe('CreateStoreWithSelectors', () => {
     const modeButton = page.getByTestId(htmlIds.modeButton);
     const themeButton = page.getByTestId(htmlIds.themeButton);
 
-    expect(textInnerHtml()).toBe('Mode is select');
+    // We start at the sign in page
+    expect(textInnerHtml()).toBe('Mode is signin');
 
     // Toggle the mode -- the component should rerender;
     fireEvent.click(modeButton);

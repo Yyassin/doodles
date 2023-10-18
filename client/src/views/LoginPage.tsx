@@ -15,7 +15,7 @@ const RadixCheckBoxDummy = () => {
         <div className="flex items-center justify-center">
           <Checkbox.Root
             onClick={() => {
-              setTheme(mode === 'pan' ? 'light' : 'dark');
+              setTheme(mode === 'signin' ? 'light' : 'dark');
             }}
             className="shadow-blackA7 hover:bg-violet3 flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-[4px] bg-white shadow-[0_2px_10px] outline-none focus:shadow-[0_0_0_2px_black]"
             defaultChecked
@@ -43,7 +43,7 @@ const ShadcnButtonDummy = () => {
   // console.log('Shadcn button rerender');
   return (
     <>
-      <Button onClick={() => setMode(theme === 'dark' ? 'pan' : 'select')}>
+      <Button onClick={() => setMode(theme === 'light' ? 'signin' : 'signup')}>
         The current theme is: {theme}
       </Button>
     </>
