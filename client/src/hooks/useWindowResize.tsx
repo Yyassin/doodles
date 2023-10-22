@@ -6,7 +6,6 @@ import { useEffect } from 'react';
  * update app dimension state for resize handling.
  * @author Yousef Yassin
  */
-
 const useWindowResize = () => {
   const { setAppDimensions } = useAppStore(['setAppDimensions']);
   const handleResize = () => {
