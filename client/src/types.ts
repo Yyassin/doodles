@@ -14,10 +14,10 @@ export type AppMode = (typeof AppModes)[number];
 export const AppTools = [
   'select',
   'pan',
-  'line',
-  'rectangle',
   'text',
   'freehand',
+  'rectangle',
+  'line',
   'image',
   'erase',
 ] as const;
