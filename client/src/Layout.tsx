@@ -6,6 +6,7 @@ import Dashboard from './views/Dashboard';
 import useDrawElements from './hooks/useDrawElements';
 import useWindowResize from './hooks/useWindowResize';
 import Viewport from './views/Viewport';
+import { useShortcuts } from './hooks/useShortcut';
 
 /**
  * Layout component that handles routing between pages, and
@@ -16,6 +17,7 @@ import Viewport from './views/Viewport';
 const Layout = () => {
   useDrawElements();
   useWindowResize();
+  useShortcuts();
   const { mode } = useAppStore(['mode']);
 
   switch (mode) {

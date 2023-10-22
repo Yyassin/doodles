@@ -35,7 +35,7 @@ const ZoomButtons = () => {
       </div>
       <CanvasFlatButton
         className="rounded-r-md"
-        onClick={() => () => setZoom(Math.min(zoom + 1, 2000))}
+        onClick={() => setZoom(Math.min(zoom + 1, 2000))}
         tooltip={{
           content: 'Zoom in',
           side: 'top',

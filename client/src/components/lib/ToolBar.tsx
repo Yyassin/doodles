@@ -11,7 +11,7 @@ import {
   CursorArrowIcon,
 } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
-import { AppTool } from '@/types';
+import { AppTool, AppTools } from '@/types';
 import { capitalize } from '@/lib/misc';
 import IconButton from './IconButton';
 
@@ -80,13 +80,19 @@ const ToolGroup = ({
   selectedTool: AppTool;
 }) =>
   tools.map((toolName) => (
-    <ToolButton
-      key={`toolbar-${toolName}`}
-      tool={toolName}
-      active={selectedTool === toolName}
-    >
-      {toolIcons[toolName]}
-    </ToolButton>
+    <div key={`toolbar-${toolName}`} className="relative">
+      <ToolButton tool={toolName} active={selectedTool === toolName}>
+        {toolIcons[toolName]}
+        <p
+          className="absolute bottom-[0.05rem] right-[0.25rem] font-medium text-slate-400"
+          style={{
+            fontSize: '0.55rem',
+          }}
+        >
+          {AppTools.indexOf(toolName) + 1}
+        </p>
+      </ToolButton>
+    </div>
   ));
 
 /**
