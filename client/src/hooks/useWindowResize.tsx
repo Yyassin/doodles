@@ -10,7 +10,6 @@ const useWindowResize = () => {
   const { setAppDimensions } = useAppStore(['setAppDimensions']);
   const handleResize = () => {
     setAppDimensions(window.innerWidth, window.innerHeight);
-    console.log(window.innerWidth, window.innerHeight);
   };
 
   useEffect(() => {

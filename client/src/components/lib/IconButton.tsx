@@ -1,6 +1,5 @@
-import * as Toolbar from '@radix-ui/react-toolbar';
-import { Tooltip } from '@radix-ui/themes';
 import React from 'react';
+import { CanvasFlatButton } from './CanvasButton';
 
 /**
  * A button designed specifically for usage with a single icon.
@@ -20,23 +19,17 @@ const IconButton = ({
   onClick: (label: string) => void;
 }) => {
   return (
-    <Tooltip
-      className="radix-themes-custom-fonts"
-      content={label}
-      side="top"
-      sideOffset={5}
+    <CanvasFlatButton
+      className={`rounded-md ${
+        active ? 'bg-indigo-200 hover:bg-indigo-200' : ''
+      }`}
+      tooltip={{ content: label, side: 'bottom', sideOffset: 5 }}
+      value="bold"
+      aria-label="Bold"
+      onClick={() => onClick(label)}
     >
-      <Toolbar.Button
-        className={`p-[0.75rem] rounded-md items-center justify-center outline-none hover:bg-indigo-100 ${
-          active ? 'bg-indigo-200' : ''
-        }`}
-        value="bold"
-        aria-label="Bold"
-        onClick={() => onClick(label)}
-      >
-        {children}
-      </Toolbar.Button>
-    </Tooltip>
+      {children}
+    </CanvasFlatButton>
   );
 };
 

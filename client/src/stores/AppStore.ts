@@ -17,6 +17,8 @@ interface AppState {
   tool: AppTool;
   // The current app theme
   theme: AppTheme;
+  // Whether app is fullscreen or not
+  isFullscreen: boolean;
   // Viewport width
   appWidth: number;
   // Viewport Height
@@ -29,8 +31,10 @@ interface AppActions {
   setTool: (tool: AppTool) => void;
   // Reducer to set the app theme
   setTheme: (theme: AppTheme) => void;
-  //
+  // Reducer to set app window dimensions
   setAppDimensions: (width: number, height: number) => void;
+  // Reducer to set full screen mode
+  setIsFullscreen: (isFullscreen: boolean) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -39,6 +43,7 @@ export const initialAppState: AppState = {
   mode: 'signin',
   tool: 'line',
   theme: 'dark',
+  isFullscreen: false,
   appWidth: window.innerWidth,
   appHeight: window.innerHeight,
 };
@@ -54,6 +59,8 @@ const setTheme = (set: SetState<AppStore>) => (theme: AppTheme) =>
 const setAppDimensions =
   (set: SetState<AppStore>) => (width: number, height: number) =>
     set(() => ({ appWidth: width, appHeight: height }));
+const setIsFullscreen = (set: SetState<AppStore>) => (isFullscreen: boolean) =>
+  set(() => ({ isFullscreen }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
@@ -61,6 +68,7 @@ const appStore = create<AppStore>()((set) => ({
   setTool: setTool(set),
   setMode: setMode(set),
   setTheme: setTheme(set),
+  setIsFullscreen: setIsFullscreen(set),
   setAppDimensions: setAppDimensions(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);

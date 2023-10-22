@@ -80,11 +80,13 @@ const ToolGroup = ({
   selectedTool: AppTool;
 }) =>
   tools.map((toolName) => (
-    <>
-      <ToolButton tool={toolName} active={selectedTool === toolName}>
-        {toolIcons[toolName]}
-      </ToolButton>
-    </>
+    <ToolButton
+      key={`toolbar-${toolName}`}
+      tool={toolName}
+      active={selectedTool === toolName}
+    >
+      {toolIcons[toolName]}
+    </ToolButton>
   ));
 
 /**

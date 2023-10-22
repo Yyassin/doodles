@@ -74,6 +74,7 @@ export default function Canvas() {
   return (
     <canvas
       id="canvas"
+      style={{ backgroundColor: 'white' }}
       width={appWidth}
       height={appHeight}
       onMouseDown={handleMouseDown}
