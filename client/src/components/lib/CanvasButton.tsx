@@ -1,5 +1,5 @@
-import { Tooltip } from '@radix-ui/themes';
 import React, { ButtonHTMLAttributes } from 'react';
+import CanvasTooltip from './CanvasTooltip';
 
 /**
  * Defines a generic set of canvas
@@ -25,7 +25,7 @@ const BaseCanvasButton =
     tooltip: { content: string; side: 'top' | 'bottom'; sideOffset: number };
   }) => {
     return (
-      <Tooltip
+      <CanvasTooltip
         className="radix-themes-custom-fonts"
         content={tooltip.content}
         side={tooltip.side}
@@ -40,7 +40,7 @@ const BaseCanvasButton =
         >
           {children}
         </button>
-      </Tooltip>
+      </CanvasTooltip>
     );
   };
 

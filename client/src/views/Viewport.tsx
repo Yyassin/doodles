@@ -19,9 +19,9 @@ const Viewport = () => {
   const viewportRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={viewportRef}>
+    <div id="Viewport" ref={viewportRef}>
       <ToolBar />
-      <DropDownMenu />
+      <DropDownMenu viewportRef={viewportRef} />
 
       <div
         className="flex gap-[0.5rem]"
