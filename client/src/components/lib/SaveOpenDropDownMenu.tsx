@@ -71,7 +71,6 @@ export const SaveOpenDropDownMenu = () => {
     reader.onload = () => {
       const state: CanvasElementState = JSON.parse(reader.result as string);
       const roughElements: Record<string, CanvasElement['roughElement']> = {};
-      console.log(state);
 
       //create the roughElements
       for (const [key, type] of Object.entries(state.types)) {
