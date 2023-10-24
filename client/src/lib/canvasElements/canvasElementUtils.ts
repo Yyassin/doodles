@@ -13,6 +13,16 @@ const fillStyle = 'hachure';
 const strokeLineDash = [0];
 const opacity = 1;
 
+const defaultOptions = {
+  stroke,
+  fill,
+  bowing,
+  roughness,
+  strokeWidth,
+  fillStyle,
+  strokeLineDash,
+};
+
 // Temporary
 const createElement = (
   id: string,
@@ -21,17 +31,8 @@ const createElement = (
   x2: number,
   y2: number,
   type: CanvasElementType,
+  options = defaultOptions,
 ): CanvasElement => {
-  const options = {
-    stroke,
-    fill,
-    bowing,
-    roughness,
-    strokeWidth,
-    fillStyle,
-    strokeLineDash,
-  };
-
   const roughElement =
     type === 'line'
       ? generator.line(x1, y1, x2, y2, options)
