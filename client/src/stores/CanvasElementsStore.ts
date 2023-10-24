@@ -6,7 +6,7 @@ import { CanvasElementFillStyle, CanvasElementType, Vector2 } from '@/types';
 
 /**
  * Defines canvas drawable element state
- * @authors Yousef Yassin
+ * @authors Yousef Yassin & Abdalla Abdelhadi
  */
 
 /**
@@ -30,7 +30,7 @@ export interface CanvasElement {
 // resize, and rotate
 // TODO: Arrows will probably need to be composite
 
-interface CanvasElementState {
+export interface CanvasElementState {
   selectedElementId: string;
   allIds: string[];
   types: Record<string, CanvasElement['type']>;
@@ -54,6 +54,7 @@ interface CanvasElementActions {
     partialElement: Partial<CanvasElement>,
   ) => void;
   setSelectedElement: (id: string) => void;
+  setCanvasElementState: (elment: CanvasElementState) => void;
 }
 type CanvasElementStore = CanvasElementState & CanvasElementActions;
 
@@ -242,12 +243,56 @@ const setSelectedElement =
   (set: SetState<CanvasElementState>) => (selectedElementId: string) =>
     set(() => ({ selectedElementId }));
 
+/**
+ * Set the Canvas state to the paramter passed
+ * @param newCanvasElementState The new Canvas state.
+ * @returns New Canvas state
+ */
+const setCanvasElementState =
+  (set: SetState<CanvasElementState>) =>
+  (newCanvasElementState: CanvasElementState) =>
+    set((state) => {
+      const {
+        allIds,
+        types,
+        strokeColors,
+        fillColors,
+        bowings,
+        roughnesses,
+        strokeWidths,
+        strokeLineDashes,
+        fillStyles,
+        opacities,
+        roughElements,
+        p1,
+        p2,
+      } = newCanvasElementState;
+
+      return {
+        ...state,
+        allIds,
+        types,
+        strokeColors,
+        fillColors,
+        bowings,
+        roughnesses,
+        strokeWidths,
+        fillStyles,
+        strokeLineDashes,
+        opacities,
+        roughElements,
+        p1,
+        p2,
+      };
+    });
+
 /** Store Hook */
 const canvasElementStore = create<CanvasElementStore>()((set) => ({
   ...initialCanvasElementState,
   addCanvasElement: addCanvasElement(set),
   editCanvasElement: editCanvasElement(set),
   setSelectedElement: setSelectedElement(set),
+  setCanvasElementState: setCanvasElementState(set),
 }));
 export const useCanvasElementStore =
   createStoreWithSelectors(canvasElementStore);
