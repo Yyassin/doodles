@@ -23,6 +23,7 @@ export type TransformHandle = [number, number, number, number];
 export type TransformHandles = Partial<{
   [T in TransformHandleType]: TransformHandle;
 }>;
+export type MaybeTransformHandleType = TransformHandleType | false;
 
 // Rotate line from x1, y1
 export const rotate = (
@@ -124,7 +125,7 @@ const generateTransformHandle = (
   return [xx - width / 2, yy - height / 2, width, height];
 };
 
-const getTransformHandlesFromCoords = (
+export const getTransformHandlesFromCoords = (
   appState: {
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
