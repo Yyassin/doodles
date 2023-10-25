@@ -3,6 +3,8 @@
  * @author Abdalla Abdelhadi
  */
 
+import { WS_URL } from '@/constants';
+
 //websocket response status
 const enum status {
   SUCCESS = 200,
@@ -13,19 +15,20 @@ const enum status {
 export default class WebsocketClient {
   socket: WebSocket | null;
   room: string | null; //the current room the socket is in
-  msgTemplate;
+  callBacks: { [key: string]: (arg: number) => void }; //to be changed to proper types
+  msgTemplate = {
+    topic: null,
+    room: null,
+    payload: null,
+  }; //to be changed once we finalize the contents of the msg
 
   /**
    * Creates new WebsocketClient instance
    */
-  constructor() {
+  constructor(callBacks: { [key: string]: (arg: number) => void }) {
     this.socket = null;
     this.room = null;
-    this.msgTemplate = {
-      topic: null,
-      room: null,
-      payload: null,
-    };
+    this.callBacks = callBacks;
 
     this.connect(); //create a socket
   }
@@ -47,7 +50,7 @@ export default class WebsocketClient {
       throw 'Socket is already initalized';
     }
 
-    this.socket = new WebSocket('ws://localhost:3005');
+    this.socket = new WebSocket(WS_URL);
 
     this.socket.addEventListener('open', () => {
       return;
@@ -73,7 +76,7 @@ export default class WebsocketClient {
         return;
       }
 
-      console.log(jsonMsg);
+      this.callBacks.log(jsonMsg.payload);
     });
   }
 
@@ -93,7 +96,8 @@ export default class WebsocketClient {
    *
    * @param msg String, the message to be sent to the room
    */
-  sendMsgRoom(msg: string) {
+  sendMsgRoom(msg: number) {
+    //msg to be changed to proper type once everything finalized
     this.checkSocket();
 
     if (this.room === null) throw 'No room assigned!';

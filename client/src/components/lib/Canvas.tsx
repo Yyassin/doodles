@@ -1,8 +1,9 @@
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { CanvasElementType } from '@/types';
-import React, { MouseEvent, useState } from 'react';
+import React, { MouseEvent, useEffect, useState } from 'react';
 
 /**
  * Main Canvas View
@@ -23,8 +24,20 @@ export default function Canvas() {
     'editCanvasElement',
     'p1',
   ]);
+
+  const { setCounter, setRoomID } = useWebSocketStore([
+    'setCounter',
+    'setRoomID',
+  ]);
+
   const [action, setAction] = useState<Action>('none');
   const [currentDrawingElemId, setCurrentDrawingElemId] = useState('');
+
+  //initalize roomID upon entering the canvas
+  useEffect(() => {
+    setRoomID('1'); //change later
+    return () => setRoomID(null);
+  }, []);
 
   const updateElement = (
     id: string,
@@ -59,6 +72,7 @@ export default function Canvas() {
 
   const handleMouseUp = () => {
     setAction('none');
+    setCounter();
   };
 
   const handleMouseMove = (e: MouseEvent) => {
