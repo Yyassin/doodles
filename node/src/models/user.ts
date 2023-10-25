@@ -7,7 +7,7 @@ import {
 
 //TODO: add createdAt and updatedAt
 @FastFireCollection('User')
-class User extends FastFireDocument<User> {
+export class User extends FastFireDocument<User> {
   @FastFireField({ required: true })
   username!: string;
   @FastFireField({ required: true })

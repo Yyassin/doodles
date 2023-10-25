@@ -17,7 +17,7 @@ import { HTTP_STATUS } from '../constants';
 //Create user
 export const handleCreateUser = async (req: Request, res: Response) => {
   try {
-    const { username, firstname, lastname, email, password, avatar } = req.body;
+    const { username, firstname, lastname, email, password, avatar } = req.body; // The user parameters are in the body.
     const user = await createUser(
       username,
       firstname,
@@ -38,9 +38,8 @@ export const handleCreateUser = async (req: Request, res: Response) => {
 
 //Get user
 export const handleFindUserById = async (req: Request, res: Response) => {
-  console.log(req.query);
   try {
-    const userId = req.query.id; // The user ID parameter is in the body.
+    const userId = req.query.id; // The user ID parameter is in the URL.
     if (userId === undefined) {
       res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
       return;
@@ -63,7 +62,7 @@ export const handleFindUserById = async (req: Request, res: Response) => {
 // Update userName
 export const handleUpdateUserName = async (req: Request, res: Response) => {
   try {
-    const userId = req.body.id; // // The user ID and newNAme parameters are in the body.
+    const userId = req.body.id; // // The user ID and newName parameters are in the body.
     const newName = req.body.newName;
     if (userId === undefined) {
       res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
