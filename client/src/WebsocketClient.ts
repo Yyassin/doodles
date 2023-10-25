@@ -13,14 +13,16 @@ const enum status {
 export default class WebsocketClient {
   socket: WebSocket | null;
   room: string | null; //the current room the socket is in
+  callBacks: { [key: string]: (arg: any) => void };
   msgTemplate;
 
   /**
    * Creates new WebsocketClient instance
    */
-  constructor() {
+  constructor(callBacks: { [key: string]: (arg: any) => void }) {
     this.socket = null;
     this.room = null;
+    this.callBacks = callBacks;
     this.msgTemplate = {
       topic: null,
       room: null,
@@ -73,7 +75,7 @@ export default class WebsocketClient {
         return;
       }
 
-      console.log(jsonMsg);
+      this.callBacks.log(jsonMsg.payload);
     });
   }
 
@@ -93,7 +95,8 @@ export default class WebsocketClient {
    *
    * @param msg String, the message to be sent to the room
    */
-  sendMsgRoom(msg: string) {
+  sendMsgRoom(msg: any) {
+    //msg to be changed to proper type once everything finalized
     this.checkSocket();
 
     if (this.room === null) throw 'No room assigned!';
