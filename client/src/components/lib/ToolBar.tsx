@@ -14,6 +14,7 @@ import { useAppStore } from '@/stores/AppStore';
 import { AppTool, AppTools } from '@/types';
 import { capitalize } from '@/lib/misc';
 import IconButton from './IconButton';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 
 /* Map of tools to their icons */
 const toolIcons: Record<AppTool, ReactNode> = {
@@ -53,13 +54,27 @@ const ToolButton = ({
   children?: React.ReactNode;
 }) => {
   const { setTool } = useAppStore(['setTool']);
+  const { removeCanvasElement, setSelectedElement, selectedElementId } =
+    useCanvasElementStore([
+      'removeCanvasElement',
+      'setSelectedElement',
+      'selectedElementId',
+    ]);
+
+  // Temporary. For now we erase the selected element. In the
+  // future we can add a context menu with delete and make erase
+  // a drag operation.
+  const isErase = tool === 'erase';
+  const onClick = isErase
+    ? () => {
+        const id = selectedElementId;
+        setSelectedElement('');
+        removeCanvasElement(id);
+      }
+    : () => setTool(tool);
 
   return (
-    <IconButton
-      label={capitalize(tool)}
-      active={active}
-      onClick={() => setTool(tool)}
-    >
+    <IconButton label={capitalize(tool)} active={active} onClick={onClick}>
       {children}
     </IconButton>
   );
