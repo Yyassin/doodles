@@ -7,7 +7,7 @@ import {
 } from './user.controller';
 
 /**
- * Defines tempfirebase routes.
+ * Defines User routes.
  * @authors Ibrahim Almalki
  */
 

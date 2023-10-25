@@ -9,7 +9,7 @@ import {
 //TODO: add createdAt and updatedAt
 //TODO: change permissionLevel to an enum
 @FastFireCollection('Collaborator')
-class Collaborator extends FastFireDocument<Collaborator> {
+export class Collaborator extends FastFireDocument<Collaborator> {
   @FastFireField({ required: true })
   permissionLevel!: string;
   @FastFireField({ required: true })

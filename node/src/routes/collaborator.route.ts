@@ -7,7 +7,7 @@ import {
 } from './collaborator.controller';
 
 /**
- * Defines tempfirebase routes.
+ * Defines collaborator routes.
  * @authors Ibrahim Almalki
  */
 
