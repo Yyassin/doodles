@@ -1,4 +1,5 @@
-import { initializeApp } from 'firebase/app';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 /**
  * Defines connection to firebase firestore
@@ -30,6 +31,7 @@ const firebaseTestConfig = {
 };
 
 // The connected instance
-export const firebaseApp = initializeApp(
+export const firebaseApp = firebase.initializeApp(
   isTestingMode ? firebaseTestConfig : firebaseConfig,
 );
+export const firestore = firebase.firestore();

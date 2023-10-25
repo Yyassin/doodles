@@ -6,7 +6,8 @@
     "outDir": "./dist",
     "sourceMap": true,
     "esModuleInterop": true,
-    "strict": true
+    "strict": true,
+    "experimentalDecorators": true
   },
   "include": ["./src/**/*", "./test/**/*"]
 }
