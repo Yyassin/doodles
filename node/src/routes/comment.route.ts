@@ -21,7 +21,7 @@ router.post('/createComment', handleCreateComment);
 router.get('/getComment', handleFindCommentById);
 
 // PUT update comment's text
-router.put('/updateText', handleUpdateText);
+router.put('/updateCommentText', handleUpdateText);
 
 // DELETE comment by ID
 router.delete('/deleteComment', handleDeleteComment);

@@ -4,6 +4,7 @@ import setUpWSS from './websockets';
 import userRoutes from './routes/user.route';
 import collaboratorRoutes from './routes/collaborator.route';
 import commentRoutes from './routes/comment.route';
+import boardRoutes from './routes/board.route';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
@@ -28,5 +29,6 @@ server.listen(port, () => {
 app.use('/user', userRoutes);
 app.use('/collaborator', collaboratorRoutes);
 app.use('/comment', commentRoutes);
+app.use('/board', boardRoutes);
 
 setUpWSS(server);
