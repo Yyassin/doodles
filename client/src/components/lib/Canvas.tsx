@@ -25,7 +25,7 @@ export default function Canvas() {
     'p1',
   ]);
 
-  const { setCounter: setCounter, setRoomID } = useWebSocketStore([
+  const { setCounter, setRoomID } = useWebSocketStore([
     'setCounter',
     'setRoomID',
   ]);

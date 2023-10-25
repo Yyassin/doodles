@@ -8,11 +8,7 @@ import { useEffect, useRef } from 'react';
  */
 
 export const useSocket = () => {
-  const {
-    roomID,
-    counter: action,
-    setCounter: setAction,
-  } = useWebSocketStore(['roomID', 'counter', 'setCounter']);
+  const { roomID, counter } = useWebSocketStore(['roomID', 'counter']);
 
   const socket = useRef<WebsocketClient>();
 
@@ -40,7 +36,7 @@ export const useSocket = () => {
 
   //Send message once action gets set. Note: will be changed
   useEffect(() => {
-    if (!action) return;
-    socket.current?.sendMsgRoom(action);
-  }, [action]);
+    if (!counter) return;
+    socket.current?.sendMsgRoom(counter);
+  }, [counter]);
 };
