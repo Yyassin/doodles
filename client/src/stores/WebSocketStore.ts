@@ -26,7 +26,7 @@ type WebSocketStore = WebSocketActions & WebSocketState;
 // Initialize WebSocket State to default state.
 export const initialWebSocketState: WebSocketState = {
   roomID: null,
-  counter: 0,
+  counter: null,
 };
 
 /** Actions / Reducers */

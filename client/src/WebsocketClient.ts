@@ -3,6 +3,8 @@
  * @author Abdalla Abdelhadi
  */
 
+import { WS_URL } from '@/constants';
+
 //websocket response status
 const enum status {
   SUCCESS = 200,
@@ -14,7 +16,11 @@ export default class WebsocketClient {
   socket: WebSocket | null;
   room: string | null; //the current room the socket is in
   callBacks: { [key: string]: (arg: number) => void }; //to be changed to proper types
-  msgTemplate;
+  msgTemplate = {
+    topic: null,
+    room: null,
+    payload: null,
+  }; //to be changed once we finalize the contents of the msg
 
   /**
    * Creates new WebsocketClient instance
@@ -23,11 +29,6 @@ export default class WebsocketClient {
     this.socket = null;
     this.room = null;
     this.callBacks = callBacks;
-    this.msgTemplate = {
-      topic: null,
-      room: null,
-      payload: null,
-    };
 
     this.connect(); //create a socket
   }
@@ -49,7 +50,7 @@ export default class WebsocketClient {
       throw 'Socket is already initalized';
     }
 
-    this.socket = new WebSocket('ws://localhost:3005');
+    this.socket = new WebSocket(WS_URL);
 
     this.socket.addEventListener('open', () => {
       return;

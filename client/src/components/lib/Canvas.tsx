@@ -33,7 +33,7 @@ export default function Canvas() {
   const [action, setAction] = useState<Action>('none');
   const [currentDrawingElemId, setCurrentDrawingElemId] = useState('');
 
-  //initalize roomID upon entering teh canvas
+  //initalize roomID upon entering the canvas
   useEffect(() => {
     setRoomID('1'); //change later
     return () => setRoomID(null);

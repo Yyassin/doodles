@@ -36,7 +36,7 @@ export const useSocket = () => {
 
   //Send message once action gets set. Note: will be changed
   useEffect(() => {
-    if (!counter) return;
+    if (counter === null) return;
     socket.current?.sendMsgRoom(counter);
   }, [counter]);
 };
