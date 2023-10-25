@@ -1,4 +1,5 @@
 import { useAppStore } from '@/stores/AppStore';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { AppTool, AppTools } from '@/types';
 import { useEffect } from 'react';
 
@@ -36,6 +37,13 @@ AppTools.forEach((section) => {
 
 export const useShortcuts = () => {
   const { setTool } = useAppStore(['setTool']);
+  const { selectedElementId, setSelectedElement, removeCanvasElement } =
+    useCanvasElementStore([
+      'selectedElementId',
+      'setSelectedElement',
+      'removeCanvasElement',
+    ]);
+
   useEffect(() => {
     const onKeyPress = (e: KeyboardEvent) => {
       if (shouldIgnoreKeyPress(e)) return;
@@ -46,10 +54,22 @@ export const useShortcuts = () => {
       }
     };
 
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (shouldIgnoreKeyPress(e)) return;
+
+      if (e.code === 'Backspace') {
+        const id = selectedElementId;
+        setSelectedElement('');
+        removeCanvasElement(id);
+      }
+    };
+
     window.addEventListener('keypress', onKeyPress);
+    window.addEventListener('keydown', onKeyDown);
     // Cleanup
     return () => {
       window.removeEventListener('keypress', onKeyPress);
+      window.removeEventListener('keydown', onKeyDown);
     };
-  });
+  }, [selectedElementId]);
 };
