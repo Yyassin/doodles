@@ -17,7 +17,7 @@ export const useSocket = () => {
   const socket = useRef<WebsocketClient>();
 
   //setup callBack object based on actions
-  const callBacks = { log: (payload: any) => console.log(payload) };
+  const callBacks = { log: (payload: number) => console.log(payload) };
 
   //intialize socket
   useEffect(() => {

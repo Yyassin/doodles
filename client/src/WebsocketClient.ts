@@ -13,13 +13,13 @@ const enum status {
 export default class WebsocketClient {
   socket: WebSocket | null;
   room: string | null; //the current room the socket is in
-  callBacks: { [key: string]: (arg: any) => void };
+  callBacks: { [key: string]: (arg: number) => void }; //to be changed to proper types
   msgTemplate;
 
   /**
    * Creates new WebsocketClient instance
    */
-  constructor(callBacks: { [key: string]: (arg: any) => void }) {
+  constructor(callBacks: { [key: string]: (arg: number) => void }) {
     this.socket = null;
     this.room = null;
     this.callBacks = callBacks;
@@ -95,7 +95,7 @@ export default class WebsocketClient {
    *
    * @param msg String, the message to be sent to the room
    */
-  sendMsgRoom(msg: any) {
+  sendMsgRoom(msg: number) {
     //msg to be changed to proper type once everything finalized
     this.checkSocket();
 
