@@ -27,7 +27,7 @@ export async function createBoard(
   title: string,
   tags: string[],
   shareUrl: string,
-  collaborators: string[],
+  collaborators: Collaborator[],
 ) {
   const board = await FastFire.create(Board, {
     serialized,

@@ -17,13 +17,13 @@ import { HTTP_STATUS } from '../constants';
 // Create board
 export const handleCreateBoard = async (req: Request, res: Response) => {
   try {
-    const { serialized, title, tags, shareUrl, collaborator } = req.body; // The board parameters are in the body.
+    const { serialized, title, tags, shareUrl, collaborators } = req.body; // The board parameters are in the body.
     const board = await createBoard(
       serialized,
       title,
       tags,
       shareUrl,
-      collaborator,
+      collaborators,
     );
 
     res.status(HTTP_STATUS.SUCCESS).json({ board });
