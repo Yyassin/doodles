@@ -8,32 +8,33 @@ import { Share2Icon } from '@radix-ui/react-icons';
  *
  * @author Dana El Sherif
  */
-export const Exporting = () => {
+
+/**
+ * Downloads Canvas as PNG File
+ */
+const handlePNGExport = () => {
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
   const dataURL = canvas.toDataURL('image/png');
+  const link = document.createElement('a');
+  link.href = dataURL;
+  link.download = 'canvas.png';
+  link.click();
+};
 
-  /**
-   * Downloads Canvas as PNG File
-   */
-  const handlePNGExport = () => {
-    const link = document.createElement('a');
-    link.href = dataURL;
-    link.download = 'canvas.png';
-    link.click();
-  };
+/**
+ * Downloads Canvas as PDF File
+ */
+const handlePDFExport = () => {
+  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  const dataURL = canvas.toDataURL('image/png');
+  const pdf = new jsPDF('portrait');
+  pdf.addImage(dataURL, 'PNG', 15, 15, 190, 130);
+  pdf.save('canvas.pdf');
+};
 
-  /**
-   * Downloads Canvas as PDF File
-   */
-  const handlePDFExport = () => {
-    const pdf = new jsPDF('portrait');
-    const dataURL = canvas.toDataURL('image/png');
-    pdf.addImage(dataURL, 'PNG', 15, 15, 190, 130);
-    pdf.save('canvas.pdf');
-  };
-
+export const Exporting = () => {
   return (
-    <React.Fragment>
+    <>
       <DropdownMenu.Sub>
         <DropdownMenu.SubTrigger className="group w-full text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-teal-500">
           <Share2Icon /> Export
@@ -48,17 +49,17 @@ export const Exporting = () => {
               className="group w-full text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-teal-500"
               onClick={handlePDFExport}
             >
-              Export as PDF...
+              Export as PDF
             </DropdownMenu.Item>
             <DropdownMenu.Item
               className="group w-full text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-teal-500"
               onClick={handlePNGExport}
             >
-              Export as PNG...
+              Export as PNG
             </DropdownMenu.Item>
           </DropdownMenu.SubContent>
         </DropdownMenu.Portal>
       </DropdownMenu.Sub>
-    </React.Fragment>
+    </>
   );
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { SaveOpenDropDownMenu } from '@/components/lib/SaveOpenDropDownMenu';
-import { Exporting } from '@/components/lib/Exporting';
+import { Exporting } from '@/components/lib/ExportingDropDownMenu';
 import {
   HamburgerMenuIcon,
   Pencil2Icon,
