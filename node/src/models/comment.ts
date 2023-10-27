@@ -6,6 +6,11 @@ import {
   FastFireDocument,
 } from 'fastfire';
 
+/**
+ * Defines comment class.
+ * @authors Ibrahim Almalki
+ */
+
 //TODO: add createdAt and updatedAt
 @FastFireCollection('Comment')
 export class Comment extends FastFireDocument<Comment> {

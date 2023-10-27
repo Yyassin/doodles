@@ -6,6 +6,11 @@ import {
   FastFireDocument,
 } from 'fastfire';
 
+/**
+ * Defines Board class.
+ * @authors Ibrahim Almalki
+ */
+
 //TODO: add createdAt and updatedAt
 @FastFireCollection('Board')
 export class Board extends FastFireDocument<Board> {

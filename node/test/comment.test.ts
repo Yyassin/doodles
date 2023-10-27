@@ -6,9 +6,15 @@ import { Comment, findCommentById } from '../src/models/comment';
 import { Collaborator } from '../src/models/collaborator';
 import { User } from '../src/models/user';
 
+/**
+ * Defines Comment tests.
+ * @authors Ibrahim Almalki
+ */
+
 // Connect to the server instance
 const request = superwstest(server);
 
+// sample test user data
 const expectedUser = {
   username: 'testuser',
   firstname: 'John',

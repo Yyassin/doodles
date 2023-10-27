@@ -9,6 +9,7 @@ import { User } from '../src/models/user';
 // Connect to the server instance
 const request = superwstest(server);
 
+// sample test user data
 const expectedUser = {
   username: 'testuser',
   firstname: 'John',
@@ -69,15 +70,15 @@ describe('Test Board', () => {
     }
   });
 
-  it('Should delete a comment', async function () {
+  it('Should delete a board', async function () {
     if (testBoard) {
-      const deleteCommentResponse = await request
+      const deleteBoardResponse = await request
         .delete('/board/deleteBoard')
         .send({
           id: testBoard.id,
         });
 
-      expect(deleteCommentResponse.status).to.equal(200);
+      expect(deleteBoardResponse.status).to.equal(200);
 
       expect(await findBoardById(testBoard.id)).to.equal(null);
     }

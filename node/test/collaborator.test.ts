@@ -5,9 +5,15 @@ import superwstest from 'superwstest';
 import { Collaborator, findCollaboratorById } from '../src/models/collaborator';
 import { User } from '../src/models/user';
 
+/**
+ * Defines Collaborator tests.
+ * @authors Ibrahim Almalki
+ */
+
 // Connect to the server instance
 const request = superwstest(server);
 
+// sample test user data
 const expectedUser = {
   username: 'testuser',
   firstname: 'John',
@@ -28,7 +34,6 @@ describe('Test Collaborator', () => {
 
     expect(createUserResponse.status).to.eq(200);
     const createdUser = createUserResponse.body.user as User;
-    console.log('createdUser:', createdUser);
 
     //create collaborator with previously created user
     const response = await request
@@ -36,9 +41,8 @@ describe('Test Collaborator', () => {
       .send({ permissionLevel: 'edit', user: createdUser });
 
     expect(response.status).to.eq(200);
-    const createdCollaborator = response.body.collaborator as Collaborator;
-    console.log('createdcolab:', createdCollaborator);
 
+    const createdCollaborator = response.body.collaborator as Collaborator;
     testCollaborator = await findCollaboratorById(createdCollaborator.id);
 
     expect(testCollaborator).to.be.an.instanceOf(Collaborator);

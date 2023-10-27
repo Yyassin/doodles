@@ -5,6 +5,11 @@ import {
   FastFireDocument,
 } from 'fastfire';
 
+/**
+ * Defines user class.
+ * @authors Ibrahim Almalki
+ */
+
 //TODO: add createdAt and updatedAt
 @FastFireCollection('User')
 export class User extends FastFireDocument<User> {

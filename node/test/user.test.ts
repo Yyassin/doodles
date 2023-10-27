@@ -4,10 +4,15 @@ import { server } from '../src/app';
 import superwstest from 'superwstest';
 import { User, findUserById } from '../src/models/user';
 
+/**
+ * Defines User tests.
+ * @authors Ibrahim Almalki
+ */
+
 // Connect to the server instance
 const request = superwstest(server);
 
-// Expected values
+// sample test user data
 const expectedUser = {
   username: 'testuser',
   firstname: 'John',

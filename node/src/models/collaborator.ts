@@ -6,6 +6,11 @@ import {
   FastFireDocument,
 } from 'fastfire';
 
+/**
+ * Defines collaborator class.
+ * @authors Ibrahim Almalki
+ */
+
 //TODO: add createdAt and updatedAt
 //TODO: change permissionLevel to an enum
 @FastFireCollection('Collaborator')
