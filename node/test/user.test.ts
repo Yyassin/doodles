@@ -38,7 +38,7 @@ describe('Test Users', () => {
     expect(testUser).to.be.an.instanceOf(User);
   });
 
-  it("Should update user's name", async function () {
+  it("Should update user's name", async () => {
     if (testUser) {
       console.log('test id:', testUser.id);
       const updateUserNameResponse = await request
@@ -53,7 +53,7 @@ describe('Test Users', () => {
     }
   });
 
-  it('Should delete a user', async function () {
+  it('Should delete a user', async () => {
     if (testUser) {
       const deleteUserResponse = await request.delete('/user/deleteUser').send({
         id: testUser.id,

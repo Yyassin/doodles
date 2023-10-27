@@ -18,7 +18,10 @@ import { HTTP_STATUS } from '../constants';
 export const handleCreateCollaborator = async (req: Request, res: Response) => {
   try {
     const { permissionLevel, user } = req.body; // The permission level and user parameters are in the body.
-    const collaborator = await createCollaborator(permissionLevel, user);
+    const { fastFireOptions, ...collaborator } = await createCollaborator(
+      permissionLevel,
+      user,
+    );
 
     res.status(HTTP_STATUS.SUCCESS).json({ collaborator });
   } catch (error) {
@@ -71,9 +74,7 @@ export const handleUpdatePermissionLevel = async (
 
     if (collaborator) {
       await updateCollaboratorPermission(collaborator, newPermissionLevel);
-      res
-        .status(HTTP_STATUS.SUCCESS)
-        .json({ message: 'Permission level updated successfully' });
+      res.status(HTTP_STATUS.SUCCESS).json({ newPermissionLevel });
     } else {
       res.status(HTTP_STATUS.ERROR).json({ error: 'collaborator not found' });
     }
