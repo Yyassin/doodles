@@ -8,7 +8,7 @@ import {
 
 //TODO: add createdAt and updatedAt
 @FastFireCollection('Board')
-class Board extends FastFireDocument<Board> {
+export class Board extends FastFireDocument<Board> {
   @FastFireField({ required: true })
   serialized!: string;
   @FastFireField({ required: true })

@@ -62,7 +62,7 @@ export const handleFindBoardById = async (req: Request, res: Response) => {
 export const handleUpdateBoardTitle = async (req: Request, res: Response) => {
   try {
     const boardId = req.body.id; // // The board ID and title parameters are in the body.
-    const newTitle = req.body.newText;
+    const newTitle = req.body.newTitle;
     if (boardId === undefined) {
       res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
       return;
@@ -71,9 +71,7 @@ export const handleUpdateBoardTitle = async (req: Request, res: Response) => {
 
     if (board) {
       await updateBoardTitle(board, newTitle);
-      res
-        .status(HTTP_STATUS.SUCCESS)
-        .json({ message: 'board text updated successfully' });
+      res.status(HTTP_STATUS.SUCCESS).json({ newTitle });
     } else {
       res.status(HTTP_STATUS.ERROR).json({ error: 'board not found' });
     }
