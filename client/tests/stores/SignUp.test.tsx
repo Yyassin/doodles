@@ -17,7 +17,7 @@ describe('signup', () => {
         null,
       ); // Sign up test user with test email/pass
 
-      const user = userCredential.user; // Access the user object from the userCredential
+      const { user } = userCredential; // Access the user object from the userCredential
 
       expect(true).toBe(true); // It worked, they signed in
       expect(user).toBeDefined(); // Make sure user exists

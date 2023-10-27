@@ -106,7 +106,7 @@ export default function SignUp() {
     try {
       await signInWithPopup(auth, provider);
       const userData = {
-        fistname: auth.currentUser?.displayName,
+        firstname: auth.currentUser?.displayName,
         avatar: auth.currentUser?.photoURL,
       };
       // await axois.post('/api/googleSignUp', userData);  when endpoints are ready, we use them to send info to backend/dB
@@ -117,6 +117,28 @@ export default function SignUp() {
       setError((error as Error).message);
     }
   };
+
+  //use filereader to show thumbnail of pic
+  const handleProfilePictureChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      // Read the selected file and display it as a thumbnail
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target) {
+          const thumbnail = event.target.result;
+          setProfilePictureThumbnail(thumbnail as string);
+        }
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const [profilePictureThumbnail, setProfilePictureThumbnail] = useState<
+    string | null
+  >(null);
 
   return (
     <Card>
@@ -162,8 +184,19 @@ export default function SignUp() {
             type="file"
             accept=".png, .jpg, .jpeg"
             required
+            onChange={handleProfilePictureChange}
           />
         </div>
+        {profilePictureThumbnail && (
+          <div>
+            <Label>Profile Picture Thumbnail</Label>
+            <img
+              src={profilePictureThumbnail}
+              alt="Profile Thumbnail"
+              className="max-w-xs h-auto"
+            />
+          </div>
+        )}
 
         <div className="h-4" />
 
