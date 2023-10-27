@@ -14,7 +14,7 @@ FastFire.initialize(firestore as any);
 
 const app = express();
 const port = 3005;
-const server = http.createServer(app);
+export const server = http.createServer(app);
 app.use(express.json()); // parse application/json
 app.use(bodyParser.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded
 app.use(cors()); // allow cross-origin

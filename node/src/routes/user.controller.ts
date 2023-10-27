@@ -18,7 +18,7 @@ import { HTTP_STATUS } from '../constants';
 export const handleCreateUser = async (req: Request, res: Response) => {
   try {
     const { username, firstname, lastname, email, password, avatar } = req.body; // The user parameters are in the body.
-    const user = await createUser(
+    const { fastFireOptions, ...user } = await createUser(
       username,
       firstname,
       lastname,
@@ -26,7 +26,6 @@ export const handleCreateUser = async (req: Request, res: Response) => {
       password,
       avatar,
     );
-
     res.status(HTTP_STATUS.SUCCESS).json({ user });
   } catch (error) {
     console.error('Error creating user:', error);
@@ -72,9 +71,7 @@ export const handleUpdateUserName = async (req: Request, res: Response) => {
 
     if (user) {
       await updateUserName(user, newName);
-      res
-        .status(HTTP_STATUS.SUCCESS)
-        .json({ message: 'User name updated successfully' });
+      res.status(HTTP_STATUS.SUCCESS).json({ newName });
     } else {
       res.status(HTTP_STATUS.ERROR).json({ error: 'User not found' });
     }
