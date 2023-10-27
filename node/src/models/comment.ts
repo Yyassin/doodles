@@ -8,7 +8,7 @@ import {
 
 //TODO: add createdAt and updatedAt
 @FastFireCollection('Comment')
-class Comment extends FastFireDocument<Comment> {
+export class Comment extends FastFireDocument<Comment> {
   @FastFireField({ required: true })
   text!: string;
   @FastFireField({ required: true })

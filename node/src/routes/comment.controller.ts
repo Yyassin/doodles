@@ -65,9 +65,7 @@ export const handleUpdateText = async (req: Request, res: Response) => {
 
     if (comment) {
       await updateCommentText(comment, newText);
-      res
-        .status(HTTP_STATUS.SUCCESS)
-        .json({ message: 'comment text updated successfully' });
+      res.status(HTTP_STATUS.SUCCESS).json({ newText });
     } else {
       res.status(HTTP_STATUS.ERROR).json({ error: 'comment not found' });
     }

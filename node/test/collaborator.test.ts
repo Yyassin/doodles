@@ -61,13 +61,13 @@ describe('Test Collaborator', () => {
 
   it('Should delete a collaborator', async function () {
     if (testCollaborator) {
-      const deleteUserResponse = await request
+      const deleteCommentResponse = await request
         .delete('/collaborator/deleteCollaborator')
         .send({
           id: testCollaborator.id,
         });
 
-      expect(deleteUserResponse.status).to.equal(200);
+      expect(deleteCommentResponse.status).to.equal(200);
 
       expect(await findCollaboratorById(testCollaborator.id)).to.equal(null);
     }
