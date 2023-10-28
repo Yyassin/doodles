@@ -13,7 +13,7 @@ import {
   deleteObject,
   getMetadata,
 } from 'firebase/storage';
-import { firebaseApp } from './firebaseApp';
+import { firebaseApp, firestore } from './firebaseApp';
 
 /**
  * Defines Firebase database and storage instances
@@ -22,9 +22,6 @@ import { firebaseApp } from './firebaseApp';
  */
 
 // TODO: Write jsdoc
-
-// Create a Firestore instance
-export const db = getFirestore(firebaseApp);
 
 // Create a Firebase Storage instance
 export const storage = getStorage(firebaseApp);
@@ -36,7 +33,7 @@ export async function uploadDocument(
   data: Record<string, any>,
 ) {
   try {
-    const docRef = doc(db, 'documents', documentId);
+    const docRef = doc(firestore, 'documents', documentId);
     await setDoc(docRef, data);
     console.log('Document uploaded successfully.');
   } catch (error) {
@@ -47,7 +44,7 @@ export async function uploadDocument(
 // Function to read a document
 export async function readDocument(documentId: string) {
   try {
-    const docRef = doc(db, 'documents', documentId);
+    const docRef = doc(firestore, 'documents', documentId);
     const docSnapshot: DocumentSnapshot = await getDoc(docRef);
 
     if (docSnapshot.exists()) {
@@ -82,7 +79,7 @@ export async function uploadImageToStorage(
 // Function to delete a document
 export async function deleteDocument(documentId: string) {
   try {
-    const docRef = doc(db, 'documents', documentId);
+    const docRef = doc(firestore, 'documents', documentId);
     await deleteDoc(docRef);
     console.log('Document deleted successfully.');
   } catch (error) {
