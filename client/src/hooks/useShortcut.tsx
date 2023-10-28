@@ -48,6 +48,7 @@ export const useShortcuts = () => {
     const onKeyPress = (e: KeyboardEvent) => {
       if (shouldIgnoreKeyPress(e)) return;
 
+      // Set the shortcut tool
       const toolSelected = toolShortcutMap[e.code];
       if (toolSelected !== undefined) {
         setTool(toolSelected);
@@ -57,7 +58,8 @@ export const useShortcuts = () => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (shouldIgnoreKeyPress(e)) return;
 
-      if (e.code === 'Backspace') {
+      // Delete the selected element
+      if (e.code === 'Backspace' && selectedElementId !== '') {
         const id = selectedElementId;
         setSelectedElement('');
         removeCanvasElement(id);

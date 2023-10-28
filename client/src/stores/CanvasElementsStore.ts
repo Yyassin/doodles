@@ -159,7 +159,6 @@ const editCanvasElement =
   (id: string, partialElement: Partial<CanvasElement>) =>
     set((state) => {
       // Edit shouldn't add a new id
-      // const allIds = id ? [...state.allIds, id] : state.allIds;
       const types = partialElement.type
         ? { ...state.types, [id]: partialElement.type }
         : state.types;
@@ -237,9 +236,10 @@ const editCanvasElement =
     });
 
 /**
- * Adds the specified canvas element to state.
- * @param element The element to add.
- * @returns Updated state with the element added.
+ * Removes the canvas element with the specfied state
+ * from the store.
+ * @param id The element to remove.
+ * @returns Updated state with the element removed.
  */
 const removeCanvasElement =
   (set: SetState<CanvasElementState>) => (id: string) =>
@@ -268,7 +268,6 @@ const removeCanvasElement =
       delete fillStyles[id];
       delete strokeLineDashes[id];
       delete opacities[id];
-      // Need to check type maybe before doing this.
       delete roughElements[id];
       delete p1s[id];
       delete p2s[id];
