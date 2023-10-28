@@ -77,17 +77,25 @@ describe('Test Board', () => {
     }
   });
 
-  it("Should update a board's title", async () => {
+  it('Should update a board', async () => {
     if (testBoard) {
+      const newFields = {
+        title: 'newBoard',
+        tags: ['tagA', 'tagB'],
+        serialized: 'newSerialized',
+      };
       const updatetTitleResponse = await request
         .put('/board/updateBoardTitle')
         .send({
           id: testBoard.id,
-          newTitle: 'newBoard',
+          fields: newFields,
         });
 
       expect(updatetTitleResponse.status).to.equal(200);
-      expect(updatetTitleResponse.body.newTitle).to.equal('newBoard');
+
+      const { fastFireOptions: _fastFireOptions, ...testBoardfields } =
+        testBoard;
+      expect(updatetTitleResponse.body).to.deep.equal(testBoardfields);
     }
   });
 

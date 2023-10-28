@@ -2,7 +2,7 @@ import { Response, Request } from 'express';
 import {
   createBoard,
   findBoardById,
-  updateBoardTitle,
+  updateBoard,
   deleteBoard,
 } from '../models/board';
 import { HTTP_STATUS } from '../constants';
@@ -35,21 +35,27 @@ export const handleCreateBoard = async (req: Request, res: Response) => {
   }
 };
 
+const validateId = (id: string, res: Response): id is string => {
+  if (id === undefined) {
+    res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+    return false;
+  }
+  return true;
+};
+
+const notFoundError = (res: Response) =>
+  res.status(HTTP_STATUS.ERROR).json({ error: 'board not found' });
+
 // Get board
 export const handleFindBoardById = async (req: Request, res: Response) => {
   try {
     const boardId = req.body.id; // The board ID parameter is in the body.
-    if (boardId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
-      return;
-    }
+    if (!validateId(boardId, res)) return;
     const board = await findBoardById(boardId as string);
 
-    if (board) {
-      res.status(HTTP_STATUS.SUCCESS).json({ board });
-    } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'board not found' });
-    }
+    return board
+      ? res.status(HTTP_STATUS.SUCCESS).json({ board })
+      : notFoundError(res);
   } catch (error) {
     console.error('Error finding board by ID:', error);
     res
@@ -58,22 +64,22 @@ export const handleFindBoardById = async (req: Request, res: Response) => {
   }
 };
 
+// Get board
 // Update board title
 export const handleUpdateBoardTitle = async (req: Request, res: Response) => {
   try {
-    const boardId = req.body.id; // // The board ID and title parameters are in the body.
-    const newTitle = req.body.newTitle;
-    if (boardId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
-      return;
-    }
-    const board = await findBoardById(boardId as string);
+    // The board ID and new parameters are in the body.
+    const { id: boardId, fields: updatedFields } = req.body;
+    if (!validateId(boardId, res)) return;
+    const board = await findBoardById(boardId);
 
     if (board) {
-      await updateBoardTitle(board, newTitle);
-      res.status(HTTP_STATUS.SUCCESS).json({ newTitle });
+      // TODO: Return the whole updated board
+      await updateBoard(board, updatedFields);
+      const { fastFireOptions: _fastFireOptions, ...fields } = board; // TODO(yousef): Should make a helper method to extract the options
+      return res.status(HTTP_STATUS.SUCCESS).json(fields);
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'board not found' });
+      return notFoundError(res);
     }
   } catch (error) {
     console.error('Error updating board text:', error);
@@ -87,19 +93,16 @@ export const handleUpdateBoardTitle = async (req: Request, res: Response) => {
 export const handleDeleteBoard = async (req: Request, res: Response) => {
   try {
     const boardId = req.body.id; // The board ID parameter is in the body.
-    if (boardId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
-      return;
-    }
-    const board = await findBoardById(boardId as string);
+    if (!validateId(boardId, res)) return;
+    const board = await findBoardById(boardId);
 
     if (board) {
       await deleteBoard(board);
-      res
+      return res
         .status(HTTP_STATUS.SUCCESS)
         .json({ message: 'board deleted successfully' });
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'board not found' });
+      return notFoundError(res);
     }
   } catch (error) {
     console.error('Error deleting board:', error);

@@ -1,3 +1,4 @@
+import { DocumentFields } from 'fastfire/dist/types';
 import { Collaborator } from './collaborator';
 import {
   FastFire,
@@ -34,28 +35,29 @@ export async function createBoard(
   shareUrl: string,
   collaborators: Collaborator[],
 ) {
-  const board = await FastFire.create(Board, {
+  return FastFire.create(Board, {
     serialized,
     title,
     tags,
     shareUrl,
     collaborators,
   });
-  return board;
 }
 
 // Function to find a board by ID
-export async function findBoardById(boardId: string) {
-  const board = await FastFire.findById(Board, boardId);
-  return board;
-}
+export const findBoardById = async (boardId: string) =>
+  FastFire.findById(Board, boardId);
 
 // Function to update a baord's title
-export async function updateBoardTitle(board: Board, newTitle: string) {
-  await board.update({ title: newTitle });
-}
+export const updateBoard = async (
+  board: Board,
+  updatedFields: Partial<DocumentFields<Board>>,
+) => {
+  const { fastFireOptions: _fastFireOptions, id: _id, ...boardFields } = board;
+  const updatedBoard = { ...boardFields, ...updatedFields };
+  await board.update(updatedBoard);
+  return updatedBoard;
+};
 
 // Function to delete a board
-export async function deleteBoard(board: Board) {
-  await board.delete();
-}
+export const deleteBoard = async (board: Board) => await board.delete();

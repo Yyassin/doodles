@@ -18,8 +18,8 @@ dependencies:
     specifier: ^4.18.2
     version: 4.18.2
   fastfire:
-    specifier: ^0.3.28
-    version: 0.3.28
+    specifier: file:../modules/fastfire
+    version: file:../modules/fastfire
   firebase:
     specifier: ^10.4.0
     version: 10.4.0
@@ -2940,19 +2940,6 @@ packages:
       strnum: 1.0.5
     dev: false
     optional: true
-
-  /fastfire@0.3.28:
-    resolution: {integrity: sha512-s1GpvVPHgLderm7Jkaehgme1GMj0C5yuvD7AwCGiT8rW1YvRC0gYE2MKoxA/3rgX3rScMtcDCdVP3Xs6afi77Q==}
-    engines: {node: '>=12'}
-    dependencies:
-      '@google-cloud/firestore': 5.0.2
-      firebase: 9.4.1
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - supports-color
-      - utf-8-validate
-    dev: false
 
   /fastq@1.15.0:
     resolution: {integrity: sha512-wBrocU2LCXXa+lWBt8RoIRD89Fi8OdABODa/kEnyeyjS5aZO5/GNvI5sEINADqP/h8M29UHTHUb53sUu5Ihqdw==}
@@ -5898,3 +5885,17 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     requiresBuild: true
+
+  file:../modules/fastfire:
+    resolution: {directory: ../modules/fastfire, type: directory}
+    name: fastfire
+    engines: {node: '>=12'}
+    dependencies:
+      '@google-cloud/firestore': 5.0.2
+      firebase: 9.4.1
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - supports-color
+      - utf-8-validate
+    dev: false
