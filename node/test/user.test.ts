@@ -17,7 +17,7 @@ const expectedUser = {
   username: 'testuser',
   firstname: 'John',
   lastname: 'Doe',
-  email: 'testuser@example.com',
+  email: 'john@example.com',
   password: 'testpassword',
   avatar: 'testavatar.jpg',
 };
@@ -25,7 +25,7 @@ const expectedUser = {
 describe('Test Users', () => {
   let testUser: User | null = null;
 
-  it('Should create and read a user', async () => {
+  it('Should create a user', async () => {
     const createUserResponse = await request
       .post('/user/createUser')
       .send(expectedUser);
@@ -43,9 +43,21 @@ describe('Test Users', () => {
     expect(testUser).to.be.an.instanceOf(User);
   });
 
+  it("Should read user's name", async () => {
+    if (testUser) {
+      const getUserNameResponse = await request.get('/user/getUser').send({
+        id: testUser.id,
+      });
+
+      expect(getUserNameResponse.status).to.equal(200);
+      const createdUser = getUserNameResponse.body.user as User;
+
+      expect(createdUser).to.include(expectedUser);
+    }
+  });
+
   it("Should update user's name", async () => {
     if (testUser) {
-      console.log('test id:', testUser.id);
       const updateUserNameResponse = await request
         .put('/user/updateUser')
         .send({

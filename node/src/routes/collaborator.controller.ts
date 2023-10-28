@@ -38,7 +38,7 @@ export const handleFindCollaboratorById = async (
   res: Response,
 ) => {
   try {
-    const collabId = req.query.id; // The collaborator ID parameter is in the URL.
+    const collabId = req.body.id; // The collaborator ID parameter is in the body.
     if (collabId === undefined) {
       res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
       return;

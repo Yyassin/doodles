@@ -38,7 +38,7 @@ export const handleCreateUser = async (req: Request, res: Response) => {
 //Get user
 export const handleFindUserById = async (req: Request, res: Response) => {
   try {
-    const userId = req.query.id; // The user ID parameter is in the URL.
+    const userId = req.body.id; // The user ID parameter is in the body.
     if (userId === undefined) {
       res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
       return;

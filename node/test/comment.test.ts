@@ -19,22 +19,24 @@ const expectedUser = {
   username: 'testuser',
   firstname: 'John',
   lastname: 'Doe',
-  email: 'testuser@example.com',
+  email: 'johndoe1@example.com',
   password: 'testpassword',
   avatar: 'testavatar.jpg',
 };
 
 describe('Test Comment', () => {
   let testComment: Comment | null = null;
+  let createdUser: User;
+  let createdCollaborator: Collaborator;
 
-  it('Should create and read a Collaborator', async () => {
+  before(async () => {
     //create a user to add it to the collaborator
     const createUserResponse = await request
       .post('/user/createUser')
       .send(expectedUser);
 
     expect(createUserResponse.status).to.eq(200);
-    const createdUser = createUserResponse.body.user as User;
+    createdUser = createUserResponse.body.user as User;
 
     //create collaborator with previously created user
     const collabResponse = await request
@@ -42,9 +44,10 @@ describe('Test Comment', () => {
       .send({ permissionLevel: 'edit', user: createdUser });
 
     expect(collabResponse.status).to.eq(200);
-    const createdCollaborator = collabResponse.body
-      .collaborator as Collaborator;
+    createdCollaborator = collabResponse.body.collaborator as Collaborator;
+  });
 
+  it('Should create a comment', async () => {
     //create comment with previously created collaborator
     const CommentResponse = await request
       .post('/comment/createComment')
@@ -57,6 +60,18 @@ describe('Test Comment', () => {
     expect(testComment).to.be.an.instanceOf(Comment);
   });
 
+  it('Should read a comment', async () => {
+    if (testComment) {
+      const getResponse = await request.get('/comment/getComment').send({
+        id: testComment.id,
+      });
+
+      expect(getResponse.status).to.equal(200);
+
+      const createdComment = getResponse.body.comment as Comment;
+      expect(createdComment.id).to.equal(testComment.id);
+    }
+  });
   it("Should update Comment's text", async () => {
     if (testComment) {
       const updatetTextResponse = await request
@@ -82,6 +97,16 @@ describe('Test Comment', () => {
       expect(deleteCommentResponse.status).to.equal(200);
 
       expect(await findCommentById(testComment.id)).to.equal(null);
+
+      // delete created user
+      await request.delete('/user/deleteUser').send({
+        id: createdUser.id,
+      });
+
+      // delete created collaborator
+      await request.delete('/collaborator/deleteCollaborator').send({
+        id: createdCollaborator.id,
+      });
     }
   });
 });

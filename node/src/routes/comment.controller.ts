@@ -32,7 +32,7 @@ export const handleCreateComment = async (req: Request, res: Response) => {
 // Get comment
 export const handleFindCommentById = async (req: Request, res: Response) => {
   try {
-    const commentId = req.query.id; // The comment ID parameter is in the URL.
+    const commentId = req.body.id; // The comment ID parameter is in the body.
     if (commentId === undefined) {
       res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
       return;

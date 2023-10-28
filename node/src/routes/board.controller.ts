@@ -38,7 +38,7 @@ export const handleCreateBoard = async (req: Request, res: Response) => {
 // Get board
 export const handleFindBoardById = async (req: Request, res: Response) => {
   try {
-    const boardId = req.query.id; // The board ID parameter is in the URL.
+    const boardId = req.body.id; // The board ID parameter is in the body.
     if (boardId === undefined) {
       res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
       return;

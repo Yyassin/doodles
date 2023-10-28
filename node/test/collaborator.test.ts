@@ -25,16 +25,19 @@ const expectedUser = {
 
 describe('Test Collaborator', () => {
   let testCollaborator: Collaborator | null = null;
+  let createdUser: User;
 
-  it('Should create and read a Collaborator', async () => {
+  before(async () => {
     //create a user to add it to the collaborator
     const createUserResponse = await request
       .post('/user/createUser')
       .send(expectedUser);
 
     expect(createUserResponse.status).to.eq(200);
-    const createdUser = createUserResponse.body.user as User;
+    createdUser = createUserResponse.body.user as User;
+  });
 
+  it('Should create a Collaborator', async () => {
     //create collaborator with previously created user
     const response = await request
       .post('/collaborator/createCollaborator')
@@ -48,9 +51,23 @@ describe('Test Collaborator', () => {
     expect(testCollaborator).to.be.an.instanceOf(Collaborator);
   });
 
+  it("Should read a collaborator's name", async () => {
+    if (testCollaborator) {
+      const getResponse = await request
+        .get('/collaborator/getCollaborator')
+        .send({
+          id: testCollaborator.id,
+        });
+
+      expect(getResponse.status).to.equal(200);
+
+      const createdCollaborator = getResponse.body.collaborator as Collaborator;
+      expect(createdCollaborator.id).to.equal(testCollaborator.id);
+    }
+  });
+
   it("Should update collaborator's permission", async () => {
     if (testCollaborator) {
-      console.log('test id:', testCollaborator.id);
       const updateUserNameResponse = await request
         .put('/collaborator/updatePermissionLevel')
         .send({
@@ -74,6 +91,11 @@ describe('Test Collaborator', () => {
       expect(deleteCommentResponse.status).to.equal(200);
 
       expect(await findCollaboratorById(testCollaborator.id)).to.equal(null);
+
+      // delete created user
+      await request.delete('/user/deleteUser').send({
+        id: createdUser.id,
+      });
     }
   });
 });

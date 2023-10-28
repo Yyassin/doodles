@@ -6,6 +6,11 @@ import { Board, findBoardById } from '../src/models/board';
 import { Collaborator } from '../src/models/collaborator';
 import { User } from '../src/models/user';
 
+/**
+ * Defines Board tests.
+ * @authors Ibrahim Almalki
+ */
+
 // Connect to the server instance
 const request = superwstest(server);
 
@@ -14,22 +19,24 @@ const expectedUser = {
   username: 'testuser',
   firstname: 'John',
   lastname: 'Doe',
-  email: 'testuser@example.com',
+  email: 'johndoe2@example.com',
   password: 'testpassword',
   avatar: 'testavatar.jpg',
 };
 
 describe('Test Board', () => {
   let testBoard: Board | null = null;
+  let createdUser: User;
+  let createdCollaborator: Collaborator;
 
-  it('Should create and read a Board', async () => {
+  before(async () => {
     //create a user to add it to the collaborator
-    const createBoardResponse = await request
+    const createUserResponse = await request
       .post('/user/createUser')
       .send(expectedUser);
 
-    expect(createBoardResponse.status).to.eq(200);
-    const createdUser = createBoardResponse.body.user as User;
+    expect(createUserResponse.status).to.eq(200);
+    createdUser = createUserResponse.body.user as User;
 
     //create collaborator with previously created user
     const collabResponse = await request
@@ -37,9 +44,10 @@ describe('Test Board', () => {
       .send({ permissionLevel: 'edit', user: createdUser });
 
     expect(collabResponse.status).to.eq(200);
-    const createdCollaborator = collabResponse.body
-      .collaborator as Collaborator;
+    createdCollaborator = collabResponse.body.collaborator as Collaborator;
+  });
 
+  it('Should create and read a Board', async () => {
     //create board with previously created collaborator
     const BoardResponse = await request.post('/board/createBoard').send({
       serialized: 'abc123',
@@ -54,6 +62,19 @@ describe('Test Board', () => {
     const createdBoard = BoardResponse.body.board as Board;
     testBoard = await findBoardById(createdBoard.id);
     expect(testBoard).to.be.an.instanceOf(Board);
+  });
+
+  it("Should read a board's name", async () => {
+    if (testBoard) {
+      const getResponse = await request.get('/board/getBoard').send({
+        id: testBoard.id,
+      });
+
+      expect(getResponse.status).to.equal(200);
+      const createdBoard = getResponse.body.board as Board;
+
+      expect(createdBoard.title).to.include('myBoard');
+    }
   });
 
   it("Should update a board's title", async () => {
@@ -81,6 +102,16 @@ describe('Test Board', () => {
       expect(deleteBoardResponse.status).to.equal(200);
 
       expect(await findBoardById(testBoard.id)).to.equal(null);
+
+      // delete created user
+      await request.delete('/user/deleteUser').send({
+        id: createdUser.id,
+      });
+
+      // delete created collaborator
+      await request.delete('/collaborator/deleteCollaborator').send({
+        id: createdCollaborator.id,
+      });
     }
   });
 });
