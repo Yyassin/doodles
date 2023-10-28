@@ -18,8 +18,8 @@ dependencies:
     specifier: ^4.18.2
     version: 4.18.2
   fastfire:
-    specifier: file:../modules/fastfire
-    version: file:../modules/fastfire
+    specifier: file:../mod/fastfire
+    version: file:../mod/fastfire
   firebase:
     specifier: ^10.4.0
     version: 10.4.0
@@ -5338,8 +5338,8 @@ packages:
     engines: {node: '>=10'}
     requiresBuild: true
 
-  file:../modules/fastfire:
-    resolution: {directory: ../modules/fastfire, type: directory}
+  file:../mod/fastfire:
+    resolution: {directory: ../mod/fastfire, type: directory}
     name: fastfire
     engines: {node: '>=12'}
     dependencies:
