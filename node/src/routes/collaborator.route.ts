@@ -3,7 +3,7 @@ import {
   handleCreateCollaborator,
   handleDeleteCollaborator,
   handleFindCollaboratorById,
-  handleUpdatePermissionLevel,
+  handleUpdateCollaborator,
 } from './collaborator.controller';
 
 /**
@@ -20,8 +20,8 @@ router.post('/createCollaborator', handleCreateCollaborator);
 // GET collaborator by ID
 router.get('/getCollaborator', handleFindCollaboratorById);
 
-// PUT update collaborator's permission level
-router.put('/updatePermissionLevel', handleUpdatePermissionLevel);
+// PUT update a collaborator
+router.put('/updateCollaborator', handleUpdateCollaborator);
 
 // DELETE collaborator by ID
 router.delete('/deleteCollaborator', handleDeleteCollaborator);

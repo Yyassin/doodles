@@ -2,7 +2,7 @@ import { Response, Request } from 'express';
 import {
   createCollaborator,
   findCollaboratorById,
-  updateCollaboratorPermission,
+  updateCollaborator,
   deleteCollaborator,
 } from '../models/collaborator';
 import { HTTP_STATUS } from '../constants';
@@ -14,14 +14,14 @@ import { HTTP_STATUS } from '../constants';
 
 // TODO: JSDOC
 
+// for our lovely linting checker
+const NO_ID_PROVIDED = 'No ID provided';
+
 //Create collaborator
 export const handleCreateCollaborator = async (req: Request, res: Response) => {
   try {
     const { permissionLevel, user } = req.body; // The permission level and user parameters are in the body.
-    const { fastFireOptions, ...collaborator } = await createCollaborator(
-      permissionLevel,
-      user,
-    );
+    const collaborator = await createCollaborator(permissionLevel, user);
 
     res.status(HTTP_STATUS.SUCCESS).json({ collaborator });
   } catch (error) {
@@ -32,6 +32,17 @@ export const handleCreateCollaborator = async (req: Request, res: Response) => {
   }
 };
 
+const validateId = (id: string, res: Response): id is string => {
+  if (id === undefined) {
+    res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
+    return false;
+  }
+  return true;
+};
+
+const notFoundError = (res: Response) =>
+  res.status(HTTP_STATUS.ERROR).json({ error: 'collaborator not found' });
+
 //Get collaborator
 export const handleFindCollaboratorById = async (
   req: Request,
@@ -40,7 +51,7 @@ export const handleFindCollaboratorById = async (
   try {
     const collabId = req.body.id; // The collaborator ID parameter is in the body.
     if (collabId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const collaborator = await findCollaboratorById(collabId as string);
@@ -58,31 +69,26 @@ export const handleFindCollaboratorById = async (
   }
 };
 
-// Update permissionLevel
-export const handleUpdatePermissionLevel = async (
-  req: Request,
-  res: Response,
-) => {
+// Update collaborator
+export const handleUpdateCollaborator = async (req: Request, res: Response) => {
   try {
-    const collabId = req.body.id; // // The collaborator ID and permissionLevel parameters are in the body.
-    const newPermissionLevel = req.body.newPermissionLevel;
-    if (collabId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
-      return;
-    }
-    const collaborator = await findCollaboratorById(collabId as string);
+    // The collaborator ID and new parameters are in the body.
+    const { id: collaboratorId, fields: updatedFields } = req.body;
+    if (!validateId(collaboratorId, res)) return;
+    const collaborator = await findCollaboratorById(collaboratorId);
 
     if (collaborator) {
-      await updateCollaboratorPermission(collaborator, newPermissionLevel);
-      res.status(HTTP_STATUS.SUCCESS).json({ newPermissionLevel });
+      await updateCollaborator(collaborator, updatedFields);
+      const { fastFireOptions: _fastFireOptions, ...fields } = collaborator;
+      return res.status(HTTP_STATUS.SUCCESS).json(fields);
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'collaborator not found' });
+      return notFoundError(res);
     }
   } catch (error) {
-    console.error('Error updating permission level:', error);
+    console.error('Error updating collaborator:', error);
     res
       .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: 'Failed to update permission level' });
+      .json({ error: 'Failed to update collaborator' });
   }
 };
 
@@ -91,7 +97,7 @@ export const handleDeleteCollaborator = async (req: Request, res: Response) => {
   try {
     const collabId = req.body.id; // The collaborator ID parameter is in the body.
     if (collabId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const collaborator = await findCollaboratorById(collabId as string);

@@ -3,7 +3,7 @@ import {
   handleCreateUser,
   handleDeleteUser,
   handleFindUserById,
-  handleUpdateUserName,
+  handleUpdateUser,
 } from './user.controller';
 
 /**
@@ -20,8 +20,8 @@ router.post('/createUser', handleCreateUser);
 // GET user by ID
 router.get('/getUser', handleFindUserById);
 
-// PUT update user's name
-router.put('/updateUser', handleUpdateUserName);
+// PUT update user
+router.put('/updateUser', handleUpdateUser);
 
 // DELETE user by ID
 router.delete('/deleteUser', handleDeleteUser);

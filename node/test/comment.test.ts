@@ -41,7 +41,7 @@ describe('Test Comment', () => {
     //create collaborator with previously created user
     const collabResponse = await request
       .post('/collaborator/createCollaborator')
-      .send({ permissionLevel: 'edit', user: createdUser });
+      .send({ permissionLevel: 'edit', user: createdUser.id });
 
     expect(collabResponse.status).to.eq(200);
     createdCollaborator = collabResponse.body.collaborator as Collaborator;
@@ -72,17 +72,22 @@ describe('Test Comment', () => {
       expect(createdComment.id).to.equal(testComment.id);
     }
   });
-  it("Should update Comment's text", async () => {
+  it('Should update comment', async () => {
     if (testComment) {
-      const updatetTextResponse = await request
-        .put('/comment/updateCommentText')
+      const newFields = {
+        text: 'cool board there bud',
+      };
+      const updateCommentResponse = await request
+        .put('/comment/updateComment')
         .send({
           id: testComment.id,
-          newText: 'bye',
+          fields: newFields,
         });
 
-      expect(updatetTextResponse.status).to.equal(200);
-      expect(updatetTextResponse.body.newText).to.equal('bye');
+      expect(updateCommentResponse.status).to.equal(200);
+      const { fastFireOptions: _fastFireOptions, ...testCommentfields } =
+        testComment;
+      expect(updateCommentResponse.body).to.deep.equal(testCommentfields);
     }
   });
 

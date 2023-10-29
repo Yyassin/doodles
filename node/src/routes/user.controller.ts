@@ -3,7 +3,7 @@ import {
   createUser,
   findUserById,
   deleteUser,
-  updateUserName,
+  updateUser,
 } from '../models/user';
 import { HTTP_STATUS } from '../constants';
 
@@ -13,6 +13,9 @@ import { HTTP_STATUS } from '../constants';
  */
 
 // TODO: JSDOC
+
+// for our lovely linting checker
+const NO_ID_PROVIDED = 'No ID provided';
 
 //Create user
 export const handleCreateUser = async (req: Request, res: Response) => {
@@ -26,6 +29,7 @@ export const handleCreateUser = async (req: Request, res: Response) => {
       password,
       avatar,
     );
+    const _ = fastFireOptions;
     res.status(HTTP_STATUS.SUCCESS).json({ user });
   } catch (error) {
     console.error('Error creating user:', error);
@@ -34,13 +38,23 @@ export const handleCreateUser = async (req: Request, res: Response) => {
       .json({ error: 'Failed to create user' });
   }
 };
+const validateId = (id: string, res: Response): id is string => {
+  if (id === undefined) {
+    res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
+    return false;
+  }
+  return true;
+};
+
+const notFoundError = (res: Response) =>
+  res.status(HTTP_STATUS.ERROR).json({ error: 'user not found' });
 
 //Get user
 export const handleFindUserById = async (req: Request, res: Response) => {
   try {
     const userId = req.body.id; // The user ID parameter is in the body.
     if (userId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const user = await findUserById(userId as string);
@@ -58,28 +72,26 @@ export const handleFindUserById = async (req: Request, res: Response) => {
   }
 };
 
-// Update userName
-export const handleUpdateUserName = async (req: Request, res: Response) => {
+// Update user
+export const handleUpdateUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.body.id; // // The user ID and newName parameters are in the body.
-    const newName = req.body.newName;
-    if (userId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
-      return;
-    }
-    const user = await findUserById(userId as string);
+    // The user ID and new parameters are in the body.
+    const { id: userId, fields: updatedFields } = req.body;
+    if (!validateId(userId, res)) return;
+    const user = await findUserById(userId);
 
     if (user) {
-      await updateUserName(user, newName);
-      res.status(HTTP_STATUS.SUCCESS).json({ newName });
+      await updateUser(user, updatedFields);
+      const { fastFireOptions: _fastFireOptions, ...fields } = user;
+      return res.status(HTTP_STATUS.SUCCESS).json(fields);
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'User not found' });
+      return notFoundError(res);
     }
   } catch (error) {
-    console.error('Error updating user name:', error);
+    console.error('Error updating user :', error);
     res
       .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: 'Failed to update user name' });
+      .json({ error: 'Failed to update user' });
   }
 };
 
@@ -88,7 +100,7 @@ export const handleDeleteUser = async (req: Request, res: Response) => {
   try {
     const userId = req.body.id; // The user ID parameter is in the body.
     if (userId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const user = await findUserById(userId as string);

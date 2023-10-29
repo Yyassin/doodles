@@ -1,3 +1,4 @@
+import { DocumentFields } from 'fastfire/dist/types';
 import {
   FastFire,
   FastFireCollection,
@@ -36,7 +37,7 @@ export async function createUser(
   password: string,
   avatar: string,
 ) {
-  const user = await FastFire.create(User, {
+  return await FastFire.create(User, {
     username,
     firstname,
     lastname,
@@ -44,21 +45,22 @@ export async function createUser(
     password,
     avatar,
   });
-  return user;
 }
 
 // Function to find a user by ID
-export async function findUserById(userId: string) {
-  const user = await FastFire.findById(User, userId);
-  return user;
-}
+export const findUserById = async (userId: string) =>
+  FastFire.findById(User, userId);
 
 // Function to update a user's name
-export async function updateUserName(user: User, newName: string) {
-  await user.update({ username: newName });
-}
+export const updateUser = async (
+  user: User,
+  updatedFields: Partial<DocumentFields<User>>,
+) => {
+  const { fastFireOptions: _fastFireOptions, id: _id, ...userFields } = user;
+  const updatedUser = { ...userFields, ...updatedFields };
+  await user.update(updatedUser);
+  return updatedUser;
+};
 
 // Function to delete a user
-export async function deleteUser(user: User) {
-  await user.delete();
-}
+export const deleteUser = async (user: User) => await user.delete();

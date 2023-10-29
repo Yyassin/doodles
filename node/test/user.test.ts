@@ -56,17 +56,22 @@ describe('Test Users', () => {
     }
   });
 
-  it("Should update user's name", async () => {
+  it('Should update a user', async () => {
     if (testUser) {
-      const updateUserNameResponse = await request
-        .put('/user/updateUser')
-        .send({
-          id: testUser.id,
-          newName: 'NewName',
-        });
+      const newFields = {
+        username: 'newtestuser',
+        email: 'newjohn@example.com',
+        password: 'newtestpassword',
+        avatar: 'newtestavatar.jpg',
+      };
+      const updateUserResponse = await request.put('/user/updateUser').send({
+        id: testUser.id,
+        newName: newFields,
+      });
 
-      expect(updateUserNameResponse.status).to.equal(200);
-      expect(updateUserNameResponse.body.newName).to.include('NewName');
+      expect(updateUserResponse.status).to.equal(200);
+      const { fastFireOptions: _fastFireOptions, ...testFields } = testUser;
+      expect(updateUserResponse.body).to.deep.equal(testFields);
     }
   });
 
