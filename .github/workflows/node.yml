@@ -52,7 +52,7 @@ jobs:
           restore-keys: npm-
 
       - name: Install internal modules
-        working-direction: ./mod
+        working-directory: ./mod
         run: npm i --global yarn && yarn install && yarn build
 
       - name: Install dependencies
