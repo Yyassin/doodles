@@ -1,3 +1,4 @@
+import { DocumentFields } from 'fastfire/dist/types';
 import { Collaborator } from './collaborator';
 import {
   FastFire,
@@ -30,17 +31,23 @@ export async function createComment(text: string, collaborator: Collaborator) {
 }
 
 // Function to find a comment by ID
-export async function findCommentById(commentId: string) {
-  const comment = await FastFire.findById(Comment, commentId);
-  return comment;
-}
+export const findCommentById = async (commentId: string) =>
+  FastFire.findById(Comment, commentId);
 
-// Function to update a comment's text
-export async function updateCommentText(comment: Comment, newText: string) {
-  await comment.update({ text: newText });
-}
+// Function to update a comment
+export const updateComment = async (
+  comment: Comment,
+  updatedFields: Partial<DocumentFields<Comment>>,
+) => {
+  const {
+    fastFireOptions: _fastFireOptions,
+    id: _id,
+    ...commentFields
+  } = comment;
+  const updatedComment = { ...commentFields, ...updatedFields };
+  await comment.update(updatedComment);
+  return updatedComment;
+};
 
 // Function to delete a comment
-export async function deleteComment(comment: Comment) {
-  await comment.delete();
-}
+export const deleteComment = async (comment: Comment) => await comment.delete();

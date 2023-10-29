@@ -3,7 +3,7 @@ import {
   handleCreateComment,
   handleDeleteComment,
   handleFindCommentById,
-  handleUpdateText,
+  handleUpdateComment,
 } from './comment.controller';
 
 /**
@@ -20,8 +20,8 @@ router.post('/createComment', handleCreateComment);
 // GET comment by ID
 router.get('/getComment', handleFindCommentById);
 
-// PUT update comment's text
-router.put('/updateCommentText', handleUpdateText);
+// PUT update comment
+router.put('/updateComment', handleUpdateComment);
 
 // DELETE comment by ID
 router.delete('/deleteComment', handleDeleteComment);

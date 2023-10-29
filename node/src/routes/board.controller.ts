@@ -64,9 +64,8 @@ export const handleFindBoardById = async (req: Request, res: Response) => {
   }
 };
 
-// Get board
-// Update board title
-export const handleUpdateBoardTitle = async (req: Request, res: Response) => {
+// Update board
+export const handleUpdateBoard = async (req: Request, res: Response) => {
   try {
     // The board ID and new parameters are in the body.
     const { id: boardId, fields: updatedFields } = req.body;
@@ -74,7 +73,6 @@ export const handleUpdateBoardTitle = async (req: Request, res: Response) => {
     const board = await findBoardById(boardId);
 
     if (board) {
-      // TODO: Return the whole updated board
       await updateBoard(board, updatedFields);
       const { fastFireOptions: _fastFireOptions, ...fields } = board; // TODO(yousef): Should make a helper method to extract the options
       return res.status(HTTP_STATUS.SUCCESS).json(fields);
@@ -82,10 +80,10 @@ export const handleUpdateBoardTitle = async (req: Request, res: Response) => {
       return notFoundError(res);
     }
   } catch (error) {
-    console.error('Error updating board text:', error);
+    console.error('Error updating board: ', error);
     res
       .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: 'Failed to update board text' });
+      .json({ error: 'Failed to update board' });
   }
 };
 

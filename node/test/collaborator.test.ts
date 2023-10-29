@@ -41,7 +41,7 @@ describe('Test Collaborator', () => {
     //create collaborator with previously created user
     const response = await request
       .post('/collaborator/createCollaborator')
-      .send({ permissionLevel: 'edit', user: createdUser });
+      .send({ permissionLevel: 'edit', user: createdUser.id });
 
     expect(response.status).to.eq(200);
 
@@ -66,17 +66,24 @@ describe('Test Collaborator', () => {
     }
   });
 
-  it("Should update collaborator's permission", async () => {
+  it('Should update a collaborator', async () => {
     if (testCollaborator) {
-      const updateUserNameResponse = await request
-        .put('/collaborator/updatePermissionLevel')
+      const newFields = {
+        permissionLevel: 'edit',
+      };
+      const updateCollaboratorResponse = await request
+        .put('/collaborator/updateCollaborator')
         .send({
           id: testCollaborator.id,
-          newPermissionLevel: 'view',
+          fields: newFields,
         });
 
-      expect(updateUserNameResponse.status).to.equal(200);
-      expect(updateUserNameResponse.body.newPermissionLevel).to.equal('view');
+      expect(updateCollaboratorResponse.status).to.equal(200);
+      const { fastFireOptions: _fastFireOptions, ...testColaboratorfields } =
+        testCollaborator;
+      expect(updateCollaboratorResponse.body).to.deep.equal(
+        testColaboratorfields,
+      );
     }
   });
 

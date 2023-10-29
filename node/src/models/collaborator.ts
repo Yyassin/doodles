@@ -1,3 +1,4 @@
+import { DocumentFields } from 'fastfire/dist/types';
 import { User } from './user';
 import {
   FastFire,
@@ -31,20 +32,24 @@ export async function createCollaborator(permissionLevel: string, user: User) {
 }
 
 // Function to find a collaborator by ID
-export async function findCollaboratorById(collabId: string) {
-  const collaborator = await FastFire.findById(Collaborator, collabId);
-  return collaborator;
-}
+export const findCollaboratorById = async (collaboratorId: string) =>
+  FastFire.findById(Collaborator, collaboratorId);
 
-// Function to update a collaborator's permissionLevel
-export async function updateCollaboratorPermission(
+// Function to update a collaborator
+export const updateCollaborator = async (
   collaborator: Collaborator,
-  newPermissionLevel: string,
-) {
-  await collaborator.update({ permissionLevel: newPermissionLevel });
-}
+  updatedFields: Partial<DocumentFields<Collaborator>>,
+) => {
+  const {
+    fastFireOptions: _fastFireOptions,
+    id: _id,
+    ...collaboratorFields
+  } = collaborator;
+  const updatedCollaborator = { ...collaboratorFields, ...updatedFields };
+  await collaborator.update(updatedCollaborator);
+  return updatedCollaborator;
+};
 
 // Function to delete a collaborator
-export async function deleteCollaborator(collaborator: Collaborator) {
+export const deleteCollaborator = async (collaborator: Collaborator) =>
   await collaborator.delete();
-}

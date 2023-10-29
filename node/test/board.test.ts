@@ -41,20 +41,20 @@ describe('Test Board', () => {
     //create collaborator with previously created user
     const collabResponse = await request
       .post('/collaborator/createCollaborator')
-      .send({ permissionLevel: 'edit', user: createdUser });
+      .send({ permissionLevel: 'edit', user: createdUser.id });
 
     expect(collabResponse.status).to.eq(200);
     createdCollaborator = collabResponse.body.collaborator as Collaborator;
   });
 
-  it('Should create and read a Board', async () => {
+  it('Should create a Board', async () => {
     //create board with previously created collaborator
     const BoardResponse = await request.post('/board/createBoard').send({
       serialized: 'abc123',
       title: 'myBoard',
       tags: ['bestBoard', 'cool'],
       shareUrl: 'abc.com',
-      collaborators: [createdCollaborator],
+      collaborators: [createdCollaborator.id],
     });
 
     expect(BoardResponse.status).to.eq(200);
@@ -84,18 +84,16 @@ describe('Test Board', () => {
         tags: ['tagA', 'tagB'],
         serialized: 'newSerialized',
       };
-      const updatetTitleResponse = await request
-        .put('/board/updateBoardTitle')
-        .send({
-          id: testBoard.id,
-          fields: newFields,
-        });
+      const updateBoardResponse = await request.put('/board/updateBoard').send({
+        id: testBoard.id,
+        fields: newFields,
+      });
 
-      expect(updatetTitleResponse.status).to.equal(200);
+      expect(updateBoardResponse.status).to.equal(200);
 
       const { fastFireOptions: _fastFireOptions, ...testBoardfields } =
         testBoard;
-      expect(updatetTitleResponse.body).to.deep.equal(testBoardfields);
+      expect(updateBoardResponse.body).to.deep.equal(testBoardfields);
     }
   });
 

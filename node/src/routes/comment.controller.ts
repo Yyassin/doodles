@@ -2,7 +2,7 @@ import { Response, Request } from 'express';
 import {
   createComment,
   findCommentById,
-  updateCommentText,
+  updateComment,
   deleteComment,
 } from '../models/comment';
 import { HTTP_STATUS } from '../constants';
@@ -29,6 +29,17 @@ export const handleCreateComment = async (req: Request, res: Response) => {
   }
 };
 
+const validateId = (id: string, res: Response): id is string => {
+  if (id === undefined) {
+    res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+    return false;
+  }
+  return true;
+};
+
+const notFoundError = (res: Response) =>
+  res.status(HTTP_STATUS.ERROR).json({ error: 'comment not found' });
+
 // Get comment
 export const handleFindCommentById = async (req: Request, res: Response) => {
   try {
@@ -52,28 +63,26 @@ export const handleFindCommentById = async (req: Request, res: Response) => {
   }
 };
 
-// Update comment text
-export const handleUpdateText = async (req: Request, res: Response) => {
+// Update comment
+export const handleUpdateComment = async (req: Request, res: Response) => {
   try {
-    const commentId = req.body.id; // // The comment ID and text parameters are in the body.
-    const newText = req.body.newText;
-    if (commentId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
-      return;
-    }
-    const comment = await findCommentById(commentId as string);
+    // The comment ID and text parameters are in the body.
+    const { id: commentId, fields: updatedFields } = req.body;
+    if (!validateId(commentId, res)) return;
+    const comment = await findCommentById(commentId);
 
     if (comment) {
-      await updateCommentText(comment, newText);
-      res.status(HTTP_STATUS.SUCCESS).json({ newText });
+      await updateComment(comment, updatedFields);
+      const { fastFireOptions: _fastFireOptions, ...fields } = comment;
+      return res.status(HTTP_STATUS.SUCCESS).json(fields);
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'comment not found' });
+      return notFoundError(res);
     }
   } catch (error) {
-    console.error('Error updating comment text:', error);
+    console.error('Error updating comment: ', error);
     res
       .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: 'Failed to update comment text' });
+      .json({ error: 'Failed to update comment' });
   }
 };
 

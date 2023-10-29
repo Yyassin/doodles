@@ -3,7 +3,7 @@ import {
   handleCreateBoard,
   handleDeleteBoard,
   handleFindBoardById,
-  handleUpdateBoardTitle,
+  handleUpdateBoard,
 } from './board.controller';
 
 /**
@@ -20,8 +20,8 @@ router.post('/createBoard', handleCreateBoard);
 // GET board by ID
 router.get('/getBoard', handleFindBoardById);
 
-// PUT update board's title
-router.put('/updateBoardTitle', handleUpdateBoardTitle);
+// PUT update a board
+router.put('/updateBoard', handleUpdateBoard);
 
 // DELETE board by ID
 router.delete('/deleteBoard', handleDeleteBoard);
