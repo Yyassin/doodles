@@ -1,11 +1,11 @@
 import React from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { SaveOpenDropDownMenu } from '@/components/lib/SaveOpenDropDownMenu';
+import { Exporting } from '@/components/lib/ExportingDropDownMenu';
 import {
   HamburgerMenuIcon,
   Pencil2Icon,
   TrashIcon,
-  Share2Icon,
   InfoCircledIcon,
   Share1Icon,
 } from '@radix-ui/react-icons';
@@ -18,9 +18,7 @@ const DropDownMenu = ({
 }) => {
   const { isFullscreen } = useAppStore(['isFullscreen']);
   //Handle button functionailities
-  const handleExport = () => {
-    console.log('Exporting');
-  };
+
   const handleInfo = () => {
     console.log('Displaying Info');
   };
@@ -58,12 +56,7 @@ const DropDownMenu = ({
         >
           <SaveOpenDropDownMenu />
           <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
-          <DropdownMenu.Item
-            className="group text-[13px] indent-[10px] rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-teal-500"
-            onClick={handleExport}
-          >
-            <Share2Icon /> Export
-          </DropdownMenu.Item>
+          <Exporting />
           <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
           <DropdownMenu.Item
             className="group text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none  data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-teal-500"
@@ -92,7 +85,6 @@ const DropDownMenu = ({
           >
             <Pencil2Icon /> Edit Canvas
           </DropdownMenu.Item>
-
           <DropdownMenu.Arrow className="fill-white" />
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

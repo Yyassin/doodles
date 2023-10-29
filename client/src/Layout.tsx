@@ -5,6 +5,7 @@ import SignInPage from './views/SignInPage';
 import Dashboard from './views/Dashboard';
 import useDrawElements from './hooks/useDrawElements';
 import useWindowResize from './hooks/useWindowResize';
+import { useSocket } from './hooks/useSocket';
 import Viewport from './views/Viewport';
 import { useShortcuts } from './hooks/useShortcut';
 
@@ -18,6 +19,7 @@ const Layout = () => {
   useDrawElements();
   useWindowResize();
   useShortcuts();
+  useSocket();
   const { mode } = useAppStore(['mode']);
 
   switch (mode) {

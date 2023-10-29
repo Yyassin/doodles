@@ -16,6 +16,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  UserCredential,
 } from 'firebase/auth';
 import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
@@ -26,20 +27,54 @@ import { useAppStore } from '@/stores/AppStore';
  * @author Zakariyya Almalki
  */
 
-// function that uses firebase sign up method, takes email and pass
-// function is here for ease of testing
-export function signup(email: string, password: string) {
-  return createUserWithEmailAndPassword(getAuth(firebaseApp), email, password);
+export function signup(
+  email: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+  profilePicture: File | null,
+): Promise<UserCredential> {
+  return new Promise(async (resolve, reject) => {
+    const auth = getAuth(firebaseApp);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+
+      const user = userCredential.user;
+
+      // send the data as a JSON payload:
+      const userData = {
+        email: user.email,
+        password,
+        firstName,
+        lastName,
+        profilePicture,
+        // handle uploading the profile picture to backend
+      };
+      // API call to backend something like axios.post('/api/signup', userData)
+
+      console.log(userData); // to be delete when api call for userdata to backend in written
+      console.log(userCredential);
+      resolve(userCredential);
+    } catch (error: unknown) {
+      reject(error as Error);
+    }
+  });
 }
 
 export default function SignUp() {
   const { setMode } = useAppStore(['setMode']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
-  const [loading, setLoading] = useState(false); // State to disable sign up button
-  const [error, setError] = useState(''); // State for error message
+  const firstNameRef = useRef<HTMLInputElement | null>(null);
+  const lastNameRef = useRef<HTMLInputElement | null>(null);
+  const profilePictureRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // where we handle regular email/pass sign in
   const handleSignUp = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
@@ -51,6 +86,11 @@ export default function SignUp() {
       await signup(
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
+        firstNameRef.current?.value ?? '',
+        lastNameRef.current?.value ?? '',
+        profilePictureRef.current?.files
+          ? profilePictureRef.current?.files[0]
+          : null,
       );
       setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
@@ -65,18 +105,47 @@ export default function SignUp() {
 
     try {
       await signInWithPopup(auth, provider);
+      const userData = {
+        firstname: auth.currentUser?.displayName,
+        avatar: auth.currentUser?.photoURL,
+      };
+      // await axois.post('/api/googleSignUp', userData);  when endpoints are ready, we use them to send info to backend/dB
+      console.log(userData); // to be delete when api call for userdata to backend in written
+
       setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message);
     }
   };
 
+  //use filereader to show thumbnail of pic
+  const handleProfilePictureChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      // Read the selected file and display it as a thumbnail
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target) {
+          const thumbnail = event.target.result;
+          setProfilePictureThumbnail(thumbnail as string);
+        }
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const [profilePictureThumbnail, setProfilePictureThumbnail] = useState<
+    string | null
+  >(null);
+
   return (
     <Card>
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Create an account</CardTitle>
         <CardDescription>
-          Enter your email below to create your account
+          Enter your information below to create your account
         </CardDescription>
         {error && ( // Conditional rendering of error message
           <div className="text-red-500 text-center mt-2">
@@ -87,8 +156,52 @@ export default function SignUp() {
         )}
       </CardHeader>
       <CardContent className="grid gap-1">
-        <div className="grid grid-cols-1 gap-6">
-          <Label htmlFor="email"></Label>
+        <div className="grid grid-cols-1 gap-1">
+          <Label htmlFor="firstName">First Name</Label>
+          <Input
+            ref={firstNameRef}
+            id="firstName"
+            type="text"
+            placeholder="First Name"
+            required
+          />
+        </div>
+        <div className="grid grid-cols-1 gap-1">
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
+            ref={lastNameRef}
+            id="lastName"
+            type="text"
+            placeholder="Last Name"
+            required
+          />
+        </div>
+        <div className="grid grid-cols-1 gap-1">
+          <Label htmlFor="profilePicture">Profile Picture</Label>
+          <Input
+            ref={profilePictureRef}
+            id="profilePicture"
+            type="file"
+            accept=".png, .jpg, .jpeg"
+            required
+            onChange={handleProfilePictureChange}
+          />
+        </div>
+        {profilePictureThumbnail && (
+          <div>
+            <Label>Profile Picture Thumbnail</Label>
+            <img
+              src={profilePictureThumbnail}
+              alt="Profile Thumbnail"
+              className="max-w-xs h-auto"
+            />
+          </div>
+        )}
+
+        <div className="h-4" />
+
+        <div className="grid grid-cols-1 gap-1">
+          <Label htmlFor="email">Email</Label>
           <Input
             ref={emailRef}
             id="email"
@@ -97,7 +210,7 @@ export default function SignUp() {
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="password"></Label>
+          <Label htmlFor="password">Password</Label>
           <Input
             id="password"
             type="password"

@@ -5,8 +5,9 @@ import {
 } from '@/lib/canvasElements/selection';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { CanvasElementType } from '@/types';
-import React, { MouseEvent, useState } from 'react';
+import React, { MouseEvent, useEffect, useState } from 'react';
 
 /**
  * Main Canvas View
@@ -38,10 +39,22 @@ export default function Canvas() {
     'allIds',
     'setSelectedElement',
   ]);
+
+  const { setCounter, setRoomID } = useWebSocketStore([
+    'setCounter',
+    'setRoomID',
+  ]);
+
   // A canvas state machine defining the current "state" action.
   const [action, setAction] = useState<Action>('none');
   // Id of the element currently being drawn.
   const [currentDrawingElemId, setCurrentDrawingElemId] = useState('');
+
+  //initalize roomID upon entering the canvas
+  useEffect(() => {
+    setRoomID('1'); //change later
+    return () => setRoomID(null);
+  }, []);
 
   const updateElement = (
     id: string,
@@ -96,6 +109,7 @@ export default function Canvas() {
   const handleMouseUp = () => {
     // Return to idle none action state.
     setAction('none');
+    setCounter();
   };
 
   const handleMouseMove = (e: MouseEvent) => {
