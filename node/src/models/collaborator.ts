@@ -24,11 +24,10 @@ export class Collaborator extends FastFireDocument<Collaborator> {
 
 // Function to create a collaborator
 export async function createCollaborator(permissionLevel: string, user: User) {
-  const collaborator = await FastFire.create(Collaborator, {
+  return await FastFire.create(Collaborator, {
     permissionLevel,
     user,
   });
-  return collaborator;
 }
 
 // Function to find a collaborator by ID

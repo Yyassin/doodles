@@ -14,6 +14,9 @@ import { HTTP_STATUS } from '../constants';
 
 // TODO: JSDOC
 
+// for our lovely linting checker
+const NO_ID_PROVIDED = 'No ID provided';
+
 //Create collaborator
 export const handleCreateCollaborator = async (req: Request, res: Response) => {
   try {
@@ -34,7 +37,7 @@ export const handleCreateCollaborator = async (req: Request, res: Response) => {
 
 const validateId = (id: string, res: Response): id is string => {
   if (id === undefined) {
-    res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+    res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
     return false;
   }
   return true;
@@ -51,7 +54,7 @@ export const handleFindCollaboratorById = async (
   try {
     const collabId = req.body.id; // The collaborator ID parameter is in the body.
     if (collabId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const collaborator = await findCollaboratorById(collabId as string);
@@ -97,7 +100,7 @@ export const handleDeleteCollaborator = async (req: Request, res: Response) => {
   try {
     const collabId = req.body.id; // The collaborator ID parameter is in the body.
     if (collabId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const collaborator = await findCollaboratorById(collabId as string);

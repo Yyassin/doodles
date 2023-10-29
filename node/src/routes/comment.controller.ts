@@ -14,6 +14,9 @@ import { HTTP_STATUS } from '../constants';
 
 // TODO: JSDOC
 
+// for our lovely linting checker
+const NO_ID_PROVIDED = 'No ID provided';
+
 // Create comment
 export const handleCreateComment = async (req: Request, res: Response) => {
   try {
@@ -31,7 +34,7 @@ export const handleCreateComment = async (req: Request, res: Response) => {
 
 const validateId = (id: string, res: Response): id is string => {
   if (id === undefined) {
-    res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+    res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
     return false;
   }
   return true;
@@ -45,7 +48,7 @@ export const handleFindCommentById = async (req: Request, res: Response) => {
   try {
     const commentId = req.body.id; // The comment ID parameter is in the body.
     if (commentId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const comment = await findCommentById(commentId as string);
@@ -53,7 +56,7 @@ export const handleFindCommentById = async (req: Request, res: Response) => {
     if (comment) {
       res.status(HTTP_STATUS.SUCCESS).json({ comment });
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'comment not found' });
+      res.status(HTTP_STATUS.ERROR).json({ error: 'cannot find comment' });
     }
   } catch (error) {
     console.error('Error finding comment by ID:', error);
@@ -91,7 +94,7 @@ export const handleDeleteComment = async (req: Request, res: Response) => {
   try {
     const commentId = req.body.id; // The comment ID parameter is in the body.
     if (commentId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'No ID provided' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const comment = await findCommentById(commentId as string);

@@ -37,7 +37,7 @@ export async function createUser(
   password: string,
   avatar: string,
 ) {
-  const user = await FastFire.create(User, {
+  return await FastFire.create(User, {
     username,
     firstname,
     lastname,
@@ -45,7 +45,6 @@ export async function createUser(
     password,
     avatar,
   });
-  return user;
 }
 
 // Function to find a user by ID

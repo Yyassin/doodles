@@ -23,11 +23,10 @@ export class Comment extends FastFireDocument<Comment> {
 
 // Function to create a comment
 export async function createComment(text: string, collaborator: Collaborator) {
-  const comment = await FastFire.create(Comment, {
+  return await FastFire.create(Comment, {
     text,
     collaborator,
   });
-  return comment;
 }
 
 // Function to find a comment by ID
