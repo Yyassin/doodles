@@ -39,7 +39,7 @@ export const handleCreateUser = async (req: Request, res: Response) => {
 };
 const validateId = (id: string, res: Response): id is string => {
   if (id === undefined) {
-    res.status(HTTP_STATUS.ERROR).json({ error: 'NO_ID_PROVIDED' });
+    res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
     return false;
   }
   return true;
@@ -53,7 +53,7 @@ export const handleFindUserById = async (req: Request, res: Response) => {
   try {
     const userId = req.body.id; // The user ID parameter is in the body.
     if (userId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'NO_ID_PROVIDED' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const user = await findUserById(userId as string);
@@ -99,7 +99,7 @@ export const handleDeleteUser = async (req: Request, res: Response) => {
   try {
     const userId = req.body.id; // The user ID parameter is in the body.
     if (userId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'NO_ID_PROVIDED' });
+      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
       return;
     }
     const user = await findUserById(userId as string);
