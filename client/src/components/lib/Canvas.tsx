@@ -1,267 +1,16 @@
-import {
-  MaybeTransformHandleType,
-  TransformHandle,
-  TransformHandleDirection,
-  TransformHandleType,
-  getTransformHandlesFromCoords,
-} from '@/hooks/useDrawElements';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
-import { useAppStore } from '@/stores/AppStore';
 import {
-  CanvasElement,
-  useCanvasElementStore,
-} from '@/stores/CanvasElementsStore';
-import { CanvasElementType, Vector2 } from '@/types';
-import React, { MouseEvent, useRef, useState } from 'react';
-
-const resizedCoordinates = (
-  clientX: number,
-  clientY: number,
-  position: TransformHandleDirection,
-  coordinates: { x1: number; y1: number; x2: number; y2: number },
-) => {
-  const { x1, y1, x2, y2 } = coordinates;
-  switch (position) {
-    case 'nw':
-      return { x1: clientX, y1: clientY, x2, y2 };
-    case 'ne':
-      return { x1, y1: clientY, x2: clientX, y2 };
-    case 'sw':
-      return { x1: clientX, x2, y1, y2: clientY };
-    case 'se':
-      return { x1, y1, x2: clientX, y2: clientY };
-    case 'n':
-      return { x1, y1: clientY, x2, y2 };
-    case 'e':
-      return { x1, y1, x2: clientX, y2 };
-    case 's':
-      return { x1, y1, x2, y2: clientY };
-    case 'w':
-      return { x1: clientX, y1, x2, y2 };
-    default:
-      throw new Error(
-        `Something went wrong. Resize position ${position} is invalid.`,
-      );
-  }
-};
-
-const adjustElementCoordinates = (
-  elementId: string,
-  appState: {
-    p1: Record<string, CanvasElement['p1']>;
-    p2: Record<string, CanvasElement['p2']>;
-    types: Record<string, CanvasElement['type']>;
-  },
-) => {
-  const { p1, p2, types } = appState;
-  const { x: x1, y: y1 } = p1[elementId];
-  const { x: x2, y: y2 } = p2[elementId];
-  const elementType = types[elementId];
-
-  if (elementType === 'rectangle') {
-    const minX = Math.min(x1, x2);
-    const maxX = Math.max(x1, x2);
-    const minY = Math.min(y1, y2);
-    const maxY = Math.max(y1, y2);
-
-    // x1, x2 is top left
-    return { x1: minX, y1: minY, x2: maxX, y2: maxY };
-  } else {
-    // a line
-    if (x1 < x2 || (x1 === x2 && y1 < y2) /* top is x1, y1 */) {
-      return { x1, y1, x2, y2 };
-    } else {
-      // we need to swap the vertices
-      return { x1: x2, y1: y2, x2: x1, y2: y1 };
-    }
-  }
-};
-
-const isInsideTransformHandle = (
-  transformHandle: TransformHandle,
-  x: number,
-  y: number,
-) =>
-  x >= transformHandle[0] &&
-  x <= transformHandle[0] + transformHandle[2] &&
-  y >= transformHandle[1] &&
-  y <= transformHandle[1] + transformHandle[3];
-
-export const resizeTest = (
-  elementId: string,
-  appState: {
-    // Eventually, an array
-    selectedElementIds: string;
-    p1: Record<string, CanvasElement['p1']>;
-    p2: Record<string, CanvasElement['p2']>;
-  },
-  x: number,
-  y: number,
-): MaybeTransformHandleType => {
-  const { selectedElementIds, p1, p2 } = appState;
-
-  if (elementId !== selectedElementIds) {
-    return false;
-  }
-
-  const { rotation: rotationTransformHandle, ...transformHandles } =
-    getTransformHandlesFromCoords({ p1, p2 }, selectedElementIds, {
-      rotation: true,
-    });
-
-  if (
-    rotationTransformHandle &&
-    isInsideTransformHandle(rotationTransformHandle, x, y)
-  ) {
-    return 'rotation' as TransformHandleType;
-  }
-
-  const filter = Object.keys(transformHandles).filter((key) => {
-    const transformHandle =
-      transformHandles[key as Exclude<TransformHandleType, 'rotation'>];
-    if (transformHandle === undefined) {
-      return false;
-    }
-    return isInsideTransformHandle(transformHandle, x, y);
-  });
-
-  if (filter.length > 0) {
-    return filter[0] as TransformHandleType;
-  }
-
-  return false;
-};
-
-// TODO: To object
-const cursorForPosition = (
-  transformHandleType: MaybeTransformHandleType | 'inside',
-): string => {
-  const shouldSwapCursors = false;
-  // const shouldSwapCursors =
-  //   element && Math.sign(element.height) * Math.sign(element.width) === -1;
-  let cursor = null;
-
-  switch (transformHandleType) {
-    case 'n':
-    case 's':
-      cursor = 'ns';
-      break;
-    case 'w':
-    case 'e':
-      cursor = 'ew';
-      break;
-    case 'nw':
-    case 'se':
-      if (shouldSwapCursors) {
-        cursor = 'nesw';
-      } else {
-        cursor = 'nwse';
-      }
-      break;
-    case 'ne':
-    case 'sw':
-      if (shouldSwapCursors) {
-        cursor = 'nwse';
-      } else {
-        cursor = 'nesw';
-      }
-      break;
-    case 'rotation':
-      return 'grab';
-    default:
-      return 'move';
-  }
-
-  // if (cursor && element) {
-  //   cursor = rotateResizeCursor(cursor, element.angle);
-  // }
-
-  return cursor ? `${cursor}-resize` : '';
-};
-
-const distance = (a: Vector2, b: Vector2) =>
-  Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
-
-const nearPoint = (
-  x: number,
-  y: number,
-  x1: number,
-  y1: number,
-  name: TransformHandleDirection,
-  thresh = 5,
-) => {
-  return Math.abs(x - x1) < thresh && Math.abs(y - y1) < thresh ? name : false;
-};
-
-const positionWithinElement = (
-  x: number,
-  y: number,
-  appState: {
-    p1: Record<string, CanvasElement['p1']>;
-    p2: Record<string, CanvasElement['p2']>;
-    types: Record<string, CanvasElement['type']>;
-    selectedElementId: string;
-  },
-  selection: string,
-): MaybeTransformHandleType | 'inside' => {
-  const { p1, p2, types, selectedElementId } = appState;
-  const elementType = types[selection];
-  const { x: x1, y: y1 } = p1[selection];
-  const { x: x2, y: y2 } = p2[selection];
-
-  if (elementType === 'rectangle') {
-    const transformHandle = resizeTest(
-      selection,
-      { selectedElementIds: selectedElementId, p1, p2 },
-      x,
-      y,
-    );
-    // Within if mouse is between extents
-    const inside = x >= x1 && x <= x2 && y >= y1 && y <= y2 ? 'inside' : null;
-
-    // Only one of these should ever be true -- unless the shape is small
-    // but it's still possible to force one since inside is first.
-    return inside || transformHandle;
-  } else {
-    // TODO: Could do distance from point to line
-    // Line -- what we do is measure dist from point to
-    // both endpoints. If it's close enough to line length
-    // then we say this is selecting the line.
-    const a = { x: x1, y: y1 };
-    const b = { x: x2, y: y2 };
-    const c = { x, y }; // mouse pos
-
-    // TODO: Can we optimize with no sqrt?
-    const offset = Math.abs(distance(a, b) - (distance(c, a) + distance(c, b)));
-
-    const start = nearPoint(x, y, x1, y1, 'nw'); // so it resizes x1, y1
-    const end = nearPoint(x, y, x2, y2, 'se'); // so it resizes x2, y2
-    const inside = Math.abs(offset) < 1 ? 'inside' : false;
-    return inside || start || end;
-  }
-};
-
-const getElementAtPosition = (
-  x: number,
-  y: number,
-  appState: {
-    allIds: string[];
-    p1: Record<string, CanvasElement['p1']>;
-    p2: Record<string, CanvasElement['p2']>;
-    types: Record<string, CanvasElement['type']>;
-    selectedElementId: string;
-  },
-) => {
-  // Disadvantage: O(n) and it only returns the first element this satisfies -- will
-  // be an issue for overlapping elements: One solution is added some sort of layering (move to front/back)
-  // for each element. We have to find all that intersect and select front most.
-  return appState.allIds
-    .map((id) => ({
-      id,
-      position: positionWithinElement(x, y, appState, id),
-    }))
-    .find((element) => element.position);
-};
+  adjustElementCoordinatesById,
+  resizedCoordinates,
+} from '@/lib/canvasElements/resize';
+import {
+  cursorForPosition,
+  getElementAtPosition,
+} from '@/lib/canvasElements/selection';
+import { useAppStore } from '@/stores/AppStore';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { CanvasElementType, TransformHandleDirection, Vector2 } from '@/types';
+import React, { MouseEvent, useRef } from 'react';
 
 /**
  * Main Canvas View
@@ -296,14 +45,18 @@ export default function Canvas() {
     'setSelectedElement',
     'selectedElementId',
   ]);
-  // TODO: These can be refs?
-  const [action, setAction] = useState<Action>('none');
-  const [selectOffset, setSelectOffset] = useState<Vector2 | null>(null);
-  const [currentDrawingElemId, setCurrentDrawingElemId] = useState('');
+  // A canvas state machine defining the current "state" action.
+  const action = useRef<Action>('none');
+  // Id of the element currently being drawn.
+  const selectOffset = useRef<Vector2 | null>(null);
+  // Id of the element being drawn (for the first time).
+  const currentDrawingElemId = useRef('');
+  // Position of the transform handle last used.
   const selectedHandlePositionRef = useRef<TransformHandleDirection | null>(
     null,
   );
 
+  // Update a canvas element's position state.
   const updateElement = (
     id: string,
     x1: number,
@@ -324,8 +77,9 @@ export default function Canvas() {
     const { clientX, clientY } = e;
     setSelectedElement('');
     if (tool === 'select') {
-      // Check if we're on an element. This should be optimized
-      // with a quadtree.
+      // Using selection tool. Check if cursor is near an element.
+      // If so, select the element.
+      // TODO: This should be optimized with a quadtree.
       const selectedElement = getElementAtPosition(clientX, clientY, {
         allIds,
         types,
@@ -336,21 +90,24 @@ export default function Canvas() {
 
       if (selectedElement === undefined) return;
 
+      // Save the selection offset, since we want to maintain it
+      // as we translate the element.
       const selectOffsetX = clientX - p1[selectedElement.id].x;
       const selectOffsetY = clientY - p1[selectedElement.id].y;
-      setSelectOffset({ x: selectOffsetX, y: selectOffsetY });
+      selectOffset.current = { x: selectOffsetX, y: selectOffsetY };
       setSelectedElement(selectedElement.id);
 
+      // If the cursor is inside the element's BB, we're translating.
+      // We are resizing otherwise.
       if (selectedElement?.position === 'inside') {
-        setAction('moving');
+        action.current = 'moving';
       } else {
-        setAction('resizing');
+        action.current = 'resizing';
       }
-    } else {
-      // TODO: Not good
-      if (tool !== 'line' && tool !== 'rectangle') return;
+    } else if (tool === 'line' || tool === 'rectangle') {
+      // Not selection, then we're creating a new element.
 
-      // Create a new element, initially just a point where we clicked
+      // Create a new element originating from the clicked point
       const id = crypto.randomUUID();
       const element = createElement(
         id,
@@ -361,57 +118,61 @@ export default function Canvas() {
         tool,
       );
 
-      // Add the element
+      // Commit the element to state and set
+      // our 'action state' to drawing.
       addCanvasElement(element);
-      setAction('drawing');
-      setCurrentDrawingElemId(id);
+      action.current = 'drawing';
+      currentDrawingElemId.current = id;
     }
   };
 
   const handleMouseUp = () => {
-    // Reorder corners : if drawing, or resizing
-    if (action === 'drawing' || action === 'resizing') {
-      const { x1, y1, x2, y2 } = adjustElementCoordinates(
-        currentDrawingElemId,
-        { p1, p2, types },
-      );
-      updateElement(
-        currentDrawingElemId,
-        x1,
-        y1,
-        x2,
-        y2,
-        types[currentDrawingElemId],
-      );
+    // Reorder corners to align with the x1, y1 top left convention. This
+    // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).
+    if (action.current === 'drawing' || action.current === 'resizing') {
+      const id =
+        action.current === 'drawing'
+          ? currentDrawingElemId.current
+          : selectedElementId;
+      const { x1, y1, x2, y2 } = adjustElementCoordinatesById(id, {
+        p1,
+        p2,
+        types,
+      });
+      updateElement(id, x1, y1, x2, y2, types[id]);
     }
-    setAction('none');
+    // Return to idle none action state.
+    action.current = 'none';
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     const { clientX, clientY } = e;
     if (tool === 'select') {
-      switch (action) {
+      switch (action.current) {
         case 'moving': {
-          if (selectedElementId === '' || selectOffset === null) return;
+          // If moving, that means an element is selected. Translate it.
+          if (selectedElementId === '' || selectOffset.current === null) return;
           const { x: x1, y: y1 } = p1[selectedElementId];
           const { x: x2, y: y2 } = p2[selectedElementId];
           const elementType = types[selectedElementId];
 
+          // Translate by moving relative to clientXY,
+          // but accounting for the selection offset. Maintain
+          // the element's aspect ratio.
           const width = x2 - x1;
           const height = y2 - y1;
-
-          // Translate: make clientXY top left
           updateElement(
             selectedElementId,
-            clientX - selectOffset.x,
-            clientY - selectOffset.y,
-            clientX - selectOffset.x + width,
-            clientY - selectOffset.y + height,
+            clientX - selectOffset.current.x,
+            clientY - selectOffset.current.y,
+            clientX - selectOffset.current.x + width,
+            clientY - selectOffset.current.y + height,
             elementType,
           );
           break;
         }
         case 'resizing': {
+          // If resizing, that means an element is selected.
           if (
             selectedElementId === '' ||
             selectedHandlePositionRef.current === null
@@ -421,6 +182,7 @@ export default function Canvas() {
           const { x: x2, y: y2 } = p2[selectedElementId];
           const elementType = types[selectedElementId];
 
+          // Commit the adjusted coordinates.
           const {
             x1: x1r,
             y1: y1r,
@@ -437,11 +199,12 @@ export default function Canvas() {
               y2,
             },
           );
-          // TODO: Need an adjust element coords to account for flip here
           updateElement(selectedElementId, x1r, y1r, x2r, y2r, elementType);
           break;
         }
         default: {
+          // Otherwise, we're in the none state and just hovering the mouse.
+          // Check if we hover a handle/element
           const hoveredElement = getElementAtPosition(clientX, clientY, {
             allIds,
             types,
@@ -449,6 +212,9 @@ export default function Canvas() {
             p2,
             selectedElementId,
           });
+
+          // Save the last handle position since we need it to know how to change
+          // the coordinates when resizing.
           if (
             hoveredElement?.position &&
             hoveredElement?.position !== 'inside' &&
@@ -459,6 +225,7 @@ export default function Canvas() {
             selectedHandlePositionRef.current = null;
           }
 
+          // Change the cursor accordingly to denote a possible action.
           (e.target as HTMLElement).style.cursor = hoveredElement?.position
             ? cursorForPosition(hoveredElement.position)
             : 'default';
@@ -466,10 +233,19 @@ export default function Canvas() {
         }
       }
     } else if (tool === 'line' || tool === 'rectangle') {
-      if (action !== 'drawing') return;
-      const { x: x1, y: y1 } = p1[currentDrawingElemId];
+      // Not selection tool, so drawing an element.
+      if (action.current !== 'drawing') return;
 
-      updateElement(currentDrawingElemId, x1, y1, clientX, clientY, tool);
+      // Otherwise, update the element we're currently drawing
+      const { x: x1, y: y1 } = p1[currentDrawingElemId.current];
+      updateElement(
+        currentDrawingElemId.current,
+        x1,
+        y1,
+        clientX,
+        clientY,
+        tool,
+      );
     }
   };
 
