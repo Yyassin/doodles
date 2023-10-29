@@ -7,7 +7,7 @@ import React, { MouseEvent, useEffect, useState } from 'react';
 
 /**
  * Main Canvas View
- * @authors Yousef Yassin
+ * @authors Yousef Yassin, Dana El Sherif
  */
 
 type Action = 'none' | 'drawing';
@@ -19,11 +19,13 @@ export default function Canvas() {
     'appWidth',
     'setMode',
   ]);
-  const { addCanvasElement, editCanvasElement, p1 } = useCanvasElementStore([
-    'addCanvasElement',
-    'editCanvasElement',
-    'p1',
-  ]);
+  const { addCanvasElement, editCanvasElement, pushHistory, p1 } =
+    useCanvasElementStore([
+      'addCanvasElement',
+      'editCanvasElement',
+      'pushHistory',
+      'p1',
+    ]);
 
   const { setCounter, setRoomID } = useWebSocketStore([
     'setCounter',
@@ -71,6 +73,9 @@ export default function Canvas() {
   };
 
   const handleMouseUp = () => {
+    if (action !== 'none') {
+      pushHistory();
+    }
     setAction('none');
     setCounter();
   };

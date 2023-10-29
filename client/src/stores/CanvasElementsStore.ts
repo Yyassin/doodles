@@ -55,6 +55,7 @@ interface CanvasElementActions {
   ) => void;
   setSelectedElement: (id: string) => void;
   undoCanvasElementState: () => void;
+  pushHistory: () => void;
   redoCanvasElementState: () => void;
   setCanvasElementState: (elment: CanvasElementState) => void;
 }
@@ -77,8 +78,8 @@ export const initialCanvasElementState: CanvasElementState = {
   p1: {},
   p2: {},
 };
-const previousStates: CanvasElementState[] = [];
-const redoStates: CanvasElementState[] = [];
+export const history: CanvasElementState[] = [initialCanvasElementState];
+let historyIndex = 0;
 
 /* Actions */
 /**
@@ -131,7 +132,6 @@ const addCanvasElement =
       roughElements[id] = roughElement;
       p1s[id] = p1;
       p2s[id] = p2;
-      previousStates.push({ ...state });
       return {
         ...state,
         allIds,
@@ -143,7 +143,6 @@ const addCanvasElement =
         strokeWidths,
         fillStyles,
         strokeLineDashes,
-        previousStates,
         opacities,
         roughElements,
         p1: p1s,
@@ -239,26 +238,38 @@ const editCanvasElement =
       };
     });
 
+const pushHistory = (set: SetState<CanvasElementState>) => () => {
+  set((state) => {
+    history.push({ ...state });
+    historyIndex = history.length;
+    return state;
+  });
+};
 /**
- * Sets the canvas state to how it was before undo
+ * Sets the canvas state to how it was before last element added
  * @returns Updated state without the undoed element.
  */
 const undoCanvasElementState = (set: SetState<CanvasElementState>) => () => {
-  if (previousStates.length > 0) {
-    const prevState = previousStates.pop();
-    if (prevState) {
+  if (historyIndex > 0) {
+    historyIndex--;
+    const prevState = history[historyIndex];
+    if (prevState !== null) {
       set(prevState);
-      redoStates.push(prevState);
     }
+  } else {
+    set(history[0]);
   }
 };
-
+/**
+ * Sets the canvas state to how it was before undo
+ * @returns Updated state without the undo.
+ */
 const redoCanvasElementState = (set: SetState<CanvasElementState>) => () => {
-  if (redoStates.length > 0) {
-    const nextState = redoStates.pop();
-    if (nextState) {
-      set(nextState);
-      previousStates.push(nextState);
+  if (historyIndex < history.length - 1) {
+    historyIndex++;
+    const prevState = history[historyIndex];
+    if (prevState !== null) {
+      set(prevState);
     }
   }
 };
@@ -322,6 +333,7 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   setSelectedElement: setSelectedElement(set),
   setCanvasElementState: setCanvasElementState(set),
   undoCanvasElementState: undoCanvasElementState(set),
+  pushHistory: pushHistory(set),
   redoCanvasElementState: redoCanvasElementState(set),
 }));
 export const useCanvasElementStore =
