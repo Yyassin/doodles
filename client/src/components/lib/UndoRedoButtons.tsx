@@ -1,14 +1,25 @@
 import { ResetIcon } from '@radix-ui/react-icons';
 import React from 'react';
 import { CanvasFlatButton } from './CanvasButton';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 
 /**
  * Defines a set out buttons for undoing
  * and redoing actions.
- * @author Yousef Yassin
+ * @authors Yousef Yassin, Dana El Sherif
  */
 
 const UndoRedoButtons = () => {
+  const { undoCanvasElementState, redoCanvasElementState } =
+    useCanvasElementStore(['undoCanvasElementState', 'redoCanvasElementState']);
+
+  const handleUndo = () => {
+    undoCanvasElementState();
+  };
+  const handleRedo = () => {
+    redoCanvasElementState();
+  };
+
   return (
     <div
       className="flex w-full min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)]"
@@ -18,7 +29,7 @@ const UndoRedoButtons = () => {
     >
       <CanvasFlatButton
         className="rounded-l-md"
-        onClick={() => console.log('Undo')}
+        onClick={handleUndo}
         tooltip={{
           content: 'Undo',
           side: 'top',
@@ -29,7 +40,7 @@ const UndoRedoButtons = () => {
       </CanvasFlatButton>
       <CanvasFlatButton
         className="rounded-r-md"
-        onClick={() => console.log('Redo')}
+        onClick={handleRedo}
         tooltip={{
           content: 'Redo',
           side: 'top',

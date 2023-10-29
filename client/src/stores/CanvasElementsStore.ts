@@ -6,7 +6,7 @@ import { CanvasElementFillStyle, CanvasElementType, Vector2 } from '@/types';
 
 /**
  * Defines canvas drawable element state
- * @authors Yousef Yassin & Abdalla Abdelhadi
+ * @authors Yousef Yassin, Abdalla Abdelhadi, Dana El Sherif
  */
 
 /**
@@ -54,6 +54,8 @@ interface CanvasElementActions {
     partialElement: Partial<CanvasElement>,
   ) => void;
   setSelectedElement: (id: string) => void;
+  undoCanvasElementState: () => void;
+  redoCanvasElementState: () => void;
   setCanvasElementState: (elment: CanvasElementState) => void;
 }
 type CanvasElementStore = CanvasElementState & CanvasElementActions;
@@ -75,6 +77,8 @@ export const initialCanvasElementState: CanvasElementState = {
   p1: {},
   p2: {},
 };
+const previousStates: CanvasElementState[] = [];
+const redoStates: CanvasElementState[] = [];
 
 /* Actions */
 /**
@@ -127,7 +131,7 @@ const addCanvasElement =
       roughElements[id] = roughElement;
       p1s[id] = p1;
       p2s[id] = p2;
-
+      previousStates.push({ ...state });
       return {
         ...state,
         allIds,
@@ -139,6 +143,7 @@ const addCanvasElement =
         strokeWidths,
         fillStyles,
         strokeLineDashes,
+        previousStates,
         opacities,
         roughElements,
         p1: p1s,
@@ -235,6 +240,29 @@ const editCanvasElement =
     });
 
 /**
+ * Sets the canvas state to how it was before undo
+ * @returns Updated state without the undoed element.
+ */
+const undoCanvasElementState = (set: SetState<CanvasElementState>) => () => {
+  if (previousStates.length > 0) {
+    const prevState = previousStates.pop();
+    if (prevState) {
+      set(prevState);
+      redoStates.push(prevState);
+    }
+  }
+};
+
+const redoCanvasElementState = (set: SetState<CanvasElementState>) => () => {
+  if (redoStates.length > 0) {
+    const nextState = redoStates.pop();
+    if (nextState) {
+      set(nextState);
+      previousStates.push(nextState);
+    }
+  }
+};
+/**
  * Sets the currently selected element id.
  * @param selectedElementId The id to set as selected.
  * @returns Updated state with the selected element id.
@@ -293,6 +321,8 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   editCanvasElement: editCanvasElement(set),
   setSelectedElement: setSelectedElement(set),
   setCanvasElementState: setCanvasElementState(set),
+  undoCanvasElementState: undoCanvasElementState(set),
+  redoCanvasElementState: redoCanvasElementState(set),
 }));
 export const useCanvasElementStore =
   createStoreWithSelectors(canvasElementStore);
