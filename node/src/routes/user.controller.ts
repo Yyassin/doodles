@@ -14,14 +14,11 @@ import { HTTP_STATUS } from '../constants';
 
 // TODO: JSDOC
 
-// for our lovely linting checker
-const NO_ID_PROVIDED = 'No ID provided';
-
 //Create user
 export const handleCreateUser = async (req: Request, res: Response) => {
   try {
     const { username, firstname, lastname, email, password, avatar } = req.body; // The user parameters are in the body.
-    const { fastFireOptions, ...user } = await createUser(
+    const { fastFireOptions: _fastFireOptions, ...user } = await createUser(
       username,
       firstname,
       lastname,
@@ -29,7 +26,7 @@ export const handleCreateUser = async (req: Request, res: Response) => {
       password,
       avatar,
     );
-    const _ = fastFireOptions;
+    //const _ = fastFireOptions;
     res.status(HTTP_STATUS.SUCCESS).json({ user });
   } catch (error) {
     console.error('Error creating user:', error);
@@ -40,7 +37,7 @@ export const handleCreateUser = async (req: Request, res: Response) => {
 };
 const validateId = (id: string, res: Response): id is string => {
   if (id === undefined) {
-    res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
+    res.status(HTTP_STATUS.ERROR).json({ error: 'NO ID PROVIDED' });
     return false;
   }
   return true;
@@ -53,16 +50,14 @@ const notFoundError = (res: Response) =>
 export const handleFindUserById = async (req: Request, res: Response) => {
   try {
     const userId = req.body.id; // The user ID parameter is in the body.
-    if (userId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
-      return;
-    }
+    if (!validateId(userId, res)) return;
+
     const user = await findUserById(userId as string);
 
     if (user) {
       res.status(HTTP_STATUS.SUCCESS).json({ user });
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'User not found' });
+      return notFoundError(res);
     }
   } catch (error) {
     console.error('Error finding user by ID:', error);
@@ -99,10 +94,8 @@ export const handleUpdateUser = async (req: Request, res: Response) => {
 export const handleDeleteUser = async (req: Request, res: Response) => {
   try {
     const userId = req.body.id; // The user ID parameter is in the body.
-    if (userId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
-      return;
-    }
+    if (!validateId(userId, res)) return;
+
     const user = await findUserById(userId as string);
 
     if (user) {
@@ -111,7 +104,7 @@ export const handleDeleteUser = async (req: Request, res: Response) => {
         .status(HTTP_STATUS.SUCCESS)
         .json({ message: 'User deleted successfully' });
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'User not found' });
+      return notFoundError(res);
     }
   } catch (error) {
     console.error('Error deleting user:', error);

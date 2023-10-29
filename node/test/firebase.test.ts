@@ -12,8 +12,11 @@ import {
  * @authors Ibrahim Almalki
  */
 
-describe('Firestore Document and Image Upload Tests', () => {
+describe('Firestore Document and Image Upload Tests', function () {
   it('should upload an image successfully', async () => {
+    // To avoid timeout errors
+    this.timeout(5000);
+
     // Read a sample image file for testing (adjust the path as needed)
     const imageFilePath = 'assets/cat.png';
     const imageBuffer = fs.readFileSync(imageFilePath);

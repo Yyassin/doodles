@@ -14,9 +14,6 @@ import { HTTP_STATUS } from '../constants';
 
 // TODO: JSDOC
 
-// for our lovely linting checker
-const NO_ID_PROVIDED = 'No ID provided';
-
 //Create collaborator
 export const handleCreateCollaborator = async (req: Request, res: Response) => {
   try {
@@ -34,7 +31,7 @@ export const handleCreateCollaborator = async (req: Request, res: Response) => {
 
 const validateId = (id: string, res: Response): id is string => {
   if (id === undefined) {
-    res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
+    res.status(HTTP_STATUS.ERROR).json({ error: 'NO ID PROVIDED' });
     return false;
   }
   return true;
@@ -50,16 +47,13 @@ export const handleFindCollaboratorById = async (
 ) => {
   try {
     const collabId = req.body.id; // The collaborator ID parameter is in the body.
-    if (collabId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
-      return;
-    }
+    if (!validateId(collabId, res)) return;
     const collaborator = await findCollaboratorById(collabId as string);
 
     if (collaborator) {
       res.status(HTTP_STATUS.SUCCESS).json({ collaborator });
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'collaborator not found' });
+      return notFoundError(res);
     }
   } catch (error) {
     console.error('Error finding collaborator by ID:', error);
@@ -96,10 +90,8 @@ export const handleUpdateCollaborator = async (req: Request, res: Response) => {
 export const handleDeleteCollaborator = async (req: Request, res: Response) => {
   try {
     const collabId = req.body.id; // The collaborator ID parameter is in the body.
-    if (collabId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
-      return;
-    }
+    if (!validateId(collabId, res)) return;
+
     const collaborator = await findCollaboratorById(collabId as string);
 
     if (collaborator) {
@@ -108,7 +100,7 @@ export const handleDeleteCollaborator = async (req: Request, res: Response) => {
         .status(HTTP_STATUS.SUCCESS)
         .json({ message: 'Collaborator deleted successfully' });
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'Collaborator not found' });
+      return notFoundError(res);
     }
   } catch (error) {
     console.error('Error deleting collaborator:', error);

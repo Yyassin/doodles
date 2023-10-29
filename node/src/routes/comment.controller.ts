@@ -14,9 +14,6 @@ import { HTTP_STATUS } from '../constants';
 
 // TODO: JSDOC
 
-// for our lovely linting checker
-const NO_ID_PROVIDED = 'No ID provided';
-
 // Create comment
 export const handleCreateComment = async (req: Request, res: Response) => {
   try {
@@ -34,7 +31,7 @@ export const handleCreateComment = async (req: Request, res: Response) => {
 
 const validateId = (id: string, res: Response): id is string => {
   if (id === undefined) {
-    res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
+    res.status(HTTP_STATUS.ERROR).json({ error: 'NO ID PROVIDED' });
     return false;
   }
   return true;
@@ -47,16 +44,14 @@ const notFoundError = (res: Response) =>
 export const handleFindCommentById = async (req: Request, res: Response) => {
   try {
     const commentId = req.body.id; // The comment ID parameter is in the body.
-    if (commentId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
-      return;
-    }
+    if (!validateId(commentId, res)) return;
+
     const comment = await findCommentById(commentId as string);
 
     if (comment) {
       res.status(HTTP_STATUS.SUCCESS).json({ comment });
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'cannot find comment' });
+      return notFoundError(res);
     }
   } catch (error) {
     console.error('Error finding comment by ID:', error);
@@ -93,10 +88,8 @@ export const handleUpdateComment = async (req: Request, res: Response) => {
 export const handleDeleteComment = async (req: Request, res: Response) => {
   try {
     const commentId = req.body.id; // The comment ID parameter is in the body.
-    if (commentId === undefined) {
-      res.status(HTTP_STATUS.ERROR).json({ error: NO_ID_PROVIDED });
-      return;
-    }
+    if (!validateId(commentId, res)) return;
+
     const comment = await findCommentById(commentId as string);
 
     if (comment) {
@@ -105,7 +98,7 @@ export const handleDeleteComment = async (req: Request, res: Response) => {
         .status(HTTP_STATUS.SUCCESS)
         .json({ message: 'comment deleted successfully' });
     } else {
-      res.status(HTTP_STATUS.ERROR).json({ error: 'comment not found' });
+      return notFoundError(res);
     }
   } catch (error) {
     console.error('Error deleting comment:', error);

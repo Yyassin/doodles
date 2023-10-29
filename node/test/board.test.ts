@@ -5,6 +5,7 @@ import superwstest from 'superwstest';
 import { Board, findBoardById } from '../src/models/board';
 import { Collaborator } from '../src/models/collaborator';
 import { User } from '../src/models/user';
+import { HTTP_STATUS } from '../src/constants';
 
 /**
  * Defines Board tests.
@@ -35,7 +36,7 @@ describe('Test Board', () => {
       .post('/user/createUser')
       .send(expectedUser);
 
-    expect(createUserResponse.status).to.eq(200);
+    expect(createUserResponse.status).to.eq(HTTP_STATUS.SUCCESS);
     createdUser = createUserResponse.body.user as User;
 
     //create collaborator with previously created user
@@ -43,7 +44,7 @@ describe('Test Board', () => {
       .post('/collaborator/createCollaborator')
       .send({ permissionLevel: 'edit', user: createdUser.id });
 
-    expect(collabResponse.status).to.eq(200);
+    expect(collabResponse.status).to.eq(HTTP_STATUS.SUCCESS);
     createdCollaborator = collabResponse.body.collaborator as Collaborator;
   });
 
@@ -57,7 +58,7 @@ describe('Test Board', () => {
       collaborators: [createdCollaborator.id],
     });
 
-    expect(BoardResponse.status).to.eq(200);
+    expect(BoardResponse.status).to.eq(HTTP_STATUS.SUCCESS);
 
     const createdBoard = BoardResponse.body.board as Board;
     testBoard = await findBoardById(createdBoard.id);
@@ -70,7 +71,7 @@ describe('Test Board', () => {
         id: testBoard.id,
       });
 
-      expect(getResponse.status).to.equal(200);
+      expect(getResponse.status).to.equal(HTTP_STATUS.SUCCESS);
       const createdBoard = getResponse.body.board as Board;
 
       expect(createdBoard.title).to.include('myBoard');
@@ -89,7 +90,7 @@ describe('Test Board', () => {
         fields: newFields,
       });
 
-      expect(updateBoardResponse.status).to.equal(200);
+      expect(updateBoardResponse.status).to.equal(HTTP_STATUS.SUCCESS);
 
       const { fastFireOptions: _fastFireOptions, ...testBoardfields } =
         testBoard;
@@ -105,7 +106,7 @@ describe('Test Board', () => {
           id: testBoard.id,
         });
 
-      expect(deleteBoardResponse.status).to.equal(200);
+      expect(deleteBoardResponse.status).to.equal(HTTP_STATUS.SUCCESS);
 
       expect(await findBoardById(testBoard.id)).to.equal(null);
 

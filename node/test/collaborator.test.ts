@@ -4,6 +4,7 @@ import { server } from '../src/app';
 import superwstest from 'superwstest';
 import { Collaborator, findCollaboratorById } from '../src/models/collaborator';
 import { User } from '../src/models/user';
+import { HTTP_STATUS } from '../src/constants';
 
 /**
  * Defines Collaborator tests.
@@ -33,7 +34,7 @@ describe('Test Collaborator', () => {
       .post('/user/createUser')
       .send(expectedUser);
 
-    expect(createUserResponse.status).to.eq(200);
+    expect(createUserResponse.status).to.eq(HTTP_STATUS.SUCCESS);
     createdUser = createUserResponse.body.user as User;
   });
 
@@ -43,7 +44,7 @@ describe('Test Collaborator', () => {
       .post('/collaborator/createCollaborator')
       .send({ permissionLevel: 'edit', user: createdUser.id });
 
-    expect(response.status).to.eq(200);
+    expect(response.status).to.eq(HTTP_STATUS.SUCCESS);
 
     const createdCollaborator = response.body.collaborator as Collaborator;
     testCollaborator = await findCollaboratorById(createdCollaborator.id);
@@ -59,7 +60,7 @@ describe('Test Collaborator', () => {
           id: testCollaborator.id,
         });
 
-      expect(getResponse.status).to.equal(200);
+      expect(getResponse.status).to.equal(HTTP_STATUS.SUCCESS);
 
       const createdCollaborator = getResponse.body.collaborator as Collaborator;
       expect(createdCollaborator.id).to.equal(testCollaborator.id);
@@ -78,7 +79,7 @@ describe('Test Collaborator', () => {
           fields: newFields,
         });
 
-      expect(updateCollaboratorResponse.status).to.equal(200);
+      expect(updateCollaboratorResponse.status).to.equal(HTTP_STATUS.SUCCESS);
       const { fastFireOptions: _fastFireOptions, ...testColaboratorfields } =
         testCollaborator;
       expect(updateCollaboratorResponse.body).to.deep.equal(
@@ -95,7 +96,7 @@ describe('Test Collaborator', () => {
           id: testCollaborator.id,
         });
 
-      expect(deleteCommentResponse.status).to.equal(200);
+      expect(deleteCommentResponse.status).to.equal(HTTP_STATUS.SUCCESS);
 
       expect(await findCollaboratorById(testCollaborator.id)).to.equal(null);
 

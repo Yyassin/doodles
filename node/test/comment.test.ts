@@ -5,6 +5,7 @@ import superwstest from 'superwstest';
 import { Comment, findCommentById } from '../src/models/comment';
 import { Collaborator } from '../src/models/collaborator';
 import { User } from '../src/models/user';
+import { HTTP_STATUS } from '../src/constants';
 
 /**
  * Defines Comment tests.
@@ -35,7 +36,7 @@ describe('Test Comment', () => {
       .post('/user/createUser')
       .send(expectedUser);
 
-    expect(createUserResponse.status).to.eq(200);
+    expect(createUserResponse.status).to.eq(HTTP_STATUS.SUCCESS);
     createdUser = createUserResponse.body.user as User;
 
     //create collaborator with previously created user
@@ -43,7 +44,7 @@ describe('Test Comment', () => {
       .post('/collaborator/createCollaborator')
       .send({ permissionLevel: 'edit', user: createdUser.id });
 
-    expect(collabResponse.status).to.eq(200);
+    expect(collabResponse.status).to.eq(HTTP_STATUS.SUCCESS);
     createdCollaborator = collabResponse.body.collaborator as Collaborator;
   });
 
@@ -53,7 +54,7 @@ describe('Test Comment', () => {
       .post('/comment/createComment')
       .send({ text: 'hello', collaborator: createdCollaborator.id });
 
-    expect(CommentResponse.status).to.eq(200);
+    expect(CommentResponse.status).to.eq(HTTP_STATUS.SUCCESS);
 
     const createdComment = CommentResponse.body.comment as Comment;
     testComment = await findCommentById(createdComment.id);
@@ -66,7 +67,7 @@ describe('Test Comment', () => {
         id: testComment.id,
       });
 
-      expect(getResponse.status).to.equal(200);
+      expect(getResponse.status).to.equal(HTTP_STATUS.SUCCESS);
 
       const createdComment = getResponse.body.comment as Comment;
       expect(createdComment.id).to.equal(testComment.id);
@@ -84,7 +85,7 @@ describe('Test Comment', () => {
           fields: newFields,
         });
 
-      expect(updateCommentResponse.status).to.equal(200);
+      expect(updateCommentResponse.status).to.equal(HTTP_STATUS.SUCCESS);
       const { fastFireOptions: _fastFireOptions, ...testCommentfields } =
         testComment;
       expect(updateCommentResponse.body).to.deep.equal(testCommentfields);
@@ -99,7 +100,7 @@ describe('Test Comment', () => {
           id: testComment.id,
         });
 
-      expect(deleteCommentResponse.status).to.equal(200);
+      expect(deleteCommentResponse.status).to.equal(HTTP_STATUS.SUCCESS);
 
       expect(await findCommentById(testComment.id)).to.equal(null);
 

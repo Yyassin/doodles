@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { server } from '../src/app';
 import superwstest from 'superwstest';
 import { User, findUserById } from '../src/models/user';
+import { HTTP_STATUS } from '../src/constants';
 
 /**
  * Defines User tests.
@@ -30,7 +31,7 @@ describe('Test Users', () => {
       .post('/user/createUser')
       .send(expectedUser);
 
-    expect(createUserResponse.status).to.eq(200);
+    expect(createUserResponse.status).to.eq(HTTP_STATUS.SUCCESS);
     const createdUser = createUserResponse.body.user as User;
 
     expect(createdUser).to.deep.equal({
@@ -49,7 +50,7 @@ describe('Test Users', () => {
         id: testUser.id,
       });
 
-      expect(getUserNameResponse.status).to.equal(200);
+      expect(getUserNameResponse.status).to.equal(HTTP_STATUS.SUCCESS);
       const createdUser = getUserNameResponse.body.user as User;
 
       expect(createdUser).to.include(expectedUser);
@@ -69,7 +70,7 @@ describe('Test Users', () => {
         newName: newFields,
       });
 
-      expect(updateUserResponse.status).to.equal(200);
+      expect(updateUserResponse.status).to.equal(HTTP_STATUS.SUCCESS);
       const { fastFireOptions: _fastFireOptions, ...testFields } = testUser;
       expect(updateUserResponse.body).to.deep.equal(testFields);
     }
@@ -81,7 +82,7 @@ describe('Test Users', () => {
         id: testUser.id,
       });
 
-      expect(deleteUserResponse.status).to.equal(200);
+      expect(deleteUserResponse.status).to.equal(HTTP_STATUS.SUCCESS);
 
       expect(await findUserById(testUser.id)).to.equal(null);
     }
