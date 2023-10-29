@@ -1,3 +1,4 @@
+import React, { MouseEvent, useEffect, useRef } from 'react';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import {
   adjustElementCoordinatesById,
@@ -10,7 +11,7 @@ import {
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { CanvasElementType, TransformHandleDirection, Vector2 } from '@/types';
-import React, { MouseEvent, useRef } from 'react';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 
 /**
  * Main Canvas View
@@ -45,6 +46,12 @@ export default function Canvas() {
     'setSelectedElement',
     'selectedElementId',
   ]);
+
+  const { setCounter, setRoomID } = useWebSocketStore([
+    'setCounter',
+    'setRoomID',
+  ]);
+
   // A canvas state machine defining the current "state" action.
   const action = useRef<Action>('none');
   // Id of the element currently being drawn.
@@ -55,6 +62,12 @@ export default function Canvas() {
   const selectedHandlePositionRef = useRef<TransformHandleDirection | null>(
     null,
   );
+
+  // Initalize roomID upon entering the canvas
+  useEffect(() => {
+    setRoomID('1'); // Change later
+    return () => setRoomID(null);
+  }, []);
 
   // Update a canvas element's position state.
   const updateElement = (
@@ -143,6 +156,7 @@ export default function Canvas() {
     }
     // Return to idle none action state.
     action.current = 'none';
+    setCounter();
   };
 
   const handleMouseMove = (e: MouseEvent) => {

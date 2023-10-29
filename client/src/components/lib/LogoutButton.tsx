@@ -4,6 +4,11 @@ import { getAuth, signOut } from 'firebase/auth';
 import { firebaseApp } from '../../firebaseDB/firebase';
 import { Button } from '@/components/ui/button';
 
+/**
+ * It is the LogOut button component that allows users to log out
+ * @author Zakariyya Almalki
+ */
+
 function logOut() {
   return signOut(getAuth(firebaseApp));
 }
@@ -16,7 +21,7 @@ export default function LogoutButton() {
     setError('');
     try {
       await logOut();
-      setMode('signin');
+      setMode('signin'); // if logout works, bring back to sign in page
     } catch (error: unknown) {
       setError((error as Error).message);
     }
