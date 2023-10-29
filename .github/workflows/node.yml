@@ -51,8 +51,8 @@ jobs:
           key: npm-${{ hashFiles('./node/pnpm-lock.yaml') }}
           restore-keys: npm-
 
-      - name: Install internal modules
-        working-directory: ./mod
+      - name: Install Fastfire
+        working-directory: ./mod/fastfire
         run: npm i --global yarn && yarn install && yarn build
 
       - name: Install dependencies
