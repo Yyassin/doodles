@@ -21,10 +21,7 @@ const NO_ID_PROVIDED = 'No ID provided';
 export const handleCreateCollaborator = async (req: Request, res: Response) => {
   try {
     const { permissionLevel, user } = req.body; // The permission level and user parameters are in the body.
-    const { fastFireOptions, ...collaborator } = await createCollaborator(
-      permissionLevel,
-      user,
-    );
+    const collaborator = await createCollaborator(permissionLevel, user);
 
     res.status(HTTP_STATUS.SUCCESS).json({ collaborator });
   } catch (error) {
