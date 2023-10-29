@@ -29,6 +29,7 @@ export const handleCreateUser = async (req: Request, res: Response) => {
       password,
       avatar,
     );
+    const _ = fastFireOptions;
     res.status(HTTP_STATUS.SUCCESS).json({ user });
   } catch (error) {
     console.error('Error creating user:', error);
