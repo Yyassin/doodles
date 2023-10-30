@@ -54,9 +54,9 @@ interface CanvasElementActions {
     partialElement: Partial<CanvasElement>,
   ) => void;
   setSelectedElement: (id: string) => void;
-  undoCanvasElementState: () => void;
-  pushHistory: () => void;
-  redoCanvasElementState: () => void;
+  undoCanvasHistory: () => void;
+  pushCanvasHistory: () => void;
+  redoCanvasHistory: () => void;
   setCanvasElementState: (elment: CanvasElementState) => void;
 }
 type CanvasElementStore = CanvasElementState & CanvasElementActions;
@@ -78,8 +78,11 @@ export const initialCanvasElementState: CanvasElementState = {
   p1: {},
   p2: {},
 };
-export const history: CanvasElementState[] = [initialCanvasElementState];
-let historyIndex = 0;
+
+// History of prior canvas element stores for undo/redo.
+export let history: CanvasElementState[] = [initialCanvasElementState];
+// Index pointing to the current canvas element state inside history.
+export let historyIndex = 0;
 
 /* Actions */
 /**
@@ -238,10 +241,14 @@ const editCanvasElement =
       };
     });
 
-const pushHistory = (set: SetState<CanvasElementState>) => () => {
+/**
+ * Pushes the current store to the history array for undo/redo support.
+ */
+const pushCanvasHistory = (set: SetState<CanvasElementState>) => () => {
   set((state) => {
+    historyIndex++;
+    history = history.slice(0, historyIndex);
     history.push({ ...state });
-    historyIndex = history.length;
     return state;
   });
 };
@@ -249,28 +256,22 @@ const pushHistory = (set: SetState<CanvasElementState>) => () => {
  * Sets the canvas state to how it was before last element added
  * @returns Updated state without the undoed element.
  */
-const undoCanvasElementState = (set: SetState<CanvasElementState>) => () => {
+const undoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
   if (historyIndex > 0) {
     historyIndex--;
     const prevState = history[historyIndex];
-    if (prevState !== null) {
-      set(prevState);
-    }
-  } else {
-    set(history[0]);
+    set(prevState);
   }
 };
 /**
  * Sets the canvas state to how it was before undo
  * @returns Updated state without the undo.
  */
-const redoCanvasElementState = (set: SetState<CanvasElementState>) => () => {
+const redoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
   if (historyIndex < history.length - 1) {
     historyIndex++;
     const prevState = history[historyIndex];
-    if (prevState !== null) {
-      set(prevState);
-    }
+    set(prevState);
   }
 };
 /**
@@ -332,9 +333,9 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   editCanvasElement: editCanvasElement(set),
   setSelectedElement: setSelectedElement(set),
   setCanvasElementState: setCanvasElementState(set),
-  undoCanvasElementState: undoCanvasElementState(set),
-  pushHistory: pushHistory(set),
-  redoCanvasElementState: redoCanvasElementState(set),
+  undoCanvasHistory: undoCanvasHistory(set),
+  pushCanvasHistory: pushCanvasHistory(set),
+  redoCanvasHistory: redoCanvasHistory(set),
 }));
 export const useCanvasElementStore =
   createStoreWithSelectors(canvasElementStore);

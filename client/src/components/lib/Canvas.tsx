@@ -19,11 +19,11 @@ export default function Canvas() {
     'appWidth',
     'setMode',
   ]);
-  const { addCanvasElement, editCanvasElement, pushHistory, p1 } =
+  const { addCanvasElement, editCanvasElement, pushCanvasHistory, p1 } =
     useCanvasElementStore([
       'addCanvasElement',
       'editCanvasElement',
-      'pushHistory',
+      'pushCanvasHistory',
       'p1',
     ]);
 
@@ -74,7 +74,7 @@ export default function Canvas() {
 
   const handleMouseUp = () => {
     if (action !== 'none') {
-      pushHistory();
+      pushCanvasHistory();
     }
     setAction('none');
     setCounter();

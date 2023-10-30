@@ -1,7 +1,11 @@
 import { ResetIcon } from '@radix-ui/react-icons';
 import React from 'react';
 import { CanvasFlatButton } from './CanvasButton';
-import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import {
+  history,
+  historyIndex,
+  useCanvasElementStore,
+} from '@/stores/CanvasElementsStore';
 
 /**
  * Defines a set out buttons for undoing
@@ -10,15 +14,10 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
  */
 
 const UndoRedoButtons = () => {
-  const { undoCanvasElementState, redoCanvasElementState } =
-    useCanvasElementStore(['undoCanvasElementState', 'redoCanvasElementState']);
-
-  const handleUndo = () => {
-    undoCanvasElementState();
-  };
-  const handleRedo = () => {
-    redoCanvasElementState();
-  };
+  const { undoCanvasHistory, redoCanvasHistory } = useCanvasElementStore([
+    'undoCanvasHistory',
+    'redoCanvasHistory',
+  ]);
 
   return (
     <div
@@ -29,7 +28,8 @@ const UndoRedoButtons = () => {
     >
       <CanvasFlatButton
         className="rounded-l-md"
-        onClick={handleUndo}
+        disabled={historyIndex <= 0}
+        onClick={undoCanvasHistory}
         tooltip={{
           content: 'Undo',
           side: 'top',
@@ -40,7 +40,8 @@ const UndoRedoButtons = () => {
       </CanvasFlatButton>
       <CanvasFlatButton
         className="rounded-r-md"
-        onClick={handleRedo}
+        disabled={historyIndex >= history.length - 1}
+        onClick={redoCanvasHistory}
         tooltip={{
           content: 'Redo',
           side: 'top',
