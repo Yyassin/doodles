@@ -51,6 +51,10 @@ jobs:
           key: npm-${{ hashFiles('./node/pnpm-lock.yaml') }}
           restore-keys: npm-
 
+      - name: Install Fastfire
+        working-directory: ./mod/fastfire
+        run: npm i --global yarn && yarn install && yarn build
+
       - name: Install dependencies
         working-directory: ./node
         run: pnpm i --frozen-lockfile

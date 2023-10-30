@@ -18,14 +18,19 @@
   "license": "ISC",
   "dependencies": {
     "@types/ws": "^8.5.6",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
+    "fastfire": "file:../mod/fastfire",
     "firebase": "^10.4.0",
     "firebase-admin": "^11.11.0",
     "multer": "1.4.5-lts.1",
     "ws": "^8.14.2"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.19.4",
     "@types/chai": "^4.3.6",
+    "@types/cors": "^2.8.15",
     "@types/express": "^4.17.17",
     "@types/mocha": "^10.0.2",
     "@types/multer": "^1.4.8",
@@ -44,6 +49,8 @@
     "fs": "0.0.1-security",
     "mocha": "^10.2.0",
     "nodemon": "^3.0.1",
+    "supertest": "^6.3.3",
+    "superwstest": "^2.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }
