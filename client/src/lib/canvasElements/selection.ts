@@ -1,5 +1,11 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { distance, nearPoint } from '../math';
+import {
+  MaybeTransformHandleType,
+  TransformHandle,
+  TransformHandleType,
+} from '@/types';
+import { getTransformHandlesFromCoords } from './transform';
 
 /**
  * Various canvas element selection helpers.
@@ -8,23 +14,116 @@ import { distance, nearPoint } from '../math';
 
 /**
  * Returns the string corresponding to the cursor
- * style for the specified position.
- * @param position The position to get the style for.
+ * style for the specified position / near handle.
+ * @param transformHandleType The position / near handle. to get the style for.
  * @returns The cursor style.
  */
-export const cursorForPosition = (position: string) => {
-  switch (position) {
-    case 'tl':
-    case 'br':
-    case 'start':
-    case 'end':
-      return 'nwse-resize';
-    case 'tr':
-    case 'bl':
-      return 'nesw-resize';
+export const cursorForPosition = (
+  transformHandleType: MaybeTransformHandleType | 'inside',
+): string => {
+  let cursor = null;
+
+  switch (transformHandleType) {
+    case 'n':
+    case 's':
+      cursor = 'ns';
+      break;
+    case 'w':
+    case 'e':
+      cursor = 'ew';
+      break;
+    case 'nw':
+    case 'se':
+      cursor = 'nwse';
+      break;
+    case 'ne':
+    case 'sw':
+      cursor = 'nesw';
+      break;
+    case 'rotation':
+      return 'grab';
     default:
       return 'move';
   }
+
+  // if (cursor && element) {
+  //   cursor = rotateResizeCursor(cursor, element.angle);
+  // }
+
+  return cursor ? `${cursor}-resize` : '';
+};
+
+/**
+ * Checks whether the provided (x, y) position
+ * is within the provided handle's bounds.
+ * @param transformHandle The handle to check for [x, y, w, h].
+ * @param x The position to check's x coordinate.
+ * @param y The position to check's y coordinate.
+ * @returns True if the position is inside the handle, false otherwise.
+ */
+const isInsideTransformHandle = (
+  transformHandle: TransformHandle,
+  x: number,
+  y: number,
+) =>
+  x >= transformHandle[0] &&
+  x <= transformHandle[0] + transformHandle[2] &&
+  y >= transformHandle[1] &&
+  y <= transformHandle[1] + transformHandle[3];
+
+/**
+ * Checks which, if any, transform handle the provided (x, y)
+ * position is above relative to the element with teh specified id.
+ * @param elementId Id of the element who's handles to consider.
+ * @param appState Application state, which includes the element's state.
+ * @param x The position to check's x coordinate.
+ * @param y The position to check's y coordinate.
+ * @returns The handle the position is above, if any. False otherwise.
+ */
+export const resizeTest = (
+  elementId: string,
+  appState: {
+    // Eventually, an array
+    selectedElementIds: string;
+    p1: Record<string, CanvasElement['p1']>;
+    p2: Record<string, CanvasElement['p2']>;
+  },
+  x: number,
+  y: number,
+): MaybeTransformHandleType => {
+  const { selectedElementIds, p1, p2 } = appState;
+
+  if (elementId !== selectedElementIds) {
+    return false;
+  }
+
+  // TODO: Potential optimization if we cache this.
+  const { rotation: rotationTransformHandle, ...transformHandles } =
+    getTransformHandlesFromCoords({ p1, p2 }, selectedElementIds, {
+      rotation: true,
+    });
+
+  if (
+    rotationTransformHandle &&
+    isInsideTransformHandle(rotationTransformHandle, x, y)
+  ) {
+    return 'rotation' as TransformHandleType;
+  }
+
+  const filter = Object.keys(transformHandles).filter((key) => {
+    const transformHandle =
+      transformHandles[key as Exclude<TransformHandleType, 'rotation'>];
+    if (transformHandle === undefined) {
+      return false;
+    }
+    return isInsideTransformHandle(transformHandle, x, y);
+  });
+
+  if (filter.length > 0) {
+    return filter[0] as TransformHandleType;
+  }
+
+  return false;
 };
 
 /**
@@ -36,42 +135,40 @@ export const cursorForPosition = (position: string) => {
  * @param elementId Id of the element to check nearness on.
  * @returns The relative cursor position, or null if not near.
  */
-export const positionWithinElement = (
+const positionWithinElement = (
   x: number,
   y: number,
   appState: {
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
     types: Record<string, CanvasElement['type']>;
+    selectedElementId: string;
   },
-  elementId: string,
-) => {
-  // Grab the element's BB bounds.
-  const { p1, p2, types } = appState;
-  const elementType = types[elementId];
-  const { x: x1, y: y1 } = p1[elementId];
-  const { x: x2, y: y2 } = p2[elementId];
+  selection: string,
+): MaybeTransformHandleType | 'inside' => {
+  const { p1, p2, types, selectedElementId } = appState;
+  const elementType = types[selection];
+  const { x: x1, y: y1 } = p1[selection];
+  const { x: x2, y: y2 } = p2[selection];
 
-  // If it's a rectangle check nearness against corners or
-  // inside if inside all the bounds.
   if (elementType === 'rectangle') {
-    const topLeft = nearPoint(x, y, x1, y1, 'tl');
-    const topRight = nearPoint(x, y, x2, y1, 'tr');
-    const bottomLeft = nearPoint(x, y, x1, y2, 'bl');
-    const bottomRight = nearPoint(x, y, x2, y2, 'br');
+    const transformHandle = resizeTest(
+      selection,
+      { selectedElementIds: selectedElementId, p1, p2 },
+      x,
+      y,
+    );
     // Within if mouse is between extents
     const inside = x >= x1 && x <= x2 && y >= y1 && y <= y2 ? 'inside' : null;
 
     // Only one of these should ever be true -- unless the shape is small
     // but it's still possible to force one since inside is first.
-    return inside || topLeft || topRight || bottomLeft || bottomRight;
+    return inside || transformHandle;
   } else {
-    // Otherwise, it's a line. Measure the distance of the cursor
-    // to both line endpoints. If it's close to the actual line length
-    // then we are near the line.
-
-    // TODO: Could do distance from point to line??
-
+    // TODO: Could do distance from point to line
+    // Line -- what we do is measure dist from point to
+    // both endpoints. If it's close enough to line length
+    // then we say this is selecting the line.
     const a = { x: x1, y: y1 };
     const b = { x: x2, y: y2 };
     const c = { x, y }; // mouse pos
@@ -79,10 +176,9 @@ export const positionWithinElement = (
     // TODO: Can we optimize with no sqrt?
     const offset = Math.abs(distance(a, b) - (distance(c, a) + distance(c, b)));
 
-    // TODO: Can early return
-    const start = nearPoint(x, y, x1, y1, 'nw');
-    const end = nearPoint(x, y, x2, y2, 'se');
-    const inside = Math.abs(offset) < 1 ? 'inside' : null;
+    const start = nearPoint(x, y, x1, y1, 'nw'); // so it resizes x1, y1
+    const end = nearPoint(x, y, x2, y2, 'se'); // so it resizes x2, y2
+    const inside = Math.abs(offset) < 1 ? 'inside' : false;
     return inside || start || end;
   }
 };
@@ -105,6 +201,7 @@ export const getElementAtPosition = (
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
     types: Record<string, CanvasElement['type']>;
+    selectedElementId: string;
   },
 ) => {
   // TODO:
@@ -117,5 +214,5 @@ export const getElementAtPosition = (
       id,
       position: positionWithinElement(x, y, appState, id),
     }))
-    .find((element) => element.position !== null);
+    .find((element) => element.position);
 };

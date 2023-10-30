@@ -25,6 +25,8 @@ export type TransformHandle = [number, number, number, number];
 export type TransformHandles = Partial<{
   [T in TransformHandleType]: TransformHandle;
 }>;
+/* Falsable transform handle type */
+export type MaybeTransformHandleType = TransformHandleType | false;
 
 /** App */
 export const AppModes = ['signup', 'signin', 'canvas', 'dashboard'] as const;

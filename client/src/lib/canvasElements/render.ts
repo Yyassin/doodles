@@ -85,11 +85,16 @@ export const renderSelectionBorder = (
   elementId: string,
 ) => {
   const { p1, p2 } = appState;
-  const { x: elementX1, y: elementY1 } = p1[elementId];
-  const { x: elementX2, y: elementY2 } = p2[elementId];
+  const { x: x1, y: y1 } = p1[elementId];
+  const { x: x2, y: y2 } = p2[elementId];
 
-  const elementWidth = elementX2 - elementX1;
-  const elementHeight = elementY2 - elementY1;
+  const elementWidth = x2 - x1;
+  const elementHeight = y2 - y1;
+
+  // If we switch the corners while resizing, simply invert
+  // padding rather than swapping coordinates around.
+  const widthInversion = Math.sign(elementWidth);
+  const heightInversion = Math.sign(elementHeight);
 
   const linePadding = 6 / zoomValue;
 
@@ -98,10 +103,10 @@ export const renderSelectionBorder = (
   ctx.lineWidth = 2 / zoomValue;
   strokeRectWithRotation(
     ctx,
-    elementX1 - linePadding,
-    elementY1 - linePadding,
-    elementWidth + linePadding * 2,
-    elementHeight + linePadding * 2,
+    x1 - widthInversion * linePadding,
+    y1 - heightInversion * linePadding,
+    elementWidth + widthInversion * linePadding * 2,
+    elementHeight + heightInversion * linePadding * 2,
     0,
   );
 };

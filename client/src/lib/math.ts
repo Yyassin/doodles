@@ -1,4 +1,4 @@
-import { Vector2 } from '@/types';
+import { TransformHandleDirection, Vector2 } from '@/types';
 
 /**
  * Math related helper functions.
@@ -22,7 +22,7 @@ export const distance = (a: Vector2, b: Vector2) =>
  * @param y The y coordinate of the first point.
  * @param x1 The x coordinate of the target.
  * @param y1 The y coordinate of the target
- * @param name The name to return if true.
+ * @param name The handle name to return if true.
  * @param thresh The threshold to determine nearness.
  * @returns The name if the points are near eachother, null otherwise.
  */
@@ -31,10 +31,10 @@ export const nearPoint = (
   y: number,
   x1: number,
   y1: number,
-  name: string,
+  name: TransformHandleDirection,
   thresh = 5,
 ) => {
-  return Math.abs(x - x1) < thresh && Math.abs(y - y1) < thresh ? name : null;
+  return Math.abs(x - x1) < thresh && Math.abs(y - y1) < thresh ? name : false;
 };
 
 /**

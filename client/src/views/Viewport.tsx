@@ -19,7 +19,7 @@ const Viewport = () => {
   const viewportRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div id="Viewport" ref={viewportRef}>
+    <div id="Viewport" className="select-none" ref={viewportRef}>
       <ToolBar />
       <DropDownMenu viewportRef={viewportRef} />
 

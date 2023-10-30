@@ -58,7 +58,7 @@ export const useShortcuts = () => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (shouldIgnoreKeyPress(e)) return;
 
-      // Delete the selected element
+      // Delete the selected element on backspace
       if (e.code === 'Backspace' && selectedElementId !== '') {
         const id = selectedElementId;
         setSelectedElement('');

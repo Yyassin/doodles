@@ -52,18 +52,24 @@ export const getTransformHandlesFromCoords = (
   omitSides: { [T in TransformHandleType]?: boolean } = {},
 ) => {
   const { p1, p2 } = appState;
-  const { x: x1, y: y1 } = p1[elementId];
-  const { x: x2, y: y2 } = p2[elementId];
+  let { x: x1, y: y1 } = p1[elementId];
+  let { x: x2, y: y2 } = p2[elementId];
 
   const size = 8;
   const handleWidth = size / zoomValue;
   const handleHeight = size / zoomValue;
 
+  // We could do adjustCoordinates here, but I
+  // think a manual inversion is faster. We also
+  // know this is rectangle for sure.
+  const width = Math.abs(x2 - x1);
+  const height = Math.abs(y2 - y1);
+  [x1, x2] = x2 < x1 ? [x2, x1] : [x1, x2];
+  [y1, y2] = y2 < y1 ? [y2, y1] : [y1, y2];
+
   const handleMarginX = size / zoomValue;
   const handleMarginY = size / zoomValue;
 
-  const width = x2 - x1;
-  const height = y2 - y1;
   // Rect only for now
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
@@ -138,7 +144,7 @@ export const getTransformHandlesFromCoords = (
 
   const transformHandleSizes = 8;
   const minimumSizeForEightHandles = (5 * transformHandleSizes) / zoomValue;
-  if (Math.abs(width) > minimumSizeForEightHandles) {
+  if (width > minimumSizeForEightHandles) {
     if (!omitSides.n) {
       transformHandles.n = generateTransformHandle(
         x1 + width / 2 - handleWidth / 2,
@@ -162,7 +168,7 @@ export const getTransformHandlesFromCoords = (
       );
     }
   }
-  if (Math.abs(height) > minimumSizeForEightHandles) {
+  if (height > minimumSizeForEightHandles) {
     if (!omitSides.w) {
       transformHandles.w = generateTransformHandle(
         x1 - dashedLineMargin - handleMarginX + centeringOffset,

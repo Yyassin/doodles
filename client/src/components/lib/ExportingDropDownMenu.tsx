@@ -12,9 +12,7 @@ import { Share2Icon } from '@radix-ui/react-icons';
 /**
  * Downloads Canvas as PNG File
  */
-const handlePNGExport = () => {
-  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-  const dataURL = canvas.toDataURL('image/png');
+const handlePNGExport = (dataURL: string) => {
   const link = document.createElement('a');
   link.href = dataURL;
   link.download = 'canvas.png';
@@ -24,15 +22,16 @@ const handlePNGExport = () => {
 /**
  * Downloads Canvas as PDF File
  */
-const handlePDFExport = () => {
-  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-  const dataURL = canvas.toDataURL('image/png');
+const handlePDFExport = (dataURL: string) => {
   const pdf = new jsPDF('portrait');
   pdf.addImage(dataURL, 'PNG', 15, 15, 190, 130);
   pdf.save('canvas.pdf');
 };
 
-export const Exporting = () => {
+export const ExportingDropDownMenu = () => {
+  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  const dataURL = canvas.toDataURL('image/png');
+
   return (
     <>
       <DropdownMenu.Sub>
@@ -47,13 +46,13 @@ export const Exporting = () => {
           >
             <DropdownMenu.Item
               className="group w-full text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-teal-500"
-              onClick={handlePDFExport}
+              onClick={() => handlePDFExport(dataURL)}
             >
               Export as PDF
             </DropdownMenu.Item>
             <DropdownMenu.Item
               className="group w-full text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-teal-500"
-              onClick={handlePNGExport}
+              onClick={() => handlePNGExport(dataURL)}
             >
               Export as PNG
             </DropdownMenu.Item>
