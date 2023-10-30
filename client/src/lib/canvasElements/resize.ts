@@ -68,6 +68,10 @@ export const adjustElementCoordinates = (
 ) => {
   const { x: x1, y: y1 } = p1;
   const { x: x2, y: y2 } = p2;
+  // TODO: Temporary, this is a bug
+  if (elementType === 'circle') {
+    return { x1, x2, y1, y2 };
+  }
   if (elementType === 'rectangle') {
     const minX = Math.min(x1, x2);
     const maxX = Math.max(x1, x2);

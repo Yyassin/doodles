@@ -58,6 +58,9 @@ interface CanvasElementActions {
   ) => void;
   removeCanvasElement: (id: string) => void;
   setSelectedElement: (id: string) => void;
+  undoCanvasHistory: () => void;
+  pushCanvasHistory: () => void;
+  redoCanvasHistory: () => void;
   setCanvasElementState: (elment: CanvasElementState) => void;
 }
 type CanvasElementStore = CanvasElementState & CanvasElementActions;
@@ -80,6 +83,11 @@ export const initialCanvasElementState: CanvasElementState = {
   p1: {},
   p2: {},
 };
+
+// History of prior canvas element stores for undo/redo.
+export let history: CanvasElementState[] = [initialCanvasElementState];
+// Index pointing to the current canvas element state inside history.
+export let historyIndex = 0;
 
 /* Actions */
 /**
@@ -132,7 +140,6 @@ const addCanvasShape =
       roughElements[id] = roughElement;
       p1s[id] = p1;
       p2s[id] = p2;
-
       return {
         ...state,
         allIds,
@@ -335,6 +342,39 @@ const removeCanvasElement =
     });
 
 /**
+ * Pushes the current store to the history array for undo/redo support.
+ */
+const pushCanvasHistory = (set: SetState<CanvasElementState>) => () => {
+  set((state) => {
+    historyIndex++;
+    history = history.slice(0, historyIndex);
+    history.push({ ...state });
+    return state;
+  });
+};
+/**
+ * Sets the canvas state to how it was before last element added
+ * @returns Updated state without the undoed element.
+ */
+const undoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
+  if (historyIndex > 0) {
+    historyIndex--;
+    const prevState = history[historyIndex];
+    set(prevState);
+  }
+};
+/**
+ * Sets the canvas state to how it was before undo
+ * @returns Updated state without the undo.
+ */
+const redoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
+  if (historyIndex < history.length - 1) {
+    historyIndex++;
+    const prevState = history[historyIndex];
+    set(prevState);
+  }
+};
+/**
  * Sets the currently selected element id.
  * @param selectedElementId The id to set as selected.
  * @returns Updated state with the selected element id.
@@ -395,6 +435,9 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   removeCanvasElement: removeCanvasElement(set),
   setSelectedElement: setSelectedElement(set),
   setCanvasElementState: setCanvasElementState(set),
+  undoCanvasHistory: undoCanvasHistory(set),
+  pushCanvasHistory: pushCanvasHistory(set),
+  redoCanvasHistory: redoCanvasHistory(set),
 }));
 export const useCanvasElementStore =
   createStoreWithSelectors(canvasElementStore);

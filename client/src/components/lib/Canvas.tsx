@@ -20,7 +20,7 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
 
 /**
  * Main Canvas View
- * @authors Yousef Yassin
+ * @authors Yousef Yassin, Dana El Sherif
  */
 
 const drawingTools = ['line', 'rectangle', 'circle', 'freehand'] as const;
@@ -46,6 +46,7 @@ export default function Canvas() {
     allIds,
     selectedElementId,
     freehandPoints,
+    pushCanvasHistory,
     setSelectedElement,
   } = useCanvasElementStore([
     'addCanvasShape',
@@ -58,6 +59,8 @@ export default function Canvas() {
     'setSelectedElement',
     'freehandPoints',
     'selectedElementId',
+    'pushCanvasHistory',
+    'setSelectedElement',
   ]);
 
   const { setCounter, setRoomID } = useWebSocketStore([
@@ -175,9 +178,13 @@ export default function Canvas() {
       });
       updateElement(id, x1, y1, x2, y2, types[id]);
     }
+
+    if (action.current !== 'none') {
+      pushCanvasHistory();
+    }
+    setCounter();
     // Return to idle none action state.
     action.current = 'none';
-    setCounter();
   };
 
   const handleMouseMove = (e: MouseEvent) => {

@@ -48,7 +48,7 @@ const BaseCanvasButton =
 const CanvasButton = BaseCanvasButton();
 // These are inside a canvas island (that already has shadow).
 const CanvasFlatButton = BaseCanvasButton(
-  'p-[0.75rem] items-center justify-center outline-none hover:bg-indigo-100',
+  'p-[0.75rem] items-center justify-center outline-none enabled:hover:bg-indigo-100 disabled:opacity-40 disabled:cursor-not-allowed	',
 );
 
 export { CanvasButton, CanvasFlatButton };
