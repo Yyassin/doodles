@@ -1,3 +1,4 @@
+import { renderTransformFrame } from '@/lib/canvasElements/transform';
 import { ObjectValues } from '@/lib/misc';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
@@ -12,7 +13,14 @@ import rough from 'roughjs';
  */
 const useDrawElements = () => {
   const { appHeight, appWidth } = useAppStore(['appHeight', 'appWidth']);
-  const { roughElements } = useCanvasElementStore(['roughElements']);
+  const { roughElements, selectedElementId, p1, p2, types } =
+    useCanvasElementStore([
+      'roughElements',
+      'selectedElementId',
+      'p1',
+      'p2',
+      'types',
+    ]);
 
   // Effect fires after DOM is mounted
   useLayoutEffect(() => {
@@ -30,7 +38,14 @@ const useDrawElements = () => {
     ObjectValues(roughElements).forEach((roughElement) =>
       roughCanvas.draw(roughElement),
     );
-  }, [roughElements, appWidth, appHeight]);
+
+    // Highlight selected elements (only 1 for now). We ignore
+    // lines for the moment.
+    if (selectedElementId === '' || types[selectedElementId] === 'line') return;
+    [selectedElementId].forEach((id) => {
+      renderTransformFrame(ctx, { p1, p2 }, id);
+    });
+  }, [roughElements, selectedElementId, types, p1, p2, appWidth, appHeight]);
 };
 
 export default useDrawElements;

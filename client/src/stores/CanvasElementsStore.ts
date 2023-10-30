@@ -53,6 +53,7 @@ interface CanvasElementActions {
     id: string,
     partialElement: Partial<CanvasElement>,
   ) => void;
+  removeCanvasElement: (id: string) => void;
   setSelectedElement: (id: string) => void;
   undoCanvasHistory: () => void;
   pushCanvasHistory: () => void;
@@ -164,7 +165,7 @@ const editCanvasElement =
   (set: SetState<CanvasElementState>) =>
   (id: string, partialElement: Partial<CanvasElement>) =>
     set((state) => {
-      const allIds = id ? [...state.allIds, id] : state.allIds;
+      // Edit shouldn't add a new id
       const types = partialElement.type
         ? { ...state.types, [id]: partialElement.type }
         : state.types;
@@ -222,6 +223,61 @@ const editCanvasElement =
       const p2s = partialElement.p2
         ? { ...state.p2, [id]: partialElement.p2 }
         : state.p2;
+
+      return {
+        ...state,
+        // allIds,
+        types,
+        strokeColors,
+        fillColors,
+        bowings,
+        roughnesses,
+        strokeWidths,
+        fillStyles,
+        strokeLineDashes,
+        opacities,
+        roughElements,
+        p1: p1s,
+        p2: p2s,
+      };
+    });
+
+/**
+ * Removes the canvas element with the specfied state
+ * from the store.
+ * @param id The element to remove.
+ * @returns Updated state with the element removed.
+ */
+const removeCanvasElement =
+  (set: SetState<CanvasElementState>) => (id: string) =>
+    set((state) => {
+      const allIds = [...state.allIds];
+      const types = { ...state.types };
+      const strokeColors = { ...state.strokeColors };
+      const fillColors = { ...state.fillColors };
+      const bowings = { ...state.bowings };
+      const roughnesses = { ...state.roughnesses };
+      const strokeWidths = { ...state.strokeWidths };
+      const fillStyles = { ...state.fillStyles };
+      const strokeLineDashes = { ...state.strokeLineDashes };
+      const opacities = { ...state.opacities };
+      const roughElements = { ...state.roughElements };
+      const p1s = { ...state.p1 };
+      const p2s = { ...state.p2 };
+
+      allIds.splice(allIds.indexOf(id), 1);
+      delete types[id];
+      delete strokeColors[id];
+      delete fillColors[id];
+      delete bowings[id];
+      delete roughnesses[id];
+      delete strokeWidths[id];
+      delete fillStyles[id];
+      delete strokeLineDashes[id];
+      delete opacities[id];
+      delete roughElements[id];
+      delete p1s[id];
+      delete p2s[id];
 
       return {
         ...state,
@@ -331,6 +387,7 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   ...initialCanvasElementState,
   addCanvasElement: addCanvasElement(set),
   editCanvasElement: editCanvasElement(set),
+  removeCanvasElement: removeCanvasElement(set),
   setSelectedElement: setSelectedElement(set),
   setCanvasElementState: setCanvasElementState(set),
   undoCanvasHistory: undoCanvasHistory(set),
