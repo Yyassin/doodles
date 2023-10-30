@@ -6,6 +6,26 @@
 /** General */
 export type Vector2 = { x: number; y: number };
 
+/** Canvas Element Selection */
+/* The 4 sides, and 4 corners of a canvas element BB. */
+export type TransformHandleDirection =
+  | 'n'
+  | 's'
+  | 'w'
+  | 'e'
+  | 'nw'
+  | 'ne'
+  | 'sw'
+  | 'se';
+/* A transform handle is defined by it's position (side/corner) or it can be a rotation. */
+export type TransformHandleType = TransformHandleDirection | 'rotation';
+/* A transform handle: the position [x, y] and size [width, height] */
+export type TransformHandle = [number, number, number, number];
+/* A given canvas element's handles, labelled by their position. */
+export type TransformHandles = Partial<{
+  [T in TransformHandleType]: TransformHandle;
+}>;
+
 /** App */
 export const AppModes = ['signup', 'signin', 'canvas', 'dashboard'] as const;
 export type AppMode = (typeof AppModes)[number];
