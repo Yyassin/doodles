@@ -6,7 +6,7 @@ import { CanvasElementFillStyle, CanvasElementType, Vector2 } from '@/types';
 
 /**
  * Defines canvas drawable element state
- * @authors Yousef Yassin & Abdalla Abdelhadi
+ * @authors Yousef Yassin, Abdalla Abdelhadi, Dana El Sherif
  */
 
 /**
@@ -22,7 +22,8 @@ export interface CanvasElement {
   fillStyle: CanvasElementFillStyle; // Pattern for filling the element
   strokeLineDash: number[]; // Array of gap width between strokes (repeats)
   opacity: number; // Element opacity -- TODO: not sure how this will work yet
-  roughElement: Drawable; // The underlying roughjs element, if applicable.
+  roughElement?: Drawable; // The underlying roughjs element, if applicable.
+  freehandPoints?: Vector2[];
   p1: Vector2; // Top left coordinate, or center for circles
   p2: Vector2; // Bottom right coordinate
   id: string; // Element id
@@ -43,12 +44,14 @@ export interface CanvasElementState {
   strokeLineDashes: Record<string, CanvasElement['strokeLineDash']>;
   opacities: Record<string, CanvasElement['opacity']>;
   roughElements: Record<string, CanvasElement['roughElement']>;
+  freehandPoints: Record<string, CanvasElement['freehandPoints']>;
   p1: Record<string, CanvasElement['p1']>;
   p2: Record<string, CanvasElement['p2']>;
 }
 
 interface CanvasElementActions {
-  addCanvasElement: (element: CanvasElement) => void;
+  addCanvasShape: (element: CanvasElement) => void;
+  addCanvasFreehand: (element: CanvasElement) => void;
   editCanvasElement: (
     id: string,
     partialElement: Partial<CanvasElement>,
@@ -73,6 +76,7 @@ export const initialCanvasElementState: CanvasElementState = {
   strokeLineDashes: {},
   opacities: {},
   roughElements: {},
+  freehandPoints: {},
   p1: {},
   p2: {},
 };
@@ -83,7 +87,7 @@ export const initialCanvasElementState: CanvasElementState = {
  * @param element The element to add.
  * @returns Updated state with the element added.
  */
-const addCanvasElement =
+const addCanvasShape =
   (set: SetState<CanvasElementState>) => (element: CanvasElement) =>
     set((state) => {
       const allIds = [...state.allIds];
@@ -144,6 +148,42 @@ const addCanvasElement =
         roughElements,
         p1: p1s,
         p2: p2s,
+      };
+    });
+
+const addCanvasFreehand =
+  (set: SetState<CanvasElementState>) => (element: CanvasElement) =>
+    set((state) => {
+      const allIds = [...state.allIds];
+      const types = { ...state.types };
+      const fillColors = { ...state.fillColors };
+      const strokeWidths = { ...state.strokeWidths };
+      const opacities = { ...state.opacities };
+      const freehandPoints = { ...state.freehandPoints };
+
+      const {
+        id,
+        type,
+        fillColor,
+        strokeWidth,
+        opacity,
+        freehandPoints: elemFreehandPoints,
+      } = element;
+      allIds.push(id);
+      types[id] = type;
+      fillColors[id] = fillColor;
+      strokeWidths[id] = strokeWidth;
+      opacities[id] = opacity;
+      freehandPoints[id] = elemFreehandPoints;
+
+      return {
+        ...state,
+        allIds,
+        types,
+        fillColors,
+        strokeWidths,
+        opacities,
+        freehandPoints,
       };
     });
 
@@ -216,6 +256,9 @@ const editCanvasElement =
       const p2s = partialElement.p2
         ? { ...state.p2, [id]: partialElement.p2 }
         : state.p2;
+      const freehandPoints = partialElement.freehandPoints
+        ? { ...state.freehandPoints, [id]: partialElement.freehandPoints }
+        : state.freehandPoints;
 
       return {
         ...state,
@@ -232,6 +275,7 @@ const editCanvasElement =
         roughElements,
         p1: p1s,
         p2: p2s,
+        freehandPoints,
       };
     });
 
@@ -345,7 +389,8 @@ const setCanvasElementState =
 /** Store Hook */
 const canvasElementStore = create<CanvasElementStore>()((set) => ({
   ...initialCanvasElementState,
-  addCanvasElement: addCanvasElement(set),
+  addCanvasShape: addCanvasShape(set),
+  addCanvasFreehand: addCanvasFreehand(set),
   editCanvasElement: editCanvasElement(set),
   removeCanvasElement: removeCanvasElement(set),
   setSelectedElement: setSelectedElement(set),

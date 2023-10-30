@@ -39,6 +39,7 @@ export const AppTools = [
   'text',
   'freehand',
   'rectangle',
+  'circle',
   'line',
   'image',
   'erase',
@@ -51,7 +52,12 @@ export type AppTheme = (typeof AppThemes)[number];
 
 /** Canvas Elements */
 /* Supported canvas element types */
-export const CanvasElementTypes = ['line', 'rectangle'] as const;
+export const CanvasElementTypes = [
+  'line',
+  'rectangle',
+  'circle',
+  'freehand',
+] as const;
 export type CanvasElementType = (typeof CanvasElementTypes)[number];
 
 /* Supported canvas element fill styles */
