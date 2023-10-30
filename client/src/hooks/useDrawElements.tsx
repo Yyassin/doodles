@@ -64,7 +64,7 @@ const useDrawElements = () => {
       if (type === 'freehand') {
         const points = freehandPoints[id];
         if (points === undefined) return;
-        const stroke = getSvgPathFromStroke(getStroke(points));
+        const stroke = getSvgPathFromStroke(getStroke(points, { size: 5 }));
         // TODO: Potential optimization by saving Path2Ds
         ctx.fill(new Path2D(stroke));
       } else {
