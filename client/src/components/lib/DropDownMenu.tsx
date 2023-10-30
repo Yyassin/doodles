@@ -11,6 +11,11 @@ import {
 } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
 
+/**
+ * Creates a DropDownMenu for Canvas
+ * @author Dana El Sherif
+ */
+
 const DropDownMenu = ({
   viewportRef,
 }: {

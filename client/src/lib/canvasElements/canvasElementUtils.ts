@@ -1,6 +1,6 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { generator } from './generator';
-import { CanvasElementType } from '@/types';
+import { CanvasElementType, Vector2 } from '@/types';
 
 // TODO: Want an inheritance approach with creation/editing.
 
@@ -31,13 +31,33 @@ const createElement = (
   x2: number,
   y2: number,
   type: CanvasElementType,
+  points?: Vector2[],
   options = defaultOptions,
 ): CanvasElement => {
-  const roughElement =
-    type === 'line'
-      ? generator.line(x1, y1, x2, y2, options)
-      : // Rectangle takes w, h as last two params
-        generator.rectangle(x1, y1, x2 - x1, y2 - y1, options);
+  let roughElement;
+  let newPoints;
+  if (points === undefined) {
+    switch (type) {
+      case 'line':
+        roughElement = generator.line(x1, y1, x2, y2, options);
+        break;
+      case 'rectangle':
+        roughElement = generator.rectangle(x1, y1, x2 - x1, y2 - y1, options);
+        break;
+      case 'circle':
+        roughElement = generator.circle(
+          x1,
+          y1,
+          2 * Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)),
+          options,
+        );
+        break;
+      default:
+        null;
+    }
+  } else {
+    newPoints = [...points, { x: x2, y: y2 }];
+  }
 
   return {
     id,
@@ -53,6 +73,7 @@ const createElement = (
     strokeLineDash,
     opacity,
     roughElement,
+    freehandPoints: newPoints,
   };
 };
 
