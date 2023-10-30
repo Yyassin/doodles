@@ -10,7 +10,12 @@ import {
 } from '@/lib/canvasElements/selection';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
-import { CanvasElementType, TransformHandleDirection, Vector2 } from '@/types';
+import {
+  AppTool,
+  CanvasElementType,
+  TransformHandleDirection,
+  Vector2,
+} from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 
 /**
@@ -18,6 +23,10 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
  * @authors Yousef Yassin, Dana El Sherif
  */
 
+const drawingTools = ['line', 'rectangle', 'circle', 'freehand'] as const;
+const drawingToolsSet = new Set(drawingTools);
+const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
+  drawingToolsSet.has(tool as (typeof drawingTools)[number]);
 type Action = 'none' | 'drawing' | 'resizing' | 'moving';
 
 export default function Canvas() {
@@ -28,25 +37,30 @@ export default function Canvas() {
     'setMode',
   ]);
   const {
-    addCanvasElement,
+    addCanvasShape,
+    addCanvasFreehand,
     editCanvasElement,
     p1,
     p2,
     types,
     allIds,
     selectedElementId,
-    setSelectedElement,
+    freehandPoints,
     pushCanvasHistory,
+    setSelectedElement,
   } = useCanvasElementStore([
-    'addCanvasElement',
+    'addCanvasShape',
+    'addCanvasFreehand',
     'editCanvasElement',
     'p1',
     'p2',
     'types',
     'allIds',
     'setSelectedElement',
+    'freehandPoints',
     'selectedElementId',
     'pushCanvasHistory',
+    'setSelectedElement',
   ]);
 
   const { setCounter, setRoomID } = useWebSocketStore([
@@ -71,6 +85,8 @@ export default function Canvas() {
     return () => setRoomID(null);
   }, []);
 
+  const isDrawingSelected = isDrawingTool(tool);
+
   // Update a canvas element's position state.
   const updateElement = (
     id: string,
@@ -79,12 +95,14 @@ export default function Canvas() {
     x2: number,
     y2: number,
     type: CanvasElementType,
+    points?: Vector2[],
   ) => {
-    const updatedElement = createElement(id, x1, y1, x2, y2, type);
+    const updatedElement = createElement(id, x1, y1, x2, y2, type, points);
     editCanvasElement(id, {
       p1: { x: x1, y: y1 },
       p2: { x: x2, y: y2 },
       roughElement: updatedElement.roughElement,
+      freehandPoints: updatedElement.freehandPoints,
     });
   };
 
@@ -119,11 +137,12 @@ export default function Canvas() {
       } else {
         action.current = 'resizing';
       }
-    } else if (tool === 'line' || tool === 'rectangle') {
+    } else if (isDrawingSelected) {
       // Not selection, then we're creating a new element.
 
       // Create a new element originating from the clicked point
       const id = crypto.randomUUID();
+      const points = tool === 'freehand' ? ([] as Vector2[]) : undefined;
       const element = createElement(
         id,
         clientX,
@@ -131,11 +150,14 @@ export default function Canvas() {
         clientX,
         clientY,
         tool,
+        points,
       );
 
       // Commit the element to state and set
       // our 'action state' to drawing.
-      addCanvasElement(element);
+      tool === 'freehand'
+        ? addCanvasFreehand(element)
+        : addCanvasShape(element);
       action.current = 'drawing';
       currentDrawingElemId.current = id;
     }
@@ -156,11 +178,12 @@ export default function Canvas() {
       });
       updateElement(id, x1, y1, x2, y2, types[id]);
     }
-    // Return to idle none action state.
+
     if (action.current !== 'none') {
       pushCanvasHistory();
     }
     setCounter();
+    // Return to idle none action state.
     action.current = 'none';
   };
 
@@ -251,12 +274,13 @@ export default function Canvas() {
           break;
         }
       }
-    } else if (tool === 'line' || tool === 'rectangle') {
+    } else if (isDrawingSelected) {
       // Not selection tool, so drawing an element.
       if (action.current !== 'drawing') return;
 
       // Otherwise, update the element we're currently drawing
-      const { x: x1, y: y1 } = p1[currentDrawingElemId.current];
+      const { x: x1, y: y1 } = p1[currentDrawingElemId.current] ?? {};
+      const points = freehandPoints[currentDrawingElemId.current];
       updateElement(
         currentDrawingElemId.current,
         x1,
@@ -264,6 +288,7 @@ export default function Canvas() {
         clientX,
         clientY,
         tool,
+        points,
       );
     }
   };

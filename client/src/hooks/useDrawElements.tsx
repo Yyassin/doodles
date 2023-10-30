@@ -1,26 +1,50 @@
 import { renderTransformFrame } from '@/lib/canvasElements/transform';
-import { ObjectValues } from '@/lib/misc';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useLayoutEffect } from 'react';
 import rough from 'roughjs';
+import getStroke from 'perfect-freehand';
+
+const getSvgPathFromStroke = (stroke: number[][]) => {
+  if (!stroke.length) return '';
+
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i + 1) % arr.length];
+      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+      return acc;
+    },
+    ['M', ...stroke[0], 'Q'],
+  );
+  d.push('Z');
+  return d.join(' ');
+};
 
 /**
  * Hook that's subscribed to the roughElements
  * state and will trigger a rerender, redrawing all elements,
  * whenever an element is updated.
- * @author Yousef Yassin
+ * @authors Yousef Yassin, Dana El Sherif
  */
 const useDrawElements = () => {
   const { appHeight, appWidth } = useAppStore(['appHeight', 'appWidth']);
-  const { roughElements, selectedElementId, p1, p2, types } =
-    useCanvasElementStore([
-      'roughElements',
-      'selectedElementId',
-      'p1',
-      'p2',
-      'types',
-    ]);
+  const {
+    roughElements,
+    selectedElementId,
+    p1,
+    p2,
+    types,
+    allIds,
+    freehandPoints,
+  } = useCanvasElementStore([
+    'roughElements',
+    'selectedElementId',
+    'p1',
+    'p2',
+    'types',
+    'allIds',
+    'freehandPoints',
+  ]);
 
   // Effect fires after DOM is mounted
   useLayoutEffect(() => {
@@ -35,9 +59,19 @@ const useDrawElements = () => {
     const roughCanvas = rough.canvas(canvas);
 
     // Render each element
-    ObjectValues(roughElements).forEach((roughElement) =>
-      roughCanvas.draw(roughElement),
-    );
+    allIds.forEach((id) => {
+      const type = types[id];
+      if (type === 'freehand') {
+        const points = freehandPoints[id];
+        if (points === undefined) return;
+        const stroke = getSvgPathFromStroke(getStroke(points, { size: 5 }));
+        // TODO: Potential optimization by saving Path2Ds
+        ctx.fill(new Path2D(stroke));
+      } else {
+        const roughElement = roughElements[id];
+        roughElement && roughCanvas.draw(roughElement);
+      }
+    });
 
     // Highlight selected elements (only 1 for now). We ignore
     // lines for the moment.
@@ -45,7 +79,7 @@ const useDrawElements = () => {
     [selectedElementId].forEach((id) => {
       renderTransformFrame(ctx, { p1, p2 }, id);
     });
-  }, [roughElements, selectedElementId, types, p1, p2, appWidth, appHeight]);
+  }, [allIds, selectedElementId, types, p1, p2, appWidth, appHeight]);
 };
 
 export default useDrawElements;

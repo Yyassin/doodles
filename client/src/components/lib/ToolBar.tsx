@@ -7,6 +7,7 @@ import {
   SquareIcon,
   MinusIcon,
   ImageIcon,
+  CircleIcon,
   EraserIcon,
   CursorArrowIcon,
 } from '@radix-ui/react-icons';
@@ -23,6 +24,7 @@ const toolIcons: Record<AppTool, ReactNode> = {
   text: <TextIcon />,
   freehand: <Pencil1Icon />,
   rectangle: <SquareIcon />,
+  circle: <CircleIcon />,
   line: <MinusIcon />,
   image: <ImageIcon />,
   erase: <EraserIcon />,
@@ -136,6 +138,7 @@ const ToolBar = () => {
             'text',
             'freehand',
             'rectangle',
+            'circle',
             'line',
             'image',
             'erase',

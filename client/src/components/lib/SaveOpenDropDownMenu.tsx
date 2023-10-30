@@ -91,6 +91,7 @@ export const SaveOpenDropDownMenu = () => {
           state.p2[key].x,
           state.p2[key].y,
           type,
+          undefined,
           options,
         ).roughElement;
       }
