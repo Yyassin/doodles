@@ -32,10 +32,12 @@ const createElement = (
   y2: number,
   type: CanvasElementType,
   points?: Vector2[],
+  textElem?: string,
   options = defaultOptions,
 ): CanvasElement => {
   let roughElement;
   let newPoints;
+  let textValue;
   if (points === undefined) {
     switch (type) {
       case 'line':
@@ -51,6 +53,9 @@ const createElement = (
           2 * Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)),
           options,
         );
+        break;
+      case 'text':
+        textValue = textElem;
         break;
       default:
         null;
@@ -71,6 +76,7 @@ const createElement = (
     strokeWidth,
     fillStyle,
     strokeLineDash,
+    textElem: textValue,
     opacity,
     roughElement,
     freehandPoints: newPoints,

@@ -23,7 +23,13 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
  * @authors Yousef Yassin, Dana El Sherif
  */
 
-const drawingTools = ['line', 'rectangle', 'circle', 'freehand'] as const;
+const drawingTools = [
+  'line',
+  'rectangle',
+  'circle',
+  'freehand',
+  'text',
+] as const;
 const drawingToolsSet = new Set(drawingTools);
 const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
   drawingToolsSet.has(tool as (typeof drawingTools)[number]);
@@ -39,6 +45,7 @@ export default function Canvas() {
   const {
     addCanvasShape,
     addCanvasFreehand,
+    addCanvasText,
     editCanvasElement,
     p1,
     p2,
@@ -46,18 +53,21 @@ export default function Canvas() {
     allIds,
     selectedElementId,
     freehandPoints,
+    textElem,
     pushCanvasHistory,
     setSelectedElement,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
     'editCanvasElement',
+    'addCanvasText',
     'p1',
     'p2',
     'types',
     'allIds',
     'setSelectedElement',
     'freehandPoints',
+    'textElem',
     'selectedElementId',
     'pushCanvasHistory',
     'setSelectedElement',
@@ -74,6 +84,8 @@ export default function Canvas() {
   const selectOffset = useRef<Vector2 | null>(null);
   // Id of the element being drawn (for the first time).
   const currentDrawingElemId = useRef('');
+
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   // Position of the transform handle last used.
   const selectedHandlePositionRef = useRef<TransformHandleDirection | null>(
     null,
@@ -84,6 +96,14 @@ export default function Canvas() {
     setRoomID('1'); // Change later
     return () => setRoomID(null);
   }, []);
+
+  useEffect(() => {
+    const textArea = textAreaRef.current;
+    console.log(textArea);
+    if (tool === 'text' && textArea) {
+      textArea.focus();
+    }
+  }, [tool]);
 
   const isDrawingSelected = isDrawingTool(tool);
 
@@ -96,16 +116,36 @@ export default function Canvas() {
     y2: number,
     type: CanvasElementType,
     points?: Vector2[],
+    text?: string,
   ) => {
-    const updatedElement = createElement(id, x1, y1, x2, y2, type, points);
+    const updatedElement = createElement(
+      id,
+      x1,
+      y1,
+      x2,
+      y2,
+      type,
+      points,
+      text,
+    );
     editCanvasElement(id, {
       p1: { x: x1, y: y1 },
       p2: { x: x2, y: y2 },
       roughElement: updatedElement.roughElement,
       freehandPoints: updatedElement.freehandPoints,
+      textElem: updatedElement.textElem,
     });
   };
 
+  const handleBlur = () => {
+    const updatedText = textAreaRef.current?.value || '';
+    if (tool === 'text' && action.current === 'drawing') {
+      // Update the text of the newly created text element
+      editCanvasElement(currentDrawingElemId.current, {
+        textElem: updatedText,
+      });
+    }
+  };
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = e;
     setSelectedElement('');
@@ -141,8 +181,10 @@ export default function Canvas() {
       // Not selection, then we're creating a new element.
 
       // Create a new element originating from the clicked point
+
       const id = crypto.randomUUID();
       const points = tool === 'freehand' ? ([] as Vector2[]) : undefined;
+      const text = tool === 'text' ? ('' as string) : undefined;
       const element = createElement(
         id,
         clientX,
@@ -151,19 +193,27 @@ export default function Canvas() {
         clientY,
         tool,
         points,
+        text,
       );
 
       // Commit the element to state and set
       // our 'action state' to drawing.
-      tool === 'freehand'
-        ? addCanvasFreehand(element)
-        : addCanvasShape(element);
+      if (tool === 'freehand') {
+        addCanvasFreehand(element);
+      } else if (tool === 'text') {
+        // console.log(element);
+
+        addCanvasText(element);
+      } else {
+        addCanvasShape(element);
+      }
       action.current = 'drawing';
       currentDrawingElemId.current = id;
     }
   };
 
   const handleMouseUp = () => {
+    // if (tool === 'text') return;
     // Reorder corners to align with the x1, y1 top left convention. This
     // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).
     if (action.current === 'drawing' || action.current === 'resizing') {
@@ -182,6 +232,8 @@ export default function Canvas() {
     if (action.current !== 'none') {
       pushCanvasHistory();
     }
+
+    if (tool === 'text') return;
     setCounter();
     // Return to idle none action state.
     action.current = 'none';
@@ -281,6 +333,7 @@ export default function Canvas() {
       // Otherwise, update the element we're currently drawing
       const { x: x1, y: y1 } = p1[currentDrawingElemId.current] ?? {};
       const points = freehandPoints[currentDrawingElemId.current];
+      const text = textElem[currentDrawingElemId.current];
       updateElement(
         currentDrawingElemId.current,
         x1,
@@ -289,19 +342,34 @@ export default function Canvas() {
         clientY,
         tool,
         points,
+        text,
       );
     }
   };
 
   return (
-    <canvas
-      id="canvas"
-      style={{ backgroundColor: 'white' }}
-      width={appWidth}
-      height={appHeight}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-    />
+    <div>
+      <canvas
+        id="canvas"
+        style={{ backgroundColor: 'white' }}
+        width={appWidth}
+        height={appHeight}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+      />
+
+      {tool === 'text' ? (
+        <textarea
+          ref={textAreaRef}
+          onBlur={handleBlur}
+          style={{
+            position: 'fixed',
+            top: p1[currentDrawingElemId.current]?.y,
+            left: p1[currentDrawingElemId.current]?.x,
+          }}
+        />
+      ) : null}
+    </div>
   );
 }

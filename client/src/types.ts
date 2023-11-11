@@ -57,6 +57,7 @@ export const CanvasElementTypes = [
   'rectangle',
   'circle',
   'freehand',
+  'text',
 ] as const;
 export type CanvasElementType = (typeof CanvasElementTypes)[number];
 

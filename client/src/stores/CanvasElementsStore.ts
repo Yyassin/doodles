@@ -24,6 +24,7 @@ export interface CanvasElement {
   opacity: number; // Element opacity -- TODO: not sure how this will work yet
   roughElement?: Drawable; // The underlying roughjs element, if applicable.
   freehandPoints?: Vector2[];
+  textElem?: string;
   p1: Vector2; // Top left coordinate, or center for circles
   p2: Vector2; // Bottom right coordinate
   id: string; // Element id
@@ -45,6 +46,7 @@ export interface CanvasElementState {
   opacities: Record<string, CanvasElement['opacity']>;
   roughElements: Record<string, CanvasElement['roughElement']>;
   freehandPoints: Record<string, CanvasElement['freehandPoints']>;
+  textElem: Record<string, CanvasElement['textElem']>;
   p1: Record<string, CanvasElement['p1']>;
   p2: Record<string, CanvasElement['p2']>;
 }
@@ -52,6 +54,7 @@ export interface CanvasElementState {
 interface CanvasElementActions {
   addCanvasShape: (element: CanvasElement) => void;
   addCanvasFreehand: (element: CanvasElement) => void;
+  addCanvasText: (element: CanvasElement) => void;
   editCanvasElement: (
     id: string,
     partialElement: Partial<CanvasElement>,
@@ -80,6 +83,7 @@ export const initialCanvasElementState: CanvasElementState = {
   opacities: {},
   roughElements: {},
   freehandPoints: {},
+  textElem: {},
   p1: {},
   p2: {},
 };
@@ -194,6 +198,46 @@ const addCanvasFreehand =
       };
     });
 
+const addCanvasText =
+  (set: SetState<CanvasElementState>) => (element: CanvasElement) =>
+    set((state) => {
+      const allIds = [...state.allIds];
+      const types = { ...state.types };
+      const opacities = { ...state.opacities };
+      const textElem = { ...state.textElem };
+      const fillColors = { ...state.fillColors };
+      const strokeWidths = { ...state.strokeWidths };
+
+      const p1s = { ...state.p1 };
+      const {
+        id,
+        type,
+        opacity,
+        p1,
+        textElem: elemText,
+        fillColor,
+        strokeWidth,
+      } = element;
+      allIds.push(id);
+      types[id] = type;
+      opacities[id] = opacity;
+      textElem[id] = elemText;
+      fillColors[id] = fillColor;
+      strokeWidths[id] = strokeWidth;
+      p1s[id] = p1;
+
+      return {
+        ...state,
+        allIds,
+        types,
+        p1: p1s,
+        opacities,
+        textElem,
+        fillColor,
+        strokeWidth,
+      };
+    });
+
 /**
  * Edits the specified canvas element in state.
  * @param id The id of the element to edit
@@ -266,6 +310,9 @@ const editCanvasElement =
       const freehandPoints = partialElement.freehandPoints
         ? { ...state.freehandPoints, [id]: partialElement.freehandPoints }
         : state.freehandPoints;
+      const textElem = partialElement.textElem
+        ? { ...state.textElem, [id]: partialElement.textElem }
+        : state.textElem;
 
       return {
         ...state,
@@ -283,6 +330,7 @@ const editCanvasElement =
         p1: p1s,
         p2: p2s,
         freehandPoints,
+        textElem,
       };
     });
 
@@ -349,6 +397,7 @@ const pushCanvasHistory = (set: SetState<CanvasElementState>) => () => {
     historyIndex++;
     history = history.slice(0, historyIndex);
     history.push({ ...state });
+    let i;
     return state;
   });
 };
@@ -431,6 +480,7 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   ...initialCanvasElementState,
   addCanvasShape: addCanvasShape(set),
   addCanvasFreehand: addCanvasFreehand(set),
+  addCanvasText: addCanvasText(set),
   editCanvasElement: editCanvasElement(set),
   removeCanvasElement: removeCanvasElement(set),
   setSelectedElement: setSelectedElement(set),
