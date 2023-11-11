@@ -6,6 +6,7 @@ import { useAppStore } from '@/stores/AppStore';
 import FullScreenButton from '@/components/lib/FullScreenButton';
 import UndoRedoButtons from '@/components/lib/UndoRedoButtons';
 import ZoomButtons from '@/components/lib/ZoomButtons';
+import CustomToolbar from '@/components/lib/CustomizabilityToolbar';
 
 /**
  * Primary viewport that houses the canvas
@@ -21,6 +22,7 @@ const Viewport = () => {
   return (
     <div id="Viewport" className="select-none" ref={viewportRef}>
       <ToolBar />
+      <CustomToolbar />
       <DropDownMenu viewportRef={viewportRef} />
 
       <div
