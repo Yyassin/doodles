@@ -30,6 +30,7 @@ export const SaveOpenDropDownMenu = () => {
     fillStyles,
     strokeLineDashes,
     opacities,
+    freehandPoints,
     p1,
     p2,
   } = useCanvasElementStore([
@@ -44,6 +45,7 @@ export const SaveOpenDropDownMenu = () => {
     'fillStyles',
     'strokeLineDashes',
     'opacities',
+    'freehandPoints',
     'p1',
     'p2',
   ]);
@@ -115,6 +117,7 @@ export const SaveOpenDropDownMenu = () => {
       fillStyles,
       strokeLineDashes,
       opacities,
+      freehandPoints,
       p1,
       p2,
     });
