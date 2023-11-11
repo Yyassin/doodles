@@ -72,10 +72,11 @@ const useDrawElements = () => {
       } else if (type === 'text') {
         ctx.font = '24px  sans-serif';
         const text = textElem[id];
+        if (selectedElementId === textElem[id]) {
+          console.log('same');
+        }
         if (text === undefined) return;
-        // console.log(text);
         ctx.fillText(text, p1[id].x, p1[id].y);
-        // console.log('aye');
       } else {
         const roughElement = roughElements[id];
         roughElement && roughCanvas.draw(roughElement);

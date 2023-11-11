@@ -84,7 +84,6 @@ export default function Canvas() {
   const selectOffset = useRef<Vector2 | null>(null);
   // Id of the element being drawn (for the first time).
   const currentDrawingElemId = useRef('');
-
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   // Position of the transform handle last used.
   const selectedHandlePositionRef = useRef<TransformHandleDirection | null>(
@@ -140,12 +139,34 @@ export default function Canvas() {
   const handleBlur = () => {
     const updatedText = textAreaRef.current?.value || '';
     if (tool === 'text' && action.current === 'drawing') {
-      // Update the text of the newly created text element
+      // Update the text of the text element
       editCanvasElement(currentDrawingElemId.current, {
         textElem: updatedText,
       });
+
+      const id = crypto.randomUUID();
+      const newElement = createElement(
+        id,
+        p1[currentDrawingElemId.current].x,
+        p1[currentDrawingElemId.current].y,
+        0,
+        0,
+        'text',
+        [],
+        '',
+      );
+      addCanvasText(newElement);
+      currentDrawingElemId.current = id;
+
+      // Reset the text area value
+      if (textAreaRef.current) {
+        textAreaRef.current.value = '';
+        textAreaRef.current.focus();
+        textAreaRef;
+      }
     }
   };
+
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = e;
     setSelectedElement('');
@@ -184,7 +205,6 @@ export default function Canvas() {
 
       const id = crypto.randomUUID();
       const points = tool === 'freehand' ? ([] as Vector2[]) : undefined;
-      const text = tool === 'text' ? ('' as string) : undefined;
       const element = createElement(
         id,
         clientX,
@@ -193,17 +213,12 @@ export default function Canvas() {
         clientY,
         tool,
         points,
-        text,
       );
 
       // Commit the element to state and set
       // our 'action state' to drawing.
       if (tool === 'freehand') {
         addCanvasFreehand(element);
-      } else if (tool === 'text') {
-        // console.log(element);
-
-        addCanvasText(element);
       } else {
         addCanvasShape(element);
       }
@@ -233,7 +248,6 @@ export default function Canvas() {
       pushCanvasHistory();
     }
 
-    if (tool === 'text') return;
     setCounter();
     // Return to idle none action state.
     action.current = 'none';
