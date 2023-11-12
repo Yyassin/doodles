@@ -79,7 +79,7 @@ export default class WebsocketClient {
     });
 
     this.socket.addEventListener('message', (msg) => {
-      const jsonMsg: msgType = JSON.parse(msg.data);
+      const jsonMsg = JSON.parse(msg.data) as msgType;
 
       if (jsonMsg.status !== undefined) {
         if (jsonMsg.status === status.SUCCESS) {
@@ -90,7 +90,6 @@ export default class WebsocketClient {
         return;
       }
 
-      console.log(jsonMsg.payload.freehandPoints);
       this.callBacks[jsonMsg.topic](jsonMsg.payload);
     });
   }

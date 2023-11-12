@@ -60,11 +60,10 @@ export default function Canvas() {
     'freehandPoints',
     'selectedElementId',
     'pushCanvasHistory',
-    'setSelectedElement',
   ]);
 
-  const { setIDandAction, setRoomID } = useWebSocketStore([
-    'setIDandAction',
+  const { setWebsocketAction, setRoomID } = useWebSocketStore([
+    'setWebsocketAction',
     'setRoomID',
   ]);
 
@@ -184,10 +183,7 @@ export default function Canvas() {
     }
 
     if (action.current === 'drawing') {
-      setIDandAction(
-        currentDrawingElemId.current,
-        tool === 'freehand' ? 'addCanvasFreehand' : 'addCanvasShape',
-      );
+      setWebsocketAction(currentDrawingElemId.current, tool);
     }
 
     // Return to idle none action state.

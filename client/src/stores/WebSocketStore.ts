@@ -17,14 +17,14 @@ interface WebSocketState {
   // The current action
   action: string;
   // Modifed element ID
-  elemID: string;
+  actionElementID: string;
 }
 
 interface WebSocketActions {
   // Reducer to set the roomID
   setRoomID: (roomID: string | null) => void;
   // Set action and elemID
-  setIDandAction: (elemID: string, action: string) => void;
+  setWebsocketAction: (elemID: string, action: string) => void;
 }
 
 type WebSocketStore = WebSocketActions & WebSocketState;
@@ -33,21 +33,25 @@ type WebSocketStore = WebSocketActions & WebSocketState;
 export const initialWebSocketState: WebSocketState = {
   roomID: null,
   action: '',
-  elemID: '',
+  actionElementID: '',
 };
 
 /** Actions / Reducers */
 const setRoomID = (set: SetState<WebSocketStore>) => (roomID: string | null) =>
   set(() => ({ roomID }));
 
-const setIDandAction =
-  (set: SetState<WebSocketStore>) => (elemID: string, action: string) =>
-    set(() => ({ elemID, action }));
+const setWebsocketAction =
+  (set: SetState<WebSocketStore>) => (actionElementID: string, tool: string) =>
+    set(() => {
+      const action =
+        tool === 'freehand' ? 'addCanvasFreehand' : 'addCanvasShape';
+      return { actionElementID, action };
+    });
 
 /** Store Hook */
 const WebSocketStore = create<WebSocketStore>()((set) => ({
   ...initialWebSocketState,
   setRoomID: setRoomID(set),
-  setIDandAction: setIDandAction(set),
+  setWebsocketAction: setWebsocketAction(set),
 }));
 export const useWebSocketStore = createStoreWithSelectors(WebSocketStore);

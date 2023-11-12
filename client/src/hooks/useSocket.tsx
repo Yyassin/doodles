@@ -1,6 +1,9 @@
 import WebsocketClient from '@/WebsocketClient';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
-import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import {
+  CanvasElement,
+  useCanvasElementStore,
+} from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { useEffect, useRef } from 'react';
 
@@ -10,9 +13,9 @@ import { useEffect, useRef } from 'react';
  */
 
 export const useSocket = () => {
-  const { roomID, elemID, action } = useWebSocketStore([
+  const { roomID, actionElementID, action } = useWebSocketStore([
     'roomID',
-    'elemID',
+    'actionElementID',
     'action',
   ]);
 
@@ -52,8 +55,51 @@ export const useSocket = () => {
 
   //setup callBack object based on actions
   const callBacks = {
-    addCanvasShape,
-    addCanvasFreehand,
+    addCanvasShape: (element: CanvasElement) => {
+      const newElement = createElement(
+        element.id,
+        element.p1.x,
+        element.p1.y,
+        element.p2.x,
+        element.p2.y,
+        element.type,
+        undefined,
+        {
+          stroke: element.strokeColor,
+          fill: element.fillColor,
+          bowing: element.bowing,
+          roughness: element.roughness,
+          strokeWidth: element.strokeWidth,
+          fillStyle: element.fillStyle,
+          strokeLineDash: element.strokeLineDash,
+          opacity: element.opacity,
+        },
+      );
+      addCanvasShape(newElement);
+    },
+    addCanvasFreehand: (element: CanvasElement) => {
+      const newElement = createElement(
+        element.id,
+        element.p1.x,
+        element.p1.y,
+        element.p2.x,
+        element.p2.y,
+        element.type,
+        element.freehandPoints,
+        {
+          stroke: element.strokeColor,
+          fill: element.fillColor,
+          bowing: element.bowing,
+          roughness: element.roughness,
+          strokeWidth: element.strokeWidth,
+          fillStyle: element.fillStyle,
+          strokeLineDash: element.strokeLineDash,
+          opacity: element.opacity,
+        },
+        true,
+      );
+      addCanvasFreehand(newElement);
+    },
   };
 
   //intialize socket
@@ -77,30 +123,34 @@ export const useSocket = () => {
 
   //Send message once action gets set. Note: will be changed
   useEffect(() => {
-    if (elemID === '') return;
+    if (actionElementID === '') return;
 
-    //craete element to send to other sockets in room
+    //Create element to send to other sockets in room
     const element = createElement(
-      elemID,
-      p1[elemID].x,
-      p1[elemID].y,
-      p2[elemID].x,
-      p2[elemID].y,
-      types[elemID],
-      action === 'addCanvasFreehand' ? freehandPoints[elemID] : undefined,
+      actionElementID,
+      p1[actionElementID].x,
+      p1[actionElementID].y,
+      p2[actionElementID].x,
+      p2[actionElementID].y,
+      types[actionElementID],
+      action === 'addCanvasFreehand'
+        ? freehandPoints[actionElementID]
+        : undefined,
       {
-        stroke: strokeColors[elemID],
-        fill: fillColors[elemID],
-        bowing: bowings[elemID],
-        roughness: roughnesses[elemID],
-        strokeWidth: strokeWidths[elemID],
-        fillStyle: fillStyles[elemID],
-        strokeLineDash: strokeLineDashes[elemID],
-        opacity: opacities[elemID],
+        stroke: strokeColors[actionElementID],
+        fill: fillColors[actionElementID],
+        bowing: bowings[actionElementID],
+        roughness: roughnesses[actionElementID],
+        strokeWidth: strokeWidths[actionElementID],
+        fillStyle: fillStyles[actionElementID],
+        strokeLineDash: strokeLineDashes[actionElementID],
+        opacity: opacities[actionElementID],
       },
       true,
     );
 
+    delete element.roughElement;
+
     socket.current?.sendMsgRoom(action, element);
-  }, [elemID]);
+  }, [actionElementID]);
 };

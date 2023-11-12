@@ -148,6 +148,7 @@ const positionWithinElement = (
 ): MaybeTransformHandleType | 'inside' => {
   const { p1, p2, types, selectedElementId } = appState;
   const elementType = types[selection];
+  if (!['rectangle', 'line'].includes(elementType)) return false;
   const { x: x1, y: y1 } = p1[selection];
   const { x: x2, y: y2 } = p2[selection];
 
@@ -209,6 +210,7 @@ export const getElementAtPosition = (
   // be an issue for overlapping elements.
   // One solution is adding some sort of layering (move to front/back)
   // for each element. We have to find all that intersect and select front most.
+  console.log();
   return appState.allIds
     .map((id) => ({
       id,
