@@ -50,7 +50,7 @@ export const initialAppState: AppState = {
   isFullscreen: false,
   appWidth: window.innerWidth,
   appHeight: window.innerHeight,
-  colourTool: 'redCircle',
+  colourTool: 'blackCircle',
 };
 
 /** Actions / Reducers */
