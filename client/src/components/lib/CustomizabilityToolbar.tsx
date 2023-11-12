@@ -1,11 +1,9 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import * as Toolbar from '@radix-ui/react-toolbar';
-import { CircleIcon } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
-import { colourType, colourTypes } from '@/types';
+import { colourType } from '@/types';
 import { capitalize } from '@/lib/misc';
 import IconButton from './IconButton';
-import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 
 const getCircleStyle = (toolName: colourType): React.CSSProperties => {
   switch (toolName) {

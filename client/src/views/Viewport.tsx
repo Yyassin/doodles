@@ -7,6 +7,7 @@ import FullScreenButton from '@/components/lib/FullScreenButton';
 import UndoRedoButtons from '@/components/lib/UndoRedoButtons';
 import ZoomButtons from '@/components/lib/ZoomButtons';
 import CustomToolbar from '@/components/lib/CustomizabilityToolbar';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 
 /**
  * Primary viewport that houses the canvas
@@ -14,15 +15,16 @@ import CustomToolbar from '@/components/lib/CustomizabilityToolbar';
  * on top of it (absolutely positioned).
  * @authors Yousef Yassin
  */
-
 const Viewport = () => {
   const { setMode } = useAppStore(['setMode']);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const { selectedElementId } = useCanvasElementStore(['selectedElementId']);
 
   return (
     <div id="Viewport" className="select-none" ref={viewportRef}>
       <ToolBar />
-      <CustomToolbar />
+      {/*only show the toolbar is an element is selected*/}
+      {selectedElementId !== '' && <CustomToolbar />}
       <DropDownMenu viewportRef={viewportRef} />
 
       <div
