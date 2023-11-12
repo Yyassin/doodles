@@ -7,41 +7,47 @@ import { createStoreWithSelectors } from './utils';
  * @author Abdalla Abdelhadi
  */
 
+export const Actions = ['addCanvasShape', 'addCanvasFreehand'] as const;
+export type ActionsType = typeof Actions;
+
 /** Definitions */
 interface WebSocketState {
   // The roomID for the websocket to join
   roomID: string | null;
   // The current action
-  counter: number | null;
+  action: string;
+  // Modifed element ID
+  elemID: string;
 }
 
 interface WebSocketActions {
   // Reducer to set the roomID
   setRoomID: (roomID: string | null) => void;
-  // Reducer to set the action
-  setCounter: () => void;
+  // Set action and elemID
+  setIDandAction: (elemID: string, action: string) => void;
 }
+
 type WebSocketStore = WebSocketActions & WebSocketState;
 
 // Initialize WebSocket State to default state.
 export const initialWebSocketState: WebSocketState = {
   roomID: null,
-  counter: null,
+  action: '',
+  elemID: '',
 };
 
 /** Actions / Reducers */
 const setRoomID = (set: SetState<WebSocketStore>) => (roomID: string | null) =>
   set(() => ({ roomID }));
-const setAction = (set: SetState<WebSocketStore>) => () =>
-  set((state) => ({
-    ...state,
-    counter: state.counter ? state.counter + 1 : 1,
-  }));
+
+const setIDandAction =
+  (set: SetState<WebSocketStore>) => (elemID: string, action: string) =>
+    set(() => ({ elemID, action }));
 
 /** Store Hook */
 const WebSocketStore = create<WebSocketStore>()((set) => ({
   ...initialWebSocketState,
   setRoomID: setRoomID(set),
-  setCounter: setAction(set),
+  setIDandAction: setIDandAction(set),
 }));
 export const useWebSocketStore = createStoreWithSelectors(WebSocketStore);

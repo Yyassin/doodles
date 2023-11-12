@@ -4,6 +4,8 @@
  */
 
 import { WS_URL } from '@/constants';
+import { CanvasElement } from '@/stores/CanvasElementsStore';
+// import { Actions } from '@/stores/WebSocketStore';
 
 //websocket response status
 const enum status {
@@ -11,11 +13,23 @@ const enum status {
   ERROR = 400,
 }
 
+interface CallBacksType {
+  addCanvasShape: (element: CanvasElement) => void;
+  addCanvasFreehand: (element: CanvasElement) => void;
+}
+
+interface msgType {
+  topic: keyof CallBacksType;
+  payload: CanvasElement;
+  status?: status;
+  msg?: string;
+}
+
 //class that provides functionality to interact with websockets
 export default class WebsocketClient {
   socket: WebSocket | null;
   room: string | null; //the current room the socket is in
-  callBacks: { [key: string]: (arg: number) => void }; //to be changed to proper types
+  callBacks: CallBacksType;
   msgTemplate = {
     topic: null,
     room: null,
@@ -25,7 +39,7 @@ export default class WebsocketClient {
   /**
    * Creates new WebsocketClient instance
    */
-  constructor(callBacks: { [key: string]: (arg: number) => void }) {
+  constructor(callBacks: CallBacksType) {
     this.socket = null;
     this.room = null;
     this.callBacks = callBacks;
@@ -65,7 +79,7 @@ export default class WebsocketClient {
     });
 
     this.socket.addEventListener('message', (msg) => {
-      const jsonMsg = JSON.parse(msg.data);
+      const jsonMsg: msgType = JSON.parse(msg.data);
 
       if (jsonMsg.status !== undefined) {
         if (jsonMsg.status === status.SUCCESS) {
@@ -76,7 +90,8 @@ export default class WebsocketClient {
         return;
       }
 
-      this.callBacks.log(jsonMsg.payload);
+      console.log(jsonMsg.payload.freehandPoints);
+      this.callBacks[jsonMsg.topic](jsonMsg.payload);
     });
   }
 
@@ -96,7 +111,7 @@ export default class WebsocketClient {
    *
    * @param msg String, the message to be sent to the room
    */
-  sendMsgRoom(msg: number) {
+  sendMsgRoom(topic: string, msg: CanvasElement) {
     //msg to be changed to proper type once everything finalized
     this.checkSocket();
 
@@ -105,7 +120,7 @@ export default class WebsocketClient {
     this.socket?.send(
       JSON.stringify({
         ...this.msgTemplate,
-        topic: 'sendRoom',
+        topic: topic,
         room: this.room,
         payload: msg,
       }),

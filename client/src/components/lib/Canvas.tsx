@@ -63,8 +63,8 @@ export default function Canvas() {
     'setSelectedElement',
   ]);
 
-  const { setCounter, setRoomID } = useWebSocketStore([
-    'setCounter',
+  const { setIDandAction, setRoomID } = useWebSocketStore([
+    'setIDandAction',
     'setRoomID',
   ]);
 
@@ -182,7 +182,14 @@ export default function Canvas() {
     if (action.current !== 'none') {
       pushCanvasHistory();
     }
-    setCounter();
+
+    if (action.current === 'drawing') {
+      setIDandAction(
+        currentDrawingElemId.current,
+        tool === 'freehand' ? 'addCanvasFreehand' : 'addCanvasShape',
+      );
+    }
+
     // Return to idle none action state.
     action.current = 'none';
   };
