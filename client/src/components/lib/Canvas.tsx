@@ -60,11 +60,10 @@ export default function Canvas() {
     'freehandPoints',
     'selectedElementId',
     'pushCanvasHistory',
-    'setSelectedElement',
   ]);
 
-  const { setCounter, setRoomID } = useWebSocketStore([
-    'setCounter',
+  const { setWebsocketAction, setRoomID } = useWebSocketStore([
+    'setWebsocketAction',
     'setRoomID',
   ]);
 
@@ -182,7 +181,11 @@ export default function Canvas() {
     if (action.current !== 'none') {
       pushCanvasHistory();
     }
-    setCounter();
+
+    if (action.current === 'drawing') {
+      setWebsocketAction(currentDrawingElemId.current, tool);
+    }
+
     // Return to idle none action state.
     action.current = 'none';
   };

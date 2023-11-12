@@ -84,6 +84,7 @@ export const SaveOpenDropDownMenu = () => {
           strokeWidth: state.strokeWidths[key],
           fillStyle: state.fillStyles[key],
           strokeLineDash: state.strokeLineDashes[key],
+          opacity: state.opacities[key],
         };
 
         roughElements[key] = createElement(
