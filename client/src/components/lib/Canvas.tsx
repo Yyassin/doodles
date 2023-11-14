@@ -136,7 +136,7 @@ export default function Canvas() {
     });
   };
 
-  const handleBlur = () => {
+  const handleText = () => {
     const updatedText = textAreaRef.current?.value || '';
     if (tool === 'text' && action.current === 'drawing') {
       // Update the text of the text element
@@ -144,25 +144,10 @@ export default function Canvas() {
         textElem: updatedText,
       });
 
-      const id = crypto.randomUUID();
-      const newElement = createElement(
-        id,
-        p1[currentDrawingElemId.current].x,
-        p1[currentDrawingElemId.current].y,
-        0,
-        0,
-        'text',
-        [],
-        '',
-      );
-      addCanvasText(newElement);
-      currentDrawingElemId.current = id;
-
       // Reset the text area value
       if (textAreaRef.current) {
         textAreaRef.current.value = '';
         textAreaRef.current.focus();
-        textAreaRef;
       }
     }
   };
@@ -202,7 +187,6 @@ export default function Canvas() {
       // Not selection, then we're creating a new element.
 
       // Create a new element originating from the clicked point
-
       const id = crypto.randomUUID();
       const points = tool === 'freehand' ? ([] as Vector2[]) : undefined;
       const element = createElement(
@@ -219,6 +203,9 @@ export default function Canvas() {
       // our 'action state' to drawing.
       if (tool === 'freehand') {
         addCanvasFreehand(element);
+      } else if (tool === 'text') {
+        addCanvasText(element);
+        handleText();
       } else {
         addCanvasShape(element);
       }
@@ -376,7 +363,7 @@ export default function Canvas() {
       {tool === 'text' ? (
         <textarea
           ref={textAreaRef}
-          onBlur={handleBlur}
+          // onBlur={handleBlur}
           style={{
             position: 'fixed',
             top: p1[currentDrawingElemId.current]?.y,
