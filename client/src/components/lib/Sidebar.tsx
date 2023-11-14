@@ -13,7 +13,7 @@ const TEMPLATES = 'Templates';
 const SETTINGS = 'Settings';
 
 export const Sidebar = ({ folders }: { folders: string[] }) => {
-  const [bar, setBar] = useState('');
+  const [bar, setBar] = useState(FOLDER);
   const { folder, setBoard } = useCanvasBoardStore(['folder', 'setBoard']);
 
   return (
