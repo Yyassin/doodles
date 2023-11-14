@@ -30,6 +30,7 @@ export const SaveOpenDropDownMenu = () => {
     fillStyles,
     strokeLineDashes,
     opacities,
+    freehandPoints,
     p1,
     p2,
   } = useCanvasElementStore([
@@ -44,6 +45,7 @@ export const SaveOpenDropDownMenu = () => {
     'fillStyles',
     'strokeLineDashes',
     'opacities',
+    'freehandPoints',
     'p1',
     'p2',
   ]);
@@ -82,6 +84,7 @@ export const SaveOpenDropDownMenu = () => {
           strokeWidth: state.strokeWidths[key],
           fillStyle: state.fillStyles[key],
           strokeLineDash: state.strokeLineDashes[key],
+          opacity: state.opacities[key],
         };
 
         roughElements[key] = createElement(
@@ -115,6 +118,7 @@ export const SaveOpenDropDownMenu = () => {
       fillStyles,
       strokeLineDashes,
       opacities,
+      freehandPoints,
       p1,
       p2,
     });
