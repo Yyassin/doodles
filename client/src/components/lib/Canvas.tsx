@@ -96,9 +96,9 @@ export default function Canvas() {
     return () => setRoomID(null);
   }, []);
 
+  //Focus textbox
   useEffect(() => {
     const textArea = textAreaRef.current;
-    console.log(textArea);
     if (tool === 'text' && textArea) {
       textArea.focus();
     }
@@ -239,7 +239,6 @@ export default function Canvas() {
     // Return to idle none action state.
     action.current = 'none';
   };
-
   const handleMouseMove = (e: MouseEvent) => {
     const { clientX, clientY } = e;
     if (tool === 'select') {
@@ -254,6 +253,7 @@ export default function Canvas() {
           // Translate by moving relative to clientXY,
           // but accounting for the selection offset. Maintain
           // the element's aspect ratio.
+
           const width = x2 - x1;
           const height = y2 - y1;
           updateElement(

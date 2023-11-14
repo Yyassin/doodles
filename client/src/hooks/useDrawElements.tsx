@@ -70,7 +70,7 @@ const useDrawElements = () => {
         // TODO: Potential optimization by saving Path2Ds
         ctx.fill(new Path2D(stroke));
       } else if (type === 'text') {
-        ctx.font = '24px  sans-serif';
+        ctx.font = '24px sans-serif';
         const text = textElem[id];
         if (text === undefined) return;
         ctx.fillText(text, p1[id].x, p1[id].y);

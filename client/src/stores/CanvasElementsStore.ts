@@ -205,26 +205,15 @@ const addCanvasText =
       const types = { ...state.types };
       const opacities = { ...state.opacities };
       const textElem = { ...state.textElem };
-      const fillColors = { ...state.fillColors };
-      const strokeWidths = { ...state.strokeWidths };
-
       const p1s = { ...state.p1 };
-      const {
-        id,
-        type,
-        opacity,
-        p1,
-        textElem: elemText,
-        fillColor,
-        strokeWidth,
-      } = element;
+      const p2s = { ...state.p2 };
+      const { id, type, opacity, p1, p2, textElem: elemText } = element;
       allIds.push(id);
       types[id] = type;
       opacities[id] = opacity;
       textElem[id] = elemText;
-      fillColors[id] = fillColor;
-      strokeWidths[id] = strokeWidth;
       p1s[id] = p1;
+      p2s[id] = p2;
 
       return {
         ...state,
@@ -233,8 +222,6 @@ const addCanvasText =
         p1: p1s,
         opacities,
         textElem,
-        fillColor,
-        strokeWidth,
       };
     });
 
@@ -397,7 +384,6 @@ const pushCanvasHistory = (set: SetState<CanvasElementState>) => () => {
     historyIndex++;
     history = history.slice(0, historyIndex);
     history.push({ ...state });
-    let i;
     return state;
   });
 };
