@@ -19,12 +19,12 @@ export const BoardScroll = () => {
     { board: 'unit5', date: '19.09.2023' },
   ];
   return (
-    <div className="relative flex items-center h-[250px]">
+    <div className="relative flex  mx-2 items-center h-[250px]">
       <div className="w-full h-full overflow-x-scroll scroll whitespace-nowrap scroll-smooth">
         {boards.map((board) => (
           <div
             key={board.board}
-            className="relative w-[500px] h-[200px] inline-block mx-3 mt-4 bg-[#ebebeb] cursor-pointer hover:scale-105 ease-in-out duration-300"
+            className="relative w-[500px] h-[200px] rounded-md inline-block mx-3 mt-4 bg-[#ebebeb] cursor-pointer hover:scale-105 ease-in-out duration-300"
             onClick={() => setMode('canvas')}
           >
             {board.board}
