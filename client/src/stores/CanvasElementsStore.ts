@@ -404,6 +404,7 @@ const setCanvasElementState =
         fillStyles,
         opacities,
         roughElements,
+        freehandPoints,
         p1,
         p2,
       } = newCanvasElementState;
@@ -421,6 +422,7 @@ const setCanvasElementState =
         strokeLineDashes,
         opacities,
         roughElements,
+        freehandPoints,
         p1,
         p2,
       };

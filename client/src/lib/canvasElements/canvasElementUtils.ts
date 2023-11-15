@@ -34,6 +34,7 @@ const createElement = (
   type: CanvasElementType,
   points?: Vector2[],
   options = defaultOptions,
+  isLive = false,
 ): CanvasElement => {
   let roughElement;
   let newPoints;
@@ -57,7 +58,7 @@ const createElement = (
         null;
     }
   } else {
-    newPoints = [...points, { x: x2, y: y2 }];
+    newPoints = isLive ? points : [...points, { x: x2, y: y2 }];
   }
 
   return {

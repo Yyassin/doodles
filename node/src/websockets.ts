@@ -90,8 +90,10 @@ export const handleMsg = (socket: WebSocket, msg: RawData) => {
     }
     //send message and topic to sockets in room
     default: {
-      sockets[room].forEach((socket) => {
-        socket.send(JSON.stringify({ topic: topic, payload: payload }));
+      sockets[room].forEach((roomSocket) => {
+        if (socket != roomSocket) {
+          roomSocket.send(JSON.stringify({ topic: topic, payload: payload }));
+        }
       });
       return;
     }
