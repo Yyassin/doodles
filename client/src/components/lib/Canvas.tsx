@@ -130,13 +130,11 @@ export default function Canvas() {
     if (type === 'text') {
       const canvas = document.getElementById('canvas') as HTMLCanvasElement;
       const ctx = canvas.getContext('2d');
-      console.log(text);
       if (text && ctx) {
         x2 = x1 + ctx.measureText(text).width;
         y2 = y1 + 24;
       }
     }
-    console.log(x1, y1, x2, y2);
     editCanvasElement(id, {
       p1: { x: x1, y: y1 },
       p2: { x: x2, y: y2 },
@@ -149,23 +147,18 @@ export default function Canvas() {
   const updateText = () => {
     //Collect text from textbox
     const updatedText = textAreaRef.current?.value || '';
-    // if (tool === 'text' && action.current === 'drawing') {
-    //   // Update the text of the text element
-    editCanvasElement(currentDrawingElemId.current, {
-      textElem: updatedText,
-    });
-
-    // updateElement(
-    //   currentDrawingElemId.current,
-    //   p1[currentDrawingElemId.current].x,
-    //   p1[currentDrawingElemId.current].y,
-    //   p2[currentDrawingElemId.current].x,
-    //   p2[currentDrawingElemId.current].y,
-    //   'text',
-    //   [],
-    //   updatedText,
-    // );
-    //   // Reset the text area value
+    // Update the text of the text element
+    updateElement(
+      currentDrawingElemId.current,
+      p1[currentDrawingElemId.current].x,
+      p1[currentDrawingElemId.current].y,
+      p2[currentDrawingElemId.current].x,
+      p2[currentDrawingElemId.current].y,
+      'text',
+      [],
+      updatedText,
+    );
+    // Reset the textbox
     if (textAreaRef.current) {
       textAreaRef.current.value = '';
       textAreaRef.current.focus();
