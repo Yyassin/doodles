@@ -142,25 +142,36 @@ export default function Canvas() {
       p2: { x: x2, y: y2 },
       roughElement: updatedElement.roughElement,
       freehandPoints: updatedElement.freehandPoints,
-      textElem: updatedElement.textElem,
+      textElem: text,
     });
   };
 
   const updateText = () => {
     //Collect text from textbox
     const updatedText = textAreaRef.current?.value || '';
-    if (tool === 'text' && action.current === 'drawing') {
-      // Update the text of the text element
-      editCanvasElement(currentDrawingElemId.current, {
-        textElem: updatedText,
-      });
-      // Reset the text area value
-      if (textAreaRef.current) {
-        textAreaRef.current.value = '';
-        textAreaRef.current.focus();
-      }
+    // if (tool === 'text' && action.current === 'drawing') {
+    //   // Update the text of the text element
+    editCanvasElement(currentDrawingElemId.current, {
+      textElem: updatedText,
+    });
+
+    // updateElement(
+    //   currentDrawingElemId.current,
+    //   p1[currentDrawingElemId.current].x,
+    //   p1[currentDrawingElemId.current].y,
+    //   p2[currentDrawingElemId.current].x,
+    //   p2[currentDrawingElemId.current].y,
+    //   'text',
+    //   [],
+    //   updatedText,
+    // );
+    //   // Reset the text area value
+    if (textAreaRef.current) {
+      textAreaRef.current.value = '';
+      textAreaRef.current.focus();
     }
   };
+  // };
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = e;
