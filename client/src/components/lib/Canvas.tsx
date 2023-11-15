@@ -48,6 +48,14 @@ export default function Canvas() {
     freehandPoints,
     pushCanvasHistory,
     setSelectedElement,
+    strokeColors,
+    fillColors,
+    bowings,
+    roughnesses,
+    strokeWidths,
+    fillStyles,
+    strokeLineDashes,
+    opacities,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -61,6 +69,14 @@ export default function Canvas() {
     'selectedElementId',
     'pushCanvasHistory',
     'setSelectedElement',
+    'strokeColors',
+    'fillColors',
+    'bowings',
+    'roughnesses',
+    'strokeWidths',
+    'fillStyles',
+    'strokeLineDashes',
+    'opacities',
   ]);
 
   const { setCounter, setRoomID } = useWebSocketStore([
@@ -97,7 +113,16 @@ export default function Canvas() {
     type: CanvasElementType,
     points?: Vector2[],
   ) => {
-    const updatedElement = createElement(id, x1, y1, x2, y2, type, points);
+    const updatedElement = createElement(id, x1, y1, x2, y2, type, points, {
+      stroke: strokeColors[id],
+      fill: fillColors[id],
+      bowing: bowings[id],
+      roughness: roughnesses[id],
+      strokeWidth: strokeWidths[id],
+      fillStyle: fillStyles[id],
+      strokeLineDash: strokeLineDashes[id],
+      opacity: opacities[id],
+    });
     editCanvasElement(id, {
       p1: { x: x1, y: y1 },
       p2: { x: x2, y: y2 },
