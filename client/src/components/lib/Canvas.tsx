@@ -127,6 +127,16 @@ export default function Canvas() {
       points,
       text,
     );
+    if (type === 'text') {
+      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+      const ctx = canvas.getContext('2d');
+      console.log(text);
+      if (text && ctx) {
+        x2 = x1 + ctx.measureText(text).width;
+        y2 = y1 + 24;
+      }
+    }
+    console.log(x1, y1, x2, y2);
     editCanvasElement(id, {
       p1: { x: x1, y: y1 },
       p2: { x: x2, y: y2 },
@@ -136,14 +146,14 @@ export default function Canvas() {
     });
   };
 
-  const handleText = () => {
+  const updateText = () => {
+    //Collect text from textbox
     const updatedText = textAreaRef.current?.value || '';
     if (tool === 'text' && action.current === 'drawing') {
       // Update the text of the text element
       editCanvasElement(currentDrawingElemId.current, {
         textElem: updatedText,
       });
-
       // Reset the text area value
       if (textAreaRef.current) {
         textAreaRef.current.value = '';
@@ -205,7 +215,7 @@ export default function Canvas() {
         addCanvasFreehand(element);
       } else if (tool === 'text') {
         addCanvasText(element);
-        handleText();
+        updateText();
       } else {
         addCanvasShape(element);
       }
@@ -215,7 +225,6 @@ export default function Canvas() {
   };
 
   const handleMouseUp = () => {
-    // if (tool === 'text') return;
     // Reorder corners to align with the x1, y1 top left convention. This
     // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).
     if (action.current === 'drawing' || action.current === 'resizing') {
@@ -363,7 +372,6 @@ export default function Canvas() {
       {tool === 'text' ? (
         <textarea
           ref={textAreaRef}
-          // onBlur={handleBlur}
           style={{
             position: 'fixed',
             top: p1[currentDrawingElemId.current]?.y,

@@ -146,9 +146,6 @@ const ToolBar = () => {
         }
         selectedTool={tool}
       />
-      {/* {tool === 'text' ? (
-        <textarea style={{ position: 'fixed', top: selectedE, left: 100 }} />
-      ) : null} */}
     </Toolbar.Root>
   );
 };

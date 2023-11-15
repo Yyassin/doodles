@@ -151,7 +151,7 @@ const positionWithinElement = (
   const { x: x1, y: y1 } = p1[selection];
   const { x: x2, y: y2 } = p2[selection];
 
-  if (elementType === 'rectangle') {
+  if (elementType === 'rectangle' || elementType === 'text') {
     const transformHandle = resizeTest(
       selection,
       { selectedElementIds: selectedElementId, p1, p2 },
