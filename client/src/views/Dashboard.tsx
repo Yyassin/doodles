@@ -1,15 +1,15 @@
 import React from 'react';
-import { useAppStore } from '@/stores/AppStore';
-import LogoutButton from '../components/lib/LogoutButton';
+import { Sidebar } from '@/components/lib/Sidebar';
+import { Board } from '@/components/lib/Board';
 
 export default function Dashboard() {
-  const { setMode } = useAppStore(['setMode']);
+  const folders = ['Math', 'Science', 'Stats'];
+  folders.unshift('Recent');
 
   return (
-    <div>
-      <h1>Dashboard dummy text</h1>
-      <button onClick={() => setMode('canvas')}>Canvas</button>
-      <LogoutButton />
+    <div className="flex flex-row h-screen overflow-hidden">
+      <Sidebar folders={folders} />
+      <Board />
     </div>
   );
 }
