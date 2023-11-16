@@ -9,7 +9,10 @@ import {
   getElementAtPosition,
 } from '@/lib/canvasElements/selection';
 import { useAppStore } from '@/stores/AppStore';
-import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import {
+  CanvasElement,
+  useCanvasElementStore,
+} from '@/stores/CanvasElementsStore';
 import {
   AppTool,
   CanvasElementType,
@@ -144,27 +147,44 @@ export default function Canvas() {
     });
   };
 
-  const updateText = () => {
+  const updateText = (element: CanvasElement) => {
     //Collect text from textbox
     const updatedText = textAreaRef.current?.value || '';
-    // Update the text of the text element
-    updateElement(
-      currentDrawingElemId.current,
-      p1[currentDrawingElemId.current].x,
-      p1[currentDrawingElemId.current].y,
-      p2[currentDrawingElemId.current].x,
-      p2[currentDrawingElemId.current].y,
-      'text',
-      [],
-      updatedText,
-    );
-    // Reset the textbox
-    if (textAreaRef.current) {
-      textAreaRef.current.value = '';
-      textAreaRef.current.focus();
+    if (tool === 'text' && action.current === 'drawing') {
+      // Update the text of the text element
+
+      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+      const ctx = canvas.getContext('2d');
+
+      // if (updatedText && ctx) {
+      //   editCanvasElement(currentDrawingElemId.current, {
+      //     textElem: updatedText,
+      //     p2: {
+      //       x:
+      //         p1[currentDrawingElemId.current].x +
+      //         ctx.measureText(updatedText).width,
+      //       y: p1[currentDrawingElemId.current].y + 24,
+      //     },
+      //   });
+      // }
+
+      updateElement(
+        currentDrawingElemId.current,
+        p1[currentDrawingElemId.current].x,
+        p1[currentDrawingElemId.current].y,
+        p1[currentDrawingElemId.current].x + ctx.measureText(updatedText).width,
+        p1[currentDrawingElemId.current].y + 24,
+        'text',
+        [],
+        updatedText,
+      );
+      // Reset the text area value
+      if (textAreaRef.current) {
+        textAreaRef.current.value = '';
+        textAreaRef.current.focus();
+      }
     }
   };
-  // };
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = e;
@@ -219,7 +239,7 @@ export default function Canvas() {
         addCanvasFreehand(element);
       } else if (tool === 'text') {
         addCanvasText(element);
-        updateText();
+        updateText(element);
       } else {
         addCanvasShape(element);
       }
