@@ -130,59 +130,36 @@ export default function Canvas() {
       points,
       text,
     );
-    if (type === 'text') {
-      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-      const ctx = canvas.getContext('2d');
-      if (text && ctx) {
-        x2 = x1 + ctx.measureText(text).width;
-        y2 = y1 + 24;
-      }
-    }
     editCanvasElement(id, {
       p1: { x: x1, y: y1 },
       p2: { x: x2, y: y2 },
       roughElement: updatedElement.roughElement,
       freehandPoints: updatedElement.freehandPoints,
-      textElem: text,
+      textElem: updatedElement.textElem,
     });
   };
 
-  const updateText = (element: CanvasElement) => {
+  const updateText = () => {
     //Collect text from textbox
     const updatedText = textAreaRef.current?.value || '';
-    if (tool === 'text' && action.current === 'drawing') {
-      // Update the text of the text element
-
-      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-      const ctx = canvas.getContext('2d');
-
-      // if (updatedText && ctx) {
-      //   editCanvasElement(currentDrawingElemId.current, {
-      //     textElem: updatedText,
-      //     p2: {
-      //       x:
-      //         p1[currentDrawingElemId.current].x +
-      //         ctx.measureText(updatedText).width,
-      //       y: p1[currentDrawingElemId.current].y + 24,
-      //     },
-      //   });
-      // }
-
-      updateElement(
-        currentDrawingElemId.current,
-        p1[currentDrawingElemId.current].x,
-        p1[currentDrawingElemId.current].y,
-        p1[currentDrawingElemId.current].x + ctx.measureText(updatedText).width,
-        p1[currentDrawingElemId.current].y + 24,
-        'text',
-        [],
-        updatedText,
-      );
-      // Reset the text area value
-      if (textAreaRef.current) {
-        textAreaRef.current.value = '';
-        textAreaRef.current.focus();
-      }
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    // Update text element and add p2
+    if (updatedText && ctx) {
+      editCanvasElement(currentDrawingElemId.current, {
+        textElem: updatedText,
+        p2: {
+          x:
+            p1[currentDrawingElemId.current].x +
+            ctx.measureText(updatedText).width,
+          y: p1[currentDrawingElemId.current].y + 24,
+        },
+      });
+    }
+    // Reset the text area value
+    if (textAreaRef.current) {
+      textAreaRef.current.value = '';
+      textAreaRef.current.focus();
     }
   };
 
@@ -239,7 +216,7 @@ export default function Canvas() {
         addCanvasFreehand(element);
       } else if (tool === 'text') {
         addCanvasText(element);
-        updateText(element);
+        updateText();
       } else {
         addCanvasShape(element);
       }
