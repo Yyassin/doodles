@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useRef } from 'react';
+import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import {
   adjustElementCoordinatesById,
@@ -9,10 +9,7 @@ import {
   getElementAtPosition,
 } from '@/lib/canvasElements/selection';
 import { useAppStore } from '@/stores/AppStore';
-import {
-  CanvasElement,
-  useCanvasElementStore,
-} from '@/stores/CanvasElementsStore';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import {
   AppTool,
   CanvasElementType,
@@ -36,7 +33,7 @@ const drawingTools = [
 const drawingToolsSet = new Set(drawingTools);
 const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
   drawingToolsSet.has(tool as (typeof drawingTools)[number]);
-type Action = 'none' | 'drawing' | 'resizing' | 'moving';
+type Action = 'none' | 'drawing' | 'resizing' | 'moving' | 'writing';
 
 export default function Canvas() {
   const { tool, appHeight, appWidth } = useAppStore([
@@ -90,6 +87,10 @@ export default function Canvas() {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   // Position of the transform handle last used.
   const selectedHandlePositionRef = useRef<TransformHandleDirection | null>(
+    null,
+  );
+  //stores previous mouse position
+  const [prevMousePosition, setPrevMousePosition] = useState<Vector2 | null>(
     null,
   );
 
@@ -225,7 +226,26 @@ export default function Canvas() {
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
+    const { clientX, clientY } = e;
+
+    // Check if the mouse has moved
+    if (
+      prevMousePosition &&
+      (clientX !== prevMousePosition.x || clientY !== prevMousePosition.y) &&
+      tool === 'select'
+    ) {
+      console.log('Mouse moved from:', prevMousePosition, 'to:', {
+        x: clientX,
+        y: clientY,
+      });
+    }
+    // Update the previous mouse position
+    setPrevMousePosition({ x: clientX, y: clientY });
+    // console.log('element', clientX + p1[selectedElementId].x);
+    // console.log('prevMouse', prevMousePosition);
+    // console.log('mouse', clientX);
+
     // Reorder corners to align with the x1, y1 top left convention. This
     // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).
     if (action.current === 'drawing' || action.current === 'resizing') {

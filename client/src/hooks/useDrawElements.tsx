@@ -70,6 +70,7 @@ const useDrawElements = () => {
         // TODO: Potential optimization by saving Path2Ds
         ctx.fill(new Path2D(stroke));
       } else if (type === 'text') {
+        ctx.textBaseline = 'top';
         ctx.font = '24px sans-serif';
         const text = textElem[id];
         if (text === undefined) return;
