@@ -1,4 +1,10 @@
-import React, { MouseEvent, useEffect, useRef, useState } from 'react';
+import React, {
+  MouseEvent,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import {
   adjustElementCoordinatesById,
@@ -103,7 +109,7 @@ export default function Canvas() {
   //Focus textbox
   useEffect(() => {
     const textArea = textAreaRef.current;
-    if (tool === 'text' && textArea) {
+    if ((tool === 'text' || action.current === 'writing') && textArea) {
       textArea.focus();
     }
   }, [tool]);
@@ -145,7 +151,11 @@ export default function Canvas() {
     const updatedText = textAreaRef.current?.value || '';
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
+
+    if (action.current === 'writing') {
+    }
     // Update text element and add p2
+    console.log(updatedText);
     if (updatedText && ctx) {
       editCanvasElement(currentDrawingElemId.current, {
         textElem: updatedText,
@@ -178,6 +188,15 @@ export default function Canvas() {
         p2,
         selectedElementId,
       });
+
+      if (action.current === 'writing') {
+        //on selection tool, but editing text
+        currentDrawingElemId.current = selectedElementId;
+        p1[currentDrawingElemId.current] = p1[selectedElementId];
+        updateText();
+        action.current = 'drawing';
+        console.log(action.current);
+      }
 
       if (selectedElement === undefined) return;
 
@@ -232,19 +251,13 @@ export default function Canvas() {
     // Check if the mouse has moved
     if (
       prevMousePosition &&
-      (clientX !== prevMousePosition.x || clientY !== prevMousePosition.y) &&
-      tool === 'select'
+      (clientX === prevMousePosition.x || clientY === prevMousePosition.y)
     ) {
-      console.log('Mouse moved from:', prevMousePosition, 'to:', {
-        x: clientX,
-        y: clientY,
-      });
+      action.current = 'writing';
     }
+
     // Update the previous mouse position
     setPrevMousePosition({ x: clientX, y: clientY });
-    // console.log('element', clientX + p1[selectedElementId].x);
-    // console.log('prevMouse', prevMousePosition);
-    // console.log('mouse', clientX);
 
     // Reorder corners to align with the x1, y1 top left convention. This
     // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).
@@ -267,8 +280,13 @@ export default function Canvas() {
 
     setCounter();
     // Return to idle none action state.
-    action.current = 'none';
+    if (action.current !== 'writing') {
+      action.current = 'none';
+    }
+
+    console.log(action.current);
   };
+
   const handleMouseMove = (e: MouseEvent) => {
     const { clientX, clientY } = e;
     if (tool === 'select') {
@@ -390,13 +408,19 @@ export default function Canvas() {
         onMouseMove={handleMouseMove}
       />
 
-      {tool === 'text' ? (
+      {tool === 'text' || action.current === 'writing' ? (
         <textarea
           ref={textAreaRef}
           style={{
             position: 'fixed',
-            top: p1[currentDrawingElemId.current]?.y,
-            left: p1[currentDrawingElemId.current]?.x,
+            top:
+              action.current === 'writing'
+                ? p1[selectedElementId]?.y
+                : p1[currentDrawingElemId.current]?.y,
+            left:
+              action.current === 'writing'
+                ? p1[selectedElementId]?.x
+                : p1[currentDrawingElemId.current]?.x,
           }}
         />
       ) : null}
