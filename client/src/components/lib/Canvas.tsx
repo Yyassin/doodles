@@ -39,7 +39,7 @@ const drawingTools = [
 const drawingToolsSet = new Set(drawingTools);
 const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
   drawingToolsSet.has(tool as (typeof drawingTools)[number]);
-type Action = 'none' | 'drawing' | 'resizing' | 'moving' | 'writing';
+type Action = 'none' | 'drawing' | 'resizing' | 'moving' | 'editText';
 
 export default function Canvas() {
   const { tool, appHeight, appWidth } = useAppStore([
@@ -109,7 +109,7 @@ export default function Canvas() {
   //Focus textbox
   useEffect(() => {
     const textArea = textAreaRef.current;
-    if ((tool === 'text' || action.current === 'writing') && textArea) {
+    if ((tool === 'text' || action.current === 'editText') && textArea) {
       textArea.focus();
     }
   }, [tool]);
@@ -152,7 +152,7 @@ export default function Canvas() {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
 
-    if (action.current === 'writing') {
+    if (action.current === 'editText') {
     }
     // Update text element and add p2
     if (updatedText && ctx) {
@@ -188,7 +188,7 @@ export default function Canvas() {
         selectedElementId,
       });
 
-      if (action.current === 'writing') {
+      if (action.current === 'editText') {
         //on selection tool, but editing text
         currentDrawingElemId.current = selectedElementId;
         p1[currentDrawingElemId.current] = p1[selectedElementId];
@@ -251,7 +251,7 @@ export default function Canvas() {
       prevMousePosition &&
       (clientX === prevMousePosition.x || clientY === prevMousePosition.y)
     ) {
-      action.current = 'writing';
+      action.current = 'editText';
     }
 
     // Update the previous mouse position
@@ -278,7 +278,7 @@ export default function Canvas() {
 
     setCounter();
     // Return to idle none action state.
-    if (action.current !== 'writing') {
+    if (action.current !== 'editText') {
       action.current = 'none';
     }
   };
@@ -404,17 +404,17 @@ export default function Canvas() {
         onMouseMove={handleMouseMove}
       />
 
-      {tool === 'text' || action.current === 'writing' ? (
+      {tool === 'text' || action.current === 'editText' ? (
         <textarea
           ref={textAreaRef}
           style={{
             position: 'fixed',
             top:
-              action.current === 'writing'
+              action.current === 'editText'
                 ? p1[selectedElementId]?.y
                 : p1[currentDrawingElemId.current]?.y,
             left:
-              action.current === 'writing'
+              action.current === 'editText'
                 ? p1[selectedElementId]?.x
                 : p1[currentDrawingElemId.current]?.x,
           }}
