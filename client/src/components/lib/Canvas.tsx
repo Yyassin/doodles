@@ -155,7 +155,6 @@ export default function Canvas() {
     if (action.current === 'writing') {
     }
     // Update text element and add p2
-    console.log(updatedText);
     if (updatedText && ctx) {
       editCanvasElement(currentDrawingElemId.current, {
         textElem: updatedText,
@@ -195,7 +194,6 @@ export default function Canvas() {
         p1[currentDrawingElemId.current] = p1[selectedElementId];
         updateText();
         action.current = 'drawing';
-        console.log(action.current);
       }
 
       if (selectedElement === undefined) return;
@@ -283,8 +281,6 @@ export default function Canvas() {
     if (action.current !== 'writing') {
       action.current = 'none';
     }
-
-    console.log(action.current);
   };
 
   const handleMouseMove = (e: MouseEvent) => {
