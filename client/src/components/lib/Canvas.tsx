@@ -1,10 +1,4 @@
-import React, {
-  MouseEvent,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import {
   adjustElementCoordinatesById,
@@ -111,8 +105,9 @@ export default function Canvas() {
     const textArea = textAreaRef.current;
     if ((tool === 'text' || action.current === 'editText') && textArea) {
       textArea.focus();
+      textArea.value = textElem[selectedElementId] || ''; // Set initial value
     }
-  }, [tool]);
+  }, [tool, action.current, selectedElementId, textElem]);
 
   const isDrawingSelected = isDrawingTool(tool);
 
