@@ -376,10 +376,15 @@ const redoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
   }
 };
 
+/**
+ * Sets the canvas state to inital state
+ * Erases history
+ * @returns reset state
+ */
 const resetCanvas = (set: SetState<CanvasElementState>) => () => {
   historyIndex = 0;
   history.splice(1);
-  const state = history[historyIndex];
+  const state = initialCanvasElementState;
   set(state);
 };
 
