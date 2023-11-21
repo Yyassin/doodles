@@ -60,6 +60,7 @@ interface CanvasElementActions {
   setSelectedElement: (id: string) => void;
   undoCanvasHistory: () => void;
   pushCanvasHistory: () => void;
+  resetCanvas: () => void;
   redoCanvasHistory: () => void;
   setCanvasElementState: (elment: CanvasElementState) => void;
 }
@@ -374,6 +375,19 @@ const redoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
     set(prevState);
   }
 };
+
+/**
+ * Sets the canvas state to inital state
+ * Erases history
+ * @returns reset state
+ */
+const resetCanvas = (set: SetState<CanvasElementState>) => () => {
+  historyIndex = 0;
+  history = [initialCanvasElementState];
+  const state = initialCanvasElementState;
+  set(state);
+};
+
 /**
  * Sets the currently selected element id.
  * @param selectedElementId The id to set as selected.
@@ -440,6 +454,7 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   undoCanvasHistory: undoCanvasHistory(set),
   pushCanvasHistory: pushCanvasHistory(set),
   redoCanvasHistory: redoCanvasHistory(set),
+  resetCanvas: resetCanvas(set),
 }));
 export const useCanvasElementStore =
   createStoreWithSelectors(canvasElementStore);
