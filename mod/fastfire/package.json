@@ -19,7 +19,7 @@
     "size": "size-limit",
     "analyze": "size-limit --why"
   },
-  "peerDependencies": {},
+"peerDependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "tsdx lint"

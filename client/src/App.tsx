@@ -1,11 +1,11 @@
 import React from 'react';
-import Layout from './Layout';
 import './App.css';
+import Bootstrap from './Bootstrap';
 
 function App() {
   return (
     <>
-      <Layout />
+      <Bootstrap />
     </>
   );
 }

@@ -19,6 +19,7 @@ import {
 } from 'firebase/auth';
 import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
+import axios from 'axios';
 
 /**
  * It is the sign in page where user either inputs email and password or
@@ -34,6 +35,12 @@ export function signin(email: string, password: string) {
   return signInWithEmailAndPassword(getAuth(firebaseApp), email, password);
 }
 
+export function checkToken(token: string) {
+  return axios.post('http://localhost:3005/token/token', {
+    body: { token: token },
+  });
+}
+
 export default function SignInPage() {
   const { setMode } = useAppStore(['setMode']);
   const emailRef = useRef<HTMLInputElement | null>(null);
@@ -47,14 +54,18 @@ export default function SignInPage() {
 
     try {
       setLoading(true);
-      await signin(
+      const signInToken = await signin(
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
       );
+      localStorage.setItem('accessToken', await signInToken.user.getIdToken());
+
       setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message); //if error thrown, setState and will display on page
     }
+    //get reqs name, id, avatar
+    //store in zustand store
     setLoading(false);
   };
 
