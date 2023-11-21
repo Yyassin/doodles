@@ -6,7 +6,6 @@ import { ResetCanvasDropDownMenu } from '@/components/lib/ResetCanvasDropDownMen
 import {
   HamburgerMenuIcon,
   Pencil2Icon,
-  TrashIcon,
   InfoCircledIcon,
   Share1Icon,
 } from '@radix-ui/react-icons';
@@ -33,9 +32,6 @@ const DropDownMenu = ({
   };
   const handleEditCanvas = () => {
     console.log('Editing Canvas');
-  };
-  const handleReset = () => {
-    console.log('Reseting');
   };
 
   return (

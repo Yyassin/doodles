@@ -383,7 +383,7 @@ const redoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
  */
 const resetCanvas = (set: SetState<CanvasElementState>) => () => {
   historyIndex = 0;
-  history.splice(1);
+  history = [initialCanvasElementState];
   const state = initialCanvasElementState;
   set(state);
 };
