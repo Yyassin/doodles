@@ -14,16 +14,12 @@ const colourTypes = [
 ] as const;
 export type colourType = (typeof colourTypes)[number];
 
-const getCircleStyle = (toolName: colourType): string => {
-  const colorMap: Record<colourType, string> = {
-    redCircle: 'bg-red-500',
-    greenCircle: 'bg-green-500',
-    blueCircle: 'bg-blue-500',
-    orangeCircle: 'bg-orange-500',
-    blackCircle: 'bg-black',
-  };
-
-  return colorMap[toolName] || '';
+const colorMap: Record<string, string> = {
+  redCircle: 'bg-red-500',
+  greenCircle: 'bg-green-500',
+  blueCircle: 'bg-blue-500',
+  orangeCircle: 'bg-orange-500',
+  blackCircle: 'bg-black',
 };
 
 const mapColour = {
@@ -57,7 +53,6 @@ const ToolButton = ({
   const {
     editCanvasElement,
     selectedElementId,
-    //fillColors,
     types,
     strokeColors,
     bowings,
@@ -66,7 +61,6 @@ const ToolButton = ({
     fillStyles,
     strokeLineDashes,
     opacities,
-    // freehandPoints,
     p1,
     p2,
   } = useCanvasElementStore([
@@ -140,9 +134,7 @@ const ToolGroup = ({ tools }: { tools: colourType[] }) => {
             active={colourTool === mapColour[toolName]}
             setColourTool={setColourTool as React.Dispatch<colourType>}
           >
-            <div
-              className={'w-5 h-5 rounded-full ' + getCircleStyle(toolName)}
-            ></div>
+            <div className={'w-5 h-5 rounded-full ' + colorMap[toolName]}></div>
           </ToolButton>
         </div>
       ))}
