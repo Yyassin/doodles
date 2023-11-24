@@ -3,11 +3,7 @@ import './App.css';
 import Bootstrap from './Bootstrap';
 
 function App() {
-  return (
-    <>
-      <Bootstrap />
-    </>
-  );
+  return <Bootstrap />;
 }
 
 export default App;

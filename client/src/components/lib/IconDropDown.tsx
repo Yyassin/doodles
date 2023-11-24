@@ -5,10 +5,11 @@ import { getAuth, signOut } from 'firebase/auth';
 import { firebaseApp } from '../../firebaseDB/firebase';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import * as Avatar from '@radix-ui/react-avatar';
+import { accessToken } from '../../constants';
 
 /**
  * Define a react component that displays a the user infromation with a dropdown menu
- * @author Abdalla Abdelhadi
+ * @author Abdalla Abdelhadi, Zakariyya Almalki
  */
 
 export const IconDropDown = () => {
@@ -16,10 +17,10 @@ export const IconDropDown = () => {
   const handleLogOut = async () => {
     try {
       await signOut(getAuth(firebaseApp));
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem(accessToken);
       setMode('signin'); // if logout works, bring back to sign in page
     } catch (error: unknown) {
-      console.log(error);
+      console.error(error);
     }
   };
 

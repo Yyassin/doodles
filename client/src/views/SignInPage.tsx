@@ -20,6 +20,8 @@ import {
 import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
 import axios from 'axios';
+import { REST_URL } from '@/constants';
+import { accessToken } from '@/constants';
 
 /**
  * It is the sign in page where user either inputs email and password or
@@ -36,7 +38,7 @@ export function signin(email: string, password: string) {
 }
 
 export function checkToken(token: string) {
-  return axios.post('http://localhost:3005/token/token', {
+  return axios.post(REST_URL.auth, {
     body: { token: token },
   });
 }
@@ -58,7 +60,7 @@ export default function SignInPage() {
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
       );
-      localStorage.setItem('accessToken', await signInToken.user.getIdToken());
+      localStorage.setItem(accessToken, await signInToken.user.getIdToken());
 
       setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
@@ -75,7 +77,11 @@ export default function SignInPage() {
     const provider = new GoogleAuthProvider();
 
     try {
-      await signInWithPopup(auth, provider);
+      const googleSignInToken = await signInWithPopup(auth, provider);
+      localStorage.setItem(
+        accessToken,
+        await googleSignInToken.user.getIdToken(),
+      );
       setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message);

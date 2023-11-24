@@ -2,33 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { useAppStore } from './stores/AppStore';
 import Layout from './Layout';
 import { checkToken } from './views/SignInPage';
+import { HTTP_STATUS } from './constants';
 
 /**
  * @author Zakariyya Almalki
+ * File performs application initialization and authentication checks :)
  */
 
 const Bootstrap = () => {
   const { setMode } = useAppStore(['setMode']);
-  const [loaded, setLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const auth = async () => {
     const token = localStorage.getItem('accessToken');
     if (token !== null) {
       try {
         const response = await checkToken(token);
-        if (response.status === 200) {
+        if (response.status === HTTP_STATUS.SUCCESS) {
           setMode('dashboard');
-          setLoaded(true);
           return;
         }
       } catch (error) {}
     }
     setMode('signin');
-    setLoaded(true);
   };
   useEffect(() => {
-    auth();
+    auth().then(() => setIsLoaded(true));
   }, []);
-  return !loaded ? null : <Layout />;
+  return isLoaded ? <Layout /> : null;
 };
 
 export default Bootstrap;

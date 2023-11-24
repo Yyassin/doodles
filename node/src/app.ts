@@ -11,7 +11,7 @@ import userRoutes from './routes/user.route';
 import collaboratorRoutes from './routes/collaborator.route';
 import commentRoutes from './routes/comment.route';
 import boardRoutes from './routes/board.route';
-import tokenRoutes from './routes/token.route';
+import authRoutes from './routes/auth.route';
 
 FastFire.initialize(firestore as Firestore);
 
@@ -30,7 +30,7 @@ app.use('/user', userRoutes);
 app.use('/collaborator', collaboratorRoutes);
 app.use('/comment', commentRoutes);
 app.use('/board', boardRoutes);
-app.use('/token', tokenRoutes);
+app.use('/auth', authRoutes);
 
 server.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

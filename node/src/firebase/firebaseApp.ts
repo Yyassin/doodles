@@ -1,6 +1,7 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import * as admin from 'firebase-admin';
+import serviceAccountJSON from '../firebase/serviceAccount.json';
 /**
  * Defines connection to firebase firestore
  * instance.
@@ -30,7 +31,7 @@ const firebaseTestConfig = {
   projectId,
 };
 
-const serviceAccount = require('../firebase/serviceAccount.json');
+const serviceAccount = serviceAccountJSON as admin.ServiceAccount;
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
