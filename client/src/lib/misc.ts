@@ -18,3 +18,13 @@ export const ObjectValues = <T>(obj: Record<string, T>): T[] => {
  * @returns The capitalized string
  */
 export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/**
+ * Clamps a value between a minimum and maximum.
+ * @param value The value to clamp.
+ * @param min The minimum bound.
+ * @param max The maximum bound.
+ * @returns The clamped value.
+ */
+export const clamp = (value: number, min: number, max: number): number =>
+  Math.min(Math.max(value, min), max);

@@ -1,3 +1,5 @@
+import { ZOOM } from '@/constants';
+import { clamp } from '@/lib/misc';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { AppTool, AppTools } from '@/types';
@@ -36,7 +38,11 @@ AppTools.forEach((section) => {
 });
 
 export const useShortcuts = () => {
-  const { setTool } = useAppStore(['setTool']);
+  const { setTool, setAppZoom, zoom } = useAppStore([
+    'setTool',
+    'setAppZoom',
+    'zoom',
+  ]);
   const { selectedElementId, setSelectedElement, removeCanvasElement } =
     useCanvasElementStore([
       'selectedElementId',
@@ -66,12 +72,23 @@ export const useShortcuts = () => {
       }
     };
 
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        // Zoom event
+        setAppZoom(clamp(zoom - e.deltaY * ZOOM.INC * 0.1, ZOOM.MIN, ZOOM.MAX));
+        e.preventDefault();
+        return false;
+      }
+    };
+
     window.addEventListener('keypress', onKeyPress);
     window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('wheel', onWheel, { passive: false });
     // Cleanup
     return () => {
       window.removeEventListener('keypress', onKeyPress);
       window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('wheel', onWheel);
     };
-  }, [selectedElementId]);
+  }, [selectedElementId, zoom]);
 };
