@@ -17,7 +17,6 @@ import {
   Vector2,
 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
-import { getScaleOffset } from '@/lib/canvasElements/render';
 
 /**
  * Main Canvas View
@@ -31,11 +30,11 @@ const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
 type Action = 'none' | 'drawing' | 'resizing' | 'moving';
 
 export default function Canvas() {
-  const { tool, appHeight, appWidth, zoom } = useAppStore([
+  const { tool, appHeight, appWidth } = useAppStore([
     'tool',
     'appHeight',
     'appWidth',
-    'zoom',
+    'setMode',
   ]);
   const {
     addCanvasShape,
@@ -104,20 +103,6 @@ export default function Canvas() {
 
   const isDrawingSelected = isDrawingTool(tool);
 
-  /**
-   * Retrieves normalized mouse coordinates according to the
-   * set zoom level.
-   * @param e The mouse event containing the raw mouse coordinates.
-   * @returns The normalized mouse coordinates.
-   */
-  const getMouseCoordinates = (e: MouseEvent<HTMLCanvasElement>) => {
-    const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
-
-    const clientX = (e.clientX + scaleOffset.x) / zoom;
-    const clientY = (e.clientY + scaleOffset.y) / zoom;
-    return { clientX, clientY };
-  };
-
   // Update a canvas element's position state.
   const updateElement = (
     id: string,
@@ -147,7 +132,7 @@ export default function Canvas() {
   };
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
-    const { clientX, clientY } = getMouseCoordinates(e);
+    const { clientX, clientY } = e;
     setSelectedElement('');
     if (tool === 'select') {
       // Using selection tool. Check if cursor is near an element.
@@ -231,8 +216,8 @@ export default function Canvas() {
     action.current = 'none';
   };
 
-  const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
-    const { clientX, clientY } = getMouseCoordinates(e);
+  const handleMouseMove = (e: MouseEvent) => {
+    const { clientX, clientY } = e;
     if (tool === 'select') {
       switch (action.current) {
         case 'moving': {

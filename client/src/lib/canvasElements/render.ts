@@ -7,23 +7,6 @@ import { TransformHandleType, TransformHandles } from '@/types';
  * @author Yousef Yassin
  */
 
-/**
- * Retrieves the scaling offset in <x, y> to apply as a translation
- * pre-scaling to result in a centered zoom post-scaling.
- * @param height The app (canvas) height.
- * @param width The app (canvas) width.
- * @param zoom The current zoom level applied.
- * @returns The scale offset.
- */
-export const getScaleOffset = (height: number, width: number, zoom: number) => {
-  const scaledWidth = width * zoom;
-  const scaledHeight = height * zoom;
-  return {
-    x: (scaledWidth - width) / 2,
-    y: (scaledHeight - height) / 2,
-  };
-};
-
 // TODO: These will be passed in from state.
 const selectionColour = '#818cf8';
 const zoomValue = 1;
@@ -126,7 +109,6 @@ export const renderSelectionBorder = (
     elementHeight + heightInversion * linePadding * 2,
     0,
   );
-  ctx.restore();
 };
 
 /**

@@ -4,7 +4,6 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useLayoutEffect } from 'react';
 import rough from 'roughjs';
 import getStroke from 'perfect-freehand';
-import { getScaleOffset } from '@/lib/canvasElements/render';
 
 const getSvgPathFromStroke = (stroke: number[][]) => {
   if (!stroke.length) return '';
@@ -28,11 +27,7 @@ const getSvgPathFromStroke = (stroke: number[][]) => {
  * @authors Yousef Yassin, Dana El Sherif
  */
 const useDrawElements = () => {
-  const { appHeight, appWidth, zoom } = useAppStore([
-    'appHeight',
-    'appWidth',
-    'zoom',
-  ]);
+  const { appHeight, appWidth } = useAppStore(['appHeight', 'appWidth']);
   const {
     roughElements,
     selectedElementId,
@@ -63,15 +58,6 @@ const useDrawElements = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const roughCanvas = rough.canvas(canvas);
 
-    // Retrieve the scaling offset to apply for centered zoom
-    // (TODO: We can change this to zoom towards mouse position)
-    const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
-
-    // Temporarily apply scaling
-    ctx.save();
-    ctx.translate(-scaleOffset.x, -scaleOffset.y);
-    ctx.scale(zoom, zoom);
-
     // Render each element
     allIds.forEach((id) => {
       const type = types[id];
@@ -89,15 +75,11 @@ const useDrawElements = () => {
 
     // Highlight selected elements (only 1 for now). We ignore
     // lines for the moment.
-    if (!(selectedElementId === '' || types[selectedElementId] === 'line')) {
-      [selectedElementId].forEach((id) => {
-        renderTransformFrame(ctx, { p1, p2 }, id);
-      });
-    }
-
-    // Restore canvas pre-scaling
-    ctx.restore();
-  }, [allIds, selectedElementId, types, p1, p2, appWidth, appHeight, zoom]);
+    if (selectedElementId === '' || types[selectedElementId] === 'line') return;
+    [selectedElementId].forEach((id) => {
+      renderTransformFrame(ctx, { p1, p2 }, id);
+    });
+  }, [allIds, selectedElementId, types, p1, p2, appWidth, appHeight]);
 };
 
 export default useDrawElements;
