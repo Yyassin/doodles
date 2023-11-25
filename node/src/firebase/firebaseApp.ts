@@ -1,6 +1,7 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-
+import * as admin from 'firebase-admin';
+import serviceAccountJSON from '../firebase/serviceAccount.json';
 /**
  * Defines connection to firebase firestore
  * instance.
@@ -16,7 +17,7 @@ const isTestingMode = process.env.TEST !== undefined;
 const projectId = 'doodles-68ce9' as const;
 
 // Actual config
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: 'AIzaSyA3Y_5c6c7uCIzgSjdVi1F4NZ11isfYbj8',
   authDomain: 'doodles-68ce9.firebaseapp.com',
   projectId,
@@ -29,6 +30,11 @@ const firebaseConfig = {
 const firebaseTestConfig = {
   projectId,
 };
+
+const serviceAccount = serviceAccountJSON as admin.ServiceAccount;
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 // The connected instance
 export const firebaseApp = firebase.initializeApp(

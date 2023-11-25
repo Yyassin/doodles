@@ -1,14 +1,29 @@
 import React from 'react';
+import { useAppStore } from '@/stores/AppStore';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
+import { getAuth, signOut } from 'firebase/auth';
+import { firebaseApp } from '../../firebaseDB/firebase';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import * as Avatar from '@radix-ui/react-avatar';
+import { ACCESS_TOKEN_TAG } from '../../constants';
 
 /**
  * Define a react component that displays a the user infromation with a dropdown menu
- * @author Abdalla Abdelhadi
+ * @author Abdalla Abdelhadi, Zakariyya Almalki
  */
 
 export const IconDropDown = () => {
+  const { setMode } = useAppStore(['setMode']);
+  const handleLogOut = async () => {
+    try {
+      await signOut(getAuth(firebaseApp));
+      localStorage.removeItem(ACCESS_TOKEN_TAG);
+      setMode('signin'); // if logout works, bring back to sign in page
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
+
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
@@ -48,7 +63,10 @@ export const IconDropDown = () => {
             Test
           </DropdownMenu.Item>
           <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
-          <DropdownMenu.Item className="group text-[13px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[25px] relative px-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-red-600">
+          <DropdownMenu.Item
+            onClick={handleLogOut}
+            className="group text-[13px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[25px] relative px-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-red-600"
+          >
             Log Out
           </DropdownMenu.Item>
           <DropdownMenu.Arrow className="fill-white" />

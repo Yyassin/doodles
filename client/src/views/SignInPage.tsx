@@ -19,6 +19,9 @@ import {
 } from 'firebase/auth';
 import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
+import axios from 'axios';
+import { REST_URL } from '@/constants';
+import { ACCESS_TOKEN_TAG } from '@/constants';
 
 /**
  * It is the sign in page where user either inputs email and password or
@@ -34,6 +37,12 @@ export function signin(email: string, password: string) {
   return signInWithEmailAndPassword(getAuth(firebaseApp), email, password);
 }
 
+export function checkToken(token: string) {
+  return axios.post(REST_URL.auth, {
+    body: { token: token },
+  });
+}
+
 export default function SignInPage() {
   const { setMode } = useAppStore(['setMode']);
   const emailRef = useRef<HTMLInputElement | null>(null);
@@ -47,14 +56,21 @@ export default function SignInPage() {
 
     try {
       setLoading(true);
-      await signin(
+      const signInToken = await signin(
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
       );
+      localStorage.setItem(
+        ACCESS_TOKEN_TAG,
+        await signInToken.user.getIdToken(),
+      );
+
       setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message); //if error thrown, setState and will display on page
     }
+    //get reqs name, id, avatar
+    //store in zustand store
     setLoading(false);
   };
 
@@ -64,7 +80,11 @@ export default function SignInPage() {
     const provider = new GoogleAuthProvider();
 
     try {
-      await signInWithPopup(auth, provider);
+      const googleSignInToken = await signInWithPopup(auth, provider);
+      localStorage.setItem(
+        ACCESS_TOKEN_TAG,
+        await googleSignInToken.user.getIdToken(),
+      );
       setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message);
