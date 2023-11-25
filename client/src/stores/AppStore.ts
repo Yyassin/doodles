@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AppMode, AppTool, AppTheme, colourType } from '@/types';
+import { AppMode, AppTool, AppTheme } from '@/types';
 import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
 
@@ -23,8 +23,8 @@ interface AppState {
   appWidth: number;
   // Viewport Height
   appHeight: number;
-  // The current app tool (selected tool or action)
-  colourTool: colourType;
+  // Canvas Zoom
+  zoom: number;
 }
 interface AppActions {
   // Reducer to set the app mode
@@ -37,8 +37,8 @@ interface AppActions {
   setAppDimensions: (width: number, height: number) => void;
   // Reducer to set full screen mode
   setIsFullscreen: (isFullscreen: boolean) => void;
-  // Reducer to set the app colour tool
-  setColourTool: (tool: colourType) => void;
+  // Reducer to set zoom level
+  setAppZoom: (zoom: number) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -50,7 +50,7 @@ export const initialAppState: AppState = {
   isFullscreen: false,
   appWidth: window.innerWidth,
   appHeight: window.innerHeight,
-  colourTool: 'blackCircle',
+  zoom: 1, // 100%
 };
 
 /** Actions / Reducers */
@@ -66,8 +66,10 @@ const setAppDimensions =
     set(() => ({ appWidth: width, appHeight: height }));
 const setIsFullscreen = (set: SetState<AppStore>) => (isFullscreen: boolean) =>
   set(() => ({ isFullscreen }));
-const setColourTool = (set: SetState<AppStore>) => (colourTool: colourType) =>
-  set(() => ({ colourTool }));
+const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
+  set(() => ({
+    zoom,
+  }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
@@ -77,6 +79,6 @@ const appStore = create<AppStore>()((set) => ({
   setTheme: setTheme(set),
   setIsFullscreen: setIsFullscreen(set),
   setAppDimensions: setAppDimensions(set),
-  setColourTool: setColourTool(set),
+  setAppZoom: setAppZoom(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);

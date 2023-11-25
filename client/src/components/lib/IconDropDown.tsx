@@ -5,7 +5,7 @@ import { getAuth, signOut } from 'firebase/auth';
 import { firebaseApp } from '../../firebaseDB/firebase';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import * as Avatar from '@radix-ui/react-avatar';
-import { accessToken } from '../../constants';
+import { ACCESS_TOKEN_TAG } from '../../constants';
 
 /**
  * Define a react component that displays a the user infromation with a dropdown menu
@@ -17,7 +17,7 @@ export const IconDropDown = () => {
   const handleLogOut = async () => {
     try {
       await signOut(getAuth(firebaseApp));
-      localStorage.removeItem(accessToken);
+      localStorage.removeItem(ACCESS_TOKEN_TAG);
       setMode('signin'); // if logout works, bring back to sign in page
     } catch (error: unknown) {
       console.error(error);

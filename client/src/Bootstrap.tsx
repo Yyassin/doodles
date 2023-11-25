@@ -3,6 +3,7 @@ import { useAppStore } from './stores/AppStore';
 import Layout from './Layout';
 import { checkToken } from './views/SignInPage';
 import { HTTP_STATUS } from './constants';
+import { ACCESS_TOKEN_TAG } from './constants';
 
 /**
  * @author Zakariyya Almalki
@@ -13,7 +14,7 @@ const Bootstrap = () => {
   const { setMode } = useAppStore(['setMode']);
   const [isLoaded, setIsLoaded] = useState(false);
   const auth = async () => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem(ACCESS_TOKEN_TAG);
     if (token !== null) {
       try {
         const response = await checkToken(token);
