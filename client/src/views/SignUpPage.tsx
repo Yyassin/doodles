@@ -20,6 +20,7 @@ import {
 } from 'firebase/auth';
 import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
+import { ACCESS_TOKEN_TAG } from '@/constants';
 
 /**
  * It is the sign up page where user either inputs email and password or
@@ -83,7 +84,7 @@ export default function SignUp() {
       //we want to disable sign up button from user so
       //firebase doesnt create many accounts if button click multiple times
       setLoading(true);
-      await signup(
+      const signUpToken = await signup(
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
         firstNameRef.current?.value ?? '',
@@ -92,10 +93,15 @@ export default function SignUp() {
           ? profilePictureRef.current?.files[0]
           : null,
       );
+      localStorage.setItem(
+        ACCESS_TOKEN_TAG,
+        await signUpToken.user.getIdToken(),
+      );
       setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message); //if error thrown, setState and will display on page
     }
+    //post reqs
     setLoading(false);
   };
 

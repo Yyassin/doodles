@@ -7,7 +7,8 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "strict": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "resolveJsonModule": true
   },
   "include": ["./src/**/*", "./test/**/*"]
 }
