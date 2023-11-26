@@ -1,4 +1,10 @@
-import React, { MouseEvent, useEffect, useRef, useState } from 'react';
+import React, {
+  MouseEvent,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import {
   adjustElementCoordinatesById,
@@ -101,13 +107,21 @@ export default function Canvas() {
   }, []);
 
   //Focus textbox
-  useEffect(() => {
+  useLayoutEffect(() => {
     const textArea = textAreaRef.current;
-    if ((tool === 'text' || action.current === 'editText') && textArea) {
+    const selectedElementType = types[selectedElementId];
+
+    if (
+      (tool === 'text' || action.current === 'editText') &&
+      textArea &&
+      selectedElementType === 'text'
+    ) {
       textArea.focus();
       textArea.value = textElem[selectedElementId] || ''; // Set initial value
     }
-  }, [tool, action.current, selectedElementId, textElem]);
+  }, [tool, action.current, selectedElementId, textElem, types]);
+
+  // ... (existing code)
 
   const isDrawingSelected = isDrawingTool(tool);
 
@@ -412,6 +426,11 @@ export default function Canvas() {
               action.current === 'editText'
                 ? p1[selectedElementId]?.x
                 : p1[currentDrawingElemId.current]?.x,
+            margin: 0,
+            padding: 0,
+            outline: 0,
+            overflow: 'hidden',
+            background: 'transparent',
           }}
         />
       ) : null}
