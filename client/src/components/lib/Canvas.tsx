@@ -428,9 +428,12 @@ export default function Canvas() {
                 : p1[currentDrawingElemId.current]?.x,
             margin: 0,
             padding: 0,
+            font: '24px sans-serif',
             outline: 0,
             overflow: 'hidden',
             background: 'transparent',
+            border: 0,
+            whiteSpace: 'pre',
           }}
         />
       ) : null}
