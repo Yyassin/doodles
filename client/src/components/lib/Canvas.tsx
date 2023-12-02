@@ -31,12 +31,15 @@ const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
 type Action = 'none' | 'drawing' | 'resizing' | 'moving';
 
 export default function Canvas() {
-  const { tool, appHeight, appWidth, zoom } = useAppStore([
-    'tool',
-    'appHeight',
-    'appWidth',
-    'zoom',
-  ]);
+  const { tool, appHeight, appWidth, zoom, panOffset, setPanOffset } =
+    useAppStore([
+      'tool',
+      'appHeight',
+      'appWidth',
+      'zoom',
+      'panOffset',
+      'setPanOffset',
+    ]);
   const {
     addCanvasShape,
     addCanvasFreehand,

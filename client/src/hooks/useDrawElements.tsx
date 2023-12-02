@@ -28,10 +28,12 @@ const getSvgPathFromStroke = (stroke: number[][]) => {
  * @authors Yousef Yassin, Dana El Sherif
  */
 const useDrawElements = () => {
-  const { appHeight, appWidth, zoom } = useAppStore([
+  const { appHeight, appWidth, zoom, setPanOffset, panOffset } = useAppStore([
     'appHeight',
     'appWidth',
     'zoom',
+    'panOffset',
+    'setPanOffset',
   ]);
   const {
     roughElements,
@@ -68,8 +70,18 @@ const useDrawElements = () => {
     const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
 
     // Temporarily apply scaling
+    // ctx.save();
+    // ctx.translate(-scaleOffset.x, -scaleOffset.y);
+    // ctx.scale(zoom, zoom);
+
+    //Panning
+    setPanOffset(50, 50);
+    ctx.fillRect(50, 50, 100, 100);
     ctx.save();
-    ctx.translate(-scaleOffset.x, -scaleOffset.y);
+    ctx.translate(
+      panOffset.x + zoom - scaleOffset.x,
+      panOffset.y + zoom - scaleOffset.y,
+    );
     ctx.scale(zoom, zoom);
 
     // Render each element
