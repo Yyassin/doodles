@@ -81,6 +81,7 @@ export const useShortcuts = () => {
         e.preventDefault();
         return false;
       } else {
+        //Pan Event
         setPanOffset(-e.deltaX, -e.deltaY);
       }
     };

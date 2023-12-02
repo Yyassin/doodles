@@ -28,18 +28,28 @@ const drawingTools = ['line', 'rectangle', 'circle', 'freehand'] as const;
 const drawingToolsSet = new Set(drawingTools);
 const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
   drawingToolsSet.has(tool as (typeof drawingTools)[number]);
-type Action = 'none' | 'drawing' | 'resizing' | 'moving';
+type Action = 'none' | 'drawing' | 'resizing' | 'moving' | 'panning';
 
 export default function Canvas() {
-  const { tool, appHeight, appWidth, zoom, panOffset, setPanOffset } =
-    useAppStore([
-      'tool',
-      'appHeight',
-      'appWidth',
-      'zoom',
-      'panOffset',
-      'setPanOffset',
-    ]);
+  const {
+    tool,
+    appHeight,
+    appWidth,
+    zoom,
+    panOffset,
+    setPanOffset,
+    panMousePosition,
+    setPanMousePosition,
+  } = useAppStore([
+    'tool',
+    'appHeight',
+    'appWidth',
+    'zoom',
+    'panOffset',
+    'setPanOffset',
+    'panMousePosition',
+    'setPanMousePosition',
+  ]);
   const {
     addCanvasShape,
     addCanvasFreehand,
@@ -151,6 +161,12 @@ export default function Canvas() {
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = getMouseCoordinates(e);
+
+    if (tool === 'pan') {
+      action.current = 'panning';
+      setPanMousePosition(clientX, clientY);
+      return;
+    }
     setSelectedElement('');
     if (tool === 'select') {
       // Using selection tool. Check if cursor is near an element.
@@ -236,6 +252,13 @@ export default function Canvas() {
 
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = getMouseCoordinates(e);
+
+    if (action.current === 'panning') {
+      const deltaX = clientX - panMousePosition.x;
+      const deltaY = clientY - panMousePosition.y;
+      setPanOffset(panOffset.x + deltaX, panOffset.y + deltaY);
+      return;
+    }
     if (tool === 'select') {
       switch (action.current) {
         case 'moving': {

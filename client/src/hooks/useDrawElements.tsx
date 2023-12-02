@@ -70,14 +70,12 @@ const useDrawElements = () => {
     const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
 
     // Temporarily apply scaling
-    // ctx.save();
-    // ctx.translate(-scaleOffset.x, -scaleOffset.y);
-    // ctx.scale(zoom, zoom);
-
-    //Panning
-    ctx.fillRect(0, 0, 100, 100);
+    //Panning & zooming
     ctx.save();
-    ctx.translate(panOffset.x, panOffset.y);
+    ctx.translate(
+      panOffset.x * zoom - scaleOffset.x,
+      panOffset.y * zoom - scaleOffset.y,
+    );
     ctx.scale(zoom, zoom);
 
     // Render each element
