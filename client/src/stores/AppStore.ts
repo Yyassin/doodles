@@ -27,8 +27,6 @@ interface AppState {
   zoom: number;
   //Panning offset
   panOffset: { x: number; y: number };
-  //Pan mouse-start position
-  panMousePosition: { x: number; y: number };
 }
 interface AppActions {
   // Reducer to set the app mode
@@ -44,7 +42,6 @@ interface AppActions {
   // Reducer to set zoom level
   setAppZoom: (zoom: number) => void;
   setPanOffset: (x: number, y: number) => void;
-  setPanMousePosition: (x: number, y: number) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -58,7 +55,6 @@ export const initialAppState: AppState = {
   appHeight: window.innerHeight,
   zoom: 1, // 100%
   panOffset: { x: 0, y: 0 },
-  panMousePosition: { x: 0, y: 0 },
 };
 
 /** Actions / Reducers */
@@ -80,9 +76,6 @@ const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
   }));
 const setPanOffset = (set: SetState<AppStore>) => (x: number, y: number) =>
   set(() => ({ panOffset: { x, y } }));
-const setPanMousePosition =
-  (set: SetState<AppStore>) => (x: number, y: number) =>
-    set(() => ({ panMousePosition: { x, y } }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
@@ -94,6 +87,5 @@ const appStore = create<AppStore>()((set) => ({
   setAppDimensions: setAppDimensions(set),
   setAppZoom: setAppZoom(set),
   setPanOffset: setPanOffset(set),
-  setPanMousePosition: setPanMousePosition(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);
