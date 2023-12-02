@@ -28,12 +28,11 @@ const getSvgPathFromStroke = (stroke: number[][]) => {
  * @authors Yousef Yassin, Dana El Sherif
  */
 const useDrawElements = () => {
-  const { appHeight, appWidth, zoom, setPanOffset, panOffset } = useAppStore([
+  const { appHeight, appWidth, zoom, panOffset } = useAppStore([
     'appHeight',
     'appWidth',
     'zoom',
     'panOffset',
-    'setPanOffset',
   ]);
   const {
     roughElements,
