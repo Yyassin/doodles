@@ -25,6 +25,8 @@ interface AppState {
   appHeight: number;
   // Canvas Zoom
   zoom: number;
+  //Panning offset
+  panOffset: { x: number; y: number };
 }
 interface AppActions {
   // Reducer to set the app mode
@@ -39,6 +41,7 @@ interface AppActions {
   setIsFullscreen: (isFullscreen: boolean) => void;
   // Reducer to set zoom level
   setAppZoom: (zoom: number) => void;
+  setPanOffset: (x: number, y: number) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -51,6 +54,7 @@ export const initialAppState: AppState = {
   appWidth: window.innerWidth,
   appHeight: window.innerHeight,
   zoom: 1, // 100%
+  panOffset: { x: 0, y: 0 },
 };
 
 /** Actions / Reducers */
@@ -70,6 +74,8 @@ const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
   set(() => ({
     zoom,
   }));
+const setPanOffset = (set: SetState<AppStore>) => (x: number, y: number) =>
+  set(() => ({ panOffset: { x, y } }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
@@ -80,5 +86,6 @@ const appStore = create<AppStore>()((set) => ({
   setIsFullscreen: setIsFullscreen(set),
   setAppDimensions: setAppDimensions(set),
   setAppZoom: setAppZoom(set),
+  setPanOffset: setPanOffset(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);

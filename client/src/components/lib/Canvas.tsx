@@ -28,15 +28,18 @@ const drawingTools = ['line', 'rectangle', 'circle', 'freehand'] as const;
 const drawingToolsSet = new Set(drawingTools);
 const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
   drawingToolsSet.has(tool as (typeof drawingTools)[number]);
-type Action = 'none' | 'drawing' | 'resizing' | 'moving';
+type Action = 'none' | 'drawing' | 'resizing' | 'moving' | 'panning';
 
 export default function Canvas() {
-  const { tool, appHeight, appWidth, zoom } = useAppStore([
-    'tool',
-    'appHeight',
-    'appWidth',
-    'zoom',
-  ]);
+  const { tool, appHeight, appWidth, zoom, panOffset, setPanOffset } =
+    useAppStore([
+      'tool',
+      'appHeight',
+      'appWidth',
+      'zoom',
+      'panOffset',
+      'setPanOffset',
+    ]);
   const {
     addCanvasShape,
     addCanvasFreehand,
@@ -91,6 +94,7 @@ export default function Canvas() {
   const selectOffset = useRef<Vector2 | null>(null);
   // Id of the element being drawn (for the first time).
   const currentDrawingElemId = useRef('');
+  const panMouseStartPosition = useRef({ x: 0, y: 0 } as Vector2);
   // Position of the transform handle last used.
   const selectedHandlePositionRef = useRef<TransformHandleDirection | null>(
     null,
@@ -113,8 +117,8 @@ export default function Canvas() {
   const getMouseCoordinates = (e: MouseEvent<HTMLCanvasElement>) => {
     const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
 
-    const clientX = (e.clientX + scaleOffset.x) / zoom;
-    const clientY = (e.clientY + scaleOffset.y) / zoom;
+    const clientX = (e.clientX - panOffset.x * zoom + scaleOffset.x) / zoom;
+    const clientY = (e.clientY - panOffset.y * zoom + scaleOffset.y) / zoom;
     return { clientX, clientY };
   };
 
@@ -148,6 +152,12 @@ export default function Canvas() {
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = getMouseCoordinates(e);
+
+    if (tool === 'pan') {
+      action.current = 'panning';
+      panMouseStartPosition.current = { x: clientX, y: clientY };
+      return;
+    }
     setSelectedElement('');
     if (tool === 'select') {
       // Using selection tool. Check if cursor is near an element.
@@ -233,6 +243,13 @@ export default function Canvas() {
 
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = getMouseCoordinates(e);
+
+    if (action.current === 'panning') {
+      const deltaX = clientX - panMouseStartPosition.current.x;
+      const deltaY = clientY - panMouseStartPosition.current.y;
+      setPanOffset(panOffset.x + deltaX, panOffset.y + deltaY);
+      return;
+    }
     if (tool === 'select') {
       switch (action.current) {
         case 'moving': {

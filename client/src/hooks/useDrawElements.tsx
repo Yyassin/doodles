@@ -28,10 +28,11 @@ const getSvgPathFromStroke = (stroke: number[][]) => {
  * @authors Yousef Yassin, Dana El Sherif
  */
 const useDrawElements = () => {
-  const { appHeight, appWidth, zoom } = useAppStore([
+  const { appHeight, appWidth, zoom, panOffset } = useAppStore([
     'appHeight',
     'appWidth',
     'zoom',
+    'panOffset',
   ]);
   const {
     roughElements,
@@ -68,8 +69,12 @@ const useDrawElements = () => {
     const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
 
     // Temporarily apply scaling
+    //Panning & zooming
     ctx.save();
-    ctx.translate(-scaleOffset.x, -scaleOffset.y);
+    ctx.translate(
+      panOffset.x * zoom - scaleOffset.x,
+      panOffset.y * zoom - scaleOffset.y,
+    );
     ctx.scale(zoom, zoom);
 
     // Render each element
@@ -97,7 +102,17 @@ const useDrawElements = () => {
 
     // Restore canvas pre-scaling
     ctx.restore();
-  }, [allIds, selectedElementId, types, p1, p2, appWidth, appHeight, zoom]);
+  }, [
+    allIds,
+    selectedElementId,
+    types,
+    p1,
+    p2,
+    appWidth,
+    appHeight,
+    zoom,
+    panOffset,
+  ]);
 };
 
 export default useDrawElements;
