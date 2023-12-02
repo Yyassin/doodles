@@ -75,13 +75,9 @@ const useDrawElements = () => {
     // ctx.scale(zoom, zoom);
 
     //Panning
-    setPanOffset(50, 50);
-    ctx.fillRect(50, 50, 100, 100);
+    ctx.fillRect(0, 0, 100, 100);
     ctx.save();
-    ctx.translate(
-      panOffset.x + zoom - scaleOffset.x,
-      panOffset.y + zoom - scaleOffset.y,
-    );
+    ctx.translate(panOffset.x, panOffset.y);
     ctx.scale(zoom, zoom);
 
     // Render each element
@@ -109,7 +105,17 @@ const useDrawElements = () => {
 
     // Restore canvas pre-scaling
     ctx.restore();
-  }, [allIds, selectedElementId, types, p1, p2, appWidth, appHeight, zoom]);
+  }, [
+    allIds,
+    selectedElementId,
+    types,
+    p1,
+    p2,
+    appWidth,
+    appHeight,
+    zoom,
+    panOffset,
+  ]);
 };
 
 export default useDrawElements;

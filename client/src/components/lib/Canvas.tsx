@@ -116,8 +116,8 @@ export default function Canvas() {
   const getMouseCoordinates = (e: MouseEvent<HTMLCanvasElement>) => {
     const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
 
-    const clientX = (e.clientX + scaleOffset.x) / zoom;
-    const clientY = (e.clientY + scaleOffset.y) / zoom;
+    const clientX = (e.clientX - panOffset.x + zoom + scaleOffset.x) / zoom;
+    const clientY = (e.clientY - panOffset.y + zoom + scaleOffset.y) / zoom;
     return { clientX, clientY };
   };
 
