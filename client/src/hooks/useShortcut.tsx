@@ -38,11 +38,10 @@ AppTools.forEach((section) => {
 });
 
 export const useShortcuts = () => {
-  const { setTool, setAppZoom, zoom, panOffset, setPanOffset } = useAppStore([
+  const { setTool, setAppZoom, zoom, setPanOffset } = useAppStore([
     'setTool',
     'setAppZoom',
     'zoom',
-    'panOffset',
     'setPanOffset',
   ]);
   const { selectedElementId, setSelectedElement, removeCanvasElement } =
