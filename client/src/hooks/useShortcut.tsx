@@ -38,10 +38,11 @@ AppTools.forEach((section) => {
 });
 
 export const useShortcuts = () => {
-  const { setTool, setAppZoom, zoom, setPanOffset } = useAppStore([
+  const { setTool, setAppZoom, zoom, panOffset, setPanOffset } = useAppStore([
     'setTool',
     'setAppZoom',
     'zoom',
+    'panOffset',
     'setPanOffset',
   ]);
   const { selectedElementId, setSelectedElement, removeCanvasElement } =
@@ -81,7 +82,7 @@ export const useShortcuts = () => {
         return false;
       } else {
         //Pan Event
-        setPanOffset(-e.deltaX, -e.deltaY);
+        setPanOffset(panOffset.x - e.deltaX, panOffset.y - e.deltaY);
       }
     };
 
@@ -94,5 +95,5 @@ export const useShortcuts = () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('wheel', onWheel);
     };
-  }, [selectedElementId, zoom]);
+  }, [selectedElementId, zoom, panOffset]);
 };
