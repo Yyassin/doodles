@@ -34,6 +34,7 @@ export const useSocket = () => {
     freehandPoints,
     p1,
     p2,
+    textStrings,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -49,6 +50,7 @@ export const useSocket = () => {
     'freehandPoints',
     'p1',
     'p2',
+    'textStrings',
   ]);
 
   const socket = useRef<WebsocketClient>();
@@ -73,6 +75,7 @@ export const useSocket = () => {
           fillStyle: element.fillStyle,
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
+          text: element.text,
         },
       );
       addCanvasShape(newElement);
@@ -95,6 +98,7 @@ export const useSocket = () => {
           fillStyle: element.fillStyle,
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
+          text: element.text,
         },
         true,
       );
@@ -145,6 +149,7 @@ export const useSocket = () => {
         fillStyle: fillStyles[actionElementID],
         strokeLineDash: strokeLineDashes[actionElementID],
         opacity: opacities[actionElementID],
+        text: textStrings[actionElementID],
       },
       true,
     );
