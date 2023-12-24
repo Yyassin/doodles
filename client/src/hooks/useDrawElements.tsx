@@ -115,7 +115,7 @@ const useDrawElements = () => {
       });
     }
 
-    // Restore canvas pre-scaling and panning
+    // Restore canvas pre-scaling and panning.
     ctx.restore();
   }, [
     allIds,
