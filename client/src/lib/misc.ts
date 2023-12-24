@@ -28,3 +28,12 @@ export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
  */
 export const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
+
+/**
+ * Retrieves a referencce to the DOM canvas and its context.
+ * @returns A reference to the canvas and 2D context.
+ */
+export const getCanvasContext = () => {
+  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  return { canvas, ctx: canvas?.getContext('2d') };
+};

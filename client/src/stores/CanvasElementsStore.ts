@@ -21,9 +21,10 @@ export interface CanvasElement {
   strokeWidth: number; // Stroke width in pixels
   fillStyle: CanvasElementFillStyle; // Pattern for filling the element
   strokeLineDash: number[]; // Array of gap width between strokes (repeats)
-  opacity: number; // Element opacity -- TODO: not sure how this will work yet
+  opacity: number; // Element opacity
   roughElement?: Drawable; // The underlying roughjs element, if applicable.
-  freehandPoints?: Vector2[];
+  freehandPoints?: Vector2[]; // Points for curves
+  text: string; // Container stringW
   p1: Vector2; // Top left coordinate, or center for circles
   p2: Vector2; // Bottom right coordinate
   id: string; // Element id
@@ -45,6 +46,7 @@ export interface CanvasElementState {
   opacities: Record<string, CanvasElement['opacity']>;
   roughElements: Record<string, CanvasElement['roughElement']>;
   freehandPoints: Record<string, CanvasElement['freehandPoints']>;
+  textStrings: Record<string, CanvasElement['text']>;
   p1: Record<string, CanvasElement['p1']>;
   p2: Record<string, CanvasElement['p2']>;
 }
@@ -81,6 +83,7 @@ export const initialCanvasElementState: CanvasElementState = {
   opacities: {},
   roughElements: {},
   freehandPoints: {},
+  textStrings: {},
   p1: {},
   p2: {},
 };
@@ -110,6 +113,7 @@ const addCanvasShape =
       const strokeLineDashes = { ...state.strokeLineDashes };
       const opacities = { ...state.opacities };
       const roughElements = { ...state.roughElements };
+      const textStrings = { ...state.textStrings };
       const p1s = { ...state.p1 };
       const p2s = { ...state.p2 };
 
@@ -125,6 +129,7 @@ const addCanvasShape =
         strokeLineDash,
         opacity,
         roughElement,
+        text,
         p1,
         p2,
       } = element;
@@ -139,6 +144,7 @@ const addCanvasShape =
       strokeLineDashes[id] = strokeLineDash;
       opacities[id] = opacity;
       roughElements[id] = roughElement;
+      textStrings[id] = text;
       p1s[id] = p1;
       p2s[id] = p2;
       return {
@@ -154,6 +160,7 @@ const addCanvasShape =
         strokeLineDashes,
         opacities,
         roughElements,
+        textStrings,
         p1: p1s,
         p2: p2s,
       };
@@ -267,6 +274,9 @@ const editCanvasElement =
       const freehandPoints = partialElement.freehandPoints
         ? { ...state.freehandPoints, [id]: partialElement.freehandPoints }
         : state.freehandPoints;
+      const textStrings = partialElement.text
+        ? { ...state.textStrings, [id]: partialElement.text }
+        : state.textStrings;
 
       return {
         ...state,
@@ -284,6 +294,7 @@ const editCanvasElement =
         p1: p1s,
         p2: p2s,
         freehandPoints,
+        textStrings,
       };
     });
 

@@ -19,3 +19,7 @@ export const ZOOM = {
   MIN: 0.1, // 10%
   MAX: 20, // 2000%
 } as const;
+
+// TODO: Move to state eventually
+export const TEXT_FONT_SIZE = 24;
+export const TEXT_FONT_FAMILY = 'sans-serif';

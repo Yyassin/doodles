@@ -5,6 +5,7 @@ import { useLayoutEffect } from 'react';
 import rough from 'roughjs';
 import getStroke from 'perfect-freehand';
 import { getScaleOffset } from '@/lib/canvasElements/render';
+import { getCanvasContext } from '@/lib/misc';
 
 const getSvgPathFromStroke = (stroke: number[][]) => {
   if (!stroke.length) return '';
@@ -28,11 +29,12 @@ const getSvgPathFromStroke = (stroke: number[][]) => {
  * @authors Yousef Yassin, Dana El Sherif
  */
 const useDrawElements = () => {
-  const { appHeight, appWidth, zoom, panOffset } = useAppStore([
+  const { appHeight, appWidth, zoom, panOffset, action } = useAppStore([
     'appHeight',
     'appWidth',
     'zoom',
     'panOffset',
+    'action',
   ]);
   const {
     roughElements,
@@ -42,6 +44,7 @@ const useDrawElements = () => {
     types,
     allIds,
     freehandPoints,
+    textStrings,
   } = useCanvasElementStore([
     'roughElements',
     'selectedElementId',
@@ -50,15 +53,13 @@ const useDrawElements = () => {
     'types',
     'allIds',
     'freehandPoints',
+    'textStrings',
   ]);
 
   // Effect fires after DOM is mounted
   useLayoutEffect(() => {
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    if (canvas === null) return;
-
-    const ctx = canvas.getContext('2d');
-    if (ctx === null) return;
+    const { canvas, ctx } = getCanvasContext();
+    if (ctx === null || canvas === null) return;
 
     // Clear on each rerender
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -86,6 +87,14 @@ const useDrawElements = () => {
         const stroke = getSvgPathFromStroke(getStroke(points, { size: 5 }));
         // TODO: Potential optimization by saving Path2Ds
         ctx.fill(new Path2D(stroke));
+      } else if (type === 'text') {
+        // Skip anything being edited
+        if (action === 'writing' && id === selectedElementId) {
+          return;
+        }
+        ctx.textBaseline = 'top';
+        ctx.font = '24px sans-serif';
+        ctx.fillText(textStrings[id], p1[id].x, p1[id].y);
       } else {
         const roughElement = roughElements[id];
         roughElement && roughCanvas.draw(roughElement);
@@ -93,14 +102,20 @@ const useDrawElements = () => {
     });
 
     // Highlight selected elements (only 1 for now). We ignore
-    // lines for the moment.
-    if (!(selectedElementId === '' || types[selectedElementId] === 'line')) {
+    // lines for the moment, and don't highlight while editing text.
+    if (
+      !(
+        selectedElementId === '' ||
+        types[selectedElementId] === 'line' ||
+        action === 'writing'
+      )
+    ) {
       [selectedElementId].forEach((id) => {
         renderTransformFrame(ctx, { p1, p2 }, id);
       });
     }
 
-    // Restore canvas pre-scaling
+    // Restore canvas pre-scaling and panning.
     ctx.restore();
   }, [
     allIds,
@@ -112,6 +127,7 @@ const useDrawElements = () => {
     appHeight,
     zoom,
     panOffset,
+    action,
   ]);
 };
 

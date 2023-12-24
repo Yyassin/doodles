@@ -31,6 +31,14 @@ export type MaybeTransformHandleType = TransformHandleType | false;
 /** App */
 export const AppModes = ['signup', 'signin', 'canvas', 'dashboard'] as const;
 export type AppMode = (typeof AppModes)[number];
+// Canvas actions defining FSM states
+export type Action =
+  | 'none'
+  | 'drawing'
+  | 'resizing'
+  | 'moving'
+  | 'panning'
+  | 'writing';
 
 /* Supported application tools, these are tools and actions the user may use. */
 export const AppTools = [
@@ -57,6 +65,7 @@ export const CanvasElementTypes = [
   'rectangle',
   'circle',
   'freehand',
+  'text',
 ] as const;
 export type CanvasElementType = (typeof CanvasElementTypes)[number];
 

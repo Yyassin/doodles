@@ -22,6 +22,7 @@ const defaultOptions = {
   fillStyle,
   strokeLineDash,
   opacity,
+  text: '',
 };
 
 // Temporary
@@ -47,12 +48,9 @@ const createElement = (
         roughElement = generator.rectangle(x1, y1, x2 - x1, y2 - y1, options);
         break;
       case 'circle':
-        roughElement = generator.circle(
-          x1,
-          y1,
-          2 * Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)),
-          options,
-        );
+        const diameter =
+          2 * Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+        roughElement = generator.ellipse(x1, y1, diameter, diameter, options);
         break;
       default:
         null;
@@ -75,6 +73,7 @@ const createElement = (
     strokeLineDash,
     opacity,
     roughElement,
+    text: options.text,
     freehandPoints: newPoints,
   };
 };
