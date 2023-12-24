@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AppMode, AppTool, AppTheme } from '@/types';
+import { AppMode, AppTool, AppTheme, Action } from '@/types';
 import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
 
@@ -11,6 +11,8 @@ import { createStoreWithSelectors } from './utils';
 
 /** Definitions */
 interface AppState {
+  // Current canvas action
+  action: Action;
   // The current app mode (the selected page)
   mode: AppMode;
   // The current app tool (selected tool or action)
@@ -29,6 +31,8 @@ interface AppState {
   panOffset: { x: number; y: number };
 }
 interface AppActions {
+  // Reducer to set the canvas action
+  setAction: (action: Action) => void;
   // Reducer to set the app mode
   setMode: (mode: AppMode) => void;
   // Reducer to set the app tool
@@ -47,6 +51,7 @@ type AppStore = AppState & AppActions;
 
 // Initialize App State to default state.
 export const initialAppState: AppState = {
+  action: 'none',
   mode: 'signin',
   tool: 'line',
   theme: 'dark',
@@ -59,6 +64,8 @@ export const initialAppState: AppState = {
 
 /** Actions / Reducers */
 // TODO(yousef): Abstract singleton setters
+const setAction = (set: SetState<AppStore>) => (action: Action) =>
+  set(() => ({ action }));
 const setTool = (set: SetState<AppStore>) => (tool: AppTool) =>
   set(() => ({ tool }));
 const setMode = (set: SetState<AppStore>) => (mode: AppMode) =>
@@ -80,6 +87,7 @@ const setPanOffset = (set: SetState<AppStore>) => (x: number, y: number) =>
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
   ...initialAppState,
+  setAction: setAction(set),
   setTool: setTool(set),
   setMode: setMode(set),
   setTheme: setTheme(set),

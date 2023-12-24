@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useRef } from 'react';
+import React, { MouseEvent, useEffect, useRef, FocusEvent } from 'react';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import {
   adjustElementCoordinatesById,
@@ -18,28 +18,46 @@ import {
 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
+import { TEXT_FONT_FAMILY, TEXT_FONT_SIZE } from '@/constants';
+import { getCanvasContext } from '@/lib/misc';
 
 /**
  * Main Canvas View
  * @authors Yousef Yassin, Dana El Sherif
  */
 
-const drawingTools = ['line', 'rectangle', 'circle', 'freehand'] as const;
+const drawingTools = [
+  'line',
+  'rectangle',
+  'circle',
+  'freehand',
+  'text',
+] as const;
 const drawingToolsSet = new Set(drawingTools);
 const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
   drawingToolsSet.has(tool as (typeof drawingTools)[number]);
-type Action = 'none' | 'drawing' | 'resizing' | 'moving' | 'panning';
 
 export default function Canvas() {
-  const { tool, appHeight, appWidth, zoom, panOffset, setPanOffset } =
-    useAppStore([
-      'tool',
-      'appHeight',
-      'appWidth',
-      'zoom',
-      'panOffset',
-      'setPanOffset',
-    ]);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const {
+    action,
+    tool,
+    appHeight,
+    appWidth,
+    zoom,
+    panOffset,
+    setPanOffset,
+    setAction,
+  } = useAppStore([
+    'action',
+    'tool',
+    'appHeight',
+    'appWidth',
+    'zoom',
+    'panOffset',
+    'setPanOffset',
+    'setAction',
+  ]);
   const {
     addCanvasShape,
     addCanvasFreehand,
@@ -60,6 +78,7 @@ export default function Canvas() {
     fillStyles,
     strokeLineDashes,
     opacities,
+    textStrings,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -81,6 +100,7 @@ export default function Canvas() {
     'fillStyles',
     'strokeLineDashes',
     'opacities',
+    'textStrings',
   ]);
 
   const { setWebsocketAction, setRoomID } = useWebSocketStore([
@@ -88,8 +108,6 @@ export default function Canvas() {
     'setRoomID',
   ]);
 
-  // A canvas state machine defining the current "state" action.
-  const action = useRef<Action>('none');
   // Id of the element currently being drawn.
   const selectOffset = useRef<Vector2 | null>(null);
   // Id of the element being drawn (for the first time).
@@ -106,7 +124,24 @@ export default function Canvas() {
     return () => setRoomID(null);
   }, []);
 
+  // Initializes text-area on text edit.
+  useEffect(() => {
+    // Auto-focus text-area on writing init, and add existing text, if any.
+    if (action === 'writing') {
+      // Needs the delay for relinquishing the thread for some reason
+      setTimeout(() => {
+        if (textAreaRef.current === null) return;
+        textAreaRef.current.focus();
+        selectedElementId !== '' &&
+          (textAreaRef.current.value = textStrings[selectedElementId]);
+      }, 0);
+    }
+  }, [action, selectedElementId, textStrings]);
+
+  // True if a drawing tool is selected, false otherwise.
   const isDrawingSelected = isDrawingTool(tool);
+  // Offset required to normalized zoomed mouse coordinates.
+  const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
 
   /**
    * Retrieves normalized mouse coordinates according to the
@@ -115,8 +150,6 @@ export default function Canvas() {
    * @returns The normalized mouse coordinates.
    */
   const getMouseCoordinates = (e: MouseEvent<HTMLCanvasElement>) => {
-    const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
-
     const clientX = (e.clientX - panOffset.x * zoom + scaleOffset.x) / zoom;
     const clientY = (e.clientY - panOffset.y * zoom + scaleOffset.y) / zoom;
     return { clientX, clientY };
@@ -130,31 +163,89 @@ export default function Canvas() {
     x2: number,
     y2: number,
     type: CanvasElementType,
-    points?: Vector2[],
+    options?: {
+      points?: Vector2[];
+      text?: string;
+    },
   ) => {
-    const updatedElement = createElement(id, x1, y1, x2, y2, type, points, {
-      stroke: strokeColors[id],
-      fill: fillColors[id],
-      bowing: bowings[id],
-      roughness: roughnesses[id],
-      strokeWidth: strokeWidths[id],
-      fillStyle: fillStyles[id],
-      strokeLineDash: strokeLineDashes[id],
-      opacity: opacities[id],
-    });
+    const updatedElement = createElement(
+      id,
+      x1,
+      y1,
+      x2,
+      y2,
+      type,
+      options?.points,
+      {
+        stroke: strokeColors[id],
+        fill: fillColors[id],
+        bowing: bowings[id],
+        roughness: roughnesses[id],
+        strokeWidth: strokeWidths[id],
+        fillStyle: fillStyles[id],
+        strokeLineDash: strokeLineDashes[id],
+        opacity: opacities[id],
+        text: options?.text ?? '',
+      },
+    );
     editCanvasElement(id, {
       p1: { x: x1, y: y1 },
       p2: { x: x2, y: y2 },
       roughElement: updatedElement.roughElement,
       freehandPoints: updatedElement.freehandPoints,
+      text: updatedElement.text,
     });
   };
 
+  /**
+   * Handles committing text updates once the textbox is unfocused.
+   */
+  const handleTextBlur = (e: FocusEvent<HTMLTextAreaElement>) => {
+    const elementId = selectedElementId || currentDrawingElemId.current;
+    const { x: x1, y: y1 } = p1[elementId];
+    const elementType = types[elementId];
+
+    const text = e?.target?.value;
+    const { ctx } = getCanvasContext();
+    if (ctx === null) return;
+
+    // Set the element's font style so measuretext
+    // calculates the correct width.
+    ctx.save();
+    ctx.textBaseline = 'top';
+    ctx.font = `${TEXT_FONT_SIZE}px ${TEXT_FONT_FAMILY}`;
+    const textWidth = ctx.measureText(text).width;
+    ctx.restore();
+
+    const textHeight = TEXT_FONT_SIZE;
+    updateElement(
+      elementId,
+      x1,
+      y1,
+      x1 + textWidth,
+      y1 + textHeight,
+      elementType,
+      {
+        text,
+      },
+    );
+
+    // Cleanup
+    setAction('none');
+    setSelectedElement('');
+  };
+
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
+    // If we're writing, then we've clicked away after an edit
+    // so we handle this with handle blur instead of creating a new element.
+    if (action === 'writing') {
+      return;
+    }
+
     const { clientX, clientY } = getMouseCoordinates(e);
 
     if (tool === 'pan') {
-      action.current = 'panning';
+      setAction('panning');
       panMouseStartPosition.current = { x: clientX, y: clientY };
       return;
     }
@@ -183,9 +274,9 @@ export default function Canvas() {
       // If the cursor is inside the element's BB, we're translating.
       // We are resizing otherwise.
       if (selectedElement?.position === 'inside') {
-        action.current = 'moving';
+        setAction('moving');
       } else {
-        action.current = 'resizing';
+        setAction('resizing');
       }
     } else if (isDrawingSelected) {
       // Not selection, then we're creating a new element.
@@ -202,25 +293,40 @@ export default function Canvas() {
         tool,
         points,
       );
+      if (tool === 'text') {
+        element.text = '';
+      }
 
       // Commit the element to state and set
       // our 'action state' to drawing.
       tool === 'freehand'
         ? addCanvasFreehand(element)
         : addCanvasShape(element);
-      action.current = 'drawing';
+      setAction(tool === 'text' ? 'writing' : 'drawing');
       currentDrawingElemId.current = id;
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
+    const { clientX, clientY } = getMouseCoordinates(e);
+    // If we've mouse uped, and the position is close to the selection
+    // position of a text eleement, then initiate an edit.
+    if (
+      selectedElementId !== '' &&
+      types[selectedElementId] === 'text' &&
+      clientX - (selectOffset.current?.x ?? 0) - p1[selectedElementId].x < 1 &&
+      clientY - (selectOffset.current?.y ?? 0) - p1[selectedElementId].y < 1
+    ) {
+      // We've clicked a text element, without dragging. Initiate an edit
+      setAction('writing');
+      return;
+    }
+
     // Reorder corners to align with the x1, y1 top left convention. This
     // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).
-    if (action.current === 'drawing' || action.current === 'resizing') {
+    if (action === 'drawing' || action === 'resizing') {
       const id =
-        action.current === 'drawing'
-          ? currentDrawingElemId.current
-          : selectedElementId;
+        action === 'drawing' ? currentDrawingElemId.current : selectedElementId;
       const { x1, y1, x2, y2 } = adjustElementCoordinatesById(id, {
         p1,
         p2,
@@ -229,29 +335,30 @@ export default function Canvas() {
       updateElement(id, x1, y1, x2, y2, types[id]);
     }
 
-    if (action.current !== 'none') {
+    if (action !== 'none') {
       pushCanvasHistory();
     }
 
-    if (action.current === 'drawing') {
+    if (action === 'drawing') {
       setWebsocketAction(currentDrawingElemId.current, tool);
     }
 
-    // Return to idle none action state.
-    action.current = 'none';
+    // Return to idle none action state, unless it's writing. We want to
+    // write after a mouse up, so we'll set none explicitly.
+    action !== 'writing' && setAction('none');
   };
 
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = getMouseCoordinates(e);
 
-    if (action.current === 'panning') {
+    if (action === 'panning') {
       const deltaX = clientX - panMouseStartPosition.current.x;
       const deltaY = clientY - panMouseStartPosition.current.y;
       setPanOffset(panOffset.x + deltaX, panOffset.y + deltaY);
       return;
     }
     if (tool === 'select') {
-      switch (action.current) {
+      switch (action) {
         case 'moving': {
           // If moving, that means an element is selected. Translate it.
           if (selectedElementId === '' || selectOffset.current === null) return;
@@ -337,7 +444,7 @@ export default function Canvas() {
       }
     } else if (isDrawingSelected) {
       // Not selection tool, so drawing an element.
-      if (action.current !== 'drawing') return;
+      if (action !== 'drawing') return;
 
       // Otherwise, update the element we're currently drawing
       const { x: x1, y: y1 } = p1[currentDrawingElemId.current] ?? {};
@@ -349,20 +456,54 @@ export default function Canvas() {
         clientX,
         clientY,
         tool,
-        points,
+        { points },
       );
     }
   };
 
   return (
-    <canvas
-      id="canvas"
-      style={{ backgroundColor: 'white' }}
-      width={appWidth}
-      height={appHeight}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-    />
+    <>
+      <canvas
+        id="canvas"
+        style={{ backgroundColor: 'white' }}
+        width={appWidth}
+        height={appHeight}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+      />
+      {action === 'writing' && (
+        <textarea
+          ref={textAreaRef}
+          style={{
+            position: 'fixed',
+            // TODO: using 3 here is not ideal
+            top:
+              ((p1[selectedElementId]?.y ??
+                p1[currentDrawingElemId.current]?.y) -
+                3 +
+                panOffset.y) *
+                zoom -
+              scaleOffset.y,
+            left:
+              ((p1[selectedElementId]?.x ??
+                p1[currentDrawingElemId.current]?.x) +
+                panOffset.x) *
+                zoom -
+              scaleOffset.x,
+            font: `${TEXT_FONT_SIZE * zoom}px ${TEXT_FONT_FAMILY}`,
+            margin: 0,
+            padding: 0,
+            border: 0,
+            outline: 0,
+            resize: 'none',
+            overflow: 'hidden',
+            whiteSpace: 'pre',
+            background: 'transparent',
+          }}
+          onBlur={handleTextBlur}
+        />
+      )}
+    </>
   );
 }
