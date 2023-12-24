@@ -63,6 +63,7 @@ const ToolButton = ({
     opacities,
     p1,
     p2,
+    textStrings,
   } = useCanvasElementStore([
     'editCanvasElement',
     'selectedElementId',
@@ -78,6 +79,7 @@ const ToolButton = ({
     'freehandPoints',
     'p1',
     'p2',
+    'textStrings',
   ]);
 
   const onClick = () => {
@@ -99,6 +101,7 @@ const ToolButton = ({
         fillStyle: fillStyles[selectedElementId],
         strokeLineDash: strokeLineDashes[selectedElementId],
         opacity: opacities[selectedElementId],
+        text: textStrings[selectedElementId],
       },
     );
     editCanvasElement(selectedElementId, newElement);
