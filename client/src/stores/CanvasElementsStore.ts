@@ -27,6 +27,7 @@ export interface CanvasElement {
   text: string; // Container stringW
   p1: Vector2; // Top left coordinate, or center for circles
   p2: Vector2; // Bottom right coordinate
+  angle: number; // Element orientation, in radians
   id: string; // Element id
 }
 // resize, and rotate
@@ -49,6 +50,7 @@ export interface CanvasElementState {
   textStrings: Record<string, CanvasElement['text']>;
   p1: Record<string, CanvasElement['p1']>;
   p2: Record<string, CanvasElement['p2']>;
+  angles: Record<string, CanvasElement['angle']>;
 }
 
 interface CanvasElementActions {
@@ -86,6 +88,7 @@ export const initialCanvasElementState: CanvasElementState = {
   textStrings: {},
   p1: {},
   p2: {},
+  angles: {},
 };
 
 // History of prior canvas element stores for undo/redo.
@@ -116,6 +119,7 @@ const addCanvasShape =
       const textStrings = { ...state.textStrings };
       const p1s = { ...state.p1 };
       const p2s = { ...state.p2 };
+      const angles = { ...state.angles };
 
       const {
         id,
@@ -132,6 +136,7 @@ const addCanvasShape =
         text,
         p1,
         p2,
+        angle,
       } = element;
       allIds.push(id);
       types[id] = type;
@@ -147,6 +152,7 @@ const addCanvasShape =
       textStrings[id] = text;
       p1s[id] = p1;
       p2s[id] = p2;
+      angles[id] = angle;
       return {
         ...state,
         allIds,
@@ -163,6 +169,7 @@ const addCanvasShape =
         textStrings,
         p1: p1s,
         p2: p2s,
+        angles,
       };
     });
 
@@ -277,6 +284,9 @@ const editCanvasElement =
       const textStrings = partialElement.text
         ? { ...state.textStrings, [id]: partialElement.text }
         : state.textStrings;
+      const angles = partialElement.angle
+        ? { ...state.angles, [id]: partialElement.angle }
+        : state.angles;
 
       return {
         ...state,
@@ -295,6 +305,7 @@ const editCanvasElement =
         p2: p2s,
         freehandPoints,
         textStrings,
+        angles,
       };
     });
 
@@ -320,6 +331,8 @@ const removeCanvasElement =
       const roughElements = { ...state.roughElements };
       const p1s = { ...state.p1 };
       const p2s = { ...state.p2 };
+      const angles = { ...state.angles };
+      const textStrings = { ...state.textStrings };
 
       allIds.splice(allIds.indexOf(id), 1);
       delete types[id];
@@ -334,6 +347,8 @@ const removeCanvasElement =
       delete roughElements[id];
       delete p1s[id];
       delete p2s[id];
+      delete angles[id];
+      delete textStrings[id];
 
       return {
         ...state,
@@ -350,6 +365,8 @@ const removeCanvasElement =
         roughElements,
         p1: p1s,
         p2: p2s,
+        textStrings,
+        angles,
       };
     });
 

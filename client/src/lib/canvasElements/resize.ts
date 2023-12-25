@@ -1,5 +1,6 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { TransformHandleDirection, Vector2 } from '@/types';
+import { centerPoint, rotate, rotatePoint } from '../math';
 
 /**
  * Helper methods to deal with coordinate
@@ -19,34 +20,89 @@ import { TransformHandleDirection, Vector2 } from '@/types';
 export const resizedCoordinates = (
   clientX: number,
   clientY: number,
+  angle: number,
   position: TransformHandleDirection,
   coordinates: { x1: number; y1: number; x2: number; y2: number },
 ) => {
   const { x1, y1, x2, y2 } = coordinates;
-  // x1, y1 is the top left corner. x2, y2 is the bottom right.
-  // We edit the corner/size that is selected.
-  switch (position) {
-    case 'nw':
-      return { x1: clientX, y1: clientY, x2, y2 };
-    case 'ne':
-      return { x1, y1: clientY, x2: clientX, y2 };
-    case 'sw':
-      return { x1: clientX, x2, y1, y2: clientY };
-    case 'se':
-      return { x1, y1, x2: clientX, y2: clientY };
-    case 'n':
-      return { x1, y1: clientY, x2, y2 };
-    case 'e':
-      return { x1, y1, x2: clientX, y2 };
-    case 's':
-      return { x1, y1, x2, y2: clientY };
-    case 'w':
-      return { x1: clientX, y1, x2, y2 };
-    default:
-      throw new Error(
-        `Something went wrong. Resize position ${position} is invalid.`,
-      );
+
+  const startTopLeft = [x1, y1] as [number, number];
+  const startBottomRight = [x2, y2] as [number, number];
+  const startCenter = centerPoint(startTopLeft, startBottomRight);
+
+  // Rotate pointer to work in axis-aligned coordinate system
+  const rotatedPointer = rotate(
+    clientX,
+    clientY,
+    startCenter[0],
+    startCenter[1],
+    -angle,
+  );
+
+  // Calculate scaling to apply based on pointer
+  const boundsCurrentWidth = x2 - x1;
+  const boundsCurrentHeight = y2 - y1;
+  const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
+  const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1];
+  let scaleX = atStartBoundsWidth / boundsCurrentWidth;
+  let scaleY = atStartBoundsHeight / boundsCurrentHeight;
+  if (position.includes('e')) {
+    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
   }
+  if (position.includes('s')) {
+    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsCurrentHeight;
+  }
+  if (position.includes('w')) {
+    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsCurrentWidth;
+  }
+  if (position.includes('n')) {
+    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsCurrentHeight;
+  }
+
+  // Calculate new bounds
+  const eleNewWidth = boundsCurrentWidth * scaleX;
+  const eleNewHeight = boundsCurrentHeight * scaleY;
+  const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] = [
+    x1,
+    y1,
+    x1 + eleNewWidth,
+    y1 + eleNewHeight,
+  ];
+  const newBoundsWidth = newBoundsX2 - newBoundsX1;
+  const newBoundsHeight = newBoundsY2 - newBoundsY1;
+
+  // Calculate new topLeft based on fixed corner during resize
+  let newTopLeft = [...startTopLeft] as [number, number];
+  if (['n', 'w', 'nw'].includes(position)) {
+    newTopLeft = [
+      startBottomRight[0] - Math.abs(newBoundsWidth),
+      startBottomRight[1] - Math.abs(newBoundsHeight),
+    ];
+  }
+  if (position === 'ne') {
+    const bottomLeft = [startTopLeft[0], startBottomRight[1]];
+    newTopLeft = [bottomLeft[0], bottomLeft[1] - Math.abs(newBoundsHeight)];
+  }
+  if (position === 'sw') {
+    const topRight = [startBottomRight[0], startTopLeft[1]];
+    newTopLeft = [topRight[0] - Math.abs(newBoundsWidth), topRight[1]];
+  }
+
+  // Adjust topLeft to new rotation point
+  const rotatedTopLeft = rotatePoint(newTopLeft, startCenter, angle);
+  const newCenter = [
+    newTopLeft[0] + Math.abs(newBoundsWidth) / 2,
+    newTopLeft[1] + Math.abs(newBoundsHeight) / 2,
+  ] as [number, number];
+  const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
+  newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
+
+  return {
+    x1: newTopLeft[0],
+    y1: newTopLeft[1],
+    x2: newTopLeft[0] + newBoundsWidth,
+    y2: newTopLeft[1] + newBoundsHeight,
+  };
 };
 
 /**

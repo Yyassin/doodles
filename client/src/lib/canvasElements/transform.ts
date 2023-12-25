@@ -47,11 +47,12 @@ export const getTransformHandlesFromCoords = (
   appState: {
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
+    angles: Record<string, CanvasElement['angle']>;
   },
   elementId: string,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
 ) => {
-  const { p1, p2 } = appState;
+  const { p1, p2, angles } = appState;
   let { x: x1, y: y1 } = p1[elementId];
   let { x: x2, y: y2 } = p2[elementId];
 
@@ -73,8 +74,9 @@ export const getTransformHandlesFromCoords = (
   // Rect only for now
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
+
   // Fixed for now
-  const angle = 0;
+  const angle = angles[elementId];
 
   // Line padding - half height
   const dashedLineMargin = 6 / zoomValue - handleHeight / 2;
@@ -208,12 +210,15 @@ export const renderTransformFrame = (
   appState: {
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
+    angles: Record<string, CanvasElement['angle']>;
   },
   elementId: string,
 ) => {
-  const transformHandles = getTransformHandlesFromCoords(appState, elementId, {
-    rotation: true, // We don't have rotation support yet
-  });
+  const transformHandles = getTransformHandlesFromCoords(
+    appState,
+    elementId,
+    {},
+  );
   renderSelectionBorder(ctx, appState, elementId);
-  renderTransformHandles(ctx, transformHandles);
+  renderTransformHandles(ctx, transformHandles, appState.angles[elementId]);
 };
