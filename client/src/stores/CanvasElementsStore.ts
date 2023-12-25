@@ -393,7 +393,7 @@ const undoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
   }
 };
 /**
- * Sets the canvas state to how it was before undo
+ * Sets the canvas state to how it was before undo.
  * @returns Updated state without the undo.
  */
 const redoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
