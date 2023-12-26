@@ -56,12 +56,17 @@ const ToolButton = ({
   children?: React.ReactNode;
 }) => {
   const { setTool } = useAppStore(['setTool']);
-  const { removeCanvasElement, setSelectedElement, selectedElementId } =
-    useCanvasElementStore([
-      'removeCanvasElement',
-      'setSelectedElement',
-      'selectedElementId',
-    ]);
+  const {
+    pushCanvasHistory,
+    removeCanvasElement,
+    setSelectedElement,
+    selectedElementId,
+  } = useCanvasElementStore([
+    'pushCanvasHistory',
+    'removeCanvasElement',
+    'setSelectedElement',
+    'selectedElementId',
+  ]);
 
   // Temporary. For now we erase the selected element. In the
   // future we can add a context menu with delete and make erase
@@ -72,6 +77,7 @@ const ToolButton = ({
         const id = selectedElementId;
         setSelectedElement('');
         removeCanvasElement(id);
+        pushCanvasHistory();
       }
     : () => setTool(tool);
 
