@@ -1,5 +1,6 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
-import { TransformHandleType, TransformHandles } from '@/types';
+import { MIME_TYPES, TransformHandleType, TransformHandles } from '@/types';
+import getStroke from 'perfect-freehand';
 
 /**
  * Various rendering helpers to render specific
@@ -160,4 +161,89 @@ export const renderTransformHandles = (
       ctx.restore();
     }
   });
+};
+
+/**
+ * Generates an SVG path string from a series of stroke points.
+ * The input is an array of [x, y] coordinate pairs representing the stroke.
+ *
+ * @param stroke An array of [x, y] coordinate pairs representing the stroke path.
+ * @returns An SVG path string representing the smoothed stroke path.
+ */
+const generateSvgPathFromStroke = (stroke: number[][]) => {
+  // If the stroke array is empty, return an empty string
+  if (!stroke.length) return '';
+
+  // Create a smoothed SVG path string from the stroke points
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      // Calculate the midpoint between the current and next points
+      const [x1, y1] = arr[(i + 1) % arr.length];
+      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+      return acc;
+    },
+    ['M', ...stroke[0], 'Q'], // Initial "Move to" command and first control point
+  );
+  // Close the path
+  d.push('Z');
+  // Join the array to form the final SVG path
+  return d.join(' ');
+};
+
+/**
+ * Draws a smoothed stroke path on the specified 2D canvas context.
+ *
+ * @param ctx Context of the canvas on which to draw the stroke.
+ * @param strokePoints An array of [x, y] coordinate pairs representing the stroke points.
+ */
+export const drawStroke = (
+  ctx: CanvasRenderingContext2D,
+  strokePoints: number[][],
+) => {
+  // Generate a smoothed SVG path from the stroke points using a specified size
+  const stroke = generateSvgPathFromStroke(
+    getStroke(strokePoints, { size: 5 }),
+  );
+  // TODO: Potential optimization by caching or saving Path2Ds
+  // Draw the filled path on the canvas using the Path2D object
+  ctx.fill(new Path2D(stroke));
+};
+
+/**
+ * A placeholder image to render while another
+ * image is being loaded.
+ */
+const IMAGE_PLACEHOLDER_IMG = document.createElement('img');
+IMAGE_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
+  `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="image" class="svg-inline--fa fa-image fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="#888" d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48zM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56zM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48z"></path></svg>`,
+)}`;
+
+/**
+ * Renders a placeholder image on the canvas if the intended
+ * image is still being loaded.
+ * @param width Width of the placeholder.
+ * @param height Height of the placeholder.
+ * @param context Drawing context of the canvas to draw on.
+ */
+export const drawImagePlaceholder = (
+  width: number,
+  height: number,
+  ctx: CanvasRenderingContext2D,
+) => {
+  ctx.fillStyle = '#E7E7E7';
+  ctx.fillRect(0, 0, width, height);
+
+  const imageMinWidthOrHeight = Math.min(width, height);
+  const size = Math.min(
+    imageMinWidthOrHeight,
+    Math.min(imageMinWidthOrHeight * 0.4, 100),
+  );
+
+  ctx.drawImage(
+    IMAGE_PLACEHOLDER_IMG,
+    width / 2 - size / 2,
+    height / 2 - size / 2,
+    size,
+    size,
+  );
 };

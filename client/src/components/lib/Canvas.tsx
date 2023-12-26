@@ -19,7 +19,9 @@ import {
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
 import { TEXT_FONT_FAMILY, TEXT_FONT_SIZE } from '@/constants';
-import { getCanvasContext } from '@/lib/misc';
+import { getCanvasContext, setCursor } from '@/lib/misc';
+import { imageCache } from '../../lib/cache';
+import { generateRandId } from '@/lib/bytes';
 
 /**
  * Main Canvas View
@@ -70,6 +72,7 @@ export default function Canvas() {
     freehandPoints,
     pushCanvasHistory,
     setSelectedElement,
+    setPendingImageElement,
     strokeColors,
     fillColors,
     bowings,
@@ -79,6 +82,8 @@ export default function Canvas() {
     strokeLineDashes,
     opacities,
     textStrings,
+    pendingImageElementId,
+    fileIds,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -92,6 +97,7 @@ export default function Canvas() {
     'selectedElementId',
     'pushCanvasHistory',
     'setSelectedElement',
+    'setPendingImageElement',
     'strokeColors',
     'fillColors',
     'bowings',
@@ -101,6 +107,8 @@ export default function Canvas() {
     'strokeLineDashes',
     'opacities',
     'textStrings',
+    'pendingImageElementId',
+    'fileIds',
   ]);
 
   const { setWebsocketAction, setRoomID } = useWebSocketStore([
@@ -282,7 +290,7 @@ export default function Canvas() {
       // Not selection, then we're creating a new element.
 
       // Create a new element originating from the clicked point
-      const id = crypto.randomUUID();
+      const id = generateRandId();
       const points = tool === 'freehand' ? ([] as Vector2[]) : undefined;
       const element = createElement(
         id,
@@ -304,6 +312,31 @@ export default function Canvas() {
         : addCanvasShape(element);
       setAction(tool === 'text' ? 'writing' : 'drawing');
       currentDrawingElemId.current = id;
+    } else if (tool == 'image' && pendingImageElementId !== '') {
+      // The element was already created, we just need to initialize it at the location.
+      const fileId = fileIds[pendingImageElementId];
+      const image = fileId && imageCache.cache.get(fileId)?.image;
+
+      if (!image || image instanceof Promise) {
+        console.error('Image is not loaded');
+        return;
+      }
+
+      const minHeight = Math.max(appHeight - 120, 160);
+      // max 65% of canvas height, clamped to <300px, vh - 120px>
+      const maxHeight = Math.min(minHeight, Math.floor(appHeight * 0.5) / zoom);
+
+      const height = Math.min(image.naturalHeight, maxHeight);
+      const width = height * (image.naturalWidth / image.naturalHeight);
+
+      editCanvasElement(pendingImageElementId, {
+        isImagePlaced: true,
+        p1: { x: clientX - width / 2, y: clientY - height / 2 },
+        p2: { x: clientX + width / 2, y: clientY + height / 2 },
+      });
+      // Unselect current image and reset cursor
+      setPendingImageElement('');
+      setCursor('');
     }
   };
 
