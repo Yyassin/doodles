@@ -92,16 +92,16 @@ const useDrawElements = () => {
 
         const { x: x1, y: y1 } = p1[id];
         const { x: x2, y: y2 } = p2[id];
-        const [elWidth, elHeight] = [Math.abs(x2 - x1), Math.abs(y2 - y1)];
+        const [width, height] = [Math.abs(x2 - x1), Math.abs(y2 - y1)];
 
         const imgFileId = fileIds[id];
         const img = imgFileId
           ? imageCache.cache.get(imgFileId)?.image
           : undefined;
         if (img !== undefined && !(img instanceof Promise)) {
-          ctx.drawImage(img, x1, y1, elWidth, elHeight);
+          ctx.drawImage(img, x1, y1, width, height);
         } else {
-          drawImagePlaceholder(elWidth, elHeight, ctx);
+          drawImagePlaceholder(width, height, ctx);
         }
       } else {
         const roughElement = roughElements[id];

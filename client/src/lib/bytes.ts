@@ -9,6 +9,10 @@ import { isSupportedImageFile } from './image';
  * @author Yousef Yassin
  */
 
+/**
+ * Generates a random uuid-v4 compliant identifier.
+ * @returns The identifier.
+ */
 export const generateRandId = () => crypto.randomUUID();
 
 /**
