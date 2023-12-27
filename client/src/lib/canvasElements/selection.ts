@@ -1,5 +1,5 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
-import { distance, nearPoint, rotate } from '../math';
+import { distance, rotate } from '../math';
 import {
   CanvasElementType,
   MaybeTransformHandleType,
