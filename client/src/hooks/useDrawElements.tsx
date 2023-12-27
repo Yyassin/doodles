@@ -45,6 +45,7 @@ const useDrawElements = () => {
     allIds,
     freehandPoints,
     textStrings,
+    angles,
   } = useCanvasElementStore([
     'roughElements',
     'selectedElementId',
@@ -54,6 +55,7 @@ const useDrawElements = () => {
     'allIds',
     'freehandPoints',
     'textStrings',
+    'angles',
   ]);
 
   // Effect fires after DOM is mounted
@@ -80,25 +82,42 @@ const useDrawElements = () => {
 
     // Render each element
     allIds.forEach((id) => {
+      const { x: x1, y: y1 } = p1[id];
+      const { x: x2, y: y2 } = p2[id];
+      const cx = (x1 + x2) / 2;
+      const cy = (y1 + y2) / 2;
+      const angle = angles[id] ?? 0;
+
+      // Translate context to element center so rotation and scale
+      // originate from center.
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+      // Revert since it isn't accounted for in the actual drawing.
+      ctx.translate(-cx, -cy);
+
       const type = types[id];
       if (type === 'freehand') {
         const points = freehandPoints[id];
-        if (points === undefined) return;
-        const stroke = getSvgPathFromStroke(getStroke(points, { size: 5 }));
-        // TODO: Potential optimization by saving Path2Ds
-        ctx.fill(new Path2D(stroke));
+        if (points !== undefined) {
+          const stroke = getSvgPathFromStroke(getStroke(points, { size: 5 }));
+          // TODO: Potential optimization by saving Path2Ds
+          ctx.fill(new Path2D(stroke));
+        }
       } else if (type === 'text') {
         // Skip anything being edited
-        if (action === 'writing' && id === selectedElementId) {
-          return;
+        if (!(action === 'writing' && id === selectedElementId)) {
+          ctx.textBaseline = 'top';
+          ctx.font = '24px sans-serif';
+          ctx.fillText(textStrings[id], p1[id].x, p1[id].y);
         }
-        ctx.textBaseline = 'top';
-        ctx.font = '24px sans-serif';
-        ctx.fillText(textStrings[id], p1[id].x, p1[id].y);
       } else {
         const roughElement = roughElements[id];
         roughElement && roughCanvas.draw(roughElement);
       }
+
+      // Cleanup
+      ctx.restore();
     });
 
     // Highlight selected elements (only 1 for now). We ignore
@@ -111,7 +130,7 @@ const useDrawElements = () => {
       )
     ) {
       [selectedElementId].forEach((id) => {
-        renderTransformFrame(ctx, { p1, p2 }, id);
+        renderTransformFrame(ctx, { p1, p2, angles }, id);
       });
     }
 
@@ -128,6 +147,7 @@ const useDrawElements = () => {
     zoom,
     panOffset,
     action,
+    angles,
   ]);
 };
 

@@ -38,7 +38,7 @@ export const nearPoint = (
 };
 
 /**
- * Rotates the lines point (x, y) about the point (cx, cx)
+ * Rotates the point (x, y) about the point (cx, cx)
  * by the specified angle
  * @param x The x coordinate of the point to rotate.
  * @param y The y coordinate of the point to rotate.
@@ -61,3 +61,45 @@ export const rotate = (
     const [dx, dy] = [x - cx, y - cy];
     return [dx * cos - dy * sin + cx, dx * sin + dy * cos + cy];
   };
+
+/**
+ * Rotates the point (x, y) about the point (cx, cx)
+ * by the specified angle
+ * @param p The point to rotate.
+ * @param c The center point to rotate about.
+ * @param angle The angle to rotate by.
+ * @returns The rotated point.
+ */
+export const rotatePoint = (
+  p: [number, number],
+  c: [number, number],
+  angle: number,
+): [number, number] => rotate(p[0], p[1], c[0], c[1], angle);
+
+/**
+ * Retrieves the midpoint of the line segment ab.
+ * @param a The point defined by a.
+ * @param b The point defined by b.
+ * @returns The midpoint of ab.
+ */
+export const centerPoint = (
+  a: [number, number],
+  b: [number, number],
+): [number, number] => {
+  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+};
+
+/**
+ * Normalizes an angle to the range [0, 2π).
+ * @param angle The input angle in radians.
+ * @returns The normalized angle in the range [0, 2π).
+ */
+export const normalizeAngle = (angle: number): number => {
+  if (angle < 0) {
+    return angle + 2 * Math.PI;
+  }
+  if (angle >= 2 * Math.PI) {
+    return angle - 2 * Math.PI;
+  }
+  return angle;
+};
