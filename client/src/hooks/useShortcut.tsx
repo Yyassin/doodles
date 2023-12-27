@@ -82,7 +82,10 @@ export const useShortcuts = () => {
         return false;
       } else {
         //Pan Event
-        setPanOffset(panOffset.x - e.deltaX, panOffset.y - e.deltaY);
+        // Most mice will only support Y scroll. If Alt is pressed, we consider
+        // Y delta to be in the X direction to support horizontal scroll.
+        const [dx, dy] = e.altKey ? [e.deltaY, e.deltaX] : [e.deltaX, e.deltaY];
+        setPanOffset(panOffset.x - dx, panOffset.y - dy);
       }
     };
 

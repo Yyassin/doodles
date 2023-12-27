@@ -1,5 +1,5 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
-import { distance, nearPoint } from '../math';
+import { distance, nearPoint, rotate } from '../math';
 import {
   MaybeTransformHandleType,
   TransformHandle,
@@ -13,6 +13,23 @@ import { getTransformHandlesFromCoords } from './transform';
  */
 
 /**
+ * Rotates the cursor type based on rotated element such
+ * that the cursor still makes sense.
+ * @param cursor The cursor, as selected in the axis-aligned frame.
+ * @param angle The orientation of the selected element.
+ * @returns The rotated cursor.
+ */
+const RESIZE_CURSORS = ['ns', 'nesw', 'ew', 'nwse'];
+const rotateResizeCursor = (cursor: string, angle: number) => {
+  const index = RESIZE_CURSORS.indexOf(cursor);
+  if (index >= 0) {
+    const a = Math.round(angle / (Math.PI / 4));
+    cursor = RESIZE_CURSORS[(index + a) % RESIZE_CURSORS.length];
+  }
+  return cursor;
+};
+
+/**
  * Returns the string corresponding to the cursor
  * style for the specified position / near handle.
  * @param transformHandleType The position / near handle. to get the style for.
@@ -20,6 +37,7 @@ import { getTransformHandlesFromCoords } from './transform';
  */
 export const cursorForPosition = (
   transformHandleType: MaybeTransformHandleType | 'inside',
+  angle = 0,
 ): string => {
   let cursor = null;
 
@@ -46,9 +64,11 @@ export const cursorForPosition = (
       return 'move';
   }
 
-  // if (cursor && element) {
-  //   cursor = rotateResizeCursor(cursor, element.angle);
-  // }
+  // The cursor direction should be rotated for consistency
+  // if the element has been rotated.
+  if (cursor && angle) {
+    cursor = rotateResizeCursor(cursor, angle);
+  }
 
   return cursor ? `${cursor}-resize` : '';
 };
@@ -87,11 +107,12 @@ export const resizeTest = (
     selectedElementIds: string;
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
+    angles: Record<string, CanvasElement['angle']>;
   },
   x: number,
   y: number,
 ): MaybeTransformHandleType => {
-  const { selectedElementIds, p1, p2 } = appState;
+  const { selectedElementIds, p1, p2, angles } = appState;
 
   if (elementId !== selectedElementIds) {
     return false;
@@ -99,9 +120,7 @@ export const resizeTest = (
 
   // TODO: Potential optimization if we cache this.
   const { rotation: rotationTransformHandle, ...transformHandles } =
-    getTransformHandlesFromCoords({ p1, p2 }, selectedElementIds, {
-      rotation: true,
-    });
+    getTransformHandlesFromCoords({ p1, p2, angles }, selectedElementIds, {});
 
   if (
     rotationTransformHandle &&
@@ -142,11 +161,12 @@ const positionWithinElement = (
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
     types: Record<string, CanvasElement['type']>;
+    angles: Record<string, CanvasElement['angle']>;
     selectedElementId: string;
   },
   selection: string,
 ): MaybeTransformHandleType | 'inside' => {
-  const { p1, p2, types, selectedElementId } = appState;
+  const { p1, p2, types, selectedElementId, angles } = appState;
   const elementType = types[selection];
   if (!['rectangle', 'line', 'text', 'image'].includes(elementType))
     return false;
@@ -160,16 +180,28 @@ const positionWithinElement = (
   ) {
     const transformHandle = resizeTest(
       selection,
-      { selectedElementIds: selectedElementId, p1, p2 },
+      { selectedElementIds: selectedElementId, p1, p2, angles },
       x,
       y,
     );
+
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    const angle = angles[selection];
+
+    // The provide p1, p2 coords are axis aligned. Effectively, this
+    // means we've rotated by -angle to get there (since we're ignoring rotation).
+    // Hence, we must rotate our mouse position by the same amount for consistency,
+    // and this allows us to still use the extents test in the rotated coordinate system.
+    const [rx, ry] = rotate(x, y, cx, cy, -angle);
+
     // Within if mouse is between extents
-    const inside = x >= x1 && x <= x2 && y >= y1 && y <= y2 ? 'inside' : null;
+    const inside =
+      rx >= x1 && rx <= x2 && ry >= y1 && ry <= y2 ? 'inside' : false;
 
     // Only one of these should ever be true -- unless the shape is small
     // but it's still possible to force one since inside is first.
-    return inside || transformHandle;
+    return transformHandle || inside;
   } else {
     // TODO: Could do distance from point to line
     // Line -- what we do is measure dist from point to
@@ -207,6 +239,7 @@ export const getElementAtPosition = (
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
     types: Record<string, CanvasElement['type']>;
+    angles: Record<string, CanvasElement['angle']>;
     selectedElementId: string;
   },
 ) => {

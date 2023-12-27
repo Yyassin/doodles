@@ -1,6 +1,7 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { MIME_TYPES, TransformHandleType, TransformHandles } from '@/types';
 import getStroke from 'perfect-freehand';
+import { centerPoint } from '../math';
 
 /**
  * Various rendering helpers to render specific
@@ -73,8 +74,15 @@ const strokeRectWithRotation = (
   angle: number,
   borderRadius = 3,
 ) => {
+  const [cx, cy] = centerPoint([x, y], [x + width, y + height]);
+
+  // Translate context to element center so rotation and scale
+  // originate from center.
   ctx.save();
+  ctx.translate(cx, cy);
   ctx.rotate(angle);
+  // Revert since it isn't accounted for in the actual drawing.
+  ctx.translate(-cx, -cy);
 
   if (borderRadius) {
     ctx.beginPath();
@@ -99,10 +107,11 @@ export const renderSelectionBorder = (
   appState: {
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
+    angles: Record<string, CanvasElement['angle']>;
   },
   elementId: string,
 ) => {
-  const { p1, p2 } = appState;
+  const { p1, p2, angles } = appState;
   const { x: x1, y: y1 } = p1[elementId];
   const { x: x2, y: y2 } = p2[elementId];
 
@@ -125,7 +134,7 @@ export const renderSelectionBorder = (
     y1 - heightInversion * linePadding,
     elementWidth + widthInversion * linePadding * 2,
     elementHeight + heightInversion * linePadding * 2,
-    0,
+    angles[elementId],
   );
   ctx.restore();
 };
@@ -138,6 +147,7 @@ export const renderSelectionBorder = (
 export const renderTransformHandles = (
   ctx: CanvasRenderingContext2D,
   transformHandles: TransformHandles,
+  angle = 0,
 ) => {
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
@@ -147,6 +157,12 @@ export const renderTransformHandles = (
       ctx.save();
       ctx.lineWidth = 1 / zoomValue;
       ctx.strokeStyle = selectionColour;
+
+      // Rotate the handles to match element orientation, translate
+      // so rotation is applied from the handle's center
+      ctx.translate(x + width / 2, y + width / 2);
+      ctx.rotate(angle);
+      ctx.translate(-x - width / 2, -y - width / 2);
 
       if (key === 'rotation') {
         // Rotation handles are circles.
@@ -201,9 +217,7 @@ export const drawStroke = (
   strokePoints: number[][],
 ) => {
   // Generate a smoothed SVG path from the stroke points using a specified size
-  const stroke = generateSvgPathFromStroke(
-    getStroke(strokePoints, { size: 5 }),
-  );
+  const stroke = generateSvgPathFromStroke(strokePoints);
   // TODO: Potential optimization by caching or saving Path2Ds
   // Draw the filled path on the canvas using the Path2D object
   ctx.fill(new Path2D(stroke));

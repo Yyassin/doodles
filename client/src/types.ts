@@ -40,7 +40,8 @@ export type Action =
   | 'resizing'
   | 'moving'
   | 'panning'
-  | 'writing';
+  | 'writing'
+  | 'rotating';
 
 /* Supported application tools, these are tools and actions the user may use. */
 export const AppTools = [

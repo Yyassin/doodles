@@ -22,6 +22,7 @@ import { TEXT_FONT_FAMILY, TEXT_FONT_SIZE } from '@/constants';
 import { getCanvasContext, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
+import { normalizeAngle } from '@/lib/math';
 
 /**
  * Main Canvas View
@@ -84,6 +85,7 @@ export default function Canvas() {
     textStrings,
     pendingImageElementId,
     fileIds,
+    angles,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -109,6 +111,7 @@ export default function Canvas() {
     'textStrings',
     'pendingImageElementId',
     'fileIds',
+    'angles',
   ]);
 
   const { setWebsocketAction, setRoomID } = useWebSocketStore([
@@ -268,6 +271,7 @@ export default function Canvas() {
         p1,
         p2,
         selectedElementId,
+        angles,
       });
 
       if (selectedElement === undefined) return;
@@ -283,6 +287,8 @@ export default function Canvas() {
       // We are resizing otherwise.
       if (selectedElement?.position === 'inside') {
         setAction('moving');
+      } else if (selectedElement?.position === 'rotation') {
+        setAction('rotating');
       } else {
         setAction('resizing');
       }
@@ -414,6 +420,22 @@ export default function Canvas() {
           );
           break;
         }
+        case 'rotating': {
+          // If rotating, that means an element is selected.
+          if (selectedElementId === '') return;
+
+          const { x: x1, y: y1 } = p1[selectedElementId];
+          const { x: x2, y: y2 } = p2[selectedElementId];
+
+          const cx = (x1 + x2) / 2;
+          const cy = (y1 + y2) / 2;
+          const angle =
+            (5 * Math.PI) / 2 + Math.atan2(clientY - cy, clientX - cx);
+          const normalizedAngle = normalizeAngle(angle);
+          editCanvasElement(selectedElementId, { angle: normalizedAngle });
+
+          break;
+        }
         case 'resizing': {
           // If resizing, that means an element is selected.
           if (
@@ -424,6 +446,7 @@ export default function Canvas() {
           const { x: x1, y: y1 } = p1[selectedElementId];
           const { x: x2, y: y2 } = p2[selectedElementId];
           const elementType = types[selectedElementId];
+          const angle = angles[selectedElementId] ?? 0;
 
           // Commit the adjusted coordinates.
           const {
@@ -434,6 +457,7 @@ export default function Canvas() {
           } = resizedCoordinates(
             clientX,
             clientY,
+            angle,
             selectedHandlePositionRef.current,
             {
               x1,
@@ -454,6 +478,7 @@ export default function Canvas() {
             p1,
             p2,
             selectedElementId,
+            angles,
           });
 
           // Save the last handle position since we need it to know how to change
@@ -470,7 +495,10 @@ export default function Canvas() {
 
           // Change the cursor accordingly to denote a possible action.
           (e.target as HTMLElement).style.cursor = hoveredElement?.position
-            ? cursorForPosition(hoveredElement.position)
+            ? cursorForPosition(
+                hoveredElement.position,
+                angles[hoveredElement.id],
+              )
             : 'default';
           break;
         }

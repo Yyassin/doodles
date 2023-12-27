@@ -37,6 +37,7 @@ const useDrawElements = () => {
     textStrings,
     fileIds,
     isImagePlaceds,
+    angles,
   } = useCanvasElementStore([
     'roughElements',
     'selectedElementId',
@@ -48,9 +49,11 @@ const useDrawElements = () => {
     'textStrings',
     'fileIds',
     'isImagePlaceds',
+    'angles',
   ]);
 
   // Effect fires after DOM is mounted
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   useLayoutEffect(() => {
     const { canvas, ctx } = getCanvasContext();
     if (ctx === null || canvas === null) return;
@@ -74,19 +77,33 @@ const useDrawElements = () => {
 
     // Render each element
     allIds.forEach((id) => {
+      const { x: x1, y: y1 } = p1[id] ?? { x: 0, y: 0 };
+      const { x: x2, y: y2 } = p2[id] ?? { x: 0, y: 0 };
+      const cx = (x1 + x2) / 2;
+      const cy = (y1 + y2) / 2;
+      const angle = angles[id] ?? 0;
+
+      // Translate context to element center so rotation and scale
+      // originate from center.
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+      // Revert since it isn't accounted for in the actual drawing.
+      ctx.translate(-cx, -cy);
+
       const type = types[id];
       if (type === 'freehand') {
         const points = freehandPoints[id];
-        if (points === undefined) return;
-        drawStroke(ctx, getStroke(points, { size: 5 }));
+        if (points !== undefined) {
+          drawStroke(ctx, getStroke(points, { size: 5 }));
+        }
       } else if (type === 'text') {
         // Skip anything being edited
-        if (action === 'writing' && id === selectedElementId) {
-          return;
+        if (!(action === 'writing' && id === selectedElementId)) {
+          ctx.textBaseline = 'top';
+          ctx.font = '24px sans-serif';
+          ctx.fillText(textStrings[id], p1[id].x, p1[id].y);
         }
-        ctx.textBaseline = 'top';
-        ctx.font = '24px sans-serif';
-        ctx.fillText(textStrings[id], p1[id].x, p1[id].y);
       } else if (type === 'image') {
         if (!isImagePlaceds[id]) return;
 
@@ -107,6 +124,9 @@ const useDrawElements = () => {
         const roughElement = roughElements[id];
         roughElement && roughCanvas.draw(roughElement);
       }
+
+      // Cleanup
+      ctx.restore();
     });
 
     // Highlight selected elements (only 1 for now). We ignore
@@ -119,7 +139,7 @@ const useDrawElements = () => {
       )
     ) {
       [selectedElementId].forEach((id) => {
-        renderTransformFrame(ctx, { p1, p2 }, id);
+        renderTransformFrame(ctx, { p1, p2, angles }, id);
       });
     }
 
@@ -138,6 +158,7 @@ const useDrawElements = () => {
     action,
     fileIds,
     isImagePlaceds,
+    angles,
   ]);
 };
 

@@ -29,6 +29,7 @@ export interface CanvasElement {
   text: string; // Container stringW
   p1: Vector2; // Top left coordinate, or center for circles
   p2: Vector2; // Bottom right coordinate
+  angle: number; // Element orientation, in radians
   id: string; // Element id
 }
 // resize, and rotate
@@ -54,6 +55,7 @@ export interface CanvasElementState {
   p2: Record<string, CanvasElement['p2']>;
   fileIds: Record<string, CanvasElement['fileId']>;
   isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
+  angles: Record<string, CanvasElement['angle']>;
 }
 
 interface CanvasElementActions {
@@ -95,6 +97,7 @@ export const initialCanvasElementState: CanvasElementState = {
   p2: {},
   fileIds: {},
   isImagePlaceds: {},
+  angles: {},
 };
 
 // History of prior canvas element stores for undo/redo.
@@ -127,6 +130,7 @@ const addCanvasShape =
       const p2s = { ...state.p2 };
       const fileIds = { ...state.fileIds };
       const isImagePlaceds = { ...state.isImagePlaceds };
+      const angles = { ...state.angles };
 
       const {
         id,
@@ -145,6 +149,7 @@ const addCanvasShape =
         p2,
         fileId,
         isImagePlaced,
+        angle,
       } = element;
       allIds.push(id);
       types[id] = type;
@@ -162,6 +167,7 @@ const addCanvasShape =
       p2s[id] = p2;
       fileIds[id] = fileId;
       isImagePlaceds[id] = isImagePlaced;
+      angles[id] = angle;
       return {
         ...state,
         allIds,
@@ -180,6 +186,7 @@ const addCanvasShape =
         p2: p2s,
         fileIds,
         isImagePlaceds,
+        angles,
       };
     });
 
@@ -301,6 +308,9 @@ const editCanvasElement =
       const isImagePlaceds = partialElement.isImagePlaced
         ? { ...state.isImagePlaceds, [id]: partialElement.isImagePlaced }
         : state.isImagePlaceds;
+      const angles = partialElement.angle
+        ? { ...state.angles, [id]: partialElement.angle }
+        : state.angles;
 
       return {
         ...state,
@@ -321,6 +331,7 @@ const editCanvasElement =
         textStrings,
         fileIds,
         isImagePlaceds,
+        angles,
       };
     });
 
@@ -346,6 +357,8 @@ const removeCanvasElement =
       const roughElements = { ...state.roughElements };
       const p1s = { ...state.p1 };
       const p2s = { ...state.p2 };
+      const angles = { ...state.angles };
+      const textStrings = { ...state.textStrings };
 
       allIds.splice(allIds.indexOf(id), 1);
       delete types[id];
@@ -360,6 +373,8 @@ const removeCanvasElement =
       delete roughElements[id];
       delete p1s[id];
       delete p2s[id];
+      delete angles[id];
+      delete textStrings[id];
 
       return {
         ...state,
@@ -376,6 +391,8 @@ const removeCanvasElement =
         roughElements,
         p1: p1s,
         p2: p2s,
+        textStrings,
+        angles,
       };
     });
 
@@ -402,7 +419,7 @@ const undoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
   }
 };
 /**
- * Sets the canvas state to how it was before undo
+ * Sets the canvas state to how it was before undo.
  * @returns Updated state without the undo.
  */
 const redoCanvasHistory = (set: SetState<CanvasElementState>) => () => {
