@@ -498,6 +498,9 @@ export default function Canvas() {
             ? cursorForPosition(
                 hoveredElement.position,
                 angles[hoveredElement.id],
+                p1[hoveredElement.id],
+                p2[hoveredElement.id],
+                types[hoveredElement.id],
               )
             : 'default';
           break;

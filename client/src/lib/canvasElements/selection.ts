@@ -1,11 +1,16 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { distance, nearPoint, rotate } from '../math';
 import {
+  CanvasElementType,
   MaybeTransformHandleType,
   TransformHandle,
   TransformHandleType,
+  Vector2,
 } from '@/types';
-import { getTransformHandlesFromCoords } from './transform';
+import {
+  getLinearTransformHandlesFromCoords,
+  getTransformHandlesFromCoords,
+} from './transform';
 
 /**
  * Various canvas element selection helpers.
@@ -38,8 +43,22 @@ const rotateResizeCursor = (cursor: string, angle: number) => {
 export const cursorForPosition = (
   transformHandleType: MaybeTransformHandleType | 'inside',
   angle = 0,
+  p1: Vector2,
+  p2: Vector2,
+  type: CanvasElementType,
 ): string => {
   let cursor = null;
+
+  // The resize behaviour for lines necessitates the use of
+  // of nw, se for simplicity. This is wrong if p1 (left most) is
+  // below p2, so we fix it visually here.
+  if (type === 'line') {
+    const { y: y1 } = p1;
+    const { y: y2 } = p2;
+    if (y1 > y2 && transformHandleType !== 'inside') {
+      transformHandleType = transformHandleType === 'nw' ? 'sw' : 'ne';
+    }
+  }
 
   switch (transformHandleType) {
     case 'n':
@@ -108,11 +127,12 @@ export const resizeTest = (
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
     angles: Record<string, CanvasElement['angle']>;
+    types: Record<string, CanvasElement['type']>;
   },
   x: number,
   y: number,
 ): MaybeTransformHandleType => {
-  const { selectedElementIds, p1, p2, angles } = appState;
+  const { selectedElementIds, p1, p2, angles, types } = appState;
 
   if (elementId !== selectedElementIds) {
     return false;
@@ -120,7 +140,16 @@ export const resizeTest = (
 
   // TODO: Potential optimization if we cache this.
   const { rotation: rotationTransformHandle, ...transformHandles } =
-    getTransformHandlesFromCoords({ p1, p2, angles }, selectedElementIds, {});
+    types[elementId] === 'line'
+      ? getLinearTransformHandlesFromCoords(
+          { p1, p2, angles },
+          selectedElementIds,
+        )
+      : getTransformHandlesFromCoords(
+          { p1, p2, angles },
+          selectedElementIds,
+          {},
+        );
 
   if (
     rotationTransformHandle &&
@@ -173,18 +202,18 @@ const positionWithinElement = (
   const { x: x1, y: y1 } = p1[selection];
   const { x: x2, y: y2 } = p2[selection];
 
+  const transformHandle = resizeTest(
+    selection,
+    { selectedElementIds: selectedElementId, p1, p2, angles, types },
+    x,
+    y,
+  );
+
   if (
     elementType === 'rectangle' ||
     elementType === 'image' ||
     elementType === 'text'
   ) {
-    const transformHandle = resizeTest(
-      selection,
-      { selectedElementIds: selectedElementId, p1, p2, angles },
-      x,
-      y,
-    );
-
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
     const angle = angles[selection];
@@ -213,11 +242,9 @@ const positionWithinElement = (
 
     // TODO: Can we optimize with no sqrt?
     const offset = Math.abs(distance(a, b) - (distance(c, a) + distance(c, b)));
-
-    const start = nearPoint(x, y, x1, y1, 'nw'); // so it resizes x1, y1
-    const end = nearPoint(x, y, x2, y2, 'se'); // so it resizes x2, y2
     const inside = Math.abs(offset) < 1 ? 'inside' : false;
-    return inside || start || end;
+
+    return transformHandle || inside;
   }
 };
 

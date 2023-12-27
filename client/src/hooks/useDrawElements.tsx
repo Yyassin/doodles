@@ -109,7 +109,7 @@ const useDrawElements = () => {
 
         const { x: x1, y: y1 } = p1[id];
         const { x: x2, y: y2 } = p2[id];
-        const [width, height] = [Math.abs(x2 - x1), Math.abs(y2 - y1)];
+        const [width, height] = [x2 - x1, y2 - y1];
 
         const imgFileId = fileIds[id];
         const img = imgFileId
@@ -131,15 +131,9 @@ const useDrawElements = () => {
 
     // Highlight selected elements (only 1 for now). We ignore
     // lines for the moment, and don't highlight while editing text.
-    if (
-      !(
-        selectedElementId === '' ||
-        types[selectedElementId] === 'line' ||
-        action === 'writing'
-      )
-    ) {
+    if (!(selectedElementId === '' || action === 'writing')) {
       [selectedElementId].forEach((id) => {
-        renderTransformFrame(ctx, { p1, p2, angles }, id);
+        renderTransformFrame(ctx, { p1, p2, angles, types }, id);
       });
     }
 
