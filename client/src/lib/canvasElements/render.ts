@@ -1,6 +1,5 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { MIME_TYPES, TransformHandleType, TransformHandles } from '@/types';
-import getStroke from 'perfect-freehand';
 import { centerPoint } from '../math';
 
 /**
