@@ -75,6 +75,7 @@ const createElement = (
     roughElement,
     text: options.text,
     freehandPoints: newPoints,
+    isImagePlaced: false,
     angle: 0,
   };
 };

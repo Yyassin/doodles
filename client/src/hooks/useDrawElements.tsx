@@ -4,23 +4,13 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useLayoutEffect } from 'react';
 import rough from 'roughjs';
 import getStroke from 'perfect-freehand';
-import { getScaleOffset } from '@/lib/canvasElements/render';
+import {
+  drawImagePlaceholder,
+  drawStroke,
+  getScaleOffset,
+} from '@/lib/canvasElements/render';
 import { getCanvasContext } from '@/lib/misc';
-
-const getSvgPathFromStroke = (stroke: number[][]) => {
-  if (!stroke.length) return '';
-
-  const d = stroke.reduce(
-    (acc, [x0, y0], i, arr) => {
-      const [x1, y1] = arr[(i + 1) % arr.length];
-      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
-      return acc;
-    },
-    ['M', ...stroke[0], 'Q'],
-  );
-  d.push('Z');
-  return d.join(' ');
-};
+import { imageCache } from '@/lib/cache';
 
 /**
  * Hook that's subscribed to the roughElements
@@ -45,6 +35,8 @@ const useDrawElements = () => {
     allIds,
     freehandPoints,
     textStrings,
+    fileIds,
+    isImagePlaceds,
     angles,
   } = useCanvasElementStore([
     'roughElements',
@@ -55,10 +47,13 @@ const useDrawElements = () => {
     'allIds',
     'freehandPoints',
     'textStrings',
+    'fileIds',
+    'isImagePlaceds',
     'angles',
   ]);
 
   // Effect fires after DOM is mounted
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   useLayoutEffect(() => {
     const { canvas, ctx } = getCanvasContext();
     if (ctx === null || canvas === null) return;
@@ -82,8 +77,8 @@ const useDrawElements = () => {
 
     // Render each element
     allIds.forEach((id) => {
-      const { x: x1, y: y1 } = p1[id];
-      const { x: x2, y: y2 } = p2[id];
+      const { x: x1, y: y1 } = p1[id] ?? { x: 0, y: 0 };
+      const { x: x2, y: y2 } = p2[id] ?? { x: 0, y: 0 };
       const cx = (x1 + x2) / 2;
       const cy = (y1 + y2) / 2;
       const angle = angles[id] ?? 0;
@@ -100,9 +95,7 @@ const useDrawElements = () => {
       if (type === 'freehand') {
         const points = freehandPoints[id];
         if (points !== undefined) {
-          const stroke = getSvgPathFromStroke(getStroke(points, { size: 5 }));
-          // TODO: Potential optimization by saving Path2Ds
-          ctx.fill(new Path2D(stroke));
+          drawStroke(ctx, getStroke(points, { size: 5 }));
         }
       } else if (type === 'text') {
         // Skip anything being edited
@@ -110,6 +103,22 @@ const useDrawElements = () => {
           ctx.textBaseline = 'top';
           ctx.font = '24px sans-serif';
           ctx.fillText(textStrings[id], p1[id].x, p1[id].y);
+        }
+      } else if (type === 'image') {
+        if (!isImagePlaceds[id]) return;
+
+        const { x: x1, y: y1 } = p1[id];
+        const { x: x2, y: y2 } = p2[id];
+        const [width, height] = [Math.abs(x2 - x1), Math.abs(y2 - y1)];
+
+        const imgFileId = fileIds[id];
+        const img = imgFileId
+          ? imageCache.cache.get(imgFileId)?.image
+          : undefined;
+        if (img !== undefined && !(img instanceof Promise)) {
+          ctx.drawImage(img, x1, y1, width, height);
+        } else {
+          drawImagePlaceholder(width, height, ctx);
         }
       } else {
         const roughElement = roughElements[id];
@@ -147,6 +156,8 @@ const useDrawElements = () => {
     zoom,
     panOffset,
     action,
+    fileIds,
+    isImagePlaceds,
     angles,
   ]);
 };

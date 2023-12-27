@@ -2,7 +2,7 @@ import { ZOOM } from '@/constants';
 import { clamp } from '@/lib/misc';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
-import { AppTool, AppTools } from '@/types';
+import { AppTool, AppTools, EVENT } from '@/types';
 import { useEffect } from 'react';
 
 /**
@@ -89,14 +89,14 @@ export const useShortcuts = () => {
       }
     };
 
-    window.addEventListener('keypress', onKeyPress);
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener(EVENT.KEYPRESS, onKeyPress);
+    window.addEventListener(EVENT.KEYDOWN, onKeyDown);
+    window.addEventListener(EVENT.WHEEL, onWheel, { passive: false });
     // Cleanup
     return () => {
-      window.removeEventListener('keypress', onKeyPress);
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener(EVENT.KEYPRESS, onKeyPress);
+      window.removeEventListener(EVENT.KEYDOWN, onKeyDown);
+      window.removeEventListener(EVENT.WHEEL, onWheel);
     };
   }, [selectedElementId, zoom, panOffset]);
 };

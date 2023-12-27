@@ -24,6 +24,8 @@ export interface CanvasElement {
   opacity: number; // Element opacity
   roughElement?: Drawable; // The underlying roughjs element, if applicable.
   freehandPoints?: Vector2[]; // Points for curves
+  fileId?: string; // For image elements; the id of the image in cache.
+  isImagePlaced: boolean; // For image elements; true if the element has been placed, false otherwise.
   text: string; // Container stringW
   p1: Vector2; // Top left coordinate, or center for circles
   p2: Vector2; // Bottom right coordinate
@@ -35,6 +37,7 @@ export interface CanvasElement {
 
 export interface CanvasElementState {
   selectedElementId: string;
+  pendingImageElementId: string;
   allIds: string[];
   types: Record<string, CanvasElement['type']>;
   strokeColors: Record<string, CanvasElement['strokeColor']>;
@@ -50,6 +53,8 @@ export interface CanvasElementState {
   textStrings: Record<string, CanvasElement['text']>;
   p1: Record<string, CanvasElement['p1']>;
   p2: Record<string, CanvasElement['p2']>;
+  fileIds: Record<string, CanvasElement['fileId']>;
+  isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
   angles: Record<string, CanvasElement['angle']>;
 }
 
@@ -62,6 +67,7 @@ interface CanvasElementActions {
   ) => void;
   removeCanvasElement: (id: string) => void;
   setSelectedElement: (id: string) => void;
+  setPendingImageElement: (id: string) => void;
   undoCanvasHistory: () => void;
   pushCanvasHistory: () => void;
   resetCanvas: () => void;
@@ -73,6 +79,7 @@ type CanvasElementStore = CanvasElementState & CanvasElementActions;
 // Initialize Canvas Element State to default state
 export const initialCanvasElementState: CanvasElementState = {
   selectedElementId: '',
+  pendingImageElementId: '',
   allIds: [],
   types: {},
   strokeColors: {},
@@ -88,6 +95,8 @@ export const initialCanvasElementState: CanvasElementState = {
   textStrings: {},
   p1: {},
   p2: {},
+  fileIds: {},
+  isImagePlaceds: {},
   angles: {},
 };
 
@@ -119,6 +128,8 @@ const addCanvasShape =
       const textStrings = { ...state.textStrings };
       const p1s = { ...state.p1 };
       const p2s = { ...state.p2 };
+      const fileIds = { ...state.fileIds };
+      const isImagePlaceds = { ...state.isImagePlaceds };
       const angles = { ...state.angles };
 
       const {
@@ -136,6 +147,8 @@ const addCanvasShape =
         text,
         p1,
         p2,
+        fileId,
+        isImagePlaced,
         angle,
       } = element;
       allIds.push(id);
@@ -152,6 +165,8 @@ const addCanvasShape =
       textStrings[id] = text;
       p1s[id] = p1;
       p2s[id] = p2;
+      fileIds[id] = fileId;
+      isImagePlaceds[id] = isImagePlaced;
       angles[id] = angle;
       return {
         ...state,
@@ -169,6 +184,8 @@ const addCanvasShape =
         textStrings,
         p1: p1s,
         p2: p2s,
+        fileIds,
+        isImagePlaceds,
         angles,
       };
     });
@@ -218,6 +235,7 @@ const addCanvasFreehand =
  */
 const editCanvasElement =
   (set: SetState<CanvasElementState>) =>
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   (id: string, partialElement: Partial<CanvasElement>) =>
     set((state) => {
       // Edit shouldn't add a new id
@@ -284,6 +302,12 @@ const editCanvasElement =
       const textStrings = partialElement.text
         ? { ...state.textStrings, [id]: partialElement.text }
         : state.textStrings;
+      const fileIds = partialElement.fileId
+        ? { ...state.fileIds, [id]: partialElement.fileId }
+        : state.fileIds;
+      const isImagePlaceds = partialElement.isImagePlaced
+        ? { ...state.isImagePlaceds, [id]: partialElement.isImagePlaced }
+        : state.isImagePlaceds;
       const angles = partialElement.angle
         ? { ...state.angles, [id]: partialElement.angle }
         : state.angles;
@@ -305,6 +329,8 @@ const editCanvasElement =
         p2: p2s,
         freehandPoints,
         textStrings,
+        fileIds,
+        isImagePlaceds,
         angles,
       };
     });
@@ -426,6 +452,15 @@ const setSelectedElement =
     set(() => ({ selectedElementId }));
 
 /**
+ * Sets the currently pending image element id.
+ * @param selectedElementId The id to set as selected.
+ * @returns Updated state with the selected element id.
+ */
+const setPendingImageElement =
+  (set: SetState<CanvasElementState>) => (pendingImageElementId: string) =>
+    set(() => ({ pendingImageElementId }));
+
+/**
  * Set the Canvas state to the paramter passed
  * @param newCanvasElementState The new Canvas state.
  * @returns New Canvas state
@@ -478,6 +513,7 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   editCanvasElement: editCanvasElement(set),
   removeCanvasElement: removeCanvasElement(set),
   setSelectedElement: setSelectedElement(set),
+  setPendingImageElement: setPendingImageElement(set),
   setCanvasElementState: setCanvasElementState(set),
   undoCanvasHistory: undoCanvasHistory(set),
   pushCanvasHistory: pushCanvasHistory(set),
