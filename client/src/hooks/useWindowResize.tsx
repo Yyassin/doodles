@@ -1,4 +1,5 @@
 import { useAppStore } from '@/stores/AppStore';
+import { EVENT } from '@/types';
 import { useEffect } from 'react';
 
 /**
@@ -13,8 +14,8 @@ const useWindowResize = () => {
   };
 
   useEffect(() => {
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener(EVENT.RESIZE, handleResize);
+    return () => window.removeEventListener(EVENT.RESIZE, handleResize);
   }, []);
 };
 

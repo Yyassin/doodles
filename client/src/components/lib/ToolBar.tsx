@@ -12,10 +12,21 @@ import {
   CursorArrowIcon,
 } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
-import { AppTool, AppTools } from '@/types';
+import { AppTool, AppTools, IMAGE_MIME_TYPES } from '@/types';
 import { capitalize } from '@/lib/misc';
 import IconButton from './IconButton';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { createElement } from '@/lib/canvasElements/canvasElementUtils';
+import { generateRandId } from '@/lib/bytes';
+import { fileOpen } from '@/lib/fs';
+import { injectImageElement } from '@/lib/image';
+
+/**
+ * This is the toolbar that is displayed on the canvas.
+ * The toolbar contains various buttons for
+ * many tool modes (e.g. erase, insert text, shapes)
+ * @authors Dana El Sherif, Yousef Yassin
+ */
 
 /* Map of tools to their icons */
 const toolIcons: Record<AppTool, ReactNode> = {
@@ -29,13 +40,6 @@ const toolIcons: Record<AppTool, ReactNode> = {
   image: <ImageIcon />,
   erase: <EraserIcon />,
 };
-
-/**
- * This is the toolbar that is displayed on the canvas.
- * The toolbar contains various buttons for
- * many tool modes (e.g. erase, insert text, shapes)
- * @authors Dana El Sherif, Yousef Yassin
- */
 
 /**
  * Defines a button for a toolbar tool. Contains
@@ -55,17 +59,27 @@ const ToolButton = ({
   active: boolean;
   children?: React.ReactNode;
 }) => {
-  const { setTool } = useAppStore(['setTool']);
+  const { setTool, zoom, appHeight } = useAppStore([
+    'setTool',
+    'zoom',
+    'appHeight',
+  ]);
   const {
     pushCanvasHistory,
     removeCanvasElement,
     setSelectedElement,
+    setPendingImageElement,
     selectedElementId,
+    addCanvasShape,
+    editCanvasElement,
   } = useCanvasElementStore([
     'pushCanvasHistory',
     'removeCanvasElement',
     'setSelectedElement',
+    'setPendingImageElement',
     'selectedElementId',
+    'addCanvasShape',
+    'editCanvasElement',
   ]);
 
   // Temporary. For now we erase the selected element. In the
@@ -78,6 +92,31 @@ const ToolButton = ({
         setSelectedElement('');
         removeCanvasElement(id);
         pushCanvasHistory();
+      }
+    : tool === 'image'
+    ? async () => {
+        // Prompt the user to select image from file explorer
+        const imageFile = await fileOpen({
+          description: 'Image',
+          extensions: Object.keys(
+            IMAGE_MIME_TYPES,
+          ) as (keyof typeof IMAGE_MIME_TYPES)[],
+        });
+        // Create a proxy element
+        const id = generateRandId();
+        const placeholderElement = createElement(id, 0, 0, 0, 0, 'image');
+        setPendingImageElement(id);
+        // Inject the image into the proxy
+        await injectImageElement(
+          placeholderElement,
+          imageFile,
+          addCanvasShape,
+          editCanvasElement,
+          { zoom, appHeight },
+          true,
+        );
+        // And let the user place the image
+        setTool('image');
       }
     : () => setTool(tool);
 

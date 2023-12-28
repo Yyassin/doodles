@@ -3,25 +3,20 @@
  * @author Abdalla Abdelhadi
  */
 
-import { WS_URL } from '@/constants';
+import { WS_URL, HTTP_STATUS } from '@/constants';
 import { CanvasElement } from '@/stores/CanvasElementsStore';
-// import { Actions } from '@/stores/WebSocketStore';
-
-//websocket response status
-const enum status {
-  SUCCESS = 200,
-  ERROR = 400,
-}
+import { EVENT } from './types';
+import { ValueOf } from './lib/misc';
 
 interface CallBacksType {
   addCanvasShape: (element: CanvasElement) => void;
   addCanvasFreehand: (element: CanvasElement) => void;
 }
 
-interface msgType {
+interface WSMessageType {
   topic: keyof CallBacksType;
   payload: CanvasElement;
-  status?: status;
+  status?: ValueOf<typeof HTTP_STATUS>;
   msg?: string;
 }
 
@@ -66,23 +61,23 @@ export default class WebsocketClient {
 
     this.socket = new WebSocket(WS_URL);
 
-    this.socket.addEventListener('open', () => {
+    this.socket.addEventListener(EVENT.OPEN, () => {
       return;
     });
 
-    this.socket.addEventListener('close', () => {
+    this.socket.addEventListener(EVENT.CLOSE, () => {
       console.log('Socket Closed');
     });
 
-    this.socket.addEventListener('error', () => {
+    this.socket.addEventListener(EVENT.ERROR, () => {
       console.log('Error Occured');
     });
 
-    this.socket.addEventListener('message', (msg) => {
-      const jsonMsg = JSON.parse(msg.data) as msgType;
+    this.socket.addEventListener(EVENT.MESSAGE, (msg) => {
+      const jsonMsg = JSON.parse(msg.data) as WSMessageType;
 
       if (jsonMsg.status !== undefined) {
-        if (jsonMsg.status === status.SUCCESS) {
+        if (jsonMsg.status === HTTP_STATUS.SUCCESS) {
           console.log(jsonMsg.msg);
         } else {
           throw jsonMsg.msg; //throw the error message received from server

@@ -3,6 +3,8 @@
  * @authors Yousef Yassin
  */
 
+import { ValueOf } from './lib/misc';
+
 /** General */
 export type Vector2 = { x: number; y: number };
 
@@ -38,7 +40,8 @@ export type Action =
   | 'resizing'
   | 'moving'
   | 'panning'
-  | 'writing';
+  | 'writing'
+  | 'rotating';
 
 /* Supported application tools, these are tools and actions the user may use. */
 export const AppTools = [
@@ -66,6 +69,7 @@ export const CanvasElementTypes = [
   'circle',
   'freehand',
   'text',
+  'image',
 ] as const;
 export type CanvasElementType = (typeof CanvasElementTypes)[number];
 
@@ -91,3 +95,62 @@ export const colourTypes = [
   'blackCircle',
 ] as const;
 export type colourType = (typeof colourTypes)[number];
+
+/** Names of common events subscribed by event listeners */
+export enum EVENT {
+  KEYDOWN = 'keydown',
+  KEYPRESS = 'keypress',
+  WHEEL = 'wheel',
+  KEYUP = 'keyup',
+  FOCUS = 'focus',
+  POINTER_UP = 'pointerup',
+  RESIZE = 'resize',
+  // ws events
+  MESSAGE = 'message',
+  OPEN = 'open',
+  CLOSE = 'close',
+  ERROR = 'error',
+}
+
+/** Supported image file types */
+export const IMAGE_MIME_TYPES = {
+  svg: 'image/svg+xml',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  bmp: 'image/bmp',
+  ico: 'image/x-icon',
+  avif: 'image/avif',
+  jfif: 'image/jfif',
+} as const;
+
+/** Supported file types  */
+export const MIME_TYPES = {
+  json: 'application/json',
+  // binary
+  binary: 'application/octet-stream',
+  // image
+  ...IMAGE_MIME_TYPES,
+} as const;
+export type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, 'binary'>;
+
+/** Encapsulating interface for binary-stored content (images normally) */
+export type BinaryFileData = {
+  // The file type
+  mimeType: ValueOf<typeof IMAGE_MIME_TYPES> | typeof MIME_TYPES.binary;
+  // Unique hash id
+  id: string;
+  // Blob url for loading (base64)
+  dataURL: string;
+  // Epoch, in milliseconds
+  created: number;
+  /**
+   * Indicates when the file was last retrieved from storage to be loaded
+   * onto the scene. This can be used to determine whether to delete unused
+   * files from storage.
+   *
+   * Epoch, in milliseconds.
+   */
+  lastRetrieved?: number;
+};
