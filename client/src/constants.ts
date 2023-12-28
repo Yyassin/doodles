@@ -36,3 +36,8 @@ export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 // Maximum single file size in cache
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
 export const DRAGGING_THRESHOLD = 10;
+
+/**
+ * Misc
+ */
+export const EPSILON = 1e-8;

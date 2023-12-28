@@ -147,6 +147,7 @@ export const renderTransformHandles = (
   ctx: CanvasRenderingContext2D,
   transformHandles: TransformHandles,
   angle = 0,
+  isLinear = false,
 ) => {
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
@@ -163,8 +164,8 @@ export const renderTransformHandles = (
       ctx.rotate(angle);
       ctx.translate(-x - width / 2, -y - width / 2);
 
-      if (key === 'rotation') {
-        // Rotation handles are circles.
+      if (key === 'rotation' || isLinear) {
+        // Rotation handles are circles, same with line endpoints.
         fillCircle(ctx, x + width / 2, y + height / 2, width / 2);
       } else {
         // And all other handles are rectangles.
