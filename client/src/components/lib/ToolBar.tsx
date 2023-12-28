@@ -65,6 +65,7 @@ const ToolButton = ({
     'appHeight',
   ]);
   const {
+    pushCanvasHistory,
     removeCanvasElement,
     setSelectedElement,
     setPendingImageElement,
@@ -72,6 +73,7 @@ const ToolButton = ({
     addCanvasShape,
     editCanvasElement,
   } = useCanvasElementStore([
+    'pushCanvasHistory',
     'removeCanvasElement',
     'setSelectedElement',
     'setPendingImageElement',
@@ -89,6 +91,7 @@ const ToolButton = ({
         const id = selectedElementId;
         setSelectedElement('');
         removeCanvasElement(id);
+        pushCanvasHistory();
       }
     : tool === 'image'
     ? async () => {
