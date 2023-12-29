@@ -8,6 +8,8 @@ import UndoRedoButtons from '@/components/lib/UndoRedoButtons';
 import ZoomButtons from '@/components/lib/ZoomButtons';
 import CustomToolbar from '@/components/lib/CustomizabilityToolbar';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import ContextMenu from '@/components/lib/ContextMenu';
+import * as RadixContextMenu from '@radix-ui/react-context-menu';
 
 /**
  * Primary viewport that houses the canvas
@@ -18,41 +20,46 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 const Viewport = () => {
   const { setMode } = useAppStore(['setMode']);
   const viewportRef = useRef<HTMLDivElement>(null);
-  const { selectedElementId } = useCanvasElementStore(['selectedElementId']);
+  const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
 
   return (
-    <div id="Viewport" className="select-none" ref={viewportRef}>
-      <ToolBar />
-      {/*only show the toolbar is an element is selected*/}
-      {selectedElementId !== '' && <CustomToolbar />}
-      <DropDownMenu viewportRef={viewportRef} />
+    <RadixContextMenu.Root>
+      <div id="Viewport" className="select-none" ref={viewportRef}>
+        <ToolBar />
+        {/* Only show the toolbar is an element is selected */}
+        {selectedElementIds.length === 1 && <CustomToolbar />}
+        <DropDownMenu viewportRef={viewportRef} />
 
-      <div
-        className="flex gap-[0.5rem]"
-        style={{
-          position: 'absolute',
-          bottom: '1rem',
-          left: '1rem',
-        }}
-      >
-        <ZoomButtons />
-        <UndoRedoButtons />
-        <FullScreenButton viewportRef={viewportRef} />
+        <div
+          className="flex gap-[0.5rem]"
+          style={{
+            position: 'absolute',
+            bottom: '1rem',
+            left: '1rem',
+          }}
+        >
+          <ZoomButtons />
+          <UndoRedoButtons />
+          <FullScreenButton viewportRef={viewportRef} />
+        </div>
+
+        {/* Temp */}
+        <button
+          style={{
+            position: 'absolute',
+            left: '1rem',
+            top: '1rem',
+          }}
+          onClick={() => setMode('dashboard')}
+        >
+          Dashboard
+        </button>
+        <RadixContextMenu.Trigger>
+          <Canvas />
+        </RadixContextMenu.Trigger>
       </div>
-
-      {/* Temp */}
-      <button
-        style={{
-          position: 'absolute',
-          left: '1rem',
-          top: '1rem',
-        }}
-        onClick={() => setMode('dashboard')}
-      >
-        Dashboard
-      </button>
-      <Canvas />
-    </div>
+      <ContextMenu />
+    </RadixContextMenu.Root>
   );
 };
 

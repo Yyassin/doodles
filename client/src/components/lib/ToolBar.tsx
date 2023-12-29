@@ -65,17 +65,17 @@ const ToolButton = ({
     'appHeight',
   ]);
   const {
-    removeCanvasElement,
-    setSelectedElement,
+    removeCanvasElements,
+    setSelectedElements,
     setPendingImageElement,
-    selectedElementId,
+    selectedElementIds,
     addCanvasShape,
     editCanvasElement,
   } = useCanvasElementStore([
-    'removeCanvasElement',
-    'setSelectedElement',
+    'removeCanvasElements',
+    'setSelectedElements',
     'setPendingImageElement',
-    'selectedElementId',
+    'selectedElementIds',
     'addCanvasShape',
     'editCanvasElement',
   ]);
@@ -86,9 +86,9 @@ const ToolButton = ({
   const isErase = tool === 'erase';
   const onClick = isErase
     ? () => {
-        const id = selectedElementId;
-        setSelectedElement('');
-        removeCanvasElement(id);
+        const ids = selectedElementIds;
+        setSelectedElements([]);
+        removeCanvasElements(ids);
       }
     : tool === 'image'
     ? async () => {

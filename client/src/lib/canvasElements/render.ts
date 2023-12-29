@@ -139,6 +139,40 @@ export const renderSelectionBorder = (
 };
 
 /**
+ * Renders a selection frame on a canvas.
+ * @param selectionFrame The selection frame object with two points p1 and p2.
+ * @param zoom The zoom factor for scaling.
+ * @param ctx The canvas rendering context.
+ */
+export const renderSelectionFrame = (
+  selectionFrame: Pick<CanvasElement, 'p1' | 'p2'>,
+  zoom: number,
+  ctx: CanvasRenderingContext2D,
+  fillColour = 'rgba(0, 0, 200, 0.04)',
+  borderColour = ' rgb(255, 101, 219)',
+) => {
+  const { x: x1, y: y1 } = selectionFrame.p1;
+  const { x: x2, y: y2 } = selectionFrame.p2;
+  const [width, height] = [x2 - x1, y2 - y1];
+
+  ctx.save();
+  ctx.translate(x1, y1);
+  ctx.fillStyle = fillColour;
+
+  // render from 0.5px offset  to get 1px wide line
+  // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
+  // TODO can be be improved by offseting to the negative when user selects
+  // from right to left
+  const offset = 0.5 / zoom;
+
+  ctx.fillRect(offset, offset, width, height);
+  ctx.lineWidth = 1 / zoom;
+  ctx.strokeStyle = borderColour;
+  ctx.strokeRect(offset, offset, width, height);
+  ctx.restore();
+};
+
+/**
  * Renders the specified transform handles onto the provided canvas.
  * @param ctx The canvas context.
  * @param transformHandles The transform handles to render.
