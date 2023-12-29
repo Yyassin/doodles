@@ -67,6 +67,7 @@ const ToolButton = ({
   const {
     removeCanvasElements,
     setSelectedElements,
+    pushCanvasHistory,
     setPendingImageElement,
     selectedElementIds,
     addCanvasShape,
@@ -74,6 +75,7 @@ const ToolButton = ({
   } = useCanvasElementStore([
     'removeCanvasElements',
     'setSelectedElements',
+    'pushCanvasHistory',
     'setPendingImageElement',
     'selectedElementIds',
     'addCanvasShape',
@@ -89,6 +91,7 @@ const ToolButton = ({
         const ids = selectedElementIds;
         setSelectedElements([]);
         removeCanvasElements(ids);
+        pushCanvasHistory();
       }
     : tool === 'image'
     ? async () => {

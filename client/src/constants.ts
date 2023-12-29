@@ -43,3 +43,8 @@ export const DRAGGING_THRESHOLD = 10;
 export const PERIPHERAL_CODES = {
   RIGHT_MOUSE: 2,
 };
+
+/**
+ * Misc
+ */
+export const EPSILON = 1e-8;

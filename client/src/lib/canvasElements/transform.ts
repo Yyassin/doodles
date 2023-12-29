@@ -36,6 +36,56 @@ const generateTransformHandle = (
 };
 
 /**
+ * Generates all the transform handles for the line element with
+ * the specified id; these are only at the endpoints and are fixed
+ * to nw and se for simple resize logic.
+ * @param appState The app state, which includes the element.
+ * @param elementId Id of the element to get handles for.
+ * @returns The transform handles.
+ */
+export const getLinearTransformHandlesFromCoords = (
+  appState: {
+    p1: Record<string, CanvasElement['p1']>;
+    p2: Record<string, CanvasElement['p2']>;
+    angles: Record<string, CanvasElement['angle']>;
+  },
+  elementId: string,
+) => {
+  const { p1, p2 } = appState;
+  const { x: x1, y: y1 } = p1[elementId];
+  const { x: x2, y: y2 } = p2[elementId];
+
+  const size = 12;
+  const handleWidth = size / zoomValue;
+  const handleHeight = size / zoomValue;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+
+  const transformHandles: TransformHandles = {
+    nw: generateTransformHandle(
+      x1 - handleWidth / 2,
+      y1 - handleHeight / 2,
+      handleWidth,
+      handleHeight,
+      cx,
+      cy,
+      0,
+    ),
+    se: generateTransformHandle(
+      x2 - handleWidth / 2,
+      y2 - handleHeight / 2,
+      handleWidth,
+      handleHeight,
+      cx,
+      cy,
+      0,
+    ),
+  };
+
+  return transformHandles;
+};
+
+/**
  * Generates all the transform handles for the element with
  * the specified id.
  * @param appState The app state, which includes the element.
@@ -71,11 +121,9 @@ export const getTransformHandlesFromCoords = (
   const handleMarginX = size / zoomValue;
   const handleMarginY = size / zoomValue;
 
-  // Rect only for now
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
 
-  // Fixed for now
   const angle = angles[elementId];
 
   // Line padding - half height
@@ -211,14 +259,20 @@ export const renderTransformFrame = (
     p1: Record<string, CanvasElement['p1']>;
     p2: Record<string, CanvasElement['p2']>;
     angles: Record<string, CanvasElement['angle']>;
+    types: Record<string, CanvasElement['type']>;
   },
   elementId: string,
 ) => {
-  const transformHandles = getTransformHandlesFromCoords(
-    appState,
-    elementId,
-    {},
+  const transformHandles =
+    appState.types[elementId] === 'line'
+      ? getLinearTransformHandlesFromCoords(appState, elementId)
+      : getTransformHandlesFromCoords(appState, elementId, {});
+  appState.types[elementId] !== 'line' &&
+    renderSelectionBorder(ctx, appState, elementId);
+  renderTransformHandles(
+    ctx,
+    transformHandles,
+    appState.angles[elementId],
+    appState.types[elementId] === 'line',
   );
-  renderSelectionBorder(ctx, appState, elementId);
-  renderTransformHandles(ctx, transformHandles, appState.angles[elementId]);
 };

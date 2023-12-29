@@ -45,12 +45,17 @@ export const useShortcuts = () => {
     'panOffset',
     'setPanOffset',
   ]);
-  const { selectedElementIds, setSelectedElements, removeCanvasElements } =
-    useCanvasElementStore([
-      'selectedElementIds',
-      'setSelectedElements',
-      'removeCanvasElements',
-    ]);
+  const {
+    selectedElementIds,
+    setSelectedElements,
+    removeCanvasElements,
+    pushCanvasHistory,
+  } = useCanvasElementStore([
+    'selectedElementIds',
+    'setSelectedElements',
+    'removeCanvasElements',
+    'pushCanvasHistory',
+  ]);
 
   useEffect(() => {
     const onKeyPress = (e: KeyboardEvent) => {
@@ -71,6 +76,7 @@ export const useShortcuts = () => {
         const ids = selectedElementIds;
         setSelectedElements([]);
         removeCanvasElements(ids);
+        pushCanvasHistory();
       }
     };
 

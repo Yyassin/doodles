@@ -97,12 +97,9 @@ const useDrawElements = () => {
     // Highlight selected elements (only 1 for now). We ignore
     // lines for the moment, and don't highlight while editing text.
     if (action !== 'writing') {
-      selectedElementIds
-        // TODO(yousef): Fix for lines in merge
-        .filter((id) => types[id] !== 'line')
-        .forEach((id) => {
-          renderTransformFrame(ctx, { p1, p2, angles }, id);
-        });
+      selectedElementIds.forEach((id) => {
+        renderTransformFrame(ctx, { p1, p2, angles, types }, id);
+      });
     }
 
     // Draw the selection frame, if any
