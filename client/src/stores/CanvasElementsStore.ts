@@ -50,6 +50,7 @@ export interface CanvasElementState {
   opacities: Record<string, CanvasElement['opacity']>;
   roughElements: Record<string, CanvasElement['roughElement']>;
   freehandPoints: Record<string, CanvasElement['freehandPoints']>;
+  freehandBounds: Record<string, [Vector2, Vector2]>;
   textStrings: Record<string, CanvasElement['text']>;
   p1: Record<string, CanvasElement['p1']>;
   p2: Record<string, CanvasElement['p2']>;
@@ -92,6 +93,7 @@ export const initialCanvasElementState: CanvasElementState = {
   opacities: {},
   roughElements: {},
   freehandPoints: {},
+  freehandBounds: {},
   textStrings: {},
   p1: {},
   p2: {},
@@ -199,6 +201,9 @@ const addCanvasFreehand =
       const strokeWidths = { ...state.strokeWidths };
       const opacities = { ...state.opacities };
       const freehandPoints = { ...state.freehandPoints };
+      const angles = { ...state.angles };
+      const p1 = { ...state.p1 };
+      const p2 = { ...state.p2 };
 
       const {
         id,
@@ -207,6 +212,7 @@ const addCanvasFreehand =
         strokeWidth,
         opacity,
         freehandPoints: elemFreehandPoints,
+        angle,
       } = element;
       allIds.push(id);
       types[id] = type;
@@ -214,6 +220,23 @@ const addCanvasFreehand =
       strokeWidths[id] = strokeWidth;
       opacities[id] = opacity;
       freehandPoints[id] = elemFreehandPoints;
+      angles[id] = angle;
+
+      const xCoords = elemFreehandPoints?.map(({ x }) => x) ?? [];
+      const yCoords = elemFreehandPoints?.map(({ y }) => y) ?? [];
+      const [minX, maxX] = [Math.min(...xCoords), Math.max(...xCoords)];
+      const [minY, maxY] = [Math.min(...yCoords), Math.max(...yCoords)];
+
+      const freehandBounds = {
+        ...state.freehandBounds,
+        [id]: [
+          { x: minX, y: minY },
+          { x: maxX, y: maxY },
+        ] as [Vector2, Vector2],
+      };
+
+      p1[id] = { x: minX, y: minY };
+      p2[id] = { x: maxX, y: maxY };
 
       return {
         ...state,
@@ -223,6 +246,10 @@ const addCanvasFreehand =
         strokeWidths,
         opacities,
         freehandPoints,
+        freehandBounds,
+        p1,
+        p2,
+        angles,
       };
     });
 
@@ -290,10 +317,10 @@ const editCanvasElement =
             [id]: partialElement.roughElement,
           }
         : state.roughElements;
-      const p1s = partialElement.p1
+      let p1s = partialElement.p1
         ? { ...state.p1, [id]: partialElement.p1 }
         : state.p1;
-      const p2s = partialElement.p2
+      let p2s = partialElement.p2
         ? { ...state.p2, [id]: partialElement.p2 }
         : state.p2;
       const freehandPoints = partialElement.freehandPoints
@@ -312,6 +339,25 @@ const editCanvasElement =
         ? { ...state.angles, [id]: partialElement.angle }
         : state.angles;
 
+      let freehandBounds = state.freehandBounds;
+      if (partialElement.freehandPoints !== undefined) {
+        const xCoords = partialElement.freehandPoints?.map(({ x }) => x) ?? [];
+        const yCoords = partialElement.freehandPoints?.map(({ y }) => y) ?? [];
+        const [minX, maxX] = [Math.min(...xCoords), Math.max(...xCoords)];
+        const [minY, maxY] = [Math.min(...yCoords), Math.max(...yCoords)];
+
+        freehandBounds = {
+          ...state.freehandBounds,
+          [id]: [
+            { x: minX, y: minY },
+            { x: maxX, y: maxY },
+          ],
+        };
+
+        p1s = { ...state.p1, [id]: { x: minX, y: minY } };
+        p2s = { ...state.p2, [id]: { x: maxX, y: maxY } };
+      }
+
       return {
         ...state,
         // allIds,
@@ -328,6 +374,7 @@ const editCanvasElement =
         p1: p1s,
         p2: p2s,
         freehandPoints,
+        freehandBounds,
         textStrings,
         fileIds,
         isImagePlaceds,

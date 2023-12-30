@@ -197,7 +197,11 @@ const positionWithinElement = (
 ): MaybeTransformHandleType | 'inside' => {
   const { p1, p2, types, selectedElementId, angles } = appState;
   const elementType = types[selection];
-  if (!['rectangle', 'line', 'text', 'image'].includes(elementType))
+  if (
+    !['rectangle', 'line', 'text', 'image', 'circle', 'freehand'].includes(
+      elementType,
+    )
+  )
     return false;
   const { x: x1, y: y1 } = p1[selection];
   const { x: x2, y: y2 } = p2[selection];
@@ -211,8 +215,10 @@ const positionWithinElement = (
 
   if (
     elementType === 'rectangle' ||
+    elementType === 'circle' ||
     elementType === 'image' ||
-    elementType === 'text'
+    elementType === 'text' ||
+    elementType === 'freehand'
   ) {
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;

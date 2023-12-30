@@ -2,6 +2,7 @@ import React, { MouseEvent, useEffect, useRef, FocusEvent } from 'react';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import {
   adjustElementCoordinatesById,
+  rescalePointsInElem,
   resizedCoordinates,
 } from '@/lib/canvasElements/resize';
 import {
@@ -200,8 +201,15 @@ export default function Canvas() {
       },
     );
     editCanvasElement(id, {
-      p1: { x: x1, y: y1 },
-      p2: { x: x2, y: y2 },
+      // If we're updating a curve, p1 and p2 are calculated internally. Otherwise,
+      // we set them explicitly when resizing -- and an affine transform is determined
+      // compared to the original curve's bounds.
+      ...(updatedElement.freehandPoints === undefined && {
+        p1: { x: x1, y: y1 },
+      }),
+      ...(updatedElement.freehandPoints === undefined && {
+        p2: { x: x2, y: y2 },
+      }),
       roughElement: updatedElement.roughElement,
       freehandPoints: updatedElement.freehandPoints,
       text: updatedElement.text,
@@ -387,6 +395,7 @@ export default function Canvas() {
     action !== 'writing' && setAction('none');
   };
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = getMouseCoordinates(e);
 
@@ -466,6 +475,15 @@ export default function Canvas() {
               y2,
             },
           );
+
+          // If the element is freehand, rescale the points.
+          let points = freehandPoints[selectedElementId];
+          if (points !== undefined) {
+            const [width, height] = [x2r - x1r, y2r - y1r];
+            points = rescalePointsInElem(points, width, height, false);
+            editCanvasElement(selectedElementId, { freehandPoints: points });
+          }
+
           updateElement(selectedElementId, x1r, y1r, x2r, y2r, elementType);
           break;
         }

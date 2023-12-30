@@ -11,6 +11,7 @@ import {
 } from '@/lib/canvasElements/render';
 import { getCanvasContext } from '@/lib/misc';
 import { imageCache } from '@/lib/cache';
+import { adjustElementCoordinates } from '@/lib/canvasElements/resize';
 
 /**
  * Hook that's subscribed to the roughElements
@@ -34,6 +35,7 @@ const useDrawElements = () => {
     types,
     allIds,
     freehandPoints,
+    freehandBounds,
     textStrings,
     fileIds,
     isImagePlaceds,
@@ -46,6 +48,7 @@ const useDrawElements = () => {
     'types',
     'allIds',
     'freehandPoints',
+    'freehandBounds',
     'textStrings',
     'fileIds',
     'isImagePlaceds',
@@ -95,7 +98,18 @@ const useDrawElements = () => {
       if (type === 'freehand') {
         const points = freehandPoints[id];
         if (points !== undefined) {
-          drawStroke(ctx, getStroke(points, { size: 5 }));
+          const { x: minX, y: minY } = freehandBounds[id][0];
+          // TODO(yousef): not great, but the offset is wrong and we can't
+          // adjust while resizing.
+          const { x1: x1a, y1: y1a } = adjustElementCoordinates(
+            { x: x1, y: y1 },
+            { x: x2, y: y2 },
+            types[selectedElementId],
+          );
+          const [tx, ty] = [x1a - minX, y1a - minY];
+          ctx.translate(tx, ty);
+
+          drawStroke(ctx, getStroke(points.slice(0, -2), { size: 5 }));
         }
       } else if (type === 'text') {
         // Skip anything being edited
@@ -153,6 +167,7 @@ const useDrawElements = () => {
     fileIds,
     isImagePlaceds,
     angles,
+    roughElements,
   ]);
 };
 
