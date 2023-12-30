@@ -5,6 +5,7 @@ import { drawImagePlaceholder, drawStroke } from './render';
 import getStroke from 'perfect-freehand';
 import { imageCache } from '../cache';
 import { createElement, defaultOptions } from './canvasElementUtils';
+import { adjustElementCoordinates } from './resize';
 
 /**
  * Entire scene rendering helpers.
@@ -30,6 +31,7 @@ export const renderCanvasElements = (
     angles: Record<string, CanvasElement['angle']>;
     types: Record<string, CanvasElement['type']>;
     freehandPoints: Record<string, CanvasElement['freehandPoints']>;
+    freehandBounds: Record<string, [Vector2, Vector2]>;
     textStrings: Record<string, CanvasElement['text']>;
     isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
     fileIds: Record<string, CanvasElement['fileId']>;
@@ -45,6 +47,7 @@ export const renderCanvasElements = (
     angles,
     types,
     freehandPoints,
+    freehandBounds,
     textStrings,
     isImagePlaceds,
     fileIds,
@@ -75,17 +78,23 @@ export const renderCanvasElements = (
 
     const type = types[id];
     if (type === 'freehand') {
-      let points = freehandPoints[id];
+      const points = freehandPoints[id];
       if (points !== undefined) {
-        points = points.map(({ x, y }) => ({
-          x: x - offsetX,
-          y: y - offsetY,
-        }));
-        drawStroke(ctx, getStroke(points, { size: 5 }));
+        const { x: minX, y: minY } = freehandBounds[id][0];
+        // TODO(yousef): not great, but the offset is wrong and we can't
+        // adjust while resizing.
+        const { x1: x1a, y1: y1a } = adjustElementCoordinates(
+          { x: x1, y: y1 },
+          { x: x2, y: y2 },
+          types[id],
+        );
+        const [tx, ty] = [x1a - minX, y1a - minY];
+        ctx.translate(tx, ty);
+
+        drawStroke(ctx, getStroke(points.slice(0, -2), { size: 5 }));
       }
     } else if (type === 'text') {
       // Skip anything being edited
-      console.log(renderTextPredicate(id));
       if (renderTextPredicate(id)) {
         ctx.textBaseline = 'top';
         ctx.font = '24px sans-serif';

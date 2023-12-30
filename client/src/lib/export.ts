@@ -2,6 +2,7 @@ import { CanvasElement } from '@/stores/CanvasElementsStore';
 import jsPDF from 'jspdf';
 import { renderCanvasElements } from './canvasElements/renderScene';
 import { getOrientedBounds } from './math';
+import { Vector2 } from '@/types';
 
 /**
  * Defines helpers for exporting canvas contents.
@@ -47,6 +48,7 @@ export const renderElementsOnOffscreenCanvas = (
     angles: Record<string, CanvasElement['angle']>;
     types: Record<string, CanvasElement['type']>;
     freehandPoints: Record<string, CanvasElement['freehandPoints']>;
+    freehandBounds: Record<string, [Vector2, Vector2]>;
     textStrings: Record<string, CanvasElement['text']>;
     isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
     fileIds: Record<string, CanvasElement['fileId']>;
@@ -68,6 +70,7 @@ export const renderElementsOnOffscreenCanvas = (
     angles,
     types,
     freehandPoints,
+    freehandBounds,
     textStrings,
     isImagePlaceds,
     fileIds,
@@ -113,6 +116,7 @@ export const renderElementsOnOffscreenCanvas = (
       angles,
       types,
       freehandPoints,
+      freehandBounds,
       textStrings,
       isImagePlaceds,
       fileIds,

@@ -30,6 +30,7 @@ const useDrawElements = () => {
     types,
     allIds,
     freehandPoints,
+    freehandBounds,
     textStrings,
     fileIds,
     isImagePlaceds,
@@ -44,6 +45,7 @@ const useDrawElements = () => {
     'types',
     'allIds',
     'freehandPoints',
+    'freehandBounds',
     'textStrings',
     'fileIds',
     'isImagePlaceds',
@@ -83,6 +85,7 @@ const useDrawElements = () => {
         angles,
         types,
         freehandPoints,
+        freehandBounds,
         textStrings,
         isImagePlaceds,
         fileIds,
@@ -120,6 +123,7 @@ const useDrawElements = () => {
     fileIds,
     isImagePlaceds,
     angles,
+    roughElements,
     selectionFrame,
   ]);
 };
