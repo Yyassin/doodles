@@ -50,7 +50,7 @@ const ToolButton = ({
 }) => {
   const {
     editCanvasElement,
-    selectedElementId,
+    selectedElementIds,
     types,
     strokeColors,
     bowings,
@@ -64,7 +64,7 @@ const ToolButton = ({
     textStrings,
   } = useCanvasElementStore([
     'editCanvasElement',
-    'selectedElementId',
+    'selectedElementIds',
     'fillColors',
     'types',
     'strokeColors',
@@ -81,6 +81,8 @@ const ToolButton = ({
   ]);
 
   const onClick = () => {
+    // If the user was able to see the panel, only one element is selected.
+    const selectedElementId = selectedElementIds[0];
     const roughElement = createElement(
       selectedElementId,
       p1[selectedElementId].x,
@@ -122,9 +124,9 @@ const ToolButton = ({
  * to highlight the selected tool.
  */
 const ToolGroup = ({ tools }: { tools: colourType[] }) => {
-  const { fillColors, selectedElementId } = useCanvasElementStore([
+  const { fillColors, selectedElementIds } = useCanvasElementStore([
     'fillColors',
-    'selectedElementId',
+    'selectedElementIds',
   ]);
 
   return (
@@ -133,7 +135,7 @@ const ToolGroup = ({ tools }: { tools: colourType[] }) => {
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
             tool={toolName}
-            active={fillColors[selectedElementId] === mapColour[toolName]}
+            active={fillColors[selectedElementIds[0]] === mapColour[toolName]}
           >
             <div className={'w-5 h-5 rounded-full ' + colorMap[toolName]}></div>
           </ToolButton>

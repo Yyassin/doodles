@@ -11,7 +11,7 @@ const fillStyle = 'hachure';
 const strokeLineDash = [0];
 const opacity = 1;
 
-const defaultOptions = {
+export const defaultOptions = {
   stroke,
   fill,
   bowing,

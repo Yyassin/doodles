@@ -32,11 +32,11 @@ export interface CanvasElement {
   angle: number; // Element orientation, in radians
   id: string; // Element id
 }
-// resize, and rotate
-// TODO: Arrows will probably need to be composite
 
 export interface CanvasElementState {
-  selectedElementId: string;
+  isSelectionFrameSet: boolean;
+  selectionFrame: Pick<CanvasElement, 'p1' | 'p2'> | null;
+  selectedElementIds: string[];
   pendingImageElementId: string;
   allIds: string[];
   types: Record<string, CanvasElement['type']>;
@@ -66,20 +66,25 @@ interface CanvasElementActions {
     id: string,
     partialElement: Partial<CanvasElement>,
   ) => void;
-  removeCanvasElement: (id: string) => void;
-  setSelectedElement: (id: string) => void;
+  removeCanvasElements: (ids: string[]) => void;
+  setSelectedElements: (ids: string[]) => void;
   setPendingImageElement: (id: string) => void;
   undoCanvasHistory: () => void;
   pushCanvasHistory: () => void;
   resetCanvas: () => void;
   redoCanvasHistory: () => void;
-  setCanvasElementState: (elment: CanvasElementState) => void;
+  setCanvasElementState: (element: CanvasElementState) => void;
+  setSelectionFrame: (
+    selectionFrame: Partial<Pick<CanvasElement, 'p1' | 'p2'>> | null,
+  ) => void;
 }
 type CanvasElementStore = CanvasElementState & CanvasElementActions;
 
 // Initialize Canvas Element State to default state
 export const initialCanvasElementState: CanvasElementState = {
-  selectedElementId: '',
+  isSelectionFrameSet: false,
+  selectionFrame: null,
+  selectedElementIds: [] as string[],
   pendingImageElementId: '',
   allIds: [],
   types: {},
@@ -192,6 +197,11 @@ const addCanvasShape =
       };
     });
 
+/**
+ * Adds a freehand element to state.
+ * @param element The curve to add.
+ * @returns Updated state with the element added.
+ */
 const addCanvasFreehand =
   (set: SetState<CanvasElementState>) => (element: CanvasElement) =>
     set((state) => {
@@ -388,8 +398,8 @@ const editCanvasElement =
  * @param id The element to remove.
  * @returns Updated state with the element removed.
  */
-const removeCanvasElement =
-  (set: SetState<CanvasElementState>) => (id: string) =>
+const removeCanvasElements =
+  (set: SetState<CanvasElementState>) => (ids: string[]) =>
     set((state) => {
       const allIds = [...state.allIds];
       const types = { ...state.types };
@@ -407,21 +417,23 @@ const removeCanvasElement =
       const angles = { ...state.angles };
       const textStrings = { ...state.textStrings };
 
-      allIds.splice(allIds.indexOf(id), 1);
-      delete types[id];
-      delete strokeColors[id];
-      delete fillColors[id];
-      delete bowings[id];
-      delete roughnesses[id];
-      delete strokeWidths[id];
-      delete fillStyles[id];
-      delete strokeLineDashes[id];
-      delete opacities[id];
-      delete roughElements[id];
-      delete p1s[id];
-      delete p2s[id];
-      delete angles[id];
-      delete textStrings[id];
+      ids.forEach((id) => {
+        allIds.splice(allIds.indexOf(id), 1);
+        delete types[id];
+        delete strokeColors[id];
+        delete fillColors[id];
+        delete bowings[id];
+        delete roughnesses[id];
+        delete strokeWidths[id];
+        delete fillStyles[id];
+        delete strokeLineDashes[id];
+        delete opacities[id];
+        delete roughElements[id];
+        delete p1s[id];
+        delete p2s[id];
+        delete angles[id];
+        delete textStrings[id];
+      });
 
       return {
         ...state,
@@ -494,9 +506,28 @@ const resetCanvas = (set: SetState<CanvasElementState>) => () => {
  * @param selectedElementId The id to set as selected.
  * @returns Updated state with the selected element id.
  */
-const setSelectedElement =
-  (set: SetState<CanvasElementState>) => (selectedElementId: string) =>
-    set(() => ({ selectedElementId }));
+const setSelectedElements =
+  (set: SetState<CanvasElementState>) => (selectedElementIds: string[]) =>
+    set(() => ({ selectedElementIds }));
+
+/**
+ * Sets the current selection frame state.
+ * @param selectionFrame The selection frame state, as
+ * bounding coordinates, or null if there is no frame.
+ * @returns Updated state with the new frame state.
+ */
+const defaultSelectionFrame = { p1: { x: 0, y: 0 }, p2: { x: 0, y: 0 } };
+const setSelectionFrame =
+  (set: SetState<CanvasElementState>) =>
+  (selectionFrame: Partial<Pick<CanvasElement, 'p1' | 'p2'>> | null) =>
+    set((state) => ({
+      ...state,
+      isSelectionFrameSet: selectionFrame !== null,
+      selectionFrame: selectionFrame && {
+        ...(state.selectionFrame ?? defaultSelectionFrame),
+        ...selectionFrame,
+      },
+    }));
 
 /**
  * Sets the currently pending image element id.
@@ -558,8 +589,9 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   addCanvasShape: addCanvasShape(set),
   addCanvasFreehand: addCanvasFreehand(set),
   editCanvasElement: editCanvasElement(set),
-  removeCanvasElement: removeCanvasElement(set),
-  setSelectedElement: setSelectedElement(set),
+  removeCanvasElements: removeCanvasElements(set),
+  setSelectedElements: setSelectedElements(set),
+  setSelectionFrame: setSelectionFrame(set),
   setPendingImageElement: setPendingImageElement(set),
   setCanvasElementState: setCanvasElementState(set),
   undoCanvasHistory: undoCanvasHistory(set),

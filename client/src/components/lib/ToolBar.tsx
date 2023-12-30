@@ -13,7 +13,7 @@ import {
 } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
 import { AppTool, AppTools, IMAGE_MIME_TYPES } from '@/types';
-import { capitalize } from '@/lib/misc';
+import { capitalize, setCursor } from '@/lib/misc';
 import IconButton from './IconButton';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
@@ -65,19 +65,19 @@ const ToolButton = ({
     'appHeight',
   ]);
   const {
+    removeCanvasElements,
+    setSelectedElements,
     pushCanvasHistory,
-    removeCanvasElement,
-    setSelectedElement,
     setPendingImageElement,
-    selectedElementId,
+    selectedElementIds,
     addCanvasShape,
     editCanvasElement,
   } = useCanvasElementStore([
+    'removeCanvasElements',
+    'setSelectedElements',
     'pushCanvasHistory',
-    'removeCanvasElement',
-    'setSelectedElement',
     'setPendingImageElement',
-    'selectedElementId',
+    'selectedElementIds',
     'addCanvasShape',
     'editCanvasElement',
   ]);
@@ -88,37 +88,45 @@ const ToolButton = ({
   const isErase = tool === 'erase';
   const onClick = isErase
     ? () => {
-        const id = selectedElementId;
-        setSelectedElement('');
-        removeCanvasElement(id);
+        const ids = selectedElementIds;
+        setSelectedElements([]);
+        removeCanvasElements(ids);
         pushCanvasHistory();
+        setCursor('');
       }
     : tool === 'image'
     ? async () => {
         // Prompt the user to select image from file explorer
-        const imageFile = await fileOpen({
-          description: 'Image',
-          extensions: Object.keys(
-            IMAGE_MIME_TYPES,
-          ) as (keyof typeof IMAGE_MIME_TYPES)[],
-        });
-        // Create a proxy element
-        const id = generateRandId();
-        const placeholderElement = createElement(id, 0, 0, 0, 0, 'image');
-        setPendingImageElement(id);
-        // Inject the image into the proxy
-        await injectImageElement(
-          placeholderElement,
-          imageFile,
-          addCanvasShape,
-          editCanvasElement,
-          { zoom, appHeight },
-          true,
-        );
-        // And let the user place the image
-        setTool('image');
+        try {
+          const imageFile = await fileOpen({
+            description: 'Image',
+            extensions: Object.keys(
+              IMAGE_MIME_TYPES,
+            ) as (keyof typeof IMAGE_MIME_TYPES)[],
+          });
+          // Create a proxy element
+          const id = generateRandId();
+          const placeholderElement = createElement(id, 0, 0, 0, 0, 'image');
+          setPendingImageElement(id);
+          // Inject the image into the proxy
+          await injectImageElement(
+            placeholderElement,
+            imageFile,
+            addCanvasShape,
+            editCanvasElement,
+            { zoom, appHeight },
+            true,
+          );
+          // And let the user place the image
+          setTool('image');
+        } catch (e: unknown) {
+          setCursor('');
+        }
       }
-    : () => setTool(tool);
+    : () => {
+        setTool(tool);
+        setCursor('');
+      };
 
   return (
     <IconButton label={capitalize(tool)} active={active} onClick={onClick}>
