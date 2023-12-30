@@ -91,18 +91,18 @@ export const renderCanvasElements = (
         ctx.fillText(textStrings[id], p1[id].x, p1[id].y);
       }
     } else if (type === 'image') {
-      if (!isImagePlaceds[id]) return;
+      if (isImagePlaceds[id]) {
+        const [width, height] = [Math.abs(x2 - x1), Math.abs(y2 - y1)];
 
-      const [width, height] = [Math.abs(x2 - x1), Math.abs(y2 - y1)];
-
-      const imgFileId = fileIds[id];
-      const img = imgFileId
-        ? imageCache.cache.get(imgFileId)?.image
-        : undefined;
-      if (img !== undefined && !(img instanceof Promise)) {
-        ctx.drawImage(img, x1, y1, width, height);
-      } else {
-        drawImagePlaceholder(width, height, ctx);
+        const imgFileId = fileIds[id];
+        const img = imgFileId
+          ? imageCache.cache.get(imgFileId)?.image
+          : undefined;
+        if (img !== undefined && !(img instanceof Promise)) {
+          ctx.drawImage(img, x1, y1, width, height);
+        } else {
+          drawImagePlaceholder(width, height, ctx);
+        }
       }
     } else {
       const roughElement =

@@ -91,7 +91,7 @@ export default function Canvas() {
     pendingImageElementId,
     fileIds,
     angles,
-    selectionFrame,
+    isSelectionFrameSet,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -119,7 +119,7 @@ export default function Canvas() {
     'pendingImageElementId',
     'fileIds',
     'angles',
-    'selectionFrame',
+    'isSelectionFrameSet',
   ]);
 
   const { setWebsocketAction, setRoomID } = useWebSocketStore([
@@ -509,10 +509,9 @@ export default function Canvas() {
         }
         default: {
           // Otherwise, we're in the none state, either hovering the mouse or creating a selection frame.
-          if (selectionFrame !== null) {
+          if (isSelectionFrameSet) {
             // Update the frame
             setSelectionFrame({
-              p1: selectionFrame.p1,
               p2: {
                 x: clientX,
                 y: clientY,

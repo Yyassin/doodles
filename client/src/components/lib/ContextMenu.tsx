@@ -41,6 +41,7 @@ const ContextMenu = () => {
                 removeCanvasElements(ids);
                 pushCanvasHistory();
               }}
+              className="text-red-700"
             >
               Delete{' '}
               <div className="ml-auto pl-5 text-red-700 group-data-[highlighted]:text-white group-data-[disabled]:text-mauve8">

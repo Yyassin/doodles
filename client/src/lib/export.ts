@@ -1,6 +1,7 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import jsPDF from 'jspdf';
 import { renderCanvasElements } from './canvasElements/renderScene';
+import { getOrientedBounds, rotate } from './math';
 
 /**
  * Defines helpers for exporting canvas contents.
@@ -73,12 +74,24 @@ export const renderElementsOnOffscreenCanvas = (
 
   const margin = options?.margin ?? 0;
   let [minX, maxX, minY, maxY] = [Infinity, 0, Infinity, 0];
-  elementIds.forEach((id) => {
-    minX = Math.min(minX, p1[id].x);
-    maxX = Math.max(maxX, p2[id].x);
-    minY = Math.min(minY, p1[id].y);
-    maxY = Math.max(maxY, p2[id].y);
-  });
+
+  elementIds
+    .filter((id) => p1[id] !== undefined && p2[id] !== undefined)
+    .forEach((id) => {
+      let { x: x1, y: y1 } = p1[id];
+      let { x: x2, y: y2 } = p2[id];
+      const [cx, cy] = [(x1 + x2) / 2, (y1 + y2) / 2];
+      ({ x1, y1, x2, y2 } = getOrientedBounds(
+        { x1, x2, y1, y2 },
+        [cx, cy],
+        angles[id],
+      ));
+
+      minX = Math.min(minX, x1, x2);
+      maxX = Math.max(maxX, x1, x2);
+      minY = Math.min(minY, y1, y2);
+      maxY = Math.max(maxY, y1, y2);
+    });
   const [width, height] = [maxX - minX + 2 * margin, maxY - minY + 2 * margin];
   ctx.canvas.width = width;
   ctx.canvas.height = height;

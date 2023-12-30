@@ -34,7 +34,7 @@ const ExportSelectedPNGContextItem = () => {
   ]);
   return (
     <ContextMenuItem
-      // eslint-disable-next-line sonarjs/cognitive-complexity
+      className="text-violet-500"
       onClick={() => {
         const canvas = renderElementsOnOffscreenCanvas(
           selectedElementIds,
@@ -54,7 +54,7 @@ const ExportSelectedPNGContextItem = () => {
       }}
     >
       Export as PNG{' '}
-      <div className="ml-auto pl-5 text-violet-700 group-data-[highlighted]:text-white group-data-[disabled]:text-mauve8">
+      <div className="ml-auto pl-5 text-violet-500 group-data-[highlighted]:text-white group-data-[disabled]:text-mauve8">
         <ImageIcon />
       </div>
     </ContextMenuItem>

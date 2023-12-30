@@ -34,7 +34,7 @@ export interface CanvasElement {
 }
 
 export interface CanvasElementState {
-  // TODO: Split up into exists, and the coords -- Canvas shouldn't listen to coords
+  isSelectionFrameSet: boolean;
   selectionFrame: Pick<CanvasElement, 'p1' | 'p2'> | null;
   selectedElementIds: string[];
   pendingImageElementId: string;
@@ -74,13 +74,14 @@ interface CanvasElementActions {
   redoCanvasHistory: () => void;
   setCanvasElementState: (element: CanvasElementState) => void;
   setSelectionFrame: (
-    selectionFrame: Pick<CanvasElement, 'p1' | 'p2'> | null,
+    selectionFrame: Partial<Pick<CanvasElement, 'p1' | 'p2'>> | null,
   ) => void;
 }
 type CanvasElementStore = CanvasElementState & CanvasElementActions;
 
 // Initialize Canvas Element State to default state
 export const initialCanvasElementState: CanvasElementState = {
+  isSelectionFrameSet: false,
   selectionFrame: null,
   selectedElementIds: [] as string[],
   pendingImageElementId: '',
@@ -468,13 +469,15 @@ const setSelectedElements =
  * bounding coordinates, or null if there is no frame.
  * @returns Updated state with the new frame state.
  */
+const defaultSelectionFrame = { p1: { x: 0, y: 0 }, p2: { x: 0, y: 0 } };
 const setSelectionFrame =
   (set: SetState<CanvasElementState>) =>
-  (selectionFrame: Pick<CanvasElement, 'p1' | 'p2'> | null) =>
+  (selectionFrame: Partial<Pick<CanvasElement, 'p1' | 'p2'>> | null) =>
     set((state) => ({
       ...state,
+      isSelectionFrameSet: selectionFrame !== null,
       selectionFrame: selectionFrame && {
-        ...state.selectionFrame,
+        ...(state.selectionFrame ?? defaultSelectionFrame),
         ...selectionFrame,
       },
     }));
