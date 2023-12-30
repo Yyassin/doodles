@@ -4,7 +4,7 @@ import rough from 'roughjs';
 import { drawImagePlaceholder, drawStroke } from './render';
 import getStroke from 'perfect-freehand';
 import { imageCache } from '../cache';
-import { createElement } from './canvasElementUtils';
+import { createElement, defaultOptions } from './canvasElementUtils';
 
 /**
  * Entire scene rendering helpers.
@@ -33,7 +33,7 @@ export const renderCanvasElements = (
     textStrings: Record<string, CanvasElement['text']>;
     isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
     fileIds: Record<string, CanvasElement['fileId']>;
-    roughElements?: Record<string, CanvasElement['roughElement']>;
+    roughElements: Record<string, CanvasElement['roughElement']>;
   },
   offset?: Vector2,
   renderTextPredicate: (id: string) => boolean = () => true,
@@ -85,10 +85,11 @@ export const renderCanvasElements = (
       }
     } else if (type === 'text') {
       // Skip anything being edited
+      console.log(renderTextPredicate(id));
       if (renderTextPredicate(id)) {
         ctx.textBaseline = 'top';
         ctx.font = '24px sans-serif';
-        ctx.fillText(textStrings[id], p1[id].x, p1[id].y);
+        ctx.fillText(textStrings[id], x1, y1);
       }
     } else if (type === 'image') {
       if (isImagePlaceds[id]) {
@@ -106,8 +107,14 @@ export const renderCanvasElements = (
       }
     } else {
       const roughElement =
-        roughElements[id] ??
-        createElement(id, x1, y1, x2, y2, types[id]).roughElement;
+        offset !== undefined
+          ? createElement(id, x1, y1, x2, y2, types[id], undefined, {
+              ...defaultOptions,
+              ...roughElements[id]?.options,
+              opacity: 1,
+              text: '',
+            }).roughElement
+          : roughElements[id];
       roughElement && roughCanvas.draw(roughElement);
     }
 

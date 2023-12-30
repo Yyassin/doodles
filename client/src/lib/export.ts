@@ -1,7 +1,7 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import jsPDF from 'jspdf';
 import { renderCanvasElements } from './canvasElements/renderScene';
-import { getOrientedBounds, rotate } from './math';
+import { getOrientedBounds } from './math';
 
 /**
  * Defines helpers for exporting canvas contents.
@@ -50,6 +50,7 @@ export const renderElementsOnOffscreenCanvas = (
     textStrings: Record<string, CanvasElement['text']>;
     isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
     fileIds: Record<string, CanvasElement['fileId']>;
+    roughElements: Record<string, CanvasElement['roughElement']>;
   },
   options?: {
     margin: number;
@@ -70,6 +71,7 @@ export const renderElementsOnOffscreenCanvas = (
     textStrings,
     isImagePlaceds,
     fileIds,
+    roughElements,
   } = appState;
 
   const margin = options?.margin ?? 0;
@@ -114,6 +116,7 @@ export const renderElementsOnOffscreenCanvas = (
       textStrings,
       isImagePlaceds,
       fileIds,
+      roughElements,
     },
     {
       x: minX - margin,

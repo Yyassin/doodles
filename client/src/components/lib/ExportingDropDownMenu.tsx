@@ -24,6 +24,7 @@ export const ExportingDropDownMenu = () => {
     fileIds,
     isImagePlaceds,
     angles,
+    roughElements,
   } = useCanvasElementStore([
     'allIds',
     'p1',
@@ -34,6 +35,7 @@ export const ExportingDropDownMenu = () => {
     'fileIds',
     'isImagePlaceds',
     'angles',
+    'roughElements',
   ]);
 
   return (
@@ -62,6 +64,7 @@ export const ExportingDropDownMenu = () => {
                     textStrings,
                     isImagePlaceds,
                     fileIds,
+                    roughElements,
                   },
                   { margin: 20, fillColour: 'white' },
                 );
@@ -84,6 +87,7 @@ export const ExportingDropDownMenu = () => {
                     textStrings,
                     isImagePlaceds,
                     fileIds,
+                    roughElements,
                   },
                   { margin: 20, fillColour: 'white' },
                 );

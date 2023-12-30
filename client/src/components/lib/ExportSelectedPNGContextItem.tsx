@@ -21,6 +21,7 @@ const ExportSelectedPNGContextItem = () => {
     fileIds,
     isImagePlaceds,
     angles,
+    roughElements,
   } = useCanvasElementStore([
     'selectedElementIds',
     'p1',
@@ -31,6 +32,7 @@ const ExportSelectedPNGContextItem = () => {
     'fileIds',
     'isImagePlaceds',
     'angles',
+    'roughElements',
   ]);
   return (
     <ContextMenuItem
@@ -47,6 +49,7 @@ const ExportSelectedPNGContextItem = () => {
             textStrings,
             isImagePlaceds,
             fileIds,
+            roughElements,
           },
           { margin: 20, fillColour: 'white' },
         );
