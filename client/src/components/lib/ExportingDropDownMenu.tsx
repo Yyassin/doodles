@@ -1,36 +1,44 @@
-import jsPDF from 'jspdf';
 import React from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Share2Icon } from '@radix-ui/react-icons';
+import {
+  handlePDFExport,
+  handlePNGExport,
+  renderElementsOnOffscreenCanvas,
+} from '@/lib/export';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 
 /**
  * Provides Exporting as PDF and PNG files buttons and functionality in DropDownMenu
- *
  * @author Dana El Sherif
  */
 
-/**
- * Downloads Canvas as PNG File
- */
-const handlePNGExport = (dataURL: string) => {
-  const link = document.createElement('a');
-  link.href = dataURL;
-  link.download = 'canvas.png';
-  link.click();
-};
-
-/**
- * Downloads Canvas as PDF File
- */
-const handlePDFExport = (dataURL: string) => {
-  const pdf = new jsPDF('portrait');
-  pdf.addImage(dataURL, 'PNG', 15, 15, 190, 130);
-  pdf.save('canvas.pdf');
-};
-
 export const ExportingDropDownMenu = () => {
-  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-  const dataURL = canvas.toDataURL('image/png');
+  const {
+    allIds,
+    p1,
+    p2,
+    types,
+    freehandPoints,
+    freehandBounds,
+    textStrings,
+    fileIds,
+    isImagePlaceds,
+    angles,
+    roughElements,
+  } = useCanvasElementStore([
+    'allIds',
+    'p1',
+    'p2',
+    'types',
+    'freehandPoints',
+    'freehandBounds',
+    'textStrings',
+    'fileIds',
+    'isImagePlaceds',
+    'angles',
+    'roughElements',
+  ]);
 
   return (
     <>
@@ -46,13 +54,49 @@ export const ExportingDropDownMenu = () => {
           >
             <DropdownMenu.Item
               className="group w-full text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 hover:bg-indigo-200"
-              onClick={() => handlePDFExport(dataURL)}
+              onClick={() => {
+                const canvas = renderElementsOnOffscreenCanvas(
+                  allIds,
+                  {
+                    p1,
+                    p2,
+                    angles,
+                    types,
+                    freehandPoints,
+                    freehandBounds,
+                    textStrings,
+                    isImagePlaceds,
+                    fileIds,
+                    roughElements,
+                  },
+                  { margin: 20, fillColour: 'white' },
+                );
+                canvas && handlePDFExport(canvas.toDataURL('image/png'));
+              }}
             >
               Export as PDF
             </DropdownMenu.Item>
             <DropdownMenu.Item
               className="group w-full text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 hover:bg-indigo-200"
-              onClick={() => handlePNGExport(dataURL)}
+              onClick={() => {
+                const canvas = renderElementsOnOffscreenCanvas(
+                  allIds,
+                  {
+                    p1,
+                    p2,
+                    angles,
+                    types,
+                    freehandPoints,
+                    freehandBounds,
+                    textStrings,
+                    isImagePlaceds,
+                    fileIds,
+                    roughElements,
+                  },
+                  { margin: 20, fillColour: 'white' },
+                );
+                canvas && handlePNGExport(canvas.toDataURL('image/png'));
+              }}
             >
               Export as PNG
             </DropdownMenu.Item>

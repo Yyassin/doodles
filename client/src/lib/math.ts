@@ -1,4 +1,4 @@
-import { TransformHandleDirection, Vector2 } from '@/types';
+import { BoundingBox, TransformHandleDirection, Vector2 } from '@/types';
 
 /**
  * Math related helper functions.
@@ -102,4 +102,40 @@ export const normalizeAngle = (angle: number): number => {
     return angle - 2 * Math.PI;
   }
   return angle;
+};
+
+/**
+ * Computes the axis aligned bounding box corresponding to the specified oriented box.
+ * @param bounds The axis aligned bounds of the oriented box.
+ * @param center The axis aligned center of the oriented box.
+ * @param angle The oriented box's orientation angle.
+ * @returns The axis aligned bounding box.
+ */
+export const getOrientedBounds = (
+  bounds: BoundingBox,
+  center: [number, number],
+  angle: number,
+): BoundingBox => {
+  const { x1, x2, y1, y2 } = bounds;
+  const [cx, cy] = center;
+
+  // Compute the other two corners of the rectangle
+  const x3 = x1;
+  const y3 = y2;
+  const x4 = x2;
+  const y4 = y1;
+
+  // Rotate all four corners
+  const [rotatedX1, rotatedY1] = rotate(x1, y1, cx, cy, angle);
+  const [rotatedX2, rotatedY2] = rotate(x2, y2, cx, cy, angle);
+  const [rotatedX3, rotatedY3] = rotate(x3, y3, cx, cy, angle);
+  const [rotatedX4, rotatedY4] = rotate(x4, y4, cx, cy, angle);
+
+  // Find the axis-aligned bounds of the rotated box
+  const minX = Math.min(rotatedX1, rotatedX2, rotatedX3, rotatedX4);
+  const minY = Math.min(rotatedY1, rotatedY2, rotatedY3, rotatedY4);
+  const maxX = Math.max(rotatedX1, rotatedX2, rotatedX3, rotatedX4);
+  const maxY = Math.max(rotatedY1, rotatedY2, rotatedY3, rotatedY4);
+
+  return { x1: minX, y1: minY, x2: maxX, y2: maxY };
 };

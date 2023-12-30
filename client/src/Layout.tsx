@@ -4,10 +4,11 @@ import SignUp from './views/SignUpPage';
 import SignInPage from './views/SignInPage';
 import Dashboard from './views/Dashboard';
 import useDrawElements from './hooks/useDrawElements';
+import useMultiSelection from './hooks/useMultiSelection';
 import useWindowResize from './hooks/useWindowResize';
 import { useSocket } from './hooks/useSocket';
-import Viewport from './views/Viewport';
 import { useShortcuts } from './hooks/useShortcut';
+import Viewport from './views/Viewport';
 
 /**
  * Layout component that handles routing between pages, and
@@ -17,6 +18,7 @@ import { useShortcuts } from './hooks/useShortcut';
 
 const Layout = () => {
   useDrawElements();
+  useMultiSelection();
   useWindowResize();
   useShortcuts();
   useSocket();

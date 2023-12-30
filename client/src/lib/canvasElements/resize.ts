@@ -1,6 +1,7 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { TransformHandleDirection, Vector2 } from '@/types';
 import { centerPoint, rotate, rotatePoint } from '../math';
+import { EPSILON } from '@/constants';
 
 /**
  * Helper methods to deal with coordinate
@@ -40,12 +41,13 @@ export const resizedCoordinates = (
   );
 
   // Calculate scaling to apply based on pointer
-  const boundsCurrentWidth = x2 - x1;
-  const boundsCurrentHeight = y2 - y1;
-  const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
-  const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1];
+  const boundsCurrentWidth = x2 - x1 + EPSILON;
+  const boundsCurrentHeight = y2 - y1 + EPSILON;
+  const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0] + EPSILON;
+  const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1] + EPSILON;
   let scaleX = atStartBoundsWidth / boundsCurrentWidth;
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
+  //console.log(scaleX, scaleY);
   if (position.includes('e')) {
     scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
   }
@@ -60,39 +62,40 @@ export const resizedCoordinates = (
   }
 
   // Calculate new bounds
-  const eleNewWidth = boundsCurrentWidth * scaleX;
-  const eleNewHeight = boundsCurrentHeight * scaleY;
+  const eleNewWidth = boundsCurrentWidth * scaleX + EPSILON;
+  const eleNewHeight = boundsCurrentHeight * scaleY + EPSILON;
   const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] = [
     x1,
     y1,
     x1 + eleNewWidth,
     y1 + eleNewHeight,
   ];
-  const newBoundsWidth = newBoundsX2 - newBoundsX1;
-  const newBoundsHeight = newBoundsY2 - newBoundsY1;
+  const newBoundsWidth = newBoundsX2 - newBoundsX1 + EPSILON;
+  const newBoundsHeight = newBoundsY2 - newBoundsY1 + EPSILON;
+  //console.log(newBoundsHeight, newBoundsWidth);
 
   // Calculate new topLeft based on fixed corner during resize
   let newTopLeft = [...startTopLeft] as [number, number];
   if (['n', 'w', 'nw'].includes(position)) {
     newTopLeft = [
-      startBottomRight[0] - Math.abs(newBoundsWidth),
-      startBottomRight[1] - Math.abs(newBoundsHeight),
+      startBottomRight[0] - newBoundsWidth,
+      startBottomRight[1] - newBoundsHeight,
     ];
   }
   if (position === 'ne') {
     const bottomLeft = [startTopLeft[0], startBottomRight[1]];
-    newTopLeft = [bottomLeft[0], bottomLeft[1] - Math.abs(newBoundsHeight)];
+    newTopLeft = [bottomLeft[0], bottomLeft[1] - newBoundsHeight];
   }
   if (position === 'sw') {
     const topRight = [startBottomRight[0], startTopLeft[1]];
-    newTopLeft = [topRight[0] - Math.abs(newBoundsWidth), topRight[1]];
+    newTopLeft = [topRight[0] - newBoundsWidth, topRight[1]];
   }
 
   // Adjust topLeft to new rotation point
   const rotatedTopLeft = rotatePoint(newTopLeft, startCenter, angle);
   const newCenter = [
-    newTopLeft[0] + Math.abs(newBoundsWidth) / 2,
-    newTopLeft[1] + Math.abs(newBoundsHeight) / 2,
+    newTopLeft[0] + newBoundsWidth / 2,
+    newTopLeft[1] + newBoundsHeight / 2,
   ] as [number, number];
   const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
   newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
@@ -124,11 +127,13 @@ export const adjustElementCoordinates = (
 ) => {
   const { x: x1, y: y1 } = p1;
   const { x: x2, y: y2 } = p2;
-  // TODO: Temporary, this is a bug
-  if (elementType === 'circle') {
-    return { x1, x2, y1, y2 };
-  }
-  if (elementType === 'rectangle') {
+
+  if (
+    elementType === 'rectangle' ||
+    elementType === 'circle' ||
+    elementType === 'image' ||
+    elementType === 'freehand'
+  ) {
     const minX = Math.min(x1, x2);
     const maxX = Math.max(x1, x2);
     const minY = Math.min(y1, y2);
@@ -174,3 +179,73 @@ export const adjustElementCoordinatesById = (
     types[elementId],
   );
 };
+
+/**
+ * Rescales a set of points along a specified dimension ('x' or 'y') to a new size.
+ *
+ * @param dim The dimension along which the points should be rescaled ('x' or 'y').
+ * @param newSize The new size to which the points should be scaled.
+ * @param points An array of Vector2 representing the points to be rescaled.
+ * @param translateInPlace Flag indicating whether to translate the points
+ * in place in order to normalize them within the new bounds.
+ * @returns An array of rescaled Vector2 points.
+ */
+const rescalePoints = (
+  dim: 'x' | 'y',
+  newSize: number,
+  points: Vector2[],
+  translateInPlace: boolean,
+): Vector2[] => {
+  const coords = points.map((point) => point[dim]);
+  const maxCoord = Math.max(...coords);
+  const minCoord = Math.min(...coords);
+  // Calculate the current size along the specified dimension
+  const size = maxCoord - minCoord;
+
+  // Calculate the scale factor for rescaling
+  // TODO: This forces same oriented, could consider allowing flips somehow
+  const scale = size === 0 ? 1 : Math.abs(newSize / size);
+
+  // Apply scaling
+  let newMinCoord = Infinity;
+  const scaledPoints = points.map((point): Vector2 => {
+    const newCoordinate = point[dim] * scale;
+    const newPoint = { ...point };
+    newPoint[dim] = newCoordinate;
+    newMinCoord = Math.min(newCoordinate, newMinCoord);
+    return newPoint as unknown as Vector2;
+  });
+
+  // Normalize, if specified:
+  if (!translateInPlace) {
+    return scaledPoints;
+  }
+  const translation = minCoord - newMinCoord;
+  return scaledPoints.map((scaledPoint) => ({
+    ...scaledPoint,
+    [dim]: scaledPoint[dim] + translation,
+  }));
+};
+
+/**
+ * Rescales a set of points to fit within the provided width and height.
+ *
+ * @param points An array of Vector2 representing the points to be rescaled.
+ * @param width The new width to which the points should be rescaled.
+ * @param height The new height to which the points should be rescaled.
+ * @param translateInPlace Flag indicating whether to translate the points
+ * in place in order to normalize them within the new bounds.
+ * @returns An array of rescaled points.
+ */
+export const rescalePointsInElem = (
+  points: Vector2[],
+  width: number,
+  height: number,
+  translateInPlace: boolean,
+) =>
+  rescalePoints(
+    'x',
+    width,
+    rescalePoints('y', height, points, translateInPlace),
+    translateInPlace,
+  );

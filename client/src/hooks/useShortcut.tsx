@@ -45,12 +45,17 @@ export const useShortcuts = () => {
     'panOffset',
     'setPanOffset',
   ]);
-  const { selectedElementId, setSelectedElement, removeCanvasElement } =
-    useCanvasElementStore([
-      'selectedElementId',
-      'setSelectedElement',
-      'removeCanvasElement',
-    ]);
+  const {
+    selectedElementIds,
+    setSelectedElements,
+    removeCanvasElements,
+    pushCanvasHistory,
+  } = useCanvasElementStore([
+    'selectedElementIds',
+    'setSelectedElements',
+    'removeCanvasElements',
+    'pushCanvasHistory',
+  ]);
 
   useEffect(() => {
     const onKeyPress = (e: KeyboardEvent) => {
@@ -67,10 +72,11 @@ export const useShortcuts = () => {
       if (shouldIgnoreKeyPress(e)) return;
 
       // Delete the selected element on backspace
-      if (e.code === 'Backspace' && selectedElementId !== '') {
-        const id = selectedElementId;
-        setSelectedElement('');
-        removeCanvasElement(id);
+      if (e.code === 'Backspace' && selectedElementIds.length) {
+        const ids = selectedElementIds;
+        setSelectedElements([]);
+        removeCanvasElements(ids);
+        pushCanvasHistory();
       }
     };
 
@@ -98,5 +104,5 @@ export const useShortcuts = () => {
       window.removeEventListener(EVENT.KEYDOWN, onKeyDown);
       window.removeEventListener(EVENT.WHEEL, onWheel);
     };
-  }, [selectedElementId, zoom, panOffset]);
+  }, [selectedElementIds, zoom, panOffset]);
 };
