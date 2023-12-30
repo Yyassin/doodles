@@ -52,7 +52,6 @@ const useDrawElements = () => {
   ]);
 
   // Effect fires after DOM is mounted
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   useLayoutEffect(() => {
     const { canvas, ctx } = getCanvasContext();
     if (ctx === null || canvas === null) return;
