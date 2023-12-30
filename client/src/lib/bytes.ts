@@ -166,6 +166,11 @@ export const dataURLToFile = (dataURL: string, filename = '') => {
 
   // Convert the byte string to an ArrayBuffer
   const ab = new ArrayBuffer(byteString.length);
+  // Initialize the buffer using a byte view
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
   // Create and return a new File object with the ArrayBuffer data
   return new File([ab], filename, { type: mimeType });
 };

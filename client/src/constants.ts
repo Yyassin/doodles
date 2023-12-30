@@ -38,6 +38,13 @@ export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
 export const DRAGGING_THRESHOLD = 10;
 
 /**
+ * Peripherals
+ */
+export const PERIPHERAL_CODES = {
+  RIGHT_MOUSE: 2,
+};
+
+/**
  * Misc
  */
 export const EPSILON = 1e-8;

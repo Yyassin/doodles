@@ -52,7 +52,7 @@ const ToolButton = ({
 }) => {
   const {
     editCanvasElement,
-    selectedElementId,
+    selectedElementIds,
     types,
     strokeColors,
     bowings,
@@ -66,7 +66,7 @@ const ToolButton = ({
     textStrings,
   } = useCanvasElementStore([
     'editCanvasElement',
-    'selectedElementId',
+    'selectedElementIds',
     'fillColors',
     'types',
     'strokeColors',
@@ -84,6 +84,8 @@ const ToolButton = ({
 
   const onClick = () => {
     setColourTool(tool);
+    // If the user was able to see the panel, only one element is selected.
+    const selectedElementId = selectedElementIds[0];
     const newElement = createElement(
       selectedElementId,
       p1[selectedElementId].x,
@@ -122,11 +124,13 @@ const ToolButton = ({
  * to highlight the selected tool.
  */
 const ToolGroup = ({ tools }: { tools: colourType[] }) => {
-  const { fillColors, selectedElementId } = useCanvasElementStore([
+  const { fillColors, selectedElementIds } = useCanvasElementStore([
     'fillColors',
-    'selectedElementId',
+    'selectedElementIds',
   ]);
-  const [colourTool, setColourTool] = useState(fillColors[selectedElementId]); //realistically it should be what the current color is
+  const [colourTool, setColourTool] = useState(
+    fillColors[selectedElementIds[0]],
+  ); //realistically it should be what the current color is
 
   return (
     <div className="flex">

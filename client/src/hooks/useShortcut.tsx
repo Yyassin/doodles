@@ -46,14 +46,14 @@ export const useShortcuts = () => {
     'setPanOffset',
   ]);
   const {
-    selectedElementId,
-    setSelectedElement,
-    removeCanvasElement,
+    selectedElementIds,
+    setSelectedElements,
+    removeCanvasElements,
     pushCanvasHistory,
   } = useCanvasElementStore([
-    'selectedElementId',
-    'setSelectedElement',
-    'removeCanvasElement',
+    'selectedElementIds',
+    'setSelectedElements',
+    'removeCanvasElements',
     'pushCanvasHistory',
   ]);
 
@@ -72,10 +72,10 @@ export const useShortcuts = () => {
       if (shouldIgnoreKeyPress(e)) return;
 
       // Delete the selected element on backspace
-      if (e.code === 'Backspace' && selectedElementId !== '') {
-        const id = selectedElementId;
-        setSelectedElement('');
-        removeCanvasElement(id);
+      if (e.code === 'Backspace' && selectedElementIds.length) {
+        const ids = selectedElementIds;
+        setSelectedElements([]);
+        removeCanvasElements(ids);
         pushCanvasHistory();
       }
     };
@@ -104,5 +104,5 @@ export const useShortcuts = () => {
       window.removeEventListener(EVENT.KEYDOWN, onKeyDown);
       window.removeEventListener(EVENT.WHEEL, onWheel);
     };
-  }, [selectedElementId, zoom, panOffset]);
+  }, [selectedElementIds, zoom, panOffset]);
 };
