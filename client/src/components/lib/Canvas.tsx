@@ -622,6 +622,8 @@ export default function Canvas() {
                 zoom -
               scaleOffset.x,
             font: `${TEXT_FONT_SIZE * zoom}px ${TEXT_FONT_FAMILY}`,
+            color:
+              fillColors[selectedElementIds[0] ?? currentDrawingElemId.current],
             margin: 0,
             padding: 0,
             border: 0,
