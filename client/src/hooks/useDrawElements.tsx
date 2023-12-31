@@ -32,6 +32,7 @@ const useDrawElements = () => {
     p1,
     p2,
     types,
+    fillColors,
     allIds,
     freehandPoints,
     textStrings,
@@ -44,6 +45,7 @@ const useDrawElements = () => {
     'p1',
     'p2',
     'types',
+    'fillColors',
     'allIds',
     'freehandPoints',
     'textStrings',
@@ -102,6 +104,9 @@ const useDrawElements = () => {
         if (!(action === 'writing' && id === selectedElementId)) {
           ctx.textBaseline = 'top';
           ctx.font = '24px sans-serif';
+
+          const fillColor = fillColors[id] ?? '#000000';
+          ctx.fillStyle = fillColor;
           ctx.fillText(textStrings[id], p1[id].x, p1[id].y);
         }
       } else if (type === 'image') {

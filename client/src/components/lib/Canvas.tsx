@@ -350,16 +350,15 @@ export default function Canvas() {
     const { clientX, clientY } = getMouseCoordinates(e);
     // If we've mouse uped, and the position is close to the selection
     // position of a text eleement, then initiate an edit.
-    if (
-      selectedElementId !== '' &&
-      types[selectedElementId] === 'text' &&
-      clientX - (selectOffset.current?.x ?? 0) - p1[selectedElementId].x < 1 &&
-      clientY - (selectOffset.current?.y ?? 0) - p1[selectedElementId].y < 1
-    ) {
-      // We've clicked a text element, without dragging. Initiate an edit
-      setAction('writing');
-      return;
-    }
+    // if (
+    //   types[selectedElementId] === 'text' &&
+    //   clientX - (selectOffset.current?.x ?? 0) - p1[selectedElementId].x < 1 &&
+    //   clientY - (selectOffset.current?.y ?? 0) - p1[selectedElementId].y < 1
+    // ) {
+    //   // We've clicked a text element, without dragging. Initiate an edit
+    //   setAction('writing');
+    //   return;
+    // }
 
     // Reorder corners to align with the x1, y1 top left convention. This
     // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).
