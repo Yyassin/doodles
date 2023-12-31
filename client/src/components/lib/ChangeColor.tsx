@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { capitalize } from '@/lib/misc';
 import IconButton from './IconButton';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
@@ -43,16 +43,14 @@ const ToolButton = ({
   tool,
   active,
   children,
-  setColourTool,
 }: {
   tool: colourType;
   active: boolean;
   children?: React.ReactNode;
-  setColourTool: React.Dispatch<colourType>;
 }) => {
   const {
     editCanvasElement,
-    selectedElementId,
+    selectedElementIds,
     types,
     strokeColors,
     bowings,
@@ -66,7 +64,7 @@ const ToolButton = ({
     textStrings,
   } = useCanvasElementStore([
     'editCanvasElement',
-    'selectedElementId',
+    'selectedElementIds',
     'fillColors',
     'types',
     'strokeColors',
@@ -83,8 +81,9 @@ const ToolButton = ({
   ]);
 
   const onClick = () => {
-    setColourTool(tool);
-    const newElement = createElement(
+    // If the user was able to see the panel, only one element is selected.
+    const selectedElementId = selectedElementIds[0];
+    const roughElement = createElement(
       selectedElementId,
       p1[selectedElementId].x,
       p1[selectedElementId].y,
@@ -103,8 +102,11 @@ const ToolButton = ({
         opacity: opacities[selectedElementId],
         text: textStrings[selectedElementId],
       },
-    );
-    editCanvasElement(selectedElementId, newElement);
+    ).roughElement;
+    editCanvasElement(selectedElementId, {
+      roughElement,
+      fillColor: mapColour[tool],
+    });
   };
 
   return (
@@ -122,11 +124,10 @@ const ToolButton = ({
  * to highlight the selected tool.
  */
 const ToolGroup = ({ tools }: { tools: colourType[] }) => {
-  const { fillColors, selectedElementId } = useCanvasElementStore([
+  const { fillColors, selectedElementIds } = useCanvasElementStore([
     'fillColors',
-    'selectedElementId',
+    'selectedElementIds',
   ]);
-  const [colourTool, setColourTool] = useState(fillColors[selectedElementId]); //realistically it should be what the current color is
 
   return (
     <div className="flex">
@@ -134,8 +135,7 @@ const ToolGroup = ({ tools }: { tools: colourType[] }) => {
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
             tool={toolName}
-            active={colourTool === mapColour[toolName]}
-            setColourTool={setColourTool as React.Dispatch<colourType>}
+            active={fillColors[selectedElementIds[0]] === mapColour[toolName]}
           >
             <div className={'w-5 h-5 rounded-full ' + colorMap[toolName]}></div>
           </ToolButton>

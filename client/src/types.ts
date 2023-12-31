@@ -7,6 +7,12 @@ import { ValueOf } from './lib/misc';
 
 /** General */
 export type Vector2 = { x: number; y: number };
+export interface BoundingBox {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
 
 /** Canvas Element Selection */
 /* The 4 sides, and 4 corners of a canvas element BB. */
@@ -70,6 +76,7 @@ export const CanvasElementTypes = [
   'freehand',
   'text',
   'image',
+  'selection',
 ] as const;
 export type CanvasElementType = (typeof CanvasElementTypes)[number];
 

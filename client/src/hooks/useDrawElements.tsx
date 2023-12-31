@@ -2,15 +2,12 @@ import { renderTransformFrame } from '@/lib/canvasElements/transform';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useLayoutEffect } from 'react';
-import rough from 'roughjs';
-import getStroke from 'perfect-freehand';
 import {
-  drawImagePlaceholder,
-  drawStroke,
   getScaleOffset,
+  renderSelectionFrame,
 } from '@/lib/canvasElements/render';
 import { getCanvasContext } from '@/lib/misc';
-import { imageCache } from '@/lib/cache';
+import { renderCanvasElements } from '@/lib/canvasElements/renderScene';
 
 /**
  * Hook that's subscribed to the roughElements
@@ -27,49 +24,51 @@ const useDrawElements = () => {
     'action',
   ]);
   const {
-    roughElements,
-    selectedElementId,
+    selectedElementIds,
     p1,
     p2,
     types,
     fillColors,
     allIds,
     freehandPoints,
+    freehandBounds,
     textStrings,
     fileIds,
     isImagePlaceds,
     angles,
+    selectionFrame,
+    roughElements,
   } = useCanvasElementStore([
     'roughElements',
-    'selectedElementId',
+    'selectedElementIds',
     'p1',
     'p2',
     'types',
     'fillColors',
     'allIds',
     'freehandPoints',
+    'freehandBounds',
     'textStrings',
     'fileIds',
     'isImagePlaceds',
     'angles',
+    'selectionFrame',
   ]);
 
   // Effect fires after DOM is mounted
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   useLayoutEffect(() => {
     const { canvas, ctx } = getCanvasContext();
     if (ctx === null || canvas === null) return;
 
     // Clear on each rerender
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const roughCanvas = rough.canvas(canvas);
 
     // Retrieve the scaling offset to apply for centered zoom
     // (TODO: We can change this to zoom towards mouse position)
     const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
 
     // Temporarily apply scaling
-    //Panning & zooming
+    // Panning & zooming
     ctx.save();
     ctx.translate(
       panOffset.x * zoom - scaleOffset.x,
@@ -78,6 +77,7 @@ const useDrawElements = () => {
     ctx.scale(zoom, zoom);
 
     // Render each element
+<<<<<<< HEAD
     allIds.forEach((id) => {
       const { x: x1, y: y1 } = p1[id] ?? { x: 0, y: 0 };
       const { x: x2, y: y2 } = p2[id] ?? { x: 0, y: 0 };
@@ -133,20 +133,45 @@ const useDrawElements = () => {
       // Cleanup
       ctx.restore();
     });
+=======
+    renderCanvasElements(
+      canvas,
+      ctx,
+      {
+        elementIds: allIds,
+        p1,
+        p2,
+        angles,
+        types,
+        freehandPoints,
+        freehandBounds,
+        textStrings,
+        isImagePlaceds,
+        fileIds,
+        roughElements,
+      },
+      undefined,
+      (id: string) =>
+        !(action === 'writing' && selectedElementIds.includes(id)),
+    );
+>>>>>>> 5b8026e91269df6c5a8a0228052673bbcb523d58
 
     // Highlight selected elements (only 1 for now). We ignore
     // lines for the moment, and don't highlight while editing text.
-    if (!(selectedElementId === '' || action === 'writing')) {
-      [selectedElementId].forEach((id) => {
+    if (action !== 'writing') {
+      selectedElementIds.forEach((id) => {
         renderTransformFrame(ctx, { p1, p2, angles, types }, id);
       });
     }
+
+    // Draw the selection frame, if any
+    selectionFrame && renderSelectionFrame(selectionFrame, zoom, ctx);
 
     // Restore canvas pre-scaling and panning.
     ctx.restore();
   }, [
     allIds,
-    selectedElementId,
+    selectedElementIds,
     types,
     p1,
     p2,
@@ -158,6 +183,8 @@ const useDrawElements = () => {
     fileIds,
     isImagePlaceds,
     angles,
+    roughElements,
+    selectionFrame,
   ]);
 };
 

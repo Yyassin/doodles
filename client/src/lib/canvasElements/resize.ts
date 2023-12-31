@@ -127,11 +127,13 @@ export const adjustElementCoordinates = (
 ) => {
   const { x: x1, y: y1 } = p1;
   const { x: x2, y: y2 } = p2;
-  // TODO: Temporary, this is a bug
-  if (elementType === 'circle') {
-    return { x1, x2, y1, y2 };
-  }
-  if (elementType === 'rectangle' || elementType === 'image') {
+
+  if (
+    elementType === 'rectangle' ||
+    elementType === 'circle' ||
+    elementType === 'image' ||
+    elementType === 'freehand'
+  ) {
     const minX = Math.min(x1, x2);
     const maxX = Math.max(x1, x2);
     const minY = Math.min(y1, y2);
@@ -177,3 +179,73 @@ export const adjustElementCoordinatesById = (
     types[elementId],
   );
 };
+
+/**
+ * Rescales a set of points along a specified dimension ('x' or 'y') to a new size.
+ *
+ * @param dim The dimension along which the points should be rescaled ('x' or 'y').
+ * @param newSize The new size to which the points should be scaled.
+ * @param points An array of Vector2 representing the points to be rescaled.
+ * @param translateInPlace Flag indicating whether to translate the points
+ * in place in order to normalize them within the new bounds.
+ * @returns An array of rescaled Vector2 points.
+ */
+const rescalePoints = (
+  dim: 'x' | 'y',
+  newSize: number,
+  points: Vector2[],
+  translateInPlace: boolean,
+): Vector2[] => {
+  const coords = points.map((point) => point[dim]);
+  const maxCoord = Math.max(...coords);
+  const minCoord = Math.min(...coords);
+  // Calculate the current size along the specified dimension
+  const size = maxCoord - minCoord;
+
+  // Calculate the scale factor for rescaling
+  // TODO: This forces same oriented, could consider allowing flips somehow
+  const scale = size === 0 ? 1 : Math.abs(newSize / size);
+
+  // Apply scaling
+  let newMinCoord = Infinity;
+  const scaledPoints = points.map((point): Vector2 => {
+    const newCoordinate = point[dim] * scale;
+    const newPoint = { ...point };
+    newPoint[dim] = newCoordinate;
+    newMinCoord = Math.min(newCoordinate, newMinCoord);
+    return newPoint as unknown as Vector2;
+  });
+
+  // Normalize, if specified:
+  if (!translateInPlace) {
+    return scaledPoints;
+  }
+  const translation = minCoord - newMinCoord;
+  return scaledPoints.map((scaledPoint) => ({
+    ...scaledPoint,
+    [dim]: scaledPoint[dim] + translation,
+  }));
+};
+
+/**
+ * Rescales a set of points to fit within the provided width and height.
+ *
+ * @param points An array of Vector2 representing the points to be rescaled.
+ * @param width The new width to which the points should be rescaled.
+ * @param height The new height to which the points should be rescaled.
+ * @param translateInPlace Flag indicating whether to translate the points
+ * in place in order to normalize them within the new bounds.
+ * @returns An array of rescaled points.
+ */
+export const rescalePointsInElem = (
+  points: Vector2[],
+  width: number,
+  height: number,
+  translateInPlace: boolean,
+) =>
+  rescalePoints(
+    'x',
+    width,
+    rescalePoints('y', height, points, translateInPlace),
+    translateInPlace,
+  );

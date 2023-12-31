@@ -2,6 +2,7 @@ import React, { MouseEvent, useEffect, useRef, FocusEvent } from 'react';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import {
   adjustElementCoordinatesById,
+  rescalePointsInElem,
   resizedCoordinates,
 } from '@/lib/canvasElements/resize';
 import {
@@ -18,7 +19,11 @@ import {
 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import { TEXT_FONT_FAMILY, TEXT_FONT_SIZE } from '@/constants';
+import {
+  PERIPHERAL_CODES,
+  TEXT_FONT_FAMILY,
+  TEXT_FONT_SIZE,
+} from '@/constants';
 import { getCanvasContext, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
@@ -69,10 +74,11 @@ export default function Canvas() {
     p2,
     types,
     allIds,
-    selectedElementId,
+    selectedElementIds,
     freehandPoints,
     pushCanvasHistory,
-    setSelectedElement,
+    setSelectedElements,
+    setSelectionFrame,
     setPendingImageElement,
     strokeColors,
     fillColors,
@@ -86,6 +92,7 @@ export default function Canvas() {
     pendingImageElementId,
     fileIds,
     angles,
+    isSelectionFrameSet,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -94,11 +101,12 @@ export default function Canvas() {
     'p2',
     'types',
     'allIds',
-    'setSelectedElement',
+    'setSelectedElements',
+    'setSelectionFrame',
     'freehandPoints',
-    'selectedElementId',
+    'selectedElementIds',
     'pushCanvasHistory',
-    'setSelectedElement',
+    'setSelectedElements',
     'setPendingImageElement',
     'strokeColors',
     'fillColors',
@@ -112,6 +120,7 @@ export default function Canvas() {
     'pendingImageElementId',
     'fileIds',
     'angles',
+    'isSelectionFrameSet',
   ]);
 
   const { setWebsocketAction, setRoomID } = useWebSocketStore([
@@ -143,11 +152,11 @@ export default function Canvas() {
       setTimeout(() => {
         if (textAreaRef.current === null) return;
         textAreaRef.current.focus();
-        selectedElementId !== '' &&
-          (textAreaRef.current.value = textStrings[selectedElementId]);
+        selectedElementIds.length === 1 &&
+          (textAreaRef.current.value = textStrings[selectedElementIds[0]]);
       }, 0);
     }
-  }, [action, selectedElementId, textStrings]);
+  }, [action, selectedElementIds, textStrings]);
 
   // True if a drawing tool is selected, false otherwise.
   const isDrawingSelected = isDrawingTool(tool);
@@ -200,8 +209,15 @@ export default function Canvas() {
       },
     );
     editCanvasElement(id, {
-      p1: { x: x1, y: y1 },
-      p2: { x: x2, y: y2 },
+      // If we're updating a curve, p1 and p2 are calculated internally. Otherwise,
+      // we set them explicitly when resizing -- and an affine transform is determined
+      // compared to the original curve's bounds.
+      ...(updatedElement.freehandPoints === undefined && {
+        p1: { x: x1, y: y1 },
+      }),
+      ...(updatedElement.freehandPoints === undefined && {
+        p2: { x: x2, y: y2 },
+      }),
       roughElement: updatedElement.roughElement,
       freehandPoints: updatedElement.freehandPoints,
       text: updatedElement.text,
@@ -212,7 +228,7 @@ export default function Canvas() {
    * Handles committing text updates once the textbox is unfocused.
    */
   const handleTextBlur = (e: FocusEvent<HTMLTextAreaElement>) => {
-    const elementId = selectedElementId || currentDrawingElemId.current;
+    const elementId = selectedElementIds[0] || currentDrawingElemId.current;
     const { x: x1, y: y1 } = p1[elementId];
     const elementType = types[elementId];
 
@@ -243,10 +259,13 @@ export default function Canvas() {
 
     // Cleanup
     setAction('none');
-    setSelectedElement('');
+    setSelectedElements([]);
   };
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
+    if (e.button === PERIPHERAL_CODES.RIGHT_MOUSE) {
+      return;
+    }
     // If we're writing, then we've clicked away after an edit
     // so we handle this with handle blur instead of creating a new element.
     if (action === 'writing') {
@@ -260,7 +279,7 @@ export default function Canvas() {
       panMouseStartPosition.current = { x: clientX, y: clientY };
       return;
     }
-    setSelectedElement('');
+    setSelectedElements([]);
     if (tool === 'select') {
       // Using selection tool. Check if cursor is near an element.
       // If so, select the element.
@@ -270,18 +289,31 @@ export default function Canvas() {
         types,
         p1,
         p2,
-        selectedElementId,
+        selectedElementId: selectedElementIds[0],
         angles,
       });
 
-      if (selectedElement === undefined) return;
+      if (selectedElement === undefined) {
+        // Did not click an element, set selection frame if it doesn't exist
+        setSelectionFrame({
+          p1: {
+            x: clientX,
+            y: clientY,
+          },
+          p2: {
+            x: clientX,
+            y: clientY,
+          },
+        });
+        return;
+      }
 
       // Save the selection offset, since we want to maintain it
       // as we translate the element.
       const selectOffsetX = clientX - p1[selectedElement.id].x;
       const selectOffsetY = clientY - p1[selectedElement.id].y;
       selectOffset.current = { x: selectOffsetX, y: selectOffsetY };
-      setSelectedElement(selectedElement.id);
+      setSelectedElements([selectedElement.id]);
 
       // If the cursor is inside the element's BB, we're translating.
       // We are resizing otherwise.
@@ -347,9 +379,16 @@ export default function Canvas() {
   };
 
   const handleMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
+    if (e.button === PERIPHERAL_CODES.RIGHT_MOUSE) {
+      return;
+    }
     const { clientX, clientY } = getMouseCoordinates(e);
+    // Destroy the selection frame
+    setSelectionFrame(null);
+
     // If we've mouse uped, and the position is close to the selection
     // position of a text eleement, then initiate an edit.
+<<<<<<< HEAD
     // if (
     //   types[selectedElementId] === 'text' &&
     //   clientX - (selectOffset.current?.x ?? 0) - p1[selectedElementId].x < 1 &&
@@ -359,12 +398,27 @@ export default function Canvas() {
     //   setAction('writing');
     //   return;
     // }
+=======
+    if (
+      selectedElementIds.length === 1 &&
+      types[selectedElementIds[0]] === 'text' &&
+      clientX - (selectOffset.current?.x ?? 0) - p1[selectedElementIds[0]].x <
+        1 &&
+      clientY - (selectOffset.current?.y ?? 0) - p1[selectedElementIds[0]].y < 1
+    ) {
+      // We've clicked a text element, without dragging. Initiate an edit
+      setAction('writing');
+      return;
+    }
+>>>>>>> 5b8026e91269df6c5a8a0228052673bbcb523d58
 
     // Reorder corners to align with the x1, y1 top left convention. This
     // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).
     if (action === 'drawing' || action === 'resizing') {
       const id =
-        action === 'drawing' ? currentDrawingElemId.current : selectedElementId;
+        action === 'drawing'
+          ? currentDrawingElemId.current
+          : selectedElementIds[0];
       const { x1, y1, x2, y2 } = adjustElementCoordinatesById(id, {
         p1,
         p2,
@@ -386,7 +440,11 @@ export default function Canvas() {
     action !== 'writing' && setAction('none');
   };
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
+    if (e.button === PERIPHERAL_CODES.RIGHT_MOUSE) {
+      return;
+    }
     const { clientX, clientY } = getMouseCoordinates(e);
 
     if (action === 'panning') {
@@ -399,10 +457,11 @@ export default function Canvas() {
       switch (action) {
         case 'moving': {
           // If moving, that means an element is selected. Translate it.
-          if (selectedElementId === '' || selectOffset.current === null) return;
-          const { x: x1, y: y1 } = p1[selectedElementId];
-          const { x: x2, y: y2 } = p2[selectedElementId];
-          const elementType = types[selectedElementId];
+          if (selectedElementIds.length === 0 || selectOffset.current === null)
+            return;
+          const { x: x1, y: y1 } = p1[selectedElementIds[0]];
+          const { x: x2, y: y2 } = p2[selectedElementIds[0]];
+          const elementType = types[selectedElementIds[0]];
 
           // Translate by moving relative to clientXY,
           // but accounting for the selection offset. Maintain
@@ -410,7 +469,7 @@ export default function Canvas() {
           const width = x2 - x1;
           const height = y2 - y1;
           updateElement(
-            selectedElementId,
+            selectedElementIds[0],
             clientX - selectOffset.current.x,
             clientY - selectOffset.current.y,
             clientX - selectOffset.current.x + width,
@@ -421,31 +480,31 @@ export default function Canvas() {
         }
         case 'rotating': {
           // If rotating, that means an element is selected.
-          if (selectedElementId === '') return;
+          if (selectedElementIds.length === 0) return;
 
-          const { x: x1, y: y1 } = p1[selectedElementId];
-          const { x: x2, y: y2 } = p2[selectedElementId];
+          const { x: x1, y: y1 } = p1[selectedElementIds[0]];
+          const { x: x2, y: y2 } = p2[selectedElementIds[0]];
 
           const cx = (x1 + x2) / 2;
           const cy = (y1 + y2) / 2;
           const angle =
             (5 * Math.PI) / 2 + Math.atan2(clientY - cy, clientX - cx);
           const normalizedAngle = normalizeAngle(angle);
-          editCanvasElement(selectedElementId, { angle: normalizedAngle });
+          editCanvasElement(selectedElementIds[0], { angle: normalizedAngle });
 
           break;
         }
         case 'resizing': {
           // If resizing, that means an element is selected.
           if (
-            selectedElementId === '' ||
+            selectedElementIds.length === 0 ||
             selectedHandlePositionRef.current === null
           )
             return;
-          const { x: x1, y: y1 } = p1[selectedElementId];
-          const { x: x2, y: y2 } = p2[selectedElementId];
-          const elementType = types[selectedElementId];
-          const angle = angles[selectedElementId] ?? 0;
+          const { x: x1, y: y1 } = p1[selectedElementIds[0]];
+          const { x: x2, y: y2 } = p2[selectedElementIds[0]];
+          const elementType = types[selectedElementIds[0]];
+          const angle = angles[selectedElementIds[0]] ?? 0;
 
           // Commit the adjusted coordinates.
           const {
@@ -465,44 +524,65 @@ export default function Canvas() {
               y2,
             },
           );
-          updateElement(selectedElementId, x1r, y1r, x2r, y2r, elementType);
+
+          // If the element is freehand, rescale the points.
+          let points = freehandPoints[selectedElementIds[0]];
+          if (points !== undefined) {
+            const [width, height] = [x2r - x1r, y2r - y1r];
+            points = rescalePointsInElem(points, width, height, false);
+            editCanvasElement(selectedElementIds[0], {
+              freehandPoints: points,
+            });
+          }
+
+          updateElement(selectedElementIds[0], x1r, y1r, x2r, y2r, elementType);
           break;
         }
         default: {
-          // Otherwise, we're in the none state and just hovering the mouse.
-          // Check if we hover a handle/element
-          const hoveredElement = getElementAtPosition(clientX, clientY, {
-            allIds,
-            types,
-            p1,
-            p2,
-            selectedElementId,
-            angles,
-          });
-
-          // Save the last handle position since we need it to know how to change
-          // the coordinates when resizing.
-          if (
-            hoveredElement?.position &&
-            hoveredElement?.position !== 'inside' &&
-            hoveredElement?.position !== 'rotation'
-          ) {
-            selectedHandlePositionRef.current = hoveredElement?.position;
+          // Otherwise, we're in the none state, either hovering the mouse or creating a selection frame.
+          if (isSelectionFrameSet) {
+            // Update the frame
+            setSelectionFrame({
+              p2: {
+                x: clientX,
+                y: clientY,
+              },
+            });
           } else {
-            selectedHandlePositionRef.current = null;
-          }
+            // Check if we hover a handle/element
+            const hoveredElement = getElementAtPosition(clientX, clientY, {
+              allIds,
+              types,
+              p1,
+              p2,
+              selectedElementId: selectedElementIds[0],
+              angles,
+            });
 
-          // Change the cursor accordingly to denote a possible action.
-          (e.target as HTMLElement).style.cursor = hoveredElement?.position
-            ? cursorForPosition(
-                hoveredElement.position,
-                angles[hoveredElement.id],
-                p1[hoveredElement.id],
-                p2[hoveredElement.id],
-                types[hoveredElement.id],
-              )
-            : 'default';
-          break;
+            // Save the last handle position since we need it to know how to change
+            // the coordinates when resizing.
+            if (
+              hoveredElement?.position &&
+              hoveredElement?.position !== 'inside' &&
+              hoveredElement?.position !== 'rotation'
+            ) {
+              selectedHandlePositionRef.current = hoveredElement?.position;
+            } else {
+              selectedHandlePositionRef.current = null;
+            }
+
+            // Change the cursor accordingly to denote a possible action.
+            (e.target as HTMLElement).style.cursor = hoveredElement?.position
+              ? cursorForPosition(
+                  hoveredElement.position,
+                  angles[hoveredElement.id],
+                  p1[hoveredElement.id],
+                  p2[hoveredElement.id],
+                  types[hoveredElement.id],
+                )
+              : 'default';
+            break;
+          }
         }
       }
     } else if (isDrawingSelected) {
@@ -542,14 +622,14 @@ export default function Canvas() {
             position: 'fixed',
             // TODO: using 3 here is not ideal
             top:
-              ((p1[selectedElementId]?.y ??
+              ((p1[selectedElementIds[0]]?.y ??
                 p1[currentDrawingElemId.current]?.y) -
                 3 +
                 panOffset.y) *
                 zoom -
               scaleOffset.y,
             left:
-              ((p1[selectedElementId]?.x ??
+              ((p1[selectedElementIds[0]]?.x ??
                 p1[currentDrawingElemId.current]?.x) +
                 panOffset.x) *
                 zoom -
