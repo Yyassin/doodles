@@ -266,6 +266,7 @@ export default function Canvas() {
     if (e.button === PERIPHERAL_CODES.RIGHT_MOUSE) {
       return;
     }
+
     // If we're writing, then we've clicked away after an edit
     // so we handle this with handle blur instead of creating a new element.
     if (action === 'writing') {
@@ -279,6 +280,8 @@ export default function Canvas() {
       panMouseStartPosition.current = { x: clientX, y: clientY };
       return;
     }
+
+    const prevSelectionId = selectedElementIds[0];
     setSelectedElements([]);
     if (tool === 'select') {
       // Using selection tool. Check if cursor is near an element.
@@ -314,6 +317,17 @@ export default function Canvas() {
       const selectOffsetY = clientY - p1[selectedElement.id].y;
       selectOffset.current = { x: selectOffsetX, y: selectOffsetY };
       setSelectedElements([selectedElement.id]);
+
+      // If we've mouse down on previously selected text element, then initiate an edit.
+      if (
+        types[selectedElement.id] === 'text' &&
+        selectedElement.id === prevSelectionId &&
+        selectedElement?.position === 'inside'
+      ) {
+        // We've clicked a text element, without dragging. Initiate an edit
+        setAction('writing');
+        return;
+      }
 
       // If the cursor is inside the element's BB, we're translating.
       // We are resizing otherwise.
@@ -382,35 +396,8 @@ export default function Canvas() {
     if (e.button === PERIPHERAL_CODES.RIGHT_MOUSE) {
       return;
     }
-    const { clientX, clientY } = getMouseCoordinates(e);
     // Destroy the selection frame
     setSelectionFrame(null);
-
-    // If we've mouse uped, and the position is close to the selection
-    // position of a text eleement, then initiate an edit.
-<<<<<<< HEAD
-    // if (
-    //   types[selectedElementId] === 'text' &&
-    //   clientX - (selectOffset.current?.x ?? 0) - p1[selectedElementId].x < 1 &&
-    //   clientY - (selectOffset.current?.y ?? 0) - p1[selectedElementId].y < 1
-    // ) {
-    //   // We've clicked a text element, without dragging. Initiate an edit
-    //   setAction('writing');
-    //   return;
-    // }
-=======
-    if (
-      selectedElementIds.length === 1 &&
-      types[selectedElementIds[0]] === 'text' &&
-      clientX - (selectOffset.current?.x ?? 0) - p1[selectedElementIds[0]].x <
-        1 &&
-      clientY - (selectOffset.current?.y ?? 0) - p1[selectedElementIds[0]].y < 1
-    ) {
-      // We've clicked a text element, without dragging. Initiate an edit
-      setAction('writing');
-      return;
-    }
->>>>>>> 5b8026e91269df6c5a8a0228052673bbcb523d58
 
     // Reorder corners to align with the x1, y1 top left convention. This
     // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).

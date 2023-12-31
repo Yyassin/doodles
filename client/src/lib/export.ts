@@ -47,6 +47,7 @@ export const renderElementsOnOffscreenCanvas = (
     p2: Record<string, CanvasElement['p2']>;
     angles: Record<string, CanvasElement['angle']>;
     types: Record<string, CanvasElement['type']>;
+    fillColors: Record<string, CanvasElement['fillColor']>;
     freehandPoints: Record<string, CanvasElement['freehandPoints']>;
     freehandBounds: Record<string, [Vector2, Vector2]>;
     textStrings: Record<string, CanvasElement['text']>;
@@ -69,6 +70,7 @@ export const renderElementsOnOffscreenCanvas = (
     p2,
     angles,
     types,
+    fillColors,
     freehandPoints,
     freehandBounds,
     textStrings,
@@ -115,6 +117,7 @@ export const renderElementsOnOffscreenCanvas = (
       p2,
       angles,
       types,
+      fillColors,
       freehandPoints,
       freehandBounds,
       textStrings,

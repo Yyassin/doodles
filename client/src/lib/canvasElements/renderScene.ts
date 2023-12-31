@@ -30,6 +30,7 @@ export const renderCanvasElements = (
     p2: Record<string, CanvasElement['p2']>;
     angles: Record<string, CanvasElement['angle']>;
     types: Record<string, CanvasElement['type']>;
+    fillColors: Record<string, CanvasElement['fillColor']>;
     freehandPoints: Record<string, CanvasElement['freehandPoints']>;
     freehandBounds: Record<string, [Vector2, Vector2]>;
     textStrings: Record<string, CanvasElement['text']>;
@@ -46,6 +47,7 @@ export const renderCanvasElements = (
     p2,
     angles,
     types,
+    fillColors,
     freehandPoints,
     freehandBounds,
     textStrings,
@@ -98,6 +100,8 @@ export const renderCanvasElements = (
       if (renderTextPredicate(id)) {
         ctx.textBaseline = 'top';
         ctx.font = '24px sans-serif';
+        const fillColor = fillColors[id] ?? '#000000';
+        ctx.fillStyle = fillColor;
         ctx.fillText(textStrings[id], x1, y1);
       }
     } else if (type === 'image') {
