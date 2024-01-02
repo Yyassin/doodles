@@ -75,6 +75,7 @@ export const renderCanvasElements = (
     ctx.rotate(angle);
     // Revert since it isn't accounted for in the actual drawing.
     ctx.translate(-cx, -cy);
+    //ctx.globalAlpha = 0.5;
 
     const type = types[id];
     if (type === 'freehand') {
@@ -90,6 +91,7 @@ export const renderCanvasElements = (
         );
         const [tx, ty] = [x1a - minX, y1a - minY];
         ctx.translate(tx, ty);
+        //ctx.fillStyle = fillColors;
 
         drawStroke(ctx, getStroke(points.slice(0, -2), { size: 5 }));
       }

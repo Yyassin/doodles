@@ -62,6 +62,8 @@ const useDrawElements = () => {
 
     // Clear on each rerender
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // ctx.fillStyle = 'blue';
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Retrieve the scaling offset to apply for centered zoom
     // (TODO: We can change this to zoom towards mouse position)
