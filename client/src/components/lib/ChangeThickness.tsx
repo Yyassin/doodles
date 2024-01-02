@@ -8,8 +8,8 @@ export type strokeType = (typeof strokeTypes)[number];
 
 const strokeMap: Record<string, string> = {
   thin: 'border-t border-gray-700',
-  bold: 'border-t-2 border-gray-700',
-  extraBold: 'border-t-4 border-gray-700',
+  bold: 'border-t-4 border-gray-700',
+  extraBold: 'border-t-8 border-gray-700',
 };
 
 const mapStroke = {
@@ -37,6 +37,7 @@ const StrokeToolGroup = ({ tools }: { tools: strokeType[] }) => {
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
             customizabilityDict={{ strokeWidth: mapStroke[toolName] }}
+            label={toolName}
             active={strokeWidths[selectedElementIds[0]] === mapStroke[toolName]}
           >
             <div className={'w-5 h-5 square-full ' + strokeMap[toolName]}></div>

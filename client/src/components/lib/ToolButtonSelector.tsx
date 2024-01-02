@@ -6,7 +6,6 @@ import {
   useCanvasElementStore,
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
-import { generateRandId } from '@/lib/bytes';
 
 /**
  * Defines a button for a toolbar tool. Contains
@@ -19,10 +18,12 @@ import { generateRandId } from '@/lib/bytes';
  */
 const ToolButton = ({
   customizabilityDict,
+  label,
   active,
   children,
 }: {
   customizabilityDict: Partial<CanvasElement>;
+  label: string;
   active: boolean;
   children?: React.ReactNode;
 }) => {
@@ -71,30 +72,28 @@ const ToolButton = ({
       types[selectedElementId],
       undefined,
       {
-        stroke: customizabilityDict.strokeColor
-          ? customizabilityDict.strokeColor
-          : strokeColors[selectedElementId],
-        fill: customizabilityDict.fillColor
-          ? customizabilityDict.fillColor
-          : fillColors[selectedElementId],
-        bowing: customizabilityDict.bowing
-          ? customizabilityDict.bowing
-          : bowings[selectedElementId],
-        roughness: customizabilityDict.roughness
-          ? customizabilityDict.roughness
-          : roughnesses[selectedElementId],
-        strokeWidth: customizabilityDict.strokeWidth
-          ? customizabilityDict.strokeWidth
-          : strokeWidths[selectedElementId],
-        fillStyle: customizabilityDict.fillStyle
-          ? customizabilityDict.fillStyle
-          : fillStyles[selectedElementId],
-        strokeLineDash: customizabilityDict.strokeLineDash
-          ? customizabilityDict.strokeLineDash
-          : strokeLineDashes[selectedElementId],
-        opacity: customizabilityDict.opacity
-          ? customizabilityDict.opacity
-          : opacities[selectedElementId],
+        stroke:
+          customizabilityDict.strokeColor ?? strokeColors[selectedElementId],
+
+        fill: customizabilityDict.fillColor ?? fillColors[selectedElementId],
+
+        bowing: customizabilityDict.bowing ?? bowings[selectedElementId],
+
+        roughness:
+          customizabilityDict.roughness ?? roughnesses[selectedElementId],
+
+        strokeWidth:
+          customizabilityDict.strokeWidth ?? strokeWidths[selectedElementId],
+
+        fillStyle:
+          customizabilityDict.fillStyle ?? fillStyles[selectedElementId],
+
+        strokeLineDash:
+          customizabilityDict.strokeLineDash ??
+          strokeLineDashes[selectedElementId],
+
+        opacity: customizabilityDict.opacity ?? opacities[selectedElementId],
+
         text: textStrings[selectedElementId],
       },
     ).roughElement;
@@ -105,11 +104,7 @@ const ToolButton = ({
   };
 
   return (
-    <IconButton
-      label={capitalize(generateRandId())}
-      active={active}
-      onClick={onClick}
-    >
+    <IconButton label={capitalize(label)} active={active} onClick={onClick}>
       {children}
     </IconButton>
   );

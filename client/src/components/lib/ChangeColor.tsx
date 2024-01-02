@@ -47,6 +47,7 @@ const ToolGroup = ({ tools }: { tools: colourType[] }) => {
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
             customizabilityDict={{ fillColor: mapColour[toolName] }}
+            label={toolName}
             active={fillColors[selectedElementIds[0]] === mapColour[toolName]}
           >
             <div className={'w-5 h-5 rounded-full ' + colorMap[toolName]}></div>

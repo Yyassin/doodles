@@ -47,6 +47,7 @@ const StokeColorToolGroup = ({ tools }: { tools: strokeColourType[] }) => {
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
             customizabilityDict={{ strokeColor: mapStrokeColour[toolName] }}
+            label={toolName}
             active={
               strokeColors[selectedElementIds[0]] === mapStrokeColour[toolName]
             }
