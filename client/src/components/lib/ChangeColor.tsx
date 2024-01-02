@@ -40,7 +40,7 @@ const ToolGroup = ({ tools }: { tools: colourType[] }) => {
     'fillColors',
     'selectedElementIds',
   ]);
-
+  console.log(fillColors[selectedElementIds[0]]);
   return (
     <div className="flex">
       {tools.map((toolName) => (

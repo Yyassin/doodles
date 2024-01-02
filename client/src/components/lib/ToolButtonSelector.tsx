@@ -63,7 +63,7 @@ const ToolButton = ({
   const onClick = () => {
     // If the user was able to see the panel, only one element is selected.
     const selectedElementId = selectedElementIds[0];
-    const roughElement = createElement(
+    const { roughElement, fillColor } = createElement(
       selectedElementId,
       p1[selectedElementId].x,
       p1[selectedElementId].y,
@@ -84,7 +84,6 @@ const ToolButton = ({
 
         strokeWidth:
           customizabilityDict.strokeWidth ?? strokeWidths[selectedElementId],
-
         fillStyle:
           customizabilityDict.fillStyle ?? fillStyles[selectedElementId],
 
@@ -96,9 +95,11 @@ const ToolButton = ({
 
         text: textStrings[selectedElementId],
       },
-    ).roughElement;
+    );
     editCanvasElement(selectedElementId, {
       roughElement,
+      //set explicity becaue its changed in the function createElement
+      fillColor,
       ...customizabilityDict,
     });
   };

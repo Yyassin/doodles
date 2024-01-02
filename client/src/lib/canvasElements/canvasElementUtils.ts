@@ -3,11 +3,11 @@ import { generator } from './generator';
 import { CanvasElementType, Vector2 } from '@/types';
 
 const stroke = '#000000';
-const fill = '#000000';
+const fill = undefined as string | undefined;
 const bowing = 0;
 const roughness = 0;
 const strokeWidth = 3;
-const fillStyle = 'hachure';
+const fillStyle = 'none';
 const strokeLineDash = [0];
 const opacity = 1;
 
@@ -37,6 +37,12 @@ const createElement = (
 ): CanvasElement => {
   let roughElement;
   let newPoints;
+  if (options.fillStyle === 'none') {
+    options.fill = undefined;
+  } else if (options.fill === undefined) {
+    options.fill = '#000000';
+  }
+
   if (points === undefined) {
     switch (type) {
       case 'line':

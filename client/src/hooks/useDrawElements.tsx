@@ -37,6 +37,7 @@ const useDrawElements = () => {
     angles,
     selectionFrame,
     roughElements,
+    fillColors,
   } = useCanvasElementStore([
     'roughElements',
     'selectedElementIds',
@@ -51,6 +52,7 @@ const useDrawElements = () => {
     'isImagePlaceds',
     'angles',
     'selectionFrame',
+    'fillColors',
   ]);
 
   // Effect fires after DOM is mounted
@@ -103,7 +105,7 @@ const useDrawElements = () => {
         renderTransformFrame(ctx, { p1, p2, angles, types }, id);
       });
     }
-
+    console.log(fillColors);
     // Draw the selection frame, if any
     selectionFrame && renderSelectionFrame(selectionFrame, zoom, ctx);
 

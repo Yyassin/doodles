@@ -4,6 +4,8 @@ import ToolGroup, { colourType } from './ChangeColor';
 import StrokeToolGroup, { strokeType } from './ChangeThickness';
 import StrokeColorToolGroup, { strokeColourType } from './ChangeStrokeColor';
 import RoughnessToolGroup, { roughnessType } from './ChangeRoughness';
+import { CanvasElementFillStyles } from '@/types';
+import FillStyleToolGroup from './ChangeFillStyle';
 
 /**
  * The toolbar that is displayed on the canvas.
@@ -49,6 +51,10 @@ const CustomToolbar = () => {
       <RoughnessToolGroup
         tools={['smooth', 'rough', 'extraRough'] as roughnessType[]}
       />
+      {/* Fill Style */}
+      <h2 className="text-sm font-semibold mb-2">Fill Style</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <FillStyleToolGroup tools={[...CanvasElementFillStyles]} />
     </Toolbar.Root>
   );
 };
