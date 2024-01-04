@@ -79,6 +79,7 @@ export default function Canvas() {
     strokeColors,
     fillColors,
     textFontOptions,
+    textSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -108,6 +109,7 @@ export default function Canvas() {
     'strokeColors',
     'fillColors',
     'textFontOptions',
+    'textSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -198,6 +200,7 @@ export default function Canvas() {
         stroke: strokeColors[id],
         fill: fillColors[id],
         font: textFontOptions[id],
+        size: textSizes[id],
         bowing: bowings[id],
         roughness: roughnesses[id],
         strokeWidth: strokeWidths[id],
@@ -239,11 +242,13 @@ export default function Canvas() {
     // calculates the correct width.
     ctx.save();
     ctx.textBaseline = 'top';
-    ctx.font = `24px ${textFontOptions[selectedElementIds[0]]}`;
+    ctx.font = ` ${textSizes[currentDrawingElemId.current]}px ${
+      textFontOptions[currentDrawingElemId.current[0]]
+    }`;
     const textWidth = ctx.measureText(text).width;
     ctx.restore();
 
-    const textHeight = 24;
+    const textHeight = textSizes[currentDrawingElemId.current];
     updateElement(
       elementId,
       x1,
@@ -620,9 +625,13 @@ export default function Canvas() {
                 panOffset.x) *
                 zoom -
               scaleOffset.x,
-            font: textFontOptions[
-              selectedElementIds[0] ?? currentDrawingElemId.current
-            ],
+            font: `${
+              textSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
+            }px ${
+              textFontOptions[
+                selectedElementIds[0] ?? currentDrawingElemId.current
+              ]
+            }`,
             color:
               fillColors[selectedElementIds[0] ?? currentDrawingElemId.current],
             margin: 0,

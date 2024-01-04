@@ -3,11 +3,9 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ToolButton from './ToolButtonSelector';
 
 /**
- * This file defines the ChangeColor component, which allows the user to select
- * a color for the canvas elements. The available colors are defined in the
- * `colourTypes` array, and the `colorMap` object maps these types to their
- * corresponding CSS classes.
- * @author Eebro
+ * This file defines the ChangeSize component, which allows the user to change
+ * the size of a text element.
+ * @author Dana
  */
 
 /** Customizability Toolbar */
@@ -29,11 +27,11 @@ const colorMap: Record<string, string> = {
 };
 
 const mapColour = {
-  redCircle: '10',
-  greenCircle: '14',
-  blueCircle: '24',
-  orangeCircle: '30',
-  blackCircle: '40',
+  redCircle: 10,
+  greenCircle: 14,
+  blueCircle: 24,
+  orangeCircle: 30,
+  blackCircle: 40,
 };
 
 /**
