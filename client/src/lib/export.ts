@@ -117,6 +117,9 @@ export const renderElementsOnOffscreenCanvas = (
 
   ctx.save();
   options?.fillColour && (ctx.fillStyle = options.fillColour);
+  options?.textFontOption &&
+    options?.textSize &&
+    (ctx.font = options.textSize + options.textFontOption);
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
 

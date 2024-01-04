@@ -114,7 +114,9 @@ export const renderCanvasElements = (
       // Skip anything being edited
       if (renderTextPredicate(id)) {
         ctx.textBaseline = 'top';
-        ctx.font = `${textSizes[id]}px ${textFontOptions[id]}`;
+        ctx.font = `${textSizes[id] ?? 30}px ${
+          textFontOptions[id] ?? 'trebuchet MS'
+        }`;
         const fillColor = fillColors[id] ?? '#000000';
         ctx.fillStyle = fillColor;
         ctx.fillText(textStrings[id], x1, y1);
