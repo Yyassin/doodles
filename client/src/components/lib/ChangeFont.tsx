@@ -11,7 +11,6 @@ import ToolButton from './ToolButtonSelector';
 /** Lists all the avaialble fonts. */
 export const fontTypes = [
   'trebuchetMS',
-  'timesNewRoman',
   'garamond',
   'courierNew',
   'brushScriptMT',
@@ -22,7 +21,6 @@ export type fontType = (typeof fontTypes)[number];
 //Defines fonts as CSS properties for Toolbar Icons
 const fontStyles: Record<fontType, React.CSSProperties> = {
   trebuchetMS: { fontFamily: 'Trebuchet MS' },
-  timesNewRoman: { fontFamily: 'Times New Roman' },
   garamond: { fontFamily: 'Garamond' },
   courierNew: { fontFamily: 'Courier New' },
   brushScriptMT: { fontFamily: 'Brush Script MT, cursive' },
@@ -32,7 +30,6 @@ const fontStyles: Record<fontType, React.CSSProperties> = {
 //Maps each font to its name
 const mapColour = {
   trebuchetMS: '30px trebuchet MS',
-  timesNewRoman: '30px times New Roman',
   garamond: '30px garamond',
   courierNew: '30px courier New',
   brushScriptMT: '30px brush Script MT, cursive',
@@ -64,13 +61,20 @@ const FontFamily = ({ tools }: { tools: fontType[] }) => {
             }
           >
             <div
-              className={'w-5 h-5 rounded-full ' + fontStyles[toolName]}
-            ></div>
-            <span style={fontStyles[toolName]}>A</span>
+              className="rounded-full"
+              style={{
+                width: '30px', // Set a fixed width as per your design
+                height: '30px', // Set a fixed height as per your design
+                ...fontStyles[toolName], // Apply font style
+              }}
+            >
+              A
+            </div>
           </ToolButton>
         </div>
       ))}
     </div>
   );
 };
+
 export default FontFamily;
