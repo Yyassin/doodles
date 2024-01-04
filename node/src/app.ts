@@ -12,11 +12,15 @@ import commentRoutes from './api/comment/comment.route';
 import boardRoutes from './api/board/board.route';
 import authRoutes from './api/auth/auth.route';
 import WebSocketManager from './lib/websocket/WebSocketManager';
+import { Logger } from './utils/Logger';
+import { LOG_LEVEL } from './constants';
 
 FastFire.initialize(firestore as Firestore);
 
 const app = express();
 const port = 3005;
+const mainLogger = new Logger('MainModule', LOG_LEVEL);
+
 export const server = http.createServer(app);
 app.use(express.json()); // parse application/json
 app.use(bodyParser.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded
@@ -33,7 +37,7 @@ app.use('/board', boardRoutes);
 app.use('/auth', authRoutes);
 
 server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  mainLogger.info(`Example app listening on port ${port}`);
 });
 
 WebSocketManager.Instance.init(server);
