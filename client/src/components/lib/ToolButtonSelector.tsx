@@ -41,6 +41,7 @@ const ToolButton = ({
     selectedElementIds,
     fillColors,
     textFontOptions,
+    textSizes,
     types,
     strokeColors,
     bowings,
@@ -57,6 +58,7 @@ const ToolButton = ({
     'selectedElementIds',
     'fillColors',
     'textFontOptions',
+    'textSizes',
     'types',
     'strokeColors',
     'bowings',
@@ -90,6 +92,7 @@ const ToolButton = ({
         font:
           customizabilityDict.textFontOption ??
           textFontOptions[selectedElementId],
+        size: customizabilityDict.textSize ?? textSizes[selectedElementId],
 
         bowing: customizabilityDict.bowing ?? bowings[selectedElementId],
 

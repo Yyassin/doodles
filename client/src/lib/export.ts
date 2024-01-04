@@ -49,6 +49,7 @@ export const renderElementsOnOffscreenCanvas = (
     types: Record<string, CanvasElement['type']>;
     fillColors: Record<string, CanvasElement['fillColor']>;
     textFontOptions: Record<string, CanvasElement['textFontOption']>;
+    textSizes: Record<string, CanvasElement['textSize']>;
     freehandPoints: Record<string, CanvasElement['freehandPoints']>;
     freehandBounds: Record<string, [Vector2, Vector2]>;
     textStrings: Record<string, CanvasElement['text']>;
@@ -63,6 +64,7 @@ export const renderElementsOnOffscreenCanvas = (
     margin: number;
     fillColour: string;
     textFontOption: string;
+    textSize: number;
     renderTextPredicate?: (id: string) => boolean;
   },
 ) => {
@@ -77,6 +79,7 @@ export const renderElementsOnOffscreenCanvas = (
     types,
     fillColors,
     textFontOptions,
+    textSizes,
     freehandPoints,
     freehandBounds,
     textStrings,
@@ -128,6 +131,7 @@ export const renderElementsOnOffscreenCanvas = (
       types,
       fillColors,
       textFontOptions,
+      textSizes,
       freehandPoints,
       freehandBounds,
       textStrings,

@@ -8,6 +8,7 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import saveAs from 'file-saver';
+import { stat } from 'fs';
 
 /**
  * Component that the save and load button with their functionality in the drop down menu in the canavas
@@ -24,6 +25,8 @@ export const SaveOpenDropDownMenu = () => {
     types,
     strokeColors,
     fillColors,
+    textFontOptions,
+    textSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -39,6 +42,8 @@ export const SaveOpenDropDownMenu = () => {
     'types',
     'strokeColors',
     'fillColors',
+    'textFontOptions',
+    'textSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -79,6 +84,8 @@ export const SaveOpenDropDownMenu = () => {
         const options = {
           stroke: state.strokeColors[key],
           fill: state.fillColors[key],
+          font: state.textFontOptions[key],
+          size: state.textSizes[key],
           bowing: state.bowings[key],
           roughness: state.roughnesses[key],
           strokeWidth: state.strokeWidths[key],
@@ -113,6 +120,8 @@ export const SaveOpenDropDownMenu = () => {
       types,
       strokeColors,
       fillColors,
+      textFontOptions,
+      textSizes,
       bowings,
       roughnesses,
       strokeWidths,
