@@ -31,6 +31,7 @@ export const renderCanvasElements = (
     angles: Record<string, CanvasElement['angle']>;
     types: Record<string, CanvasElement['type']>;
     fillColors: Record<string, CanvasElement['fillColor']>;
+    textFontOptions: Record<string, CanvasElement['textFontOption']>;
     freehandPoints: Record<string, CanvasElement['freehandPoints']>;
     freehandBounds: Record<string, [Vector2, Vector2]>;
     textStrings: Record<string, CanvasElement['text']>;
@@ -48,6 +49,7 @@ export const renderCanvasElements = (
     angles,
     types,
     fillColors,
+    textFontOptions,
     freehandPoints,
     freehandBounds,
     textStrings,
@@ -99,7 +101,7 @@ export const renderCanvasElements = (
       // Skip anything being edited
       if (renderTextPredicate(id)) {
         ctx.textBaseline = 'top';
-        ctx.font = '24px sans-serif';
+        ctx.font = textFontOptions[id] ?? '24px sans-serif';
         const fillColor = fillColors[id] ?? '#000000';
         ctx.fillStyle = fillColor;
         ctx.fillText(textStrings[id], x1, y1);

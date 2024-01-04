@@ -82,6 +82,7 @@ export default function Canvas() {
     setPendingImageElement,
     strokeColors,
     fillColors,
+    textFontOptions,
     bowings,
     roughnesses,
     strokeWidths,
@@ -110,6 +111,7 @@ export default function Canvas() {
     'setPendingImageElement',
     'strokeColors',
     'fillColors',
+    'textFontOptions',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -199,6 +201,7 @@ export default function Canvas() {
       {
         stroke: strokeColors[id],
         fill: fillColors[id],
+        font: textFontOptions[id],
         bowing: bowings[id],
         roughness: roughnesses[id],
         strokeWidth: strokeWidths[id],
@@ -621,7 +624,9 @@ export default function Canvas() {
                 panOffset.x) *
                 zoom -
               scaleOffset.x,
-            font: `${TEXT_FONT_SIZE * zoom}px ${TEXT_FONT_FAMILY}`,
+            font: textFontOptions[
+              selectedElementIds[0] ?? currentDrawingElemId.current
+            ],
             color:
               fillColors[selectedElementIds[0] ?? currentDrawingElemId.current],
             margin: 0,

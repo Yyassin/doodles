@@ -10,9 +10,11 @@ const strokeWidth = 3;
 const fillStyle = 'hachure';
 const strokeLineDash = [0];
 const opacity = 1;
+const font = '24px sans-serif';
 
 export const defaultOptions = {
   stroke,
+  font,
   fill,
   bowing,
   roughness,
@@ -66,6 +68,7 @@ const createElement = (
     type,
     strokeColor: options.stroke,
     fillColor: options.fill,
+    textFontOption: options.font,
     bowing,
     roughness,
     strokeWidth,

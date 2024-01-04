@@ -25,6 +25,7 @@ export const useSocket = () => {
     types,
     strokeColors,
     fillColors,
+    textFontOptions,
     bowings,
     roughnesses,
     strokeWidths,
@@ -41,6 +42,7 @@ export const useSocket = () => {
     'types',
     'strokeColors',
     'fillColors',
+    'textFontOptions',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -69,6 +71,7 @@ export const useSocket = () => {
         {
           stroke: element.strokeColor,
           fill: element.fillColor,
+          font: element.textFontOption,
           bowing: element.bowing,
           roughness: element.roughness,
           strokeWidth: element.strokeWidth,
@@ -92,6 +95,7 @@ export const useSocket = () => {
         {
           stroke: element.strokeColor,
           fill: element.fillColor,
+          font: element.textFontOption,
           bowing: element.bowing,
           roughness: element.roughness,
           strokeWidth: element.strokeWidth,
@@ -143,6 +147,7 @@ export const useSocket = () => {
       {
         stroke: strokeColors[actionElementID],
         fill: fillColors[actionElementID],
+        font: textFontOptions[actionElementID],
         bowing: bowings[actionElementID],
         roughness: roughnesses[actionElementID],
         strokeWidth: strokeWidths[actionElementID],

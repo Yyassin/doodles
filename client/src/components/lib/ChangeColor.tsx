@@ -23,7 +23,7 @@ const colorMap: Record<string, string> = {
 };
 
 const mapColour = {
-  redCircle: '#FF0000',
+  redCircle: 'Times New Roman',
   greenCircle: '#008000',
   blueCircle: '#0000FF',
   orangeCircle: '#FFA500',
@@ -53,6 +53,7 @@ const ToolButton = ({
     selectedElementIds,
     types,
     strokeColors,
+    textFontOptions,
     bowings,
     roughnesses,
     strokeWidths,
@@ -66,6 +67,7 @@ const ToolButton = ({
     'editCanvasElement',
     'selectedElementIds',
     'fillColors',
+    'textFontOptions',
     'types',
     'strokeColors',
     'bowings',
@@ -94,6 +96,7 @@ const ToolButton = ({
       {
         stroke: strokeColors[selectedElementId],
         fill: mapColour[tool],
+        font: textFontOptions[selectedElementId],
         bowing: bowings[selectedElementId],
         roughness: roughnesses[selectedElementId],
         strokeWidth: strokeWidths[selectedElementId],
