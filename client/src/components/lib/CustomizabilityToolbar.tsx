@@ -21,7 +21,7 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
  */
 
 //Sets of element types each component should be available for
-const fontSet = new Set(['text']);
+const fontSizeSet = new Set(['text']);
 const opacitySet = new Set([
   'text',
   'freehand',
@@ -55,7 +55,7 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Text Font */}
-      {fontSet.has(types[selectedElementIds[0]]) && (
+      {fontSizeSet.has(types[selectedElementIds[0]]) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Font</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
@@ -63,7 +63,7 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Text Size */}
-      {fontSet.has(types[selectedElementIds[0]]) && (
+      {fontSizeSet.has(types[selectedElementIds[0]]) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Size</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />

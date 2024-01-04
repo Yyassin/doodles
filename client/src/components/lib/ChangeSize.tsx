@@ -10,7 +10,7 @@ import ToolButton from './ToolButtonSelector';
 export const sizes = ['14', '24', '30', '40', '60'] as const;
 export type size = (typeof sizes)[number];
 
-const mapColour = {
+const mapsize = {
   14: 14,
   24: 24,
   30: 30,
@@ -20,9 +20,9 @@ const mapColour = {
 
 /**
  * Creates a row group of buttons corresponding
- * to the provided list of tools.
- * @param tools The list of tools
- * @param selectedTool The currently selected tool, used
+ * to the provided list of text sizes.
+ * @param tools The list of sizes
+ * @param selectedTool The currently selected size, used
  * to highlight the selected tool.
  */
 const SizeOptions = ({ tools }: { tools: size[] }) => {
@@ -35,12 +35,12 @@ const SizeOptions = ({ tools }: { tools: size[] }) => {
       {tools.map((toolName) => (
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
-            customizabilityDict={{ textSize: mapColour[toolName] }}
+            customizabilityDict={{ textSize: mapsize[toolName] }}
             label={toolName}
-            active={textSizes[selectedElementIds[0]] === mapColour[toolName]}
+            active={textSizes[selectedElementIds[0]] === mapsize[toolName]}
           >
-            <div className={'w-5 h-5 rounded-full ' + mapColour[toolName]}>
-              {mapColour[toolName]}
+            <div className={'w-5 h-5 rounded-full ' + mapsize[toolName]}>
+              {mapsize[toolName]}
             </div>
           </ToolButton>
         </div>
