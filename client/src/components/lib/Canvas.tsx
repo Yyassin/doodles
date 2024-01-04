@@ -19,11 +19,7 @@ import {
 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import {
-  PERIPHERAL_CODES,
-  TEXT_FONT_FAMILY,
-  TEXT_FONT_SIZE,
-} from '@/constants';
+import { PERIPHERAL_CODES } from '@/constants';
 import { getCanvasContext, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
@@ -243,11 +239,11 @@ export default function Canvas() {
     // calculates the correct width.
     ctx.save();
     ctx.textBaseline = 'top';
-    ctx.font = `${TEXT_FONT_SIZE}px ${TEXT_FONT_FAMILY}`;
+    ctx.font = `24px ${textFontOptions[selectedElementIds[0]]}`;
     const textWidth = ctx.measureText(text).width;
     ctx.restore();
 
-    const textHeight = TEXT_FONT_SIZE;
+    const textHeight = 24;
     updateElement(
       elementId,
       x1,
