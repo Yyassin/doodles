@@ -38,6 +38,9 @@ const useDrawElements = () => {
     selectionFrame,
     roughElements,
     fillColors,
+    opacities,
+    strokeColors,
+    strokeWidths,
   } = useCanvasElementStore([
     'roughElements',
     'selectedElementIds',
@@ -53,6 +56,9 @@ const useDrawElements = () => {
     'angles',
     'selectionFrame',
     'fillColors',
+    'opacities',
+    'strokeColors',
+    'strokeWidths',
   ]);
 
   // Effect fires after DOM is mounted
@@ -94,6 +100,9 @@ const useDrawElements = () => {
         isImagePlaceds,
         fileIds,
         roughElements,
+        opacities,
+        strokeColors,
+        strokeWidths,
       },
       undefined,
       (id: string) =>
@@ -129,6 +138,9 @@ const useDrawElements = () => {
     angles,
     roughElements,
     selectionFrame,
+    opacities,
+    strokeColors,
+    strokeWidths,
   ]);
 };
 

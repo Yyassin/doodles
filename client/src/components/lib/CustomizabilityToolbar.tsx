@@ -6,6 +6,7 @@ import StrokeColorToolGroup, { strokeColourType } from './ChangeStrokeColor';
 import RoughnessToolGroup, { roughnessType } from './ChangeRoughness';
 import { CanvasElementFillStyles } from '@/types';
 import FillStyleToolGroup from './ChangeFillStyle';
+import OpacitySlider from './ChangeOpacity';
 
 /**
  * The toolbar that is displayed on the canvas.
@@ -55,6 +56,10 @@ const CustomToolbar = () => {
       <h2 className="text-sm font-semibold mb-2">Fill Style</h2>{' '}
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
       <FillStyleToolGroup tools={[...CanvasElementFillStyles]} />
+      {/* Opacity */}
+      <h2 className="text-sm font-semibold mb-2">Opacity</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <OpacitySlider />
     </Toolbar.Root>
   );
 };

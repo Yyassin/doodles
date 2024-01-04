@@ -84,6 +84,7 @@ const ToolButton = ({
 
         strokeWidth:
           customizabilityDict.strokeWidth ?? strokeWidths[selectedElementId],
+
         fillStyle:
           customizabilityDict.fillStyle ?? fillStyles[selectedElementId],
 
