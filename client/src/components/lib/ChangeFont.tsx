@@ -11,6 +11,7 @@ import ToolButton from './ToolButtonSelector';
 /** Lists all the avaialble fonts. */
 export const fontTypes = [
   'trebuchetMS',
+  'timesNewRoman',
   'garamond',
   'courierNew',
   'brushScriptMT',
@@ -21,6 +22,7 @@ export type fontType = (typeof fontTypes)[number];
 //Defines fonts as CSS properties for the Toolbar Icons
 const fontStyles: Record<fontType, React.CSSProperties> = {
   trebuchetMS: { fontFamily: 'Trebuchet MS' },
+  timesNewRoman: { fontFamily: 'Times New Roman' },
   garamond: { fontFamily: 'Garamond' },
   courierNew: { fontFamily: 'Courier New' },
   brushScriptMT: { fontFamily: 'Brush Script MT, cursive' },
@@ -30,6 +32,7 @@ const fontStyles: Record<fontType, React.CSSProperties> = {
 //Maps each font to its label
 const mapFonts = {
   trebuchetMS: 'trebuchet MS',
+  timesNewRoman: 'times new roman',
   garamond: 'garamond',
   courierNew: 'courier New',
   brushScriptMT: 'brush Script MT, cursive',
