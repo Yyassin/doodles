@@ -7,6 +7,7 @@ import RoughnessToolGroup, { roughnessTypes } from './ChangeRoughness';
 import { CanvasElementFillStyles } from '@/types';
 import FillStyleToolGroup from './ChangeFillStyle';
 import OpacitySlider from './ChangeOpacity';
+import FontFamily, { fontTypes } from './ChangeFont';
 
 /**
  * This file defines the CustomToolbar component, which is the main toolbar displayed
@@ -27,6 +28,10 @@ const CustomToolbar = () => {
       <h2 className="text-sm font-semibold mb-2">Color</h2>{' '}
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
       <ToolGroup tools={[...colourTypes]} />
+      {/* Text Font */}
+      <h2 className="text-sm font-semibold mb-2">Font</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <FontFamily tools={[...fontTypes]} />
       {/* Stroke Thickness */}
       <h2 className="text-sm font-semibold mb-2">Stroke Thickness</h2>{' '}
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />

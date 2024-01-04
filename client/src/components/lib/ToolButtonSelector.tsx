@@ -40,6 +40,7 @@ const ToolButton = ({
     editCanvasElement,
     selectedElementIds,
     fillColors,
+    textFontOptions,
     types,
     strokeColors,
     bowings,
@@ -55,6 +56,7 @@ const ToolButton = ({
     'editCanvasElement',
     'selectedElementIds',
     'fillColors',
+    'textFontOptions',
     'types',
     'strokeColors',
     'bowings',
@@ -85,6 +87,9 @@ const ToolButton = ({
           customizabilityDict.strokeColor ?? strokeColors[selectedElementId],
 
         fill: customizabilityDict.fillColor ?? fillColors[selectedElementId],
+        font:
+          customizabilityDict.textFontOption ??
+          textFontOptions[selectedElementId],
 
         bowing: customizabilityDict.bowing ?? bowings[selectedElementId],
 

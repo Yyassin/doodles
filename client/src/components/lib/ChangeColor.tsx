@@ -29,7 +29,7 @@ const colorMap: Record<string, string> = {
 };
 
 const mapColour = {
-  redCircle: 'Times New Roman',
+  redCircle: '#FF0000',
   greenCircle: '#008000',
   blueCircle: '#0000FF',
   orangeCircle: '#FFA500',
@@ -48,7 +48,6 @@ const ToolGroup = ({ tools }: { tools: colourType[] }) => {
     'fillColors',
     'selectedElementIds',
   ]);
-  console.log(fillColors[selectedElementIds[0]]);
   return (
     <div className="flex">
       {tools.map((toolName) => (

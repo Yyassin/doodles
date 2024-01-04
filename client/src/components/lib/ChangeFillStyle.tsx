@@ -47,7 +47,7 @@ const FillStyleToolGroup = ({ tools }: { tools: CanvasElementFillStyle[] }) => {
   ]);
 
   return (
-    <div className="flex">
+    <div className="grid grid-cols-4">
       {tools.map((toolName) => (
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
