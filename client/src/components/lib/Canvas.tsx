@@ -615,7 +615,7 @@ export default function Canvas() {
             top:
               ((p1[selectedElementIds[0]]?.y ??
                 p1[currentDrawingElemId.current]?.y) -
-                3 +
+                5 +
                 panOffset.y) *
                 zoom -
               scaleOffset.y,

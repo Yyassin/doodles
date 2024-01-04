@@ -18,7 +18,7 @@ export const fontTypes = [
 ] as const;
 export type fontType = (typeof fontTypes)[number];
 
-//Defines fonts as CSS properties for Toolbar Icons
+//Defines fonts as CSS properties for the Toolbar Icons
 const fontStyles: Record<fontType, React.CSSProperties> = {
   trebuchetMS: { fontFamily: 'Trebuchet MS' },
   garamond: { fontFamily: 'Garamond' },
@@ -27,8 +27,8 @@ const fontStyles: Record<fontType, React.CSSProperties> = {
   comicSans: { fontFamily: 'Comic Sans MS' },
 };
 
-//Maps each font to its name
-const mapColour = {
+//Maps each font to its label
+const mapFonts = {
   trebuchetMS: 'trebuchet MS',
   garamond: 'garamond',
   courierNew: 'courier New',
@@ -38,10 +38,10 @@ const mapColour = {
 
 /**
  * Creates a row group of buttons corresponding
- * to the provided list of tools.
- * @param tools The list of tools
- * @param selectedTool The currently selected tool, used
- * to highlight the selected tool.
+ * to the provided list of fonts.
+ * @param tools The list of fonts
+ * @param selectedTool The currently selected dont, used
+ * to highlight the selected font.
  */
 const FontFamily = ({ tools }: { tools: fontType[] }) => {
   const { textFontOptions, selectedElementIds } = useCanvasElementStore([
@@ -54,7 +54,7 @@ const FontFamily = ({ tools }: { tools: fontType[] }) => {
       {tools.map((toolName) => (
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
-            customizabilityDict={{ textFontOption: mapColour[toolName] }}
+            customizabilityDict={{ textFontOption: mapFonts[toolName] }}
             label={toolName}
             active={
               textFontOptions[selectedElementIds[0]] === fontStyles[toolName]
@@ -63,7 +63,7 @@ const FontFamily = ({ tools }: { tools: fontType[] }) => {
             <div
               className="rounded-full"
               style={{
-                ...fontStyles[toolName],
+                ...fontStyles[toolName], //Can make it more spaced out in future
               }}
             >
               A

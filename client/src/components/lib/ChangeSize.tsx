@@ -4,34 +4,18 @@ import ToolButton from './ToolButtonSelector';
 
 /**
  * This file defines the ChangeSize component, which allows the user to change
- * the size of a text element.
+ * the size of their text element.
  * @author Dana
  */
-
-/** Customizability Toolbar */
-export const sizes = [
-  'redCircle',
-  'greenCircle',
-  'blueCircle',
-  'orangeCircle',
-  'blackCircle',
-] as const;
+export const sizes = ['14', '24', '30', '40', '60'] as const;
 export type size = (typeof sizes)[number];
 
-const colorMap: Record<string, string> = {
-  redCircle: 'bg-red-500',
-  greenCircle: 'bg-green-500',
-  blueCircle: 'bg-blue-500',
-  orangeCircle: 'bg-orange-500',
-  blackCircle: 'bg-black',
-};
-
 const mapColour = {
-  redCircle: 10,
-  greenCircle: 14,
-  blueCircle: 24,
-  orangeCircle: 30,
-  blackCircle: 40,
+  14: 14,
+  24: 24,
+  30: 30,
+  40: 40,
+  60: 60,
 };
 
 /**
@@ -55,11 +39,14 @@ const SizeOptions = ({ tools }: { tools: size[] }) => {
             label={toolName}
             active={textSizes[selectedElementIds[0]] === mapColour[toolName]}
           >
-            <div className={'w-5 h-5 rounded-full ' + colorMap[toolName]}></div>
+            <div className={'w-5 h-5 rounded-full ' + mapColour[toolName]}>
+              {mapColour[toolName]}
+            </div>
           </ToolButton>
         </div>
       ))}
     </div>
   );
 };
+
 export default SizeOptions;
