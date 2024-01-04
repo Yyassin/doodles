@@ -37,6 +37,10 @@ const useDrawElements = () => {
     angles,
     selectionFrame,
     roughElements,
+    //fillColors,
+    opacities,
+    strokeColors,
+    strokeWidths,
   } = useCanvasElementStore([
     'roughElements',
     'selectedElementIds',
@@ -51,6 +55,10 @@ const useDrawElements = () => {
     'isImagePlaceds',
     'angles',
     'selectionFrame',
+    //'fillColors',
+    'opacities',
+    'strokeColors',
+    'strokeWidths',
   ]);
 
   // Effect fires after DOM is mounted
@@ -60,6 +68,8 @@ const useDrawElements = () => {
 
     // Clear on each rerender
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // ctx.fillStyle = 'blue';
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Retrieve the scaling offset to apply for centered zoom
     // (TODO: We can change this to zoom towards mouse position)
@@ -90,6 +100,9 @@ const useDrawElements = () => {
         isImagePlaceds,
         fileIds,
         roughElements,
+        opacities,
+        strokeColors,
+        strokeWidths,
       },
       undefined,
       (id: string) =>
@@ -103,7 +116,6 @@ const useDrawElements = () => {
         renderTransformFrame(ctx, { p1, p2, angles, types }, id);
       });
     }
-
     // Draw the selection frame, if any
     selectionFrame && renderSelectionFrame(selectionFrame, zoom, ctx);
 
@@ -125,6 +137,9 @@ const useDrawElements = () => {
     angles,
     roughElements,
     selectionFrame,
+    opacities,
+    strokeColors,
+    strokeWidths,
   ]);
 };
 

@@ -15,7 +15,7 @@ import { CanvasElementFillStyle, CanvasElementType, Vector2 } from '@/types';
 export interface CanvasElement {
   type: CanvasElementType; // The element's type
   strokeColor: string; // Stroke color, in hex
-  fillColor: string; // Inside fill color, in hex
+  fillColor?: string; // Inside fill color, in hex
   bowing: number; // [0, 1], specifies stroke curviness
   roughness: number; // Specified line roughness
   strokeWidth: number; // Stroke width in pixels

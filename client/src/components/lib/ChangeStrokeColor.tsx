@@ -3,24 +3,24 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ToolButton from './ToolButtonSelector';
 
 /**
- * This file defines the ChangeColor component, which allows the user to select
- * a color for the canvas elements. The available colors are defined in the
- * `colourTypes` array, and the `colorMap` object maps these types to their
- * corresponding CSS classes.
+ * This file defines the ChangeStrokeColor component, which allows the user to select
+ * a stroke color for the selected canvas element. The available stroke colors are defined
+ * in the `strokeColourTypes` array. Changes to the stroke color are made by calling
+ * the appropriate function from the CanvasElementStore.
  * @author Eebro
  */
 
 /** Customizability Toolbar */
-export const colourTypes = [
+export const strokeColourTypes = [
   'redCircle',
   'greenCircle',
   'blueCircle',
   'orangeCircle',
   'blackCircle',
 ] as const;
-export type colourType = (typeof colourTypes)[number];
+export type strokeColourType = (typeof strokeColourTypes)[number];
 
-const colorMap: Record<string, string> = {
+const strokeColorMap: Record<string, string> = {
   redCircle: 'bg-red-500',
   greenCircle: 'bg-green-500',
   blueCircle: 'bg-blue-500',
@@ -28,7 +28,7 @@ const colorMap: Record<string, string> = {
   blackCircle: 'bg-black',
 };
 
-const mapColour = {
+const mapStrokeColour = {
   redCircle: '#FF0000',
   greenCircle: '#008000',
   blueCircle: '#0000FF',
@@ -43,26 +43,30 @@ const mapColour = {
  * @param selectedTool The currently selected tool, used
  * to highlight the selected tool.
  */
-const ToolGroup = ({ tools }: { tools: colourType[] }) => {
-  const { fillColors, selectedElementIds } = useCanvasElementStore([
-    'fillColors',
+const StokeColorToolGroup = ({ tools }: { tools: strokeColourType[] }) => {
+  const { strokeColors, selectedElementIds } = useCanvasElementStore([
+    'strokeColors',
     'selectedElementIds',
   ]);
-  console.log(fillColors[selectedElementIds[0]]);
+
   return (
     <div className="flex">
       {tools.map((toolName) => (
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
-            customizabilityDict={{ fillColor: mapColour[toolName] }}
+            customizabilityDict={{ strokeColor: mapStrokeColour[toolName] }}
             label={toolName}
-            active={fillColors[selectedElementIds[0]] === mapColour[toolName]}
+            active={
+              strokeColors[selectedElementIds[0]] === mapStrokeColour[toolName]
+            }
           >
-            <div className={'w-5 h-5 rounded-full ' + colorMap[toolName]}></div>
+            <div
+              className={'w-5 h-5 rounded-full ' + strokeColorMap[toolName]}
+            ></div>
           </ToolButton>
         </div>
       ))}
     </div>
   );
 };
-export default ToolGroup;
+export default StokeColorToolGroup;

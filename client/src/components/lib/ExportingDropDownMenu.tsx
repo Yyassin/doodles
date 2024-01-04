@@ -26,6 +26,9 @@ export const ExportingDropDownMenu = () => {
     isImagePlaceds,
     angles,
     roughElements,
+    opacities,
+    strokeColors,
+    strokeWidths,
   } = useCanvasElementStore([
     'allIds',
     'p1',
@@ -38,6 +41,9 @@ export const ExportingDropDownMenu = () => {
     'isImagePlaceds',
     'angles',
     'roughElements',
+    'opacities',
+    'strokeColors',
+    'strokeWidths',
   ]);
 
   return (
@@ -68,6 +74,9 @@ export const ExportingDropDownMenu = () => {
                     isImagePlaceds,
                     fileIds,
                     roughElements,
+                    opacities,
+                    strokeColors,
+                    strokeWidths,
                   },
                   { margin: 20, fillColour: 'white' },
                 );
@@ -92,6 +101,9 @@ export const ExportingDropDownMenu = () => {
                     isImagePlaceds,
                     fileIds,
                     roughElements,
+                    opacities,
+                    strokeColors,
+                    strokeWidths,
                   },
                   { margin: 20, fillColour: 'white' },
                 );
