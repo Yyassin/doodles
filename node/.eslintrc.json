@@ -13,6 +13,7 @@
     }
   },
   "settings": {},
+  "ignorePatterns": ["test/**/*.test.ts"],
   "rules": {
     "sonarjs/cognitive-complexity": ["error", 30],
     "sonarjs/no-identical-functions": ["error", 5],

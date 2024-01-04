@@ -1,74 +1,25 @@
-/**
- * Define test cases for ../src/websocket.ts
- * @author Abdalla Abdelhadi
- */
-
-import 'mocha';
+import * as sinon from 'sinon';
 import { expect } from 'chai';
-import {
-  sendErrorResponse,
-  sendSuccessResponse,
-} from '../src/lib/websocket/websocketHelpers';
-import { RawData, WebSocket } from 'ws';
+import http from 'http';
+import WebsocketHelper from '../src/lib/websocket/websocketHelpers';
 
-//Sockets interface, stores sockets and the room they are in
-interface socketsType {
-  [id: string]: Set<WebSocket>;
-}
+let sendSuccessResponseStub = sinon
+  .stub(WebsocketHelper, 'sendSuccessResponse' as any)
+  .returns('Socket left room!');
+let sendErrorResponseStub = sinon
+  .stub(WebsocketHelper, 'sendErrorResponse' as any)
+  .returns('Error response sent');
 
-//The storage of the rooms and the sockets inside
-export const sockets: socketsType = {};
+import WebSocketManager from '../src/lib/websocket/WebSocketManager';
 
-/**
- * Handles all the recieved message from frontend
- * @param socket Websocket, the socket from frontend that send the message
- * @param msg RawData, the message from the socket
- */
-export const handleMsg = (socket: WebSocket, msg: RawData) => {
-  //Convert message to JSON
-  const jsonMsg = JSON.parse(Buffer.from(msg as ArrayBuffer).toString());
-
-  const { topic, room, payload } = jsonMsg;
-  console.log(topic, room, payload);
-
-  switch (topic) {
-    //add socket to room specified
-    case 'joinRoom': {
-      if (sockets[room] === undefined) {
-        sockets[room] = new Set();
-      } else if (sockets[room].has(socket)) {
-        sendErrorResponse(socket, 'Socket already in room!');
-        return;
-      }
-      sockets[room].add(socket);
-      sendSuccessResponse(socket, 'Socket joined room!');
-      return;
-    }
-    //remove socket from room
-    case 'leaveRoom': {
-      if (!sockets[room].has(socket)) {
-        sendErrorResponse(socket, 'Socket already is not room!');
-        return;
-      }
-      sockets[room].delete(socket);
-      sendSuccessResponse(socket, 'Socket left room!');
-      return;
-    }
-    //send message and topic to sockets in room
-    default: {
-      sockets[room].forEach((roomSocket) => {
-        if (socket !== roomSocket) {
-          roomSocket.send(JSON.stringify({ topic: topic, payload: payload }));
-        }
-      });
-      return;
-    }
-  }
+// Helper to encode json into byte array
+const rawData = (json: object) => {
+  return Buffer.from(JSON.stringify(json));
 };
 
 // WebSocket connection stub
-class SocketStub {
-  #data: unknown[];
+class MockWebSocket {
+  #data: any[];
 
   /**
    * Creates a new Socket instance.
@@ -81,7 +32,7 @@ class SocketStub {
    * emulate sending message to socket
    * @param data, the data being sent.
    */
-  send(data: unknown) {
+  send(data: any) {
     this.#data.push(data);
   }
 
@@ -89,95 +40,178 @@ class SocketStub {
    * Returns the data received by this socket
    * @returns any[], the received data.
    */
-  getData(): unknown[] {
+  getData(): any[] {
     return this.#data;
   }
 }
 
-/**
- * Tests that WebSocket server works as intended
- */
-describe('WebSocket Client', () => {
-  it('ws::Should process message', () => {
-    // Initialization
-    const room = 'room1';
-    const ws = new SocketStub();
-    const ws2 = new SocketStub();
+describe('WebSocketManager', () => {
+  let server: http.Server;
+  let webSocketManager: WebSocketManager;
+  let sandbox: sinon.SinonSandbox;
 
-    expect(ws.getData().length).to.equal(0);
+  beforeEach(() => {
+    sandbox = sinon.createSandbox();
+    server = http.createServer();
+    webSocketManager = WebSocketManager.Instance;
+  });
 
-    // Helper to encode json into byte array
-    const rawData = (json: object) => {
-      return Buffer.from(JSON.stringify(json));
+  afterEach(() => {
+    sendSuccessResponseStub.resetHistory();
+    sendErrorResponseStub.resetHistory();
+  });
+
+  it('should initialize WebSocketManager', () => {
+    const initWSSpy = sinon.spy(webSocketManager, 'initWSS' as any);
+    webSocketManager.init(server);
+    expect(initWSSpy.calledWith(server)).to.be.true;
+  });
+
+  it('should handle joinRoom event', () => {
+    const socket = new MockWebSocket() as any;
+    webSocketManager.init(server);
+    const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
+
+    joinRoomCallback({ socket, room: 'testRoom', payload: 'data' });
+
+    expect(sendSuccessResponseStub.calledWith(socket, 'Socket joined room!')).to
+      .be.true;
+  });
+
+  it('should handle failed leaveRoom event', () => {
+    const socket = new MockWebSocket() as any;
+    webSocketManager.init(server);
+    const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
+
+    // Leave without ever joining
+    leaveRoomCallback({ socket, room: 'testRoom', payload: 'data' });
+
+    expect(
+      sendErrorResponseStub.calledWith(socket, 'Socket already is not room!'),
+    ).to.be.true;
+    expect(sendSuccessResponseStub.called).to.be.false;
+  });
+
+  it('should handle leaveRoom event', () => {
+    const socket = new MockWebSocket() as any;
+    webSocketManager.init(server);
+    const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
+    const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
+
+    // Join then leave
+    joinRoomCallback({ socket, room: 'testRoom', payload: 'data' });
+    leaveRoomCallback({ socket, room: 'testRoom', payload: 'data' });
+
+    expect(sendSuccessResponseStub.calledWith(socket, 'Socket left room!')).to
+      .be.true;
+    expect(sendErrorResponseStub.called).to.be.false;
+  });
+
+  it('should handle broadcast to room', () => {
+    const socketsA = [] as MockWebSocket[];
+    const socketsB = [] as MockWebSocket[];
+
+    webSocketManager.init(server);
+    const handleMsgSpy = sinon.spy(webSocketManager, 'handleMsg' as any);
+    const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
+    const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
+
+    // The first three socket will be in room A, the next two are in room B
+    for (let i = 0; i < 5; i++) {
+      const socket = new MockWebSocket() as any;
+      const sockets = i < 3 ? socketsA : socketsB;
+      sockets.push(socket);
+      joinRoomCallback({ socket, room: i < 3 ? 'A' : 'B', payload: 'data' });
+    }
+
+    const msg = {
+      topic: 'someTopic',
+      payload: 'data',
+      room: 'A',
     };
+    //@ts-ignore
+    webSocketManager.handleMsg(socketsA[0], rawData(msg));
 
-    // Send a joinRoom request
-    expect(Object.keys(sockets).length).to.equal(0);
-    console.log('Sending request to join room: ' + room);
-    handleMsg(
-      ws as unknown as WebSocket,
-      rawData({
-        topic: 'joinRoom',
-        room: room,
-      }),
-    );
-    // Should have a new socket and a success response.
-    expect(Object.keys(sockets).length).to.equal(1);
-    expect(ws.getData().length).equal(1); // succes response
-    console.log('Got response');
-    console.log(ws.getData()[0]);
+    // Everyone in A except the first should have got a message
+    socketsA.forEach((socket, idx) => {
+      expect(socket.getData().length).equal(idx === 0 ? 0 : 1);
+      if (socket.getData().length) {
+        // Should not have room
+        expect(JSON.parse(socket.getData()[0])).to.deep.equal({
+          payload: msg.payload,
+          topic: msg.topic,
+        });
+      }
+    });
+    socketsB.forEach((socket) => {
+      expect(socket.getData().length).equal(0);
+    });
+    expect(handleMsgSpy.calledOnce).to.be.true;
 
-    // Again with another socket
-    console.log('Sending request to join room: ' + room);
-    handleMsg(
-      ws2 as unknown as WebSocket,
-      rawData({
-        topic: 'joinRoom',
-        room: room,
-      }),
-    );
-    // Should have a new socket and a success response.
-    expect(Object.keys(sockets).length).to.equal(1);
-    expect(ws2.getData().length).equal(1); // succes response
-    console.log('Got response');
-    console.log(ws2.getData()[0]);
+    // Now send another message, but from the second socket in A
+    //@ts-ignore
+    webSocketManager.handleMsg(socketsA[1], rawData(msg));
+    // So now the first two guys have 1, the third has 2.
+    socketsA.forEach((socket, idx) => {
+      expect(socket.getData().length).equal(idx === 2 ? 2 : 1);
+    });
+    socketsB.forEach((socket) => {
+      expect(socket.getData().length).equal(0);
+    });
 
-    // Send a message to room
-    handleMsg(
-      ws2 as unknown as WebSocket,
-      rawData({
-        topic: 'sendMsg',
-        room: room,
-        payload: 'hi',
-      }),
-    );
+    // Repeat but remove the third socket
+    leaveRoomCallback({
+      socket: socketsA[2] as any,
+      room: 'A',
+      payload: 'data',
+    });
+    //@ts-ignore
+    webSocketManager.handleMsg(socketsA[0], rawData(msg));
+    // So now the first guy has 1 (he sent), second has 2, third should stay at 2.
+    socketsA.forEach((socket, idx) => {
+      expect(socket.getData().length).equal(idx === 0 ? 1 : 2);
+    });
 
-    console.log('Sending message to room');
-    expect(ws.getData().length).equal(2);
-    console.log('No additional responses');
-    console.log(ws.getData());
-
-    // Send another message to specified room
-    const messageToClient = {
-      topic: 'topic-name',
-      room: room,
-      payload: 'hi',
+    // And do the same for sockets in B
+    const msg2 = {
+      topic: 'someTopic',
+      payload: 'data',
+      room: 'B',
     };
-    console.log('Sending message to room 2.0');
-    console.log('CLIENT SENT');
-    console.log(messageToClient);
-    handleMsg(ws2 as unknown as WebSocket, rawData(messageToClient));
+    //@ts-ignore
+    webSocketManager.handleMsg(socketsB[0], rawData(msg2));
+    // So now the first two guys have 1, the third has 2.
+    socketsB.forEach((socket, idx) => {
+      expect(socket.getData().length).equal(idx === 0 ? 0 : 1);
+    });
+    socketsA.forEach((socket, idx) => {
+      expect(socket.getData().length).equal(idx === 0 ? 1 : 2);
+    });
+  });
 
-    const msgReceive = {
-      topic: messageToClient.topic,
-      payload: messageToClient.payload,
-    };
-    expect(ws.getData().length).equal(3);
+  it('should ignore non-join messages without room', () => {
+    const socket = new MockWebSocket() as any;
+    const socketA = new MockWebSocket() as any;
 
-    // Acheck the recieved message
-    const actualReceive = JSON.parse(ws.getData()[2] as string);
-    expect(actualReceive).to.deep.equal(msgReceive);
-    console.log('RECEIVED');
-    console.log(actualReceive);
+    webSocketManager.init(server);
+
+    const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
+    joinRoomCallback({ socket: socketA, room: 'A', payload: 'data' });
+
+    const msg = { topic: 'someTopic', payload: 'somePayload' };
+
+    // Sending a non-join message without room
+    //@ts-ignore
+    webSocketManager.handleMsg(socket, rawData(msg));
+    // Ensure the appropriate error message is sent to the socket
+    expect(
+      sendErrorResponseStub.calledWith(
+        socket,
+        'Received non-join message without room, ignoring!',
+      ),
+    ).to.be.true;
+    // Ensure no message is sent to other sockets
+    expect(socket.getData().length).to.equal(0);
+    expect(socketA.getData().length).to.equal(0);
   });
 });

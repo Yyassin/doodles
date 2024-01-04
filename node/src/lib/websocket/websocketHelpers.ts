@@ -19,7 +19,7 @@ const sendResponse = (
  * @param socket WebSocket, the socket that sent original message
  * @param message String, the message
  */
-export const sendSuccessResponse = (socket: WebSocket, message: string) =>
+const sendSuccessResponse = (socket: WebSocket, message: string) =>
   sendResponse(socket, message, HTTP_STATUS.SUCCESS);
 
 /**
@@ -27,5 +27,8 @@ export const sendSuccessResponse = (socket: WebSocket, message: string) =>
  * @param socket WebSocket, the socket that sent original message
  * @param message String, the message
  */
-export const sendErrorResponse = (socket: WebSocket, message: string) =>
+const sendErrorResponse = (socket: WebSocket, message: string) =>
   sendResponse(socket, message, HTTP_STATUS.ERROR);
+
+const helpers = { sendErrorResponse, sendSuccessResponse };
+export default helpers;

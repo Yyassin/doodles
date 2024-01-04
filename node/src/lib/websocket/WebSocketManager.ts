@@ -1,7 +1,8 @@
 import { RawData, WebSocket } from 'ws';
 import http from 'http';
 import { Singleton } from '../../utils/Singleton';
-import { sendErrorResponse, sendSuccessResponse } from './websocketHelpers';
+import helpers from './websocketHelpers';
+const { sendErrorResponse, sendSuccessResponse } = helpers;
 
 /**
  * Define and setup websocket server
@@ -11,7 +12,7 @@ import { sendErrorResponse, sendSuccessResponse } from './websocketHelpers';
 class WebSocketManager extends Singleton<WebSocketManager>() {
   #wss = new WebSocket.Server({ noServer: true });
   #sockets = {} as Record<string, Set<WebSocket>>;
-  #callbacks = {} as Record<
+  callbacks = {} as Record<
     string,
     ({
       socket,
@@ -40,6 +41,7 @@ class WebSocketManager extends Singleton<WebSocketManager>() {
       if (!this.#sockets[room].has(socket)) {
         return sendErrorResponse(socket, 'Socket already is not room!');
       }
+      this.#sockets[room].delete(socket);
       return sendSuccessResponse(socket, 'Socket left room!');
     });
     this.initWSS(server);
@@ -62,7 +64,7 @@ class WebSocketManager extends Singleton<WebSocketManager>() {
       payload: string;
     }) => void,
   ) {
-    this.#callbacks[handle] = callback;
+    this.callbacks[handle] = callback;
   }
 
   private handleMsg = (socket: WebSocket, msg: RawData) => {
@@ -76,7 +78,7 @@ class WebSocketManager extends Singleton<WebSocketManager>() {
       return sendErrorResponse(socket, err);
     }
 
-    const callback = this.#callbacks[topic];
+    const callback = this.callbacks[topic];
     if (callback === undefined) {
       // Send message and topic to sockets in room
       return this.#sockets[room].forEach((roomSocket) => {
