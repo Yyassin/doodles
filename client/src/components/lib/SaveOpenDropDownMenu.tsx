@@ -8,7 +8,6 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import saveAs from 'file-saver';
-import { stat } from 'fs';
 
 /**
  * Component that the save and load button with their functionality in the drop down menu in the canavas
