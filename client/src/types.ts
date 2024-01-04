@@ -93,16 +93,6 @@ export const CanvasElementFillStyles = [
 ] as const;
 export type CanvasElementFillStyle = (typeof CanvasElementFillStyles)[number];
 
-/** Customizability Toolbar */
-export const colourTypes = [
-  'redCircle',
-  'greenCircle',
-  'blueCircle',
-  'orangeCircle',
-  'blackCircle',
-] as const;
-export type colourType = (typeof colourTypes)[number];
-
 /** Names of common events subscribed by event listeners */
 export enum EVENT {
   KEYDOWN = 'keydown',

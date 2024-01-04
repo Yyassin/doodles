@@ -38,6 +38,9 @@ export const renderCanvasElements = (
     isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
     fileIds: Record<string, CanvasElement['fileId']>;
     roughElements: Record<string, CanvasElement['roughElement']>;
+    opacities: Record<string, CanvasElement['opacity']>;
+    strokeColors: Record<string, CanvasElement['strokeColor']>;
+    strokeWidths: Record<string, CanvasElement['strokeWidth']>;
   },
   offset?: Vector2,
   renderTextPredicate: (id: string) => boolean = () => true,
@@ -55,6 +58,9 @@ export const renderCanvasElements = (
     textStrings,
     isImagePlaceds,
     fileIds,
+    opacities,
+    strokeColors,
+    strokeWidths,
   } = appState;
   const roughElements = appState.roughElements ?? {};
   const { x: offsetX, y: offsetY } = offset ?? { x: 0, y: 0 };
@@ -79,6 +85,7 @@ export const renderCanvasElements = (
     ctx.rotate(angle);
     // Revert since it isn't accounted for in the actual drawing.
     ctx.translate(-cx, -cy);
+    ctx.globalAlpha = opacities[id]; //opacity of the element
 
     const type = types[id];
     if (type === 'freehand') {
@@ -94,8 +101,12 @@ export const renderCanvasElements = (
         );
         const [tx, ty] = [x1a - minX, y1a - minY];
         ctx.translate(tx, ty);
+        ctx.fillStyle = strokeColors[id];
 
-        drawStroke(ctx, getStroke(points.slice(0, -2), { size: 5 }));
+        drawStroke(
+          ctx,
+          getStroke(points.slice(0, -2), { size: strokeWidths[id] }),
+        );
       }
     } else if (type === 'text') {
       // Skip anything being edited

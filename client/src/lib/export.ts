@@ -55,6 +55,9 @@ export const renderElementsOnOffscreenCanvas = (
     isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
     fileIds: Record<string, CanvasElement['fileId']>;
     roughElements: Record<string, CanvasElement['roughElement']>;
+    opacities: Record<string, CanvasElement['opacity']>;
+    strokeColors: Record<string, CanvasElement['strokeColor']>;
+    strokeWidths: Record<string, CanvasElement['strokeWidth']>;
   },
   options?: {
     margin: number;
@@ -80,6 +83,9 @@ export const renderElementsOnOffscreenCanvas = (
     isImagePlaceds,
     fileIds,
     roughElements,
+    opacities,
+    strokeColors,
+    strokeWidths,
   } = appState;
 
   const margin = options?.margin ?? 0;
@@ -128,6 +134,9 @@ export const renderElementsOnOffscreenCanvas = (
       isImagePlaceds,
       fileIds,
       roughElements,
+      opacities,
+      strokeColors,
+      strokeWidths,
     },
     {
       x: minX - margin,
