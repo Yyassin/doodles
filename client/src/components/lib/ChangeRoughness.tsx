@@ -2,8 +2,16 @@ import React from 'react';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ToolButton from './ToolButtonSelector';
 
+/**
+ * This file defines the ChangeRoughness component, which allows the user to adjust
+ * the roughness of the selected canvas element. The current roughness value is represented
+ * by a slider that ranges from 1 to 100. Changes to the roughness are made by calling
+ * the `setCustomizabilityDict` function from the CanvasElementStore.
+ * @author Eebro
+ */
+
 /** Customizability Toolbar */
-const roughnessTypes = ['smooth', 'rough', 'extraRough'] as const;
+export const roughnessTypes = ['smooth', 'rough', 'extraRough'] as const;
 export type roughnessType = (typeof roughnessTypes)[number];
 
 const roughnessMap: Record<string, string> = {

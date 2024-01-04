@@ -2,6 +2,14 @@ import React from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 
+/**
+ * This file defines the OpacitySlider component, which allows the user to adjust
+ * the opacity of the selected canvas element. The current opacity value is retrieved
+ * from the `opacities` object in the CanvasElementStore, and changes to the opacity
+ * are made by calling the `editCanvasElement` function.
+ * @author Eebro
+ */
+
 const OpacitySlider = () => {
   const { editCanvasElement, selectedElementIds, opacities } =
     useCanvasElementStore([

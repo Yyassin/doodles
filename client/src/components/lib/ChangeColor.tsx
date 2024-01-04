@@ -2,8 +2,16 @@ import React from 'react';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ToolButton from './ToolButtonSelector';
 
+/**
+ * This file defines the ChangeColor component, which allows the user to select
+ * a color for the canvas elements. The available colors are defined in the
+ * `colourTypes` array, and the `colorMap` object maps these types to their
+ * corresponding CSS classes.
+ * @author Eebro
+ */
+
 /** Customizability Toolbar */
-const colourTypes = [
+export const colourTypes = [
   'redCircle',
   'greenCircle',
   'blueCircle',

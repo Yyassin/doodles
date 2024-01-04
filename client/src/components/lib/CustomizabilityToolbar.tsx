@@ -1,12 +1,21 @@
 import React from 'react';
 import * as Toolbar from '@radix-ui/react-toolbar';
-import ToolGroup, { colourType } from './ChangeColor';
-import StrokeToolGroup, { strokeType } from './ChangeThickness';
-import StrokeColorToolGroup, { strokeColourType } from './ChangeStrokeColor';
-import RoughnessToolGroup, { roughnessType } from './ChangeRoughness';
+import ToolGroup, { colourTypes } from './ChangeColor';
+import StrokeToolGroup, { strokeTypes } from './ChangeThickness';
+import StrokeColorToolGroup, { strokeColourTypes } from './ChangeStrokeColor';
+import RoughnessToolGroup, { roughnessTypes } from './ChangeRoughness';
 import { CanvasElementFillStyles } from '@/types';
 import FillStyleToolGroup from './ChangeFillStyle';
 import OpacitySlider from './ChangeOpacity';
+
+/**
+ * This file defines the CustomToolbar component, which is the main toolbar displayed
+ * on the canvas. It includes tool groups for changing the color, stroke thickness,
+ * stroke color, roughness, fill style, and opacity of the selected canvas element.
+ * Each tool group is imported from its respective file, and the available options for
+ * each tool group are defined in the respective arrays (e.g., `colourTypes`, `strokeTypes`, etc.).
+ * @author Eebro
+ */
 
 /**
  * The toolbar that is displayed on the canvas.
@@ -17,41 +26,19 @@ const CustomToolbar = () => {
       {/* Background Color */}
       <h2 className="text-sm font-semibold mb-2">Color</h2>{' '}
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <ToolGroup
-        tools={
-          [
-            'redCircle',
-            'greenCircle',
-            'blueCircle',
-            'orangeCircle',
-            'blackCircle',
-          ] as colourType[]
-        }
-      />
+      <ToolGroup tools={[...colourTypes]} />
       {/* Stroke Thickness */}
       <h2 className="text-sm font-semibold mb-2">Stroke Thickness</h2>{' '}
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <StrokeToolGroup tools={['thin', 'bold', 'extraBold'] as strokeType[]} />
+      <StrokeToolGroup tools={[...strokeTypes]} />
       {/* Stroke Color (border for shapes) */}
       <h2 className="text-sm font-semibold mb-2">Stroke Color</h2>{' '}
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <StrokeColorToolGroup
-        tools={
-          [
-            'redCircle',
-            'greenCircle',
-            'blueCircle',
-            'orangeCircle',
-            'blackCircle',
-          ] as strokeColourType[]
-        }
-      />
+      <StrokeColorToolGroup tools={[...strokeColourTypes]} />
       {/* Stroke Thickness */}
       <h2 className="text-sm font-semibold mb-2">Roughness</h2>{' '}
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <RoughnessToolGroup
-        tools={['smooth', 'rough', 'extraRough'] as roughnessType[]}
-      />
+      <RoughnessToolGroup tools={[...roughnessTypes]} />
       {/* Fill Style */}
       <h2 className="text-sm font-semibold mb-2">Fill Style</h2>{' '}
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />

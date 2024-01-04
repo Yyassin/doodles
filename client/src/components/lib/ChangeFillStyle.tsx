@@ -3,7 +3,13 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ToolButton from './ToolButtonSelector';
 import { CanvasElementFillStyle } from '@/types';
 
-/** Customizability Toolbar */
+/**
+ * This file defines the ChangeFillStyle component, which allows the user to select
+ * a fill style for the canvas elements. The available fill styles are defined in the
+ * `fillStyleMap` and `mapFillStyle` objects, which map these styles to their
+ * corresponding CSS classes and fill style values respectively.
+ * @author Eebro
+ */
 
 const fillStyleMap: Record<string, string> = {
   none: 'bg-red-500',

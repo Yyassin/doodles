@@ -8,6 +8,15 @@ import {
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 
 /**
+ * This file defines the ToolButton component, which represents a button for a toolbar tool.
+ * Each ToolButton has a representative icon and a state hook to set the selected tool.
+ * The currently active tool is highlighted. The ToolButton component is used in various
+ * tool groups in the CustomizabilityToolbar to allow the user to select different options
+ * for customizing the canvas elements.
+ * @author Eebro
+ */
+
+/**
  * Defines a button for a toolbar tool. Contains
  * a representative icon (defined above) and
  * a state hook to set the selected tool. The currently

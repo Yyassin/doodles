@@ -37,11 +37,8 @@ const createElement = (
 ): CanvasElement => {
   let roughElement;
   let newPoints;
-  if (options.fillStyle === 'none') {
-    options.fill = undefined;
-  } else if (options.fill === undefined) {
-    options.fill = '#000000';
-  }
+  options.fill =
+    options.fillStyle === 'none' ? undefined : options.fill ?? '#000000';
 
   if (points === undefined) {
     switch (type) {

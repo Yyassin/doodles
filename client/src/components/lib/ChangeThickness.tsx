@@ -2,8 +2,16 @@ import React from 'react';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ToolButton from './ToolButtonSelector';
 
+/**
+ * This file defines the ChangeThickness component, which allows the user to adjust
+ * the thickness of the stroke for the selected canvas element. The available stroke
+ * thicknesses are defined in the `strokeTypes` array. Changes to the stroke thickness
+ * are made by calling the appropriate function from the CanvasElementStore.
+ * @author Eebro
+ */
+
 /** Customizability Toolbar */
-const strokeTypes = ['thin', 'bold', 'extraBold'] as const;
+export const strokeTypes = ['thin', 'bold', 'extraBold'] as const;
 export type strokeType = (typeof strokeTypes)[number];
 
 const strokeMap: Record<string, string> = {

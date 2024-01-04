@@ -2,8 +2,16 @@ import React from 'react';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ToolButton from './ToolButtonSelector';
 
+/**
+ * This file defines the ChangeStrokeColor component, which allows the user to select
+ * a stroke color for the selected canvas element. The available stroke colors are defined
+ * in the `strokeColourTypes` array. Changes to the stroke color are made by calling
+ * the appropriate function from the CanvasElementStore.
+ * @author Eebro
+ */
+
 /** Customizability Toolbar */
-const strokeColourTypes = [
+export const strokeColourTypes = [
   'redCircle',
   'greenCircle',
   'blueCircle',

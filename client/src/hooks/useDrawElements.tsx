@@ -116,7 +116,6 @@ const useDrawElements = () => {
         renderTransformFrame(ctx, { p1, p2, angles, types }, id);
       });
     }
-    console.log(fillColors);
     // Draw the selection frame, if any
     selectionFrame && renderSelectionFrame(selectionFrame, zoom, ctx);
 
