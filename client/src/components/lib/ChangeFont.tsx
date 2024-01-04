@@ -29,11 +29,11 @@ const fontStyles: Record<fontType, React.CSSProperties> = {
 
 //Maps each font to its name
 const mapColour = {
-  trebuchetMS: '30px trebuchet MS',
-  garamond: '30px garamond',
-  courierNew: '30px courier New',
-  brushScriptMT: '30px brush Script MT, cursive',
-  comicSans: '30px Comic Sans MS',
+  trebuchetMS: 'trebuchet MS',
+  garamond: 'garamond',
+  courierNew: 'courier New',
+  brushScriptMT: 'brush Script MT, cursive',
+  comicSans: 'Comic Sans MS',
 };
 
 /**
@@ -63,9 +63,7 @@ const FontFamily = ({ tools }: { tools: fontType[] }) => {
             <div
               className="rounded-full"
               style={{
-                width: '30px', // Set a fixed width as per your design
-                height: '30px', // Set a fixed height as per your design
-                ...fontStyles[toolName], // Apply font style
+                ...fontStyles[toolName],
               }}
             >
               A

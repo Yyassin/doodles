@@ -10,11 +10,13 @@ const strokeWidth = 3;
 const fillStyle = 'none';
 const strokeLineDash = [0];
 const opacity = 1;
-const font = '24px sans-serif';
+const font = 'trebuchet MS';
+const size = 30;
 
 export const defaultOptions = {
   stroke,
   font,
+  size,
   fill,
   bowing,
   roughness,
@@ -72,6 +74,7 @@ const createElement = (
     strokeColor: options.stroke,
     fillColor: options.fill,
     textFontOption: options.font,
+    textSize: options.size,
     bowing,
     roughness,
     strokeWidth,

@@ -8,6 +8,7 @@ import { CanvasElementFillStyles } from '@/types';
 import FillStyleToolGroup from './ChangeFillStyle';
 import OpacitySlider from './ChangeOpacity';
 import FontFamily, { fontTypes } from './ChangeFont';
+import SizeOptions, { sizes } from './ChangeSize';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 
 /**
@@ -59,6 +60,14 @@ const CustomToolbar = () => {
           <h2 className="text-sm font-semibold mb-2">Font</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
           <FontFamily tools={[...fontTypes]} />
+        </>
+      )}
+      {/* Text Size */}
+      {fontSet.has(types[selectedElementIds[0]]) && (
+        <>
+          <h2 className="text-sm font-semibold mb-2">Size</h2>{' '}
+          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+          <SizeOptions tools={[...sizes]} />
         </>
       )}
       {/* Stroke Thickness */}
