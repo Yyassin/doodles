@@ -4,8 +4,8 @@ import {
   findUserById,
   deleteUser,
   updateUser,
-} from '../models/user';
-import { HTTP_STATUS } from '../constants';
+} from '../../models/user';
+import { HTTP_STATUS } from '../../constants';
 
 /**
  * Firebase API controllers, logic for endpoint routes.

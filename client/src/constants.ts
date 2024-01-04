@@ -16,6 +16,8 @@ export const HTTP_STATUS = {
   ERROR: 400,
   INTERNAL_SERVER_ERROR: 500,
 } as const;
+export const SECONDS_TO_MS = 1e3;
+export const WS_RECONNECT_INTERVAL = (1 * SECONDS_TO_MS) as number;
 
 // Zoom Constraints
 export const ZOOM = {

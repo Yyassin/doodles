@@ -1,5 +1,5 @@
 import { Response, Request } from 'express';
-import { HTTP_STATUS } from '../constants';
+import { HTTP_STATUS } from '../../constants';
 import * as admin from 'firebase-admin';
 
 /**

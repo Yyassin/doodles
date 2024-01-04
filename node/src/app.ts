@@ -1,17 +1,17 @@
 import express from 'express';
 import http from 'http';
-import setUpWSS from './websockets';
 import { FastFire } from 'fastfire';
 import { Firestore } from 'fastfire/dist/firestore';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import { firestore } from './firebase/firebaseApp';
-import userRoutes from './routes/user.route';
-import collaboratorRoutes from './routes/collaborator.route';
-import commentRoutes from './routes/comment.route';
-import boardRoutes from './routes/board.route';
-import authRoutes from './routes/auth.route';
+import userRoutes from './api/user/user.route';
+import collaboratorRoutes from './api/collaborator/collaborator.route';
+import commentRoutes from './api/comment/comment.route';
+import boardRoutes from './api/board/board.route';
+import authRoutes from './api/auth/auth.route';
+import WebSocketManager from './lib/websocket/WebSocketManager';
 
 FastFire.initialize(firestore as Firestore);
 
@@ -36,4 +36,5 @@ server.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
-setUpWSS(server);
+WebSocketManager.Instance.init(server);
+// Init SFU Manager

@@ -13,11 +13,14 @@ import { useEffect, useRef } from 'react';
  */
 
 export const useSocket = () => {
-  const { roomID, actionElementID, action } = useWebSocketStore([
-    'roomID',
-    'actionElementID',
-    'action',
-  ]);
+  const { roomID, actionElementID, action, userId, setSocket } =
+    useWebSocketStore([
+      'roomID',
+      'actionElementID',
+      'action',
+      'userId',
+      'setSocket',
+    ]);
 
   const {
     addCanvasShape,
@@ -106,15 +109,22 @@ export const useSocket = () => {
     },
   };
 
-  //intialize socket
+  // Intialize socket
   useEffect(() => {
-    socket.current = new WebsocketClient(callBacks);
+    if (!userId) {
+      return;
+    }
+    socket.current = new WebsocketClient(callBacks, userId);
+    setSocket(socket.current);
     return () => {
+      if (socket.current?.room !== null) {
+        socket.current?.leaveRoom();
+      }
       socket.current?.disconnect();
     };
-  }, []);
+  }, [userId]);
 
-  //The socket joins room or leaves once the roomID changes
+  // The socket joins room or leaves once the roomID changes
   useEffect(() => {
     if (roomID === null) {
       if (socket.current?.room !== null) {
@@ -125,11 +135,11 @@ export const useSocket = () => {
     }
   }, [roomID]);
 
-  //Send message once action gets set. Note: will be changed
+  // Send message once action gets set. Note: will be changed
   useEffect(() => {
     if (actionElementID === '') return;
 
-    //Create element to send to other sockets in room
+    // Create element to send to other sockets in room
     const element = createElement(
       actionElementID,
       p1[actionElementID].x,
