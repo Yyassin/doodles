@@ -86,6 +86,7 @@ export const useSocket = () => {
   //setup callBack object based on actions
   const callBacks = {
     addCanvasShape: (element: CanvasElement) => {
+      console.log(element);
       const newElement = createElement(
         element.id,
         element.p1.x,
@@ -251,6 +252,7 @@ export const useSocket = () => {
 
     delete element.roughElement;
 
+    console.log(element);
     socket.current?.sendMsgRoom(action, element);
     setWebsocketAction('', '');
   }, [

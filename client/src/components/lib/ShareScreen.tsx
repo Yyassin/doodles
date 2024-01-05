@@ -9,6 +9,7 @@ const ShareScreen = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
   const { socket } = useWebSocketStore(['socket']);
+
   const {
     setIsInCall,
     appWidth,
@@ -18,8 +19,6 @@ const ShareScreen = () => {
     zoom,
     panOffset,
     setVideoDimensions,
-    videoHeight,
-    videoWidth,
   } = useAppStore([
     'setIsInCall',
     'appWidth',
@@ -29,8 +28,6 @@ const ShareScreen = () => {
     'zoom',
     'panOffset',
     'setVideoDimensions',
-    'videoHeight',
-    'videoWidth',
   ]);
   const producerPeerRef = useRTCProducer(
     videoRef,
@@ -63,6 +60,14 @@ const ShareScreen = () => {
     });
   }, []);
 
+  const {
+    aspectRatio: aspect,
+    width: trueVideoWidth,
+    height: trueVideoHeight,
+  } = (screenStream?.getVideoTracks()[0].getSettings() ?? {
+    aspectRatio: 1,
+  }) as { aspectRatio: number; height: 1; width: 1 };
+
   useEffect(() => {
     setIsInCall(screenStream !== null);
     if (videoRef.current && screenStream !== null) {
@@ -73,13 +78,8 @@ const ShareScreen = () => {
   }, [screenStream, videoRef.current]);
   useEffect(() => {
     if (screenStream === null) return;
-    const { aspectRatio: aspect } = screenStream
-      ?.getVideoTracks()[0]
-      .getSettings() as { aspectRatio: number };
     const videoHeight = appWidth / aspect;
     const videoWidth = appHeight * aspect;
-    console.log(videoHeight, videoWidth);
-    console.log(appHeight, appWidth);
     let w, h;
     if (videoHeight < appHeight) {
       h = appHeight;
@@ -96,42 +96,39 @@ const ShareScreen = () => {
   // Temporarily apply scaling
   // Panning & zooming
   return (
-    <div
-      className="flex flex-row items-center justify-center"
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: screenStream !== null ? 'transparent' : 'white',
-        zIndex: -1,
-      }}
-    >
-      {screenStream !== null && (
-        <div
+    screenStream !== null && (
+      <div
+        className="flex flex-row items-center justify-center"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: screenStream !== null ? 'transparent' : 'white',
+          zIndex: -1,
+          overflow: 'hidden',
+        }}
+      >
+        <video
           style={{
             position: 'absolute',
-            maxHeight: appHeight,
-            maxWidth: appWidth,
-            overflow: 'hidden',
+            left: 0,
+            top: 0,
+            transform: `scaleX(${zoom}) scaleY(${zoom}) translate(${panOffset.x}px, ${panOffset.y}px)`,
+            maxWidth: '10000px',
+            maxHeight: '10000px',
           }}
-        >
-          <video
-            style={{
-              transform: `scaleX(${zoom}) scaleY(${zoom}) translate(${panOffset.x}px, ${panOffset.y}px)`,
-            }}
-            ref={videoRef}
-            width={videoWidth ? videoWidth : appWidth}
-            height={videoHeight ? videoHeight : appHeight}
-            id="localElement"
-            playsInline
-            muted
-            autoPlay
-          />
-        </div>
-      )}
-    </div>
+          ref={videoRef}
+          width={trueVideoWidth}
+          height={trueVideoHeight}
+          id="localElement"
+          playsInline
+          muted
+          autoPlay
+        />
+      </div>
+    )
   );
 };
 
