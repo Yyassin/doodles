@@ -47,6 +47,9 @@ export const renderElementsOnOffscreenCanvas = (
     p2: Record<string, CanvasElement['p2']>;
     angles: Record<string, CanvasElement['angle']>;
     types: Record<string, CanvasElement['type']>;
+    fillColors: Record<string, CanvasElement['fillColor']>;
+    textFontOptions: Record<string, CanvasElement['textFontOption']>;
+    textSizes: Record<string, CanvasElement['textSize']>;
     freehandPoints: Record<string, CanvasElement['freehandPoints']>;
     freehandBounds: Record<string, [Vector2, Vector2]>;
     textStrings: Record<string, CanvasElement['text']>;
@@ -60,6 +63,8 @@ export const renderElementsOnOffscreenCanvas = (
   options?: {
     margin: number;
     fillColour: string;
+    textFontOption: string;
+    textSize: number;
     renderTextPredicate?: (id: string) => boolean;
   },
 ) => {
@@ -72,6 +77,9 @@ export const renderElementsOnOffscreenCanvas = (
     p2,
     angles,
     types,
+    fillColors,
+    textFontOptions,
+    textSizes,
     freehandPoints,
     freehandBounds,
     textStrings,
@@ -109,6 +117,9 @@ export const renderElementsOnOffscreenCanvas = (
 
   ctx.save();
   options?.fillColour && (ctx.fillStyle = options.fillColour);
+  options?.textFontOption &&
+    options?.textSize &&
+    (ctx.font = options.textSize + options.textFontOption);
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
 
@@ -121,6 +132,9 @@ export const renderElementsOnOffscreenCanvas = (
       p2,
       angles,
       types,
+      fillColors,
+      textFontOptions,
+      textSizes,
       freehandPoints,
       freehandBounds,
       textStrings,

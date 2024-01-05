@@ -19,6 +19,9 @@ const ExportSelectedPNGContextItem = () => {
     freehandPoints,
     freehandBounds,
     textStrings,
+    textFontOptions,
+    textSizes,
+    fillColors,
     fileIds,
     isImagePlaceds,
     angles,
@@ -34,6 +37,9 @@ const ExportSelectedPNGContextItem = () => {
     'freehandPoints',
     'freehandBounds',
     'textStrings',
+    'textFontOptions',
+    'textSizes',
+    'fillColors',
     'fileIds',
     'isImagePlaceds',
     'angles',
@@ -56,6 +62,9 @@ const ExportSelectedPNGContextItem = () => {
             freehandPoints,
             freehandBounds,
             textStrings,
+            textFontOptions,
+            textSizes,
+            fillColors,
             isImagePlaceds,
             fileIds,
             roughElements,
@@ -63,7 +72,12 @@ const ExportSelectedPNGContextItem = () => {
             strokeColors,
             strokeWidths,
           },
-          { margin: 20, fillColour: 'white' },
+          {
+            margin: 20,
+            fillColour: 'white',
+            textFontOption: 'Trebuchet MS',
+            textSize: 30,
+          },
         );
         canvas && handlePNGExport(canvas.toDataURL('image/png'));
       }}
