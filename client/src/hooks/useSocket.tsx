@@ -151,6 +151,8 @@ export const useSocket = () => {
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
           text: element.text,
+          font: element.textFontOption,
+          size: element.textSize,
           angle: element.angle,
         },
         true,

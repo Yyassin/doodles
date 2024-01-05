@@ -1,5 +1,5 @@
 import React from 'react';
-import { capitalize } from '@/lib/misc';
+import { capitalize, getCanvasContext } from '@/lib/misc';
 import IconButton from './IconButton';
 import {
   CanvasElement,
@@ -124,11 +124,36 @@ const ToolButton = ({
       },
     );
 
+    let extraOptions = {} as Partial<CanvasElement>;
+    if (types[selectedElementId] === 'text') {
+      // Set the element's font style so measuretext
+      // calculates the correct width.
+      const { ctx } = getCanvasContext();
+      if (ctx === null) throw 'ctx null';
+
+      const textSize =
+        customizabilityDict.textSize ?? textSizes[selectedElementId];
+
+      const textFont =
+        customizabilityDict.textFontOption ??
+        textFontOptions[selectedElementId];
+
+      ctx.save();
+      ctx.textBaseline = 'top';
+      ctx.font = ` ${textSize}px ${textFont}`;
+      const textWidth = ctx.measureText(textStrings[selectedElementId]).width;
+      ctx.restore();
+
+      const { x, y } = p1[selectedElementId];
+      extraOptions = { p2: { x: x + textWidth, y: y + textSize } };
+    }
+
     editCanvasElement(selectedElementId, {
       roughElement,
       //set explicity becaue its changed in the function createElement
       fillColor,
       ...customizabilityDict,
+      ...extraOptions,
     });
     pushCanvasHistory();
     setWebsocketAction(selectedElementId, 'editCanvasElement');
