@@ -10,11 +10,12 @@ const ShareScreen = () => {
   const videoRef = useRef<HTMLVideoElement>();
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
   const { socket } = useWebSocketStore(['socket']);
-  const { appHeight, appWidth, zoom, panOffset } = useAppStore([
+  const { appHeight, appWidth, zoom, panOffset, setIsInCall } = useAppStore([
     'appHeight',
     'appWidth',
     'zoom',
     'panOffset',
+    'setIsInCall',
   ]);
   const producerPeerRef = useRTCProducer(
     videoRef,
@@ -48,6 +49,7 @@ const ShareScreen = () => {
   }, []);
 
   useEffect(() => {
+    setIsInCall(screenStream !== null);
     if (screenStream !== null) {
       videoRef.current = document.createElement('video');
       videoRef.current.srcObject = screenStream;

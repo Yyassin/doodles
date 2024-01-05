@@ -23,6 +23,7 @@ interface AppState {
   isFullscreen: boolean;
   // Whether sharing screen or not
   isSharingScreen: boolean;
+  isInCall: boolean;
   // Viewport width
   appWidth: number;
   // Viewport Height
@@ -49,6 +50,7 @@ interface AppActions {
   setAppZoom: (zoom: number) => void;
   setPanOffset: (x: number, y: number) => void;
   setIsSharingScreen: (isShareScreen: boolean) => void;
+  setIsInCall: (isInCall: boolean) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -60,6 +62,7 @@ export const initialAppState: AppState = {
   theme: 'dark',
   isFullscreen: false,
   isSharingScreen: false,
+  isInCall: false,
   appWidth: window.innerWidth,
   appHeight: window.innerHeight,
   zoom: 1, // 100%
@@ -84,6 +87,8 @@ const setIsFullscreen = (set: SetState<AppStore>) => (isFullscreen: boolean) =>
 const setIsSharingScreen =
   (set: SetState<AppStore>) => (isSharingScreen: boolean) =>
     set(() => ({ isSharingScreen }));
+const setIsInCall = (set: SetState<AppStore>) => (isInCall: boolean) =>
+  set(() => ({ isInCall }));
 const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
   set(() => ({
     zoom,
@@ -103,5 +108,6 @@ const appStore = create<AppStore>()((set) => ({
   setAppDimensions: setAppDimensions(set),
   setAppZoom: setAppZoom(set),
   setPanOffset: setPanOffset(set),
+  setIsInCall: setIsInCall(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);

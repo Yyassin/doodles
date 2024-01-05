@@ -8,7 +8,7 @@ import CanvasTooltip from './CanvasTooltip';
  */
 
 const DEFAULT_CLASSNAME =
-  'p-[0.75rem] rounded-md items-center bg-white justify-center outline-none hover:bg-indigo-100 shadow-[0_3px_10px_rgb(0,0,0,0.2)]';
+  'p-[0.75rem] rounded-md items-center justify-center outline-none hover:bg-indigo-100 shadow-[0_3px_10px_rgb(0,0,0,0.2)]';
 
 const BaseCanvasButton =
   (defaultClassname = DEFAULT_CLASSNAME) =>
