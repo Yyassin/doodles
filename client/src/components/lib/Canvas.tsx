@@ -471,12 +471,6 @@ export default function Canvas() {
             elementType,
           );
 
-          // console.log(
-          //   clientX - selectOffset.current.x,
-          //   clientY - selectOffset.current.y,
-          //   clientX - selectOffset.current.x + width,
-          //   clientY - selectOffset.current.y + height,
-          // );
           break;
         }
         case 'rotating': {

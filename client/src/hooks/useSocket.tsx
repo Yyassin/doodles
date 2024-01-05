@@ -135,7 +135,6 @@ export const useSocket = () => {
         },
         true,
       );
-      console.log(element.p1.x, element.p1.y, element.p2.x, element.p2.y);
       editCanvasElement(element.id, newElement, true);
     },
   };
@@ -185,13 +184,6 @@ export const useSocket = () => {
         angle: angles[actionElementID],
       },
       true,
-    );
-    console.log(
-      'socket',
-      p1[actionElementID].x,
-      p1[actionElementID].y,
-      p2[actionElementID].x,
-      p2[actionElementID].y,
     );
 
     delete element.roughElement;
