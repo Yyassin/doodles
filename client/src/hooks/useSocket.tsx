@@ -28,6 +28,8 @@ export const useSocket = () => {
     undoCanvasHistory,
     redoCanvasHistory,
     pushCanvasHistory,
+    removeCanvasElements,
+    setSelectedElements,
     types,
     strokeColors,
     fillColors,
@@ -49,6 +51,8 @@ export const useSocket = () => {
     'undoCanvasHistory',
     'redoCanvasHistory',
     'pushCanvasHistory',
+    'removeCanvasElements',
+    'setSelectedElements',
     'types',
     'strokeColors',
     'fillColors',
@@ -146,6 +150,11 @@ export const useSocket = () => {
       editCanvasElement(element.id, newElement, true);
       pushCanvasHistory();
     },
+    removeCanvasElements: (ids: string[]) => {
+      setSelectedElements([]);
+      removeCanvasElements(ids);
+      pushCanvasHistory();
+    },
     undoCanvasHistory: () => {
       undoCanvasHistory();
     },
@@ -179,6 +188,12 @@ export const useSocket = () => {
 
     if (action === 'undoCanvasHistory' || action === 'redoCanvasHistory') {
       socket.current?.sendMsgRoom(action, null);
+      setWebsocketAction('', '');
+      return;
+    }
+
+    if (typeof actionElementID === 'object') {
+      socket.current?.sendMsgRoom(action, actionElementID);
       setWebsocketAction('', '');
       return;
     }

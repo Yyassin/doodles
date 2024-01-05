@@ -107,7 +107,7 @@ export default class WebsocketClient {
    *
    * @param msg String, the message to be sent to the room
    */
-  sendMsgRoom(topic: string, msg: CanvasElement | null) {
+  sendMsgRoom(topic: string, msg: CanvasElement | string | string[] | null) {
     //msg to be changed to proper type once everything finalized
     this.checkSocket();
 
