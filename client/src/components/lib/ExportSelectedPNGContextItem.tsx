@@ -19,10 +19,16 @@ const ExportSelectedPNGContextItem = () => {
     freehandPoints,
     freehandBounds,
     textStrings,
+    textFontOptions,
+    textSizes,
+    fillColors,
     fileIds,
     isImagePlaceds,
     angles,
     roughElements,
+    opacities,
+    strokeColors,
+    strokeWidths,
   } = useCanvasElementStore([
     'selectedElementIds',
     'p1',
@@ -31,10 +37,16 @@ const ExportSelectedPNGContextItem = () => {
     'freehandPoints',
     'freehandBounds',
     'textStrings',
+    'textFontOptions',
+    'textSizes',
+    'fillColors',
     'fileIds',
     'isImagePlaceds',
     'angles',
     'roughElements',
+    'opacities',
+    'strokeColors',
+    'strokeWidths',
   ]);
   return (
     <ContextMenuItem
@@ -50,11 +62,22 @@ const ExportSelectedPNGContextItem = () => {
             freehandPoints,
             freehandBounds,
             textStrings,
+            textFontOptions,
+            textSizes,
+            fillColors,
             isImagePlaceds,
             fileIds,
             roughElements,
+            opacities,
+            strokeColors,
+            strokeWidths,
           },
-          { margin: 20, fillColour: 'white' },
+          {
+            margin: 20,
+            fillColour: 'white',
+            textFontOption: 'Trebuchet MS',
+            textSize: 30,
+          },
         );
         canvas && handlePNGExport(canvas.toDataURL('image/png'));
       }}
