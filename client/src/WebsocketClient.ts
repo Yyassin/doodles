@@ -85,9 +85,6 @@ export default class WebsocketClient {
         }
         return;
       }
-      if (jsonMsg.topic === 'editCanvasElement') {
-        console.log('heloolo');
-      }
       this.callBacks[jsonMsg.topic](jsonMsg.payload);
     });
   }

@@ -206,6 +206,7 @@ export default function Canvas() {
         strokeLineDash: strokeLineDashes[id],
         opacity: opacities[id],
         text: options?.text ?? '',
+        angle: angles[id],
       },
     );
     editCanvasElement(id, {
@@ -425,6 +426,9 @@ export default function Canvas() {
       setWebsocketAction(currentDrawingElemId.current, action);
     }
 
+    if (action === 'moving' || action === 'resizing' || action === 'rotating') {
+      setWebsocketAction(selectedElementIds[0], 'editCanvasElement');
+    }
     // Return to idle none action state, unless it's writing. We want to
     // write after a mouse up, so we'll set none explicitly.
     action !== 'writing' && setAction('none');
@@ -466,6 +470,13 @@ export default function Canvas() {
             clientY - selectOffset.current.y + height,
             elementType,
           );
+
+          // console.log(
+          //   clientX - selectOffset.current.x,
+          //   clientY - selectOffset.current.y,
+          //   clientX - selectOffset.current.x + width,
+          //   clientY - selectOffset.current.y + height,
+          // );
           break;
         }
         case 'rotating': {

@@ -1,6 +1,7 @@
 import React from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 
 /**
  * This file defines the OpacitySlider component, which allows the user to adjust
@@ -17,6 +18,7 @@ const OpacitySlider = () => {
       'selectedElementIds',
       'opacities',
     ]);
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
   return (
     <Slider.Root
@@ -24,6 +26,7 @@ const OpacitySlider = () => {
       value={[opacities[selectedElementIds[0]] ?? 1]}
       onValueChange={(value) => {
         editCanvasElement(selectedElementIds[0], { opacity: value[0] });
+        setWebsocketAction(selectedElementIds[0], 'editCanvasElement');
       }}
       min={0}
       max={1}

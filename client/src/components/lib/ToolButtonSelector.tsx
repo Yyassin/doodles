@@ -49,6 +49,7 @@ const ToolButton = ({
     fillStyles,
     strokeLineDashes,
     opacities,
+    angles,
     p1,
     p2,
     textStrings,
@@ -65,6 +66,7 @@ const ToolButton = ({
     'strokeLineDashes',
     'opacities',
     'freehandPoints',
+    'angles',
     'p1',
     'p2',
     'textStrings',
@@ -107,6 +109,8 @@ const ToolButton = ({
         opacity: customizabilityDict.opacity ?? opacities[selectedElementId],
 
         text: textStrings[selectedElementId],
+
+        angle: angles[selectedElementId],
       },
     );
 

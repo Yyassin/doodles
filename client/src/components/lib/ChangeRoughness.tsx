@@ -21,7 +21,7 @@ const roughnessMap: Record<string, string> = {
 };
 
 const mapRoughness = {
-  smooth: 0,
+  smooth: 0.01,
   rough: 1.5,
   extraRough: 3,
 };

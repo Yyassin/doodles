@@ -96,6 +96,7 @@ export const renderCanvasElements = (
           types[id],
         );
         const [tx, ty] = [x1a - minX, y1a - minY];
+        console.log(minX, minY, x1a, y1a);
         ctx.translate(tx, ty);
         ctx.fillStyle = strokeColors[id];
 

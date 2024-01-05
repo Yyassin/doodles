@@ -6,6 +6,7 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { useEffect, useRef } from 'react';
+import { rescalePointsInElem } from '@/lib/canvasElements/resize';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -35,6 +36,7 @@ export const useSocket = () => {
     strokeLineDashes,
     opacities,
     freehandPoints,
+    angles,
     p1,
     p2,
     textStrings,
@@ -52,6 +54,7 @@ export const useSocket = () => {
     'strokeLineDashes',
     'opacities',
     'freehandPoints',
+    'angles',
     'p1',
     'p2',
     'textStrings',
@@ -80,6 +83,7 @@ export const useSocket = () => {
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
           text: element.text,
+          angle: element.angle,
         },
       );
       addCanvasShape(newElement);
@@ -103,6 +107,7 @@ export const useSocket = () => {
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
           text: element.text,
+          angle: element.angle,
         },
         true,
       );
@@ -127,11 +132,12 @@ export const useSocket = () => {
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
           text: element.text,
+          angle: element.angle,
         },
         true,
       );
-      console.log(element.fillStyle);
-      editCanvasElement(element.id, newElement);
+      console.log(element.p1.x, element.p1.y, element.p2.x, element.p2.y);
+      editCanvasElement(element.id, newElement, true);
     },
   };
 
@@ -166,9 +172,7 @@ export const useSocket = () => {
       p2[actionElementID].x,
       p2[actionElementID].y,
       types[actionElementID],
-      action === 'addCanvasFreehand'
-        ? freehandPoints[actionElementID]
-        : undefined,
+      freehandPoints[actionElementID],
       {
         stroke: strokeColors[actionElementID],
         fill: fillColors[actionElementID],
@@ -179,16 +183,19 @@ export const useSocket = () => {
         strokeLineDash: strokeLineDashes[actionElementID],
         opacity: opacities[actionElementID],
         text: textStrings[actionElementID],
+        angle: angles[actionElementID],
       },
       true,
     );
+    console.log(
+      'socket',
+      p1[actionElementID].x,
+      p1[actionElementID].y,
+      p2[actionElementID].x,
+      p2[actionElementID].y,
+    );
 
     delete element.roughElement;
-
-    if (action === 'editCanvasElement') {
-      console.log('hello');
-      console.log(fillStyles[actionElementID]);
-    }
 
     socket.current?.sendMsgRoom(action, element);
     setWebsocketAction('', '');
