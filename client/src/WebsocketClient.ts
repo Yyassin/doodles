@@ -16,6 +16,9 @@ import { ValueOf } from './lib/misc';
 interface CallBacksType {
   addCanvasShape: (element: CanvasElement) => void;
   addCanvasFreehand: (element: CanvasElement) => void;
+  editCanvasElement: (element: CanvasElement) => void;
+  undoCanvasHistory: () => void;
+  redoCanvasHistory: () => void;
 }
 
 interface WSMessageType {
@@ -192,7 +195,10 @@ export default class WebsocketClient {
    *
    * @param msg String, the message to be sent to the room
    */
-  async sendMsgRoom(topic: string, msg: CanvasElement) {
+  async sendMsgRoom(
+    topic: string,
+    msg: CanvasElement | string | string[] | null,
+  ) {
     // Msg to be changed to proper type once everything finalized
     if (this.room === null) throw 'No room assigned!';
     return this.send({

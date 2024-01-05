@@ -4,6 +4,7 @@ import { TrashIcon } from '@radix-ui/react-icons';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ExportSelectedPNGContextItem from './ExportSelectedPNGContextItem';
 import ContextMenuItem from './ContextMenuItem';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 
 /**
  * Defines a context menu, with options, that is revealed
@@ -23,6 +24,9 @@ const ContextMenu = () => {
     'selectedElementIds',
     'pushCanvasHistory',
   ]);
+
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
+
   return (
     <RadixContextMenu.Portal>
       <RadixContextMenu.Content
@@ -40,6 +44,8 @@ const ContextMenu = () => {
                 setSelectedElements([]);
                 removeCanvasElements(ids);
                 pushCanvasHistory();
+
+                setWebsocketAction(ids, 'removeCanvasElements');
               }}
               className="text-red-700"
             >

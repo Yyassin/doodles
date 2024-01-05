@@ -69,6 +69,7 @@ interface CanvasElementActions {
   editCanvasElement: (
     id: string,
     partialElement: Partial<CanvasElement>,
+    isLive?: boolean,
   ) => void;
   removeCanvasElements: (ids: string[]) => void;
   setSelectedElements: (ids: string[]) => void;
@@ -287,7 +288,7 @@ const addCanvasFreehand =
 const editCanvasElement =
   (set: SetState<CanvasElementState>) =>
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  (id: string, partialElement: Partial<CanvasElement>) =>
+  (id: string, partialElement: Partial<CanvasElement>, isLive = false) =>
     set((state) => {
       // Edit shouldn't add a new id
       const types = partialElement.type
@@ -390,8 +391,10 @@ const editCanvasElement =
           ],
         };
 
-        p1s = { ...state.p1, [id]: { x: minX, y: minY } };
-        p2s = { ...state.p2, [id]: { x: maxX, y: maxY } };
+        if (!isLive) {
+          p1s = { ...state.p1, [id]: { x: minX, y: minY } };
+          p2s = { ...state.p2, [id]: { x: maxX, y: maxY } };
+        }
       }
 
       return {

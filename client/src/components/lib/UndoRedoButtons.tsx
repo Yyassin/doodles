@@ -6,6 +6,7 @@ import {
   historyIndex,
   useCanvasElementStore,
 } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 
 /**
  * Defines a set out buttons for undoing
@@ -19,6 +20,18 @@ const UndoRedoButtons = () => {
     'redoCanvasHistory',
   ]);
 
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
+
+  const undo = () => {
+    undoCanvasHistory();
+    setWebsocketAction('undo', 'undoCanvasHistory');
+  };
+
+  const redo = () => {
+    redoCanvasHistory();
+    setWebsocketAction('redo', 'redoCanvasHistory');
+  };
+
   return (
     <div
       className="flex w-full min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)]"
@@ -29,7 +42,7 @@ const UndoRedoButtons = () => {
       <CanvasFlatButton
         className="rounded-l-md bg-white"
         disabled={historyIndex <= 0}
-        onClick={undoCanvasHistory}
+        onClick={undo}
         tooltip={{
           content: 'Undo',
           side: 'top',
@@ -41,7 +54,7 @@ const UndoRedoButtons = () => {
       <CanvasFlatButton
         className="rounded-r-md bg-white"
         disabled={historyIndex >= history.length - 1}
-        onClick={redoCanvasHistory}
+        onClick={redo}
         tooltip={{
           content: 'Redo',
           side: 'top',

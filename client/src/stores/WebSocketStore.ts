@@ -9,7 +9,14 @@ import { generateRandId } from '@/lib/bytes';
  * @author Abdalla Abdelhadi
  */
 
-export const Actions = ['addCanvasShape', 'addCanvasFreehand'] as const;
+export const Actions = [
+  'addCanvasShape',
+  'addCanvasFreehand',
+  'editCanvasElement',
+  'undoCanvasHistory',
+  'redoCanvasHistory',
+  'removeCanvasElements',
+] as const;
 export type ActionsType = typeof Actions;
 
 /** Definitions */
@@ -20,17 +27,16 @@ interface WebSocketState {
   roomID: string | null;
   // The current action
   action: string;
-  // Modifed element ID
-  actionElementID: string;
   // Temporary, move to authStore
   userId: string;
+  actionElementID: string | string[];
 }
 
 interface WebSocketActions {
   // Reducer to set the roomID
   setRoomID: (roomID: string | null) => void;
   // Set action and elemID
-  setWebsocketAction: (elemID: string, action: string) => void;
+  setWebsocketAction: (elemID: string | string[], action: string) => void;
   // Set the socket reference
   setSocket: (socket: WebsocketClient) => void;
 }
@@ -55,10 +61,9 @@ const setRoomID = (set: SetState<WebSocketStore>) => (roomID: string | null) =>
   set(() => ({ roomID }));
 
 const setWebsocketAction =
-  (set: SetState<WebSocketStore>) => (actionElementID: string, tool: string) =>
+  (set: SetState<WebSocketStore>) =>
+  (actionElementID: string | string[], action: string) =>
     set(() => {
-      const action =
-        tool === 'freehand' ? 'addCanvasFreehand' : 'addCanvasShape';
       return { actionElementID, action };
     });
 

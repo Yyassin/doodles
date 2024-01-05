@@ -212,6 +212,7 @@ export default function Canvas() {
         strokeLineDash: strokeLineDashes[id],
         opacity: opacities[id],
         text: options?.text ?? '',
+        angle: angles[id],
       },
     );
     editCanvasElement(id, {
@@ -264,6 +265,9 @@ export default function Canvas() {
         text,
       },
     );
+
+    setWebsocketAction(elementId, 'addCanvasShape');
+    pushCanvasHistory();
 
     // Cleanup
     setAction('none');
@@ -427,9 +431,14 @@ export default function Canvas() {
     }
 
     if (action === 'drawing') {
-      setWebsocketAction(currentDrawingElemId.current, tool);
+      const action =
+        tool === 'freehand' ? 'addCanvasFreehand' : 'addCanvasShape';
+      setWebsocketAction(currentDrawingElemId.current, action);
     }
 
+    if (action === 'moving' || action === 'resizing' || action === 'rotating') {
+      setWebsocketAction(selectedElementIds[0], 'editCanvasElement');
+    }
     // Return to idle none action state, unless it's writing. We want to
     // write after a mouse up, so we'll set none explicitly.
     action !== 'writing' && setAction('none');
@@ -471,6 +480,7 @@ export default function Canvas() {
             clientY - selectOffset.current.y + height,
             elementType,
           );
+
           break;
         }
         case 'rotating': {
