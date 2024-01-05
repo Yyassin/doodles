@@ -39,6 +39,7 @@ export function signup(
 ): Promise<UserCredential> {
   return new Promise(async (resolve, reject) => {
     const auth = getAuth(firebaseApp);
+    console.log(profilePicture);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,

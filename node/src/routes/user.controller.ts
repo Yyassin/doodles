@@ -15,6 +15,12 @@ import { firebaseApp } from '../firebase/firebaseApp';
 
 // TODO: JSDOC
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
 //Create user
 export const handleCreateUser = async (req: Request, res: Response) => {
   try {
@@ -43,9 +49,9 @@ const validateId = (id: string, res: Response): id is string => {
   }
   return true;
 };
-
+const errorNotFound = 'user not found';
 const notFoundError = (res: Response) =>
-  res.status(HTTP_STATUS.ERROR).json({ error: 'user not found' });
+  res.status(HTTP_STATUS.ERROR).json({ error: errorNotFound });
 
 //Get user
 export const handleFindUserById = async (req: Request, res: Response) => {
@@ -62,17 +68,17 @@ export const handleFindUserById = async (req: Request, res: Response) => {
     } else {
       res
         .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-        .json({ error: 'user not found' });
+        .json({ error: errorNotFound });
     }
   } catch (error) {
     console.error('error finding user through email', error);
     res
       .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: 'user not found' });
+      .json({ error: errorNotFound });
   }
 };
 
-async function findUserByEmail(email: string): Promise<any | null> {
+async function findUserByEmail(email: string): Promise<User | null> {
   const usersCollection = firebaseApp.firestore().collection('User');
 
   const querySnapshot = await usersCollection.where('email', '==', email).get();
@@ -82,7 +88,7 @@ async function findUserByEmail(email: string): Promise<any | null> {
   }
 
   const userDoc = querySnapshot.docs[0];
-  return userDoc.data();
+  return userDoc.data() as User;
 }
 
 // Update user
