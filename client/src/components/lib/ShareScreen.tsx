@@ -6,16 +6,31 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
 import React, { useEffect, useRef, useState } from 'react';
 
 const ShareScreen = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const videoRef = useRef<HTMLVideoElement>();
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
   const { socket } = useWebSocketStore(['socket']);
-  const { appHeight, appWidth, zoom, panOffset, setIsInCall } = useAppStore([
-    'appHeight',
+  const {
+    setIsInCall,
+    appWidth,
+    appHeight,
+    setPanOffset,
+    setAppZoom,
+    zoom,
+    panOffset,
+    setVideoDimensions,
+    videoHeight,
+    videoWidth,
+  } = useAppStore([
+    'setIsInCall',
     'appWidth',
+    'appHeight',
+    'setPanOffset',
+    'setAppZoom',
     'zoom',
     'panOffset',
-    'setIsInCall',
+    'setVideoDimensions',
+    'videoHeight',
+    'videoWidth',
   ]);
   const producerPeerRef = useRTCProducer(
     videoRef,
@@ -50,66 +65,36 @@ const ShareScreen = () => {
 
   useEffect(() => {
     setIsInCall(screenStream !== null);
-    if (screenStream !== null) {
-      videoRef.current = document.createElement('video');
+    if (videoRef.current && screenStream !== null) {
       videoRef.current.srcObject = screenStream;
-      videoRef.current.addEventListener('loadeddata', loadedDataHandler);
-      updateCanvas();
+      setPanOffset(0, 0);
+      setAppZoom(1);
     }
-    return () => {
-      if (videoRef.current) {
-        videoRef.current.removeEventListener('loadeddata', loadedDataHandler);
-        videoRef.current.pause();
-        videoRef.current.srcObject = null;
-        videoRef.current = undefined;
-      }
-    };
-  }, [screenStream]);
-
+  }, [screenStream, videoRef.current]);
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.removeEventListener('loadeddata', loadedDataHandler);
-      videoRef.current.addEventListener('loadeddata', loadedDataHandler);
-      updateCanvas();
+    if (screenStream === null) return;
+    const { aspectRatio: aspect } = screenStream
+      ?.getVideoTracks()[0]
+      .getSettings() as { aspectRatio: number };
+    const videoHeight = appWidth / aspect;
+    const videoWidth = appHeight * aspect;
+    console.log(videoHeight, videoWidth);
+    console.log(appHeight, appWidth);
+    let w, h;
+    if (videoHeight < appHeight) {
+      h = appHeight;
+      w = videoWidth;
+    } else {
+      w = appWidth;
+      h = videoHeight;
     }
-  }, [appWidth, appHeight, zoom, panOffset]);
+    setVideoDimensions(w, h);
+  }, [screenStream, appHeight, appWidth]);
 
-  const loadedDataHandler = () => {
-    videoRef.current && videoRef.current.play();
-    updateCanvas();
-  };
+  //const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
 
-  const updateCanvas = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (ctx && videoRef.current) {
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-
-      const { videoHeight: height, videoWidth: width } = videoRef.current;
-      const aspect = height / width;
-      const videoHeight = appWidth * aspect;
-      const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
-      // Clear on each rerender
-      canvas && ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.save();
-      ctx.translate(
-        panOffset.x * zoom - scaleOffset.x,
-        panOffset.y * zoom - scaleOffset.y,
-      );
-      ctx.scale(zoom, zoom);
-      ctx.drawImage(
-        videoRef.current,
-        0,
-        (appHeight - videoHeight) / 2,
-        appWidth,
-        videoHeight,
-      );
-      ctx.restore();
-    }
-    requestAnimationFrame(updateCanvas);
-  };
-
+  // Temporarily apply scaling
+  // Panning & zooming
   return (
     <div
       className="flex flex-row items-center justify-center"
@@ -124,7 +109,27 @@ const ShareScreen = () => {
       }}
     >
       {screenStream !== null && (
-        <canvas width={appWidth} height={appHeight} ref={canvasRef} />
+        <div
+          style={{
+            position: 'absolute',
+            maxHeight: appHeight,
+            maxWidth: appWidth,
+            overflow: 'hidden',
+          }}
+        >
+          <video
+            style={{
+              transform: `scaleX(${zoom}) scaleY(${zoom}) translate(${panOffset.x}px, ${panOffset.y}px)`,
+            }}
+            ref={videoRef}
+            width={videoWidth ? videoWidth : appWidth}
+            height={videoHeight ? videoHeight : appHeight}
+            id="localElement"
+            playsInline
+            muted
+            autoPlay
+          />
+        </div>
       )}
     </div>
   );

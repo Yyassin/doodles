@@ -52,6 +52,8 @@ export default function Canvas() {
     tool,
     appHeight,
     appWidth,
+    videoHeight,
+    videoWidth,
     zoom,
     panOffset,
     setPanOffset,
@@ -61,6 +63,8 @@ export default function Canvas() {
     'tool',
     'appHeight',
     'appWidth',
+    'videoWidth',
+    'videoHeight',
     'zoom',
     'panOffset',
     'setPanOffset',
@@ -596,7 +600,7 @@ export default function Canvas() {
     <>
       <canvas
         id="canvas"
-        style={{ backgroundColor: 'transparent' }}
+        style={{ backgroundColor: 'transparent', border: 'black' }}
         width={appWidth}
         height={appHeight}
         onMouseDown={handleMouseDown}

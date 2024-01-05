@@ -199,6 +199,8 @@ export default class WebsocketClient {
       ...this.msgTemplate,
       topic: topic,
       payload: msg,
+      room: this.room,
+      id: this.userId,
     });
   }
 
@@ -211,6 +213,8 @@ export default class WebsocketClient {
     this.room = room;
     return this.send({
       topic: 'joinRoom',
+      room: this.room,
+      id: this.userId,
     });
   }
 
@@ -222,6 +226,8 @@ export default class WebsocketClient {
     this.checkSocket();
     await this.send({
       topic: 'leaveRoom',
+      room: this.room,
+      id: this.userId,
     });
     this.room = null;
   }
@@ -233,6 +239,7 @@ export default class WebsocketClient {
     return this.send({
       topic: 'rtc-end',
       room: this.room,
+      id: this.userId,
     });
   }
 
@@ -245,6 +252,8 @@ export default class WebsocketClient {
     return this.send({
       topic: 'ice-candidate',
       payload: { candidate },
+      room: this.room,
+      id: this.userId,
     });
   }
 }

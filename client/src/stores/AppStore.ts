@@ -28,6 +28,8 @@ interface AppState {
   appWidth: number;
   // Viewport Height
   appHeight: number;
+  videoWidth: number;
+  videoHeight: number;
   // Canvas Zoom
   zoom: number;
   //Panning offset
@@ -44,6 +46,7 @@ interface AppActions {
   setTheme: (theme: AppTheme) => void;
   // Reducer to set app window dimensions
   setAppDimensions: (width: number, height: number) => void;
+  setVideoDimensions: (width: number, height: number) => void;
   // Reducer to set full screen mode
   setIsFullscreen: (isFullscreen: boolean) => void;
   // Reducer to set zoom level
@@ -65,6 +68,8 @@ export const initialAppState: AppState = {
   isInCall: false,
   appWidth: window.innerWidth,
   appHeight: window.innerHeight,
+  videoWidth: 0,
+  videoHeight: 0,
   zoom: 1, // 100%
   panOffset: { x: 0, y: 0 },
 };
@@ -82,6 +87,9 @@ const setTheme = (set: SetState<AppStore>) => (theme: AppTheme) =>
 const setAppDimensions =
   (set: SetState<AppStore>) => (width: number, height: number) =>
     set(() => ({ appWidth: width, appHeight: height }));
+const setVideoDimensions =
+  (set: SetState<AppStore>) => (width: number, height: number) =>
+    set(() => ({ videoWidth: width, videoHeight: height }));
 const setIsFullscreen = (set: SetState<AppStore>) => (isFullscreen: boolean) =>
   set(() => ({ isFullscreen }));
 const setIsSharingScreen =
@@ -90,11 +98,16 @@ const setIsSharingScreen =
 const setIsInCall = (set: SetState<AppStore>) => (isInCall: boolean) =>
   set(() => ({ isInCall }));
 const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
-  set(() => ({
-    zoom,
-  }));
+  set((state) =>
+    state.isInCall
+      ? state
+      : {
+          ...state,
+          zoom,
+        },
+  );
 const setPanOffset = (set: SetState<AppStore>) => (x: number, y: number) =>
-  set(() => ({ panOffset: { x, y } }));
+  set((state) => (state.isInCall ? state : { ...state, panOffset: { x, y } }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
@@ -106,6 +119,7 @@ const appStore = create<AppStore>()((set) => ({
   setIsFullscreen: setIsFullscreen(set),
   setIsSharingScreen: setIsSharingScreen(set),
   setAppDimensions: setAppDimensions(set),
+  setVideoDimensions: setVideoDimensions(set),
   setAppZoom: setAppZoom(set),
   setPanOffset: setPanOffset(set),
   setIsInCall: setIsInCall(set),
