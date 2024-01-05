@@ -27,7 +27,8 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
@@ -38,11 +39,15 @@ jobs:
           version: 8
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
         with:
           path: ~/.npm
           key: npm-${{ hashFiles('./node/pnpm-lock.yaml') }}
-          restore-keys: npm-
+          restore-keys: ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
 
       - name: Install dependencies
         working-directory: ./client

@@ -6,14 +6,16 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import { firestore } from './firebase/firebaseApp';
+import { websocketManager } from './lib/websocket/WebSocketManager';
+import { Logger } from './utils/Logger';
+import { LOG_LEVEL } from './constants';
+import { sfuManager } from './lib/webrtc/SFUManager';
 import userRoutes from './api/user/user.route';
 import collaboratorRoutes from './api/collaborator/collaborator.route';
 import commentRoutes from './api/comment/comment.route';
 import boardRoutes from './api/board/board.route';
 import authRoutes from './api/auth/auth.route';
-import WebSocketManager from './lib/websocket/WebSocketManager';
-import { Logger } from './utils/Logger';
-import { LOG_LEVEL } from './constants';
+import sfuRoutes from './api/sfu/sfu.route';
 
 FastFire.initialize(firestore as Firestore);
 
@@ -35,10 +37,11 @@ app.use('/collaborator', collaboratorRoutes);
 app.use('/comment', commentRoutes);
 app.use('/board', boardRoutes);
 app.use('/auth', authRoutes);
+app.use('/sfu', sfuRoutes);
 
 server.listen(port, () => {
-  mainLogger.info(`Example app listening on port ${port}`);
+  mainLogger.info(`Example app listening on port ${port}.`);
 });
 
-WebSocketManager.Instance.init(server);
-// Init SFU Manager
+websocketManager.init(server);
+sfuManager.init();

@@ -13,4 +13,10 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 } as const;
 
-export const LOG_LEVEL = LogLevel.INFO;
+export const ICE_SERVERS = [
+  { urls: 'stun:stun.stunprotocol.org' },
+  { urls: 'stun:stun.stunprotocol.org:3478' },
+  { urls: 'stun:stun.l.google.com:19302' },
+];
+
+export const LOG_LEVEL = LogLevel.DEBUG;

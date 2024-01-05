@@ -10,6 +10,8 @@ import CustomToolbar from '@/components/lib/CustomizabilityToolbar';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ContextMenu from '@/components/lib/ContextMenu';
 import * as RadixContextMenu from '@radix-ui/react-context-menu';
+import ShareScreen from '@/components/lib/ShareScreen';
+import ShareScreenButton from '@/components/lib/ShareScreenButton';
 
 /**
  * Primary viewport that houses the canvas
@@ -41,6 +43,7 @@ const Viewport = () => {
           <ZoomButtons />
           <UndoRedoButtons />
           <FullScreenButton viewportRef={viewportRef} />
+          <ShareScreenButton />
         </div>
 
         {/* Temp */}
@@ -55,6 +58,7 @@ const Viewport = () => {
           Dashboard
         </button>
         <RadixContextMenu.Trigger>
+          <ShareScreen />
           <Canvas />
         </RadixContextMenu.Trigger>
       </div>

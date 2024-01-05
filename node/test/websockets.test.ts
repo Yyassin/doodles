@@ -46,6 +46,7 @@ class MockWebSocket {
 }
 
 describe('WebSocketManager', () => {
+  const id = 'anId';
   let server: http.Server;
   let webSocketManager: WebSocketManager;
   let sandbox: sinon.SinonSandbox;
@@ -59,6 +60,7 @@ describe('WebSocketManager', () => {
   afterEach(() => {
     sendSuccessResponseStub.resetHistory();
     sendErrorResponseStub.resetHistory();
+    WebSocketManager.destructor();
   });
 
   it('should initialize WebSocketManager', () => {
@@ -72,7 +74,7 @@ describe('WebSocketManager', () => {
     webSocketManager.init(server);
     const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
 
-    joinRoomCallback({ socket, room: 'testRoom', payload: 'data' });
+    joinRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
 
     expect(sendSuccessResponseStub.calledWith(socket, 'Socket joined room!')).to
       .be.true;
@@ -84,7 +86,7 @@ describe('WebSocketManager', () => {
     const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
 
     // Leave without ever joining
-    leaveRoomCallback({ socket, room: 'testRoom', payload: 'data' });
+    leaveRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
 
     expect(
       sendErrorResponseStub.calledWith(socket, 'Socket already is not room!'),
@@ -99,8 +101,8 @@ describe('WebSocketManager', () => {
     const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
 
     // Join then leave
-    joinRoomCallback({ socket, room: 'testRoom', payload: 'data' });
-    leaveRoomCallback({ socket, room: 'testRoom', payload: 'data' });
+    joinRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
+    leaveRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
 
     expect(sendSuccessResponseStub.calledWith(socket, 'Socket left room!')).to
       .be.true;
@@ -121,7 +123,12 @@ describe('WebSocketManager', () => {
       const socket = new MockWebSocket() as any;
       const sockets = i < 3 ? socketsA : socketsB;
       sockets.push(socket);
-      joinRoomCallback({ socket, room: i < 3 ? 'A' : 'B', payload: 'data' });
+      joinRoomCallback({
+        socket,
+        room: i < 3 ? 'A' : 'B',
+        payload: 'data',
+        id: i.toString(),
+      });
     }
 
     const msg = {
@@ -164,6 +171,7 @@ describe('WebSocketManager', () => {
       socket: socketsA[2] as any,
       room: 'A',
       payload: 'data',
+      id: '2',
     });
     //@ts-ignore
     webSocketManager.handleMsg(socketsA[0], rawData(msg));
@@ -177,6 +185,7 @@ describe('WebSocketManager', () => {
       topic: 'someTopic',
       payload: 'data',
       room: 'B',
+      id: '0',
     };
     //@ts-ignore
     webSocketManager.handleMsg(socketsB[0], rawData(msg2));
@@ -196,7 +205,7 @@ describe('WebSocketManager', () => {
     webSocketManager.init(server);
 
     const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
-    joinRoomCallback({ socket: socketA, room: 'A', payload: 'data' });
+    joinRoomCallback({ socket: socketA, room: 'A', payload: 'data', id });
 
     const msg = { topic: 'someTopic', payload: 'somePayload' };
 

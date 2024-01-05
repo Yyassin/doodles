@@ -21,6 +21,8 @@ interface AppState {
   theme: AppTheme;
   // Whether app is fullscreen or not
   isFullscreen: boolean;
+  // Whether sharing screen or not
+  isSharingScreen: boolean;
   // Viewport width
   appWidth: number;
   // Viewport Height
@@ -46,6 +48,7 @@ interface AppActions {
   // Reducer to set zoom level
   setAppZoom: (zoom: number) => void;
   setPanOffset: (x: number, y: number) => void;
+  setIsSharingScreen: (isShareScreen: boolean) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -56,6 +59,7 @@ export const initialAppState: AppState = {
   tool: 'line',
   theme: 'dark',
   isFullscreen: false,
+  isSharingScreen: false,
   appWidth: window.innerWidth,
   appHeight: window.innerHeight,
   zoom: 1, // 100%
@@ -77,6 +81,9 @@ const setAppDimensions =
     set(() => ({ appWidth: width, appHeight: height }));
 const setIsFullscreen = (set: SetState<AppStore>) => (isFullscreen: boolean) =>
   set(() => ({ isFullscreen }));
+const setIsSharingScreen =
+  (set: SetState<AppStore>) => (isSharingScreen: boolean) =>
+    set(() => ({ isSharingScreen }));
 const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
   set(() => ({
     zoom,
@@ -92,6 +99,7 @@ const appStore = create<AppStore>()((set) => ({
   setMode: setMode(set),
   setTheme: setTheme(set),
   setIsFullscreen: setIsFullscreen(set),
+  setIsSharingScreen: setIsSharingScreen(set),
   setAppDimensions: setAppDimensions(set),
   setAppZoom: setAppZoom(set),
   setPanOffset: setPanOffset(set),

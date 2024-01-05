@@ -32,6 +32,7 @@ export default class WebsocketClient {
   socket: WebSocket | null;
   room: string | null; //the current room the socket is in
   callBacks: CallBacksType;
+  injectableCallbacks: Record<string, (payload: unknown) => void>;
   msgTemplate = {
     topic: null,
     room: null,
@@ -49,9 +50,14 @@ export default class WebsocketClient {
     this.socket = null;
     this.room = null;
     this.callBacks = callBacks;
+    this.injectableCallbacks = {};
     this.userId = userId;
     this.reconnectInterval = reconnectInterval;
     this.connect(); // Create a socket
+  }
+
+  public on(handle: string, callback: (payload: unknown) => void) {
+    this.injectableCallbacks[handle] = callback;
   }
 
   /**
@@ -144,7 +150,12 @@ export default class WebsocketClient {
         return;
       }
 
-      this.callBacks[jsonMsg.topic](jsonMsg.payload);
+      const injectableCallbacks = this.injectableCallbacks[jsonMsg.topic];
+      if (injectableCallbacks !== undefined) {
+        injectableCallbacks(jsonMsg);
+      } else {
+        this.callBacks[jsonMsg.topic](jsonMsg.payload);
+      }
     });
   }
 
@@ -155,9 +166,9 @@ export default class WebsocketClient {
       this.socket.send(
         JSON.stringify({
           ...this.msgTemplate,
-          ...msg,
           room: this.room,
           id: this.userId,
+          ...msg,
         }),
       );
     } catch (err) {
@@ -187,9 +198,7 @@ export default class WebsocketClient {
     return this.send({
       ...this.msgTemplate,
       topic: topic,
-      room: this.room,
       payload: msg,
-      id: this.userId,
     });
   }
 
@@ -210,9 +219,32 @@ export default class WebsocketClient {
    */
   async leaveRoom() {
     if (this.room === null) throw "Socket isn't in a room";
+    this.checkSocket();
     await this.send({
       topic: 'leaveRoom',
     });
     this.room = null;
+  }
+
+  async rtcEnd() {
+    if (this.room === null) throw "Socket isn't in a room";
+    this.checkSocket();
+    console.log('SEND', this.room);
+    return this.send({
+      topic: 'rtc-end',
+      room: this.room,
+    });
+  }
+
+  async iceCandidate(candidate: RTCIceCandidate) {
+    this.checkSocket();
+
+    console.log(this.room);
+    console.log(candidate);
+
+    return this.send({
+      topic: 'ice-candidate',
+      payload: { candidate },
+    });
   }
 }
