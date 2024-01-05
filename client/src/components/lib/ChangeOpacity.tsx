@@ -12,12 +12,17 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
  */
 
 const OpacitySlider = () => {
-  const { editCanvasElement, selectedElementIds, opacities } =
-    useCanvasElementStore([
-      'editCanvasElement',
-      'selectedElementIds',
-      'opacities',
-    ]);
+  const {
+    editCanvasElement,
+    pushCanvasHistory,
+    selectedElementIds,
+    opacities,
+  } = useCanvasElementStore([
+    'editCanvasElement',
+    'pushCanvasHistory',
+    'selectedElementIds',
+    'opacities',
+  ]);
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
   return (
@@ -26,6 +31,7 @@ const OpacitySlider = () => {
       value={[opacities[selectedElementIds[0]] ?? 1]}
       onValueChange={(value) => {
         editCanvasElement(selectedElementIds[0], { opacity: value[0] });
+        pushCanvasHistory();
         setWebsocketAction(selectedElementIds[0], 'editCanvasElement');
       }}
       min={0}

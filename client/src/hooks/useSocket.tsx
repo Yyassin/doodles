@@ -25,6 +25,9 @@ export const useSocket = () => {
     addCanvasShape,
     addCanvasFreehand,
     editCanvasElement,
+    undoCanvasHistory,
+    redoCanvasHistory,
+    pushCanvasHistory,
     types,
     strokeColors,
     fillColors,
@@ -43,6 +46,9 @@ export const useSocket = () => {
     'addCanvasShape',
     'addCanvasFreehand',
     'editCanvasElement',
+    'undoCanvasHistory',
+    'redoCanvasHistory',
+    'pushCanvasHistory',
     'types',
     'strokeColors',
     'fillColors',
@@ -86,6 +92,7 @@ export const useSocket = () => {
         },
       );
       addCanvasShape(newElement);
+      pushCanvasHistory();
     },
     addCanvasFreehand: (element: CanvasElement) => {
       const newElement = createElement(
@@ -111,6 +118,7 @@ export const useSocket = () => {
         true,
       );
       addCanvasFreehand(newElement);
+      pushCanvasHistory();
     },
     editCanvasElement: (element: CanvasElement) => {
       const newElement = createElement(
@@ -136,6 +144,13 @@ export const useSocket = () => {
         true,
       );
       editCanvasElement(element.id, newElement, true);
+      pushCanvasHistory();
+    },
+    undoCanvasHistory: () => {
+      undoCanvasHistory();
+    },
+    redoCanvasHistory: () => {
+      redoCanvasHistory();
     },
   };
 
@@ -161,6 +176,12 @@ export const useSocket = () => {
   //Send message once action gets set. Note: will be changed
   useEffect(() => {
     if (actionElementID === '') return;
+
+    if (action === 'undoCanvasHistory' || action === 'redoCanvasHistory') {
+      socket.current?.sendMsgRoom(action, null);
+      setWebsocketAction('', '');
+      return;
+    }
 
     //Create element to send to other sockets in room
     const element = createElement(

@@ -11,6 +11,8 @@ export const Actions = [
   'addCanvasShape',
   'addCanvasFreehand',
   'editCanvasElement',
+  'undoCanvasHistory',
+  'redoCanvasHistory',
 ] as const;
 export type ActionsType = typeof Actions;
 

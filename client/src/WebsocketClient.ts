@@ -12,6 +12,8 @@ interface CallBacksType {
   addCanvasShape: (element: CanvasElement) => void;
   addCanvasFreehand: (element: CanvasElement) => void;
   editCanvasElement: (element: CanvasElement) => void;
+  undoCanvasHistory: () => void;
+  redoCanvasHistory: () => void;
 }
 
 interface WSMessageType {
@@ -105,7 +107,7 @@ export default class WebsocketClient {
    *
    * @param msg String, the message to be sent to the room
    */
-  sendMsgRoom(topic: string, msg: CanvasElement) {
+  sendMsgRoom(topic: string, msg: CanvasElement | null) {
     //msg to be changed to proper type once everything finalized
     this.checkSocket();
 

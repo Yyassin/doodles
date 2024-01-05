@@ -39,6 +39,7 @@ const ToolButton = ({
 }) => {
   const {
     editCanvasElement,
+    pushCanvasHistory,
     selectedElementIds,
     fillColors,
     types,
@@ -55,6 +56,7 @@ const ToolButton = ({
     textStrings,
   } = useCanvasElementStore([
     'editCanvasElement',
+    'pushCanvasHistory',
     'selectedElementIds',
     'fillColors',
     'types',
@@ -120,6 +122,7 @@ const ToolButton = ({
       fillColor,
       ...customizabilityDict,
     });
+    pushCanvasHistory();
     setWebsocketAction(selectedElementId, 'editCanvasElement');
   };
 
