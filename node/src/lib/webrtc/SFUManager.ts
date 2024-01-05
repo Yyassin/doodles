@@ -128,7 +128,9 @@ export class SFUManager extends Singleton<SFUManager>() {
     }
     const success = roomSFU.removeProducer();
     delete this.#SFUs[roomId];
-    this.#logger.debug(`Removed producer [${id}] from room [${roomId}]`);
+    this.#logger.debug(
+      `Removed producer [${id}] from room [${roomId}]: ${success}`,
+    );
     return success;
   }
 
@@ -140,7 +142,11 @@ export class SFUManager extends Singleton<SFUManager>() {
       );
       return false;
     }
-    return roomSFU.removeConsumer(id);
+    const success = roomSFU.removeConsumer(id);
+    this.#logger.debug(
+      `Removed consumer [${id}] from room [${roomId}]: ${success}`,
+    );
+    return success;
   }
 }
 

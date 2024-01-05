@@ -108,7 +108,7 @@ export class RoomSFU {
     }
 
     // Add producer streamers to consumer
-    const consumer = { id, peer: createPeer() } as ConsumerPeer;
+    const consumer = { id, peer: createPeer(), tracks: {} } as ConsumerPeer;
     this.#producer.stream.getTracks().forEach((track) => {
       this.#producer?.stream &&
         (consumer.tracks[track.label] = consumer.peer.addTrack(

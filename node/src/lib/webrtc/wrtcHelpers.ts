@@ -28,7 +28,7 @@ export const hookSignals = async (
         return;
       }
       const socket = roomSockets[id];
-      !socket && logger.debug('Failed to get streamer ice peer socket');
+      !socket && logger.debug('Failed to get ice peer socket');
 
       socket?.send(
         JSON.stringify({

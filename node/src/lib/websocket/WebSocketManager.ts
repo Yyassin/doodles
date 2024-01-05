@@ -82,8 +82,13 @@ class WebSocketManager extends Singleton<WebSocketManager>() {
 
     const callback = this.callbacks[topic];
     if (callback === undefined) {
+      const sockets = this.sockets[room];
+      if (sockets === undefined) {
+        this.#logger.error(`Tried to broadcast to undefined room [${room}]`);
+        return;
+      }
       // Send message and topic to sockets in room
-      return Object.values(this.sockets[room]).forEach((roomSocket) => {
+      return Object.values(sockets).forEach((roomSocket) => {
         if (socket != roomSocket) {
           roomSocket.send(JSON.stringify({ topic: topic, payload: payload }));
         }

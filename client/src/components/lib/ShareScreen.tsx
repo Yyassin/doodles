@@ -1,127 +1,9 @@
-import WebsocketClient from '@/WebsocketClient';
+import useRTCConsumer from '@/hooks/webrtc/useRTCConsumer';
+import useRTCProducer from '@/hooks/webrtc/useRTCProducer';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import { startScreenShare } from '@/lib/screenshare';
-import { createPeer, handleNegotiationNeededEvent } from '@/lib/webrtc';
 import { useAppStore } from '@/stores/AppStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
-import React, { RefObject, useEffect, useRef, useState } from 'react';
-
-const useRTCProducer = (
-  videoRef: RefObject<HTMLVideoElement | undefined>,
-  screenStream: MediaStream | null,
-  setScreenStream: (stream: MediaStream | null) => void,
-) => {
-  const peerRef = useRef<RTCPeerConnection>();
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const { isSharingScreen, setIsSharingScreen } = useAppStore([
-    'isSharingScreen',
-    'setIsSharingScreen',
-  ]);
-  const { socket, roomID, userId } = useWebSocketStore([
-    'socket',
-    'roomID',
-    'userId',
-  ]);
-
-  useEffect(() => {
-    return () => {
-      cleanup();
-      // Leave room for component unmount is handled by canvas
-    };
-  }, []);
-
-  useEffect(() => {
-    window.onbeforeunload = async () => {
-      cleanup();
-      await socket?.leaveRoom();
-    };
-    return () => {
-      window.onbeforeunload = null;
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    if (isSharingScreen) {
-      initProducer();
-    } else {
-      cleanup();
-      stopScreenShare();
-    }
-  }, [isSharingScreen]);
-
-  const initProducer = async () => {
-    if (!isSharingScreen) {
-      return;
-    }
-    const { stream, recorder } = await startScreenShare(
-      setScreenStream,
-      async () => {
-        setScreenStream(null);
-        setIsSharingScreen(false);
-        await socket?.rtcEnd();
-        peerRef.current?.close();
-        peerRef.current = undefined;
-      },
-    );
-    if (stream === undefined || recorder === undefined) {
-      console.log('canceled');
-      return;
-    }
-    const peer = createProducer();
-    if (peer === undefined) {
-      return;
-    }
-
-    peerRef.current = peer;
-    mediaRecorderRef.current = recorder;
-    // TODO: Store senders with labels in ref
-    stream.getTracks().forEach((track) => peer.addTrack(track, stream));
-  };
-
-  const createProducer = () => {
-    if (roomID === null) {
-      console.error('Cannot start a stream outside a room!');
-      return;
-    }
-    return createPeer(
-      (candidate) => {
-        socket?.iceCandidate(candidate);
-      },
-      (peer) =>
-        handleNegotiationNeededEvent(
-          peer,
-          'broadcast',
-          roomID,
-          userId,
-          cleanup,
-        ),
-    );
-  };
-
-  const cleanup = () => {
-    peerRef.current?.close();
-    peerRef.current = undefined;
-    stopScreenShare();
-  };
-
-  const stopScreenShare = () => {
-    if (screenStream) {
-      const tracks = screenStream.getTracks();
-      // Remove from peer stream?
-      tracks.forEach((track) => track.stop());
-    }
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state === 'recording'
-    ) {
-      mediaRecorderRef.current.stop();
-    }
-    setScreenStream(null);
-    setIsSharingScreen(false);
-  };
-
-  return peerRef;
-};
+import React, { useEffect, useRef, useState } from 'react';
 
 const ShareScreen = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -139,7 +21,11 @@ const ShareScreen = () => {
     screenStream,
     setScreenStream,
   );
-  //useRTCConsumer();
+  const consumerPeerRef = useRTCConsumer(
+    videoRef,
+    screenStream,
+    setScreenStream,
+  );
 
   useEffect(() => {
     socket?.on('new-ice-candidate', (msg) => {
@@ -152,6 +38,11 @@ const ShareScreen = () => {
         producerPeerRef.current.remoteDescription !== null
       ) {
         producerPeerRef.current.addIceCandidate(candidate as RTCIceCandidate);
+      } else if (
+        consumerPeerRef.current &&
+        consumerPeerRef.current.remoteDescription !== null
+      ) {
+        consumerPeerRef.current.addIceCandidate(candidate as RTCIceCandidate);
       }
     });
   }, []);
@@ -172,6 +63,7 @@ const ShareScreen = () => {
       }
     };
   }, [screenStream]);
+
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.removeEventListener('loadeddata', loadedDataHandler);
@@ -179,10 +71,12 @@ const ShareScreen = () => {
       updateCanvas();
     }
   }, [appWidth, appHeight, zoom, panOffset]);
+
   const loadedDataHandler = () => {
     videoRef.current && videoRef.current.play();
     updateCanvas();
   };
+
   const updateCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -223,8 +117,7 @@ const ShareScreen = () => {
         left: 0,
         width: '100%',
         height: '100%',
-        // If share, set to transparent?
-        backgroundColor: 'transparent',
+        backgroundColor: screenStream !== null ? 'transparent' : 'white',
         zIndex: -1,
       }}
     >
