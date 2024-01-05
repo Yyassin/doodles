@@ -258,6 +258,9 @@ export default function Canvas() {
       },
     );
 
+    setWebsocketAction(elementId, 'addCanvasShape');
+    pushCanvasHistory();
+
     // Cleanup
     setAction('none');
     setSelectedElements([]);
