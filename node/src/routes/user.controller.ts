@@ -6,10 +6,11 @@ import {
   updateUser,
 } from '../models/user';
 import { HTTP_STATUS } from '../constants';
+import { firebaseApp } from '../firebase/firebaseApp';
 
 /**
  * Firebase API controllers, logic for endpoint routes.
- * @author Ibrahim Almalki
+ * @author Ibrahim, Zakariyya Almalki
  */
 
 // TODO: JSDOC
@@ -49,23 +50,40 @@ const notFoundError = (res: Response) =>
 //Get user
 export const handleFindUserById = async (req: Request, res: Response) => {
   try {
-    const userId = req.body.id; // The user ID parameter is in the body.
-    if (!validateId(userId, res)) return;
+    const email = req.query.email as string;
 
-    const user = await findUserById(userId as string);
+    if (!email) {
+      return res.status(HTTP_STATUS.ERROR);
+    }
 
+    const user = await findUserByEmail(email);
     if (user) {
       res.status(HTTP_STATUS.SUCCESS).json({ user });
     } else {
-      return notFoundError(res);
+      res
+        .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({ error: 'user not found' });
     }
   } catch (error) {
-    console.error('Error finding user by ID:', error);
+    console.error('error finding user through email', error);
     res
       .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: 'Failed to find user' });
+      .json({ error: 'user not found' });
   }
 };
+
+async function findUserByEmail(email: string): Promise<any | null> {
+  const usersCollection = firebaseApp.firestore().collection('User');
+
+  const querySnapshot = await usersCollection.where('email', '==', email).get();
+
+  if (querySnapshot.empty) {
+    return null;
+  }
+
+  const userDoc = querySnapshot.docs[0];
+  return userDoc.data();
+}
 
 // Update user
 export const handleUpdateUser = async (req: Request, res: Response) => {

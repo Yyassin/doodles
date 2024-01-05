@@ -6,6 +6,7 @@ import { firebaseApp } from '../../firebaseDB/firebase';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import * as Avatar from '@radix-ui/react-avatar';
 import { ACCESS_TOKEN_TAG } from '../../constants';
+import { useAuthStore } from '@/stores/AuthStore';
 
 /**
  * Define a react component that displays a the user infromation with a dropdown menu
@@ -14,6 +15,12 @@ import { ACCESS_TOKEN_TAG } from '../../constants';
 
 export const IconDropDown = () => {
   const { setMode } = useAppStore(['setMode']);
+  const { userFirstName, userLastName, userEmail, userPicture } = useAuthStore([
+    'userFirstName',
+    'userLastName',
+    'userEmail',
+    'userPicture',
+  ]);
   const handleLogOut = async () => {
     try {
       await signOut(getAuth(firebaseApp));
@@ -34,7 +41,7 @@ export const IconDropDown = () => {
           <Avatar.Root className="bg-blackA1 inline-flex h-[45px] w-[45px] select-none items-center justify-center overflow-hidden rounded-full align-middle">
             <Avatar.Image
               className="h-full w-full rounded-[inherit] object-cover"
-              src="https://images.unsplash.com/photo-1511485977113-f34c92461ad9?ixlib=rb-1.2.1&w=128&h=128&dpr=2&q=80"
+              src={userPicture}
             />
             <Avatar.Fallback
               className="text-violet11 leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium"
@@ -44,8 +51,10 @@ export const IconDropDown = () => {
             </Avatar.Fallback>
           </Avatar.Root>
           <div className="flex flex-col">
-            <div>Test bye</div>
-            <div className="text-xs">job</div>
+            <div>
+              {userFirstName} {userLastName}
+            </div>
+            <div className="text-xs">{userEmail}</div>
           </div>
           <ChevronDownIcon />
         </button>
