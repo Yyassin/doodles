@@ -11,6 +11,10 @@ export const WS_URL = `ws://localhost:${WS_PORT}`;
 export const ACCESS_TOKEN_TAG = 'accessToken';
 export const REST_ROOT = 'http://localhost:3005';
 export const REST_URL = { auth: `${REST_ROOT}/auth/token` };
+export const GET_USER_URL = {
+  getUser: `${REST_ROOT}/user/getUser`,
+  createUser: `${REST_ROOT}/user/createUser`,
+};
 export const HTTP_STATUS = {
   SUCCESS: 200,
   ERROR: 400,
@@ -23,10 +27,6 @@ export const ZOOM = {
   MIN: 0.1, // 10%
   MAX: 20, // 2000%
 } as const;
-
-// TODO: Move to state eventually
-export const TEXT_FONT_SIZE = 24;
-export const TEXT_FONT_FAMILY = 'sans-serif';
 
 /**
  * Image

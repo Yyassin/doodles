@@ -11,9 +11,13 @@ const fillStyle = 'none' as CanvasElementFillStyle;
 const strokeLineDash = [0];
 const opacity = 1;
 const angle = 0;
+const font = 'trebuchet MS';
+const size = 30;
 
 export const defaultOptions = {
   stroke,
+  font,
+  size,
   fill,
   bowing,
   roughness,
@@ -77,6 +81,8 @@ const createElement = (
     fillStyle: options.fillStyle,
     strokeLineDash: options.strokeLineDash,
     opacity: options.opacity,
+    textFontOption: options.font,
+    textSize: options.size,
     roughElement,
     text: options.text,
     freehandPoints: newPoints,

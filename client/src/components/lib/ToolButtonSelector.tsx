@@ -42,6 +42,8 @@ const ToolButton = ({
     pushCanvasHistory,
     selectedElementIds,
     fillColors,
+    textFontOptions,
+    textSizes,
     types,
     strokeColors,
     bowings,
@@ -59,6 +61,8 @@ const ToolButton = ({
     'pushCanvasHistory',
     'selectedElementIds',
     'fillColors',
+    'textFontOptions',
+    'textSizes',
     'types',
     'strokeColors',
     'bowings',
@@ -92,6 +96,10 @@ const ToolButton = ({
           customizabilityDict.strokeColor ?? strokeColors[selectedElementId],
 
         fill: customizabilityDict.fillColor ?? fillColors[selectedElementId],
+        font:
+          customizabilityDict.textFontOption ??
+          textFontOptions[selectedElementId],
+        size: customizabilityDict.textSize ?? textSizes[selectedElementId],
 
         bowing: customizabilityDict.bowing ?? bowings[selectedElementId],
 

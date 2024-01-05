@@ -22,6 +22,9 @@ export const ExportingDropDownMenu = () => {
     freehandPoints,
     freehandBounds,
     textStrings,
+    textFontOptions,
+    fillColors,
+    textSizes,
     fileIds,
     isImagePlaceds,
     angles,
@@ -37,6 +40,9 @@ export const ExportingDropDownMenu = () => {
     'freehandPoints',
     'freehandBounds',
     'textStrings',
+    'textFontOptions',
+    'textSizes',
+    'fillColors',
     'fileIds',
     'isImagePlaceds',
     'angles',
@@ -71,6 +77,9 @@ export const ExportingDropDownMenu = () => {
                     freehandPoints,
                     freehandBounds,
                     textStrings,
+                    textFontOptions,
+                    textSizes,
+                    fillColors,
                     isImagePlaceds,
                     fileIds,
                     roughElements,
@@ -78,7 +87,12 @@ export const ExportingDropDownMenu = () => {
                     strokeColors,
                     strokeWidths,
                   },
-                  { margin: 20, fillColour: 'white' },
+                  {
+                    margin: 20,
+                    fillColour: 'white',
+                    textFontOption: 'Trebuchet MS',
+                    textSize: 30,
+                  },
                 );
                 canvas && handlePDFExport(canvas.toDataURL('image/png'));
               }}
@@ -98,6 +112,9 @@ export const ExportingDropDownMenu = () => {
                     freehandPoints,
                     freehandBounds,
                     textStrings,
+                    fillColors,
+                    textFontOptions,
+                    textSizes,
                     isImagePlaceds,
                     fileIds,
                     roughElements,
@@ -105,7 +122,12 @@ export const ExportingDropDownMenu = () => {
                     strokeColors,
                     strokeWidths,
                   },
-                  { margin: 20, fillColour: 'white' },
+                  {
+                    margin: 20,
+                    fillColour: 'white',
+                    textFontOption: 'Trebuchet MS',
+                    textSize: 30,
+                  },
                 );
                 canvas && handlePNGExport(canvas.toDataURL('image/png'));
               }}

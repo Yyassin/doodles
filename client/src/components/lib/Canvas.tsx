@@ -19,11 +19,7 @@ import {
 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import {
-  PERIPHERAL_CODES,
-  TEXT_FONT_FAMILY,
-  TEXT_FONT_SIZE,
-} from '@/constants';
+import { PERIPHERAL_CODES } from '@/constants';
 import { getCanvasContext, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
@@ -82,6 +78,8 @@ export default function Canvas() {
     setPendingImageElement,
     strokeColors,
     fillColors,
+    textFontOptions,
+    textSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -110,6 +108,8 @@ export default function Canvas() {
     'setPendingImageElement',
     'strokeColors',
     'fillColors',
+    'textFontOptions',
+    'textSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -199,6 +199,8 @@ export default function Canvas() {
       {
         stroke: strokeColors[id],
         fill: fillColors[id],
+        font: textFontOptions[id],
+        size: textSizes[id],
         bowing: bowings[id],
         roughness: roughnesses[id],
         strokeWidth: strokeWidths[id],
@@ -241,11 +243,13 @@ export default function Canvas() {
     // calculates the correct width.
     ctx.save();
     ctx.textBaseline = 'top';
-    ctx.font = `${TEXT_FONT_SIZE}px ${TEXT_FONT_FAMILY}`;
+    ctx.font = ` ${textSizes[currentDrawingElemId.current]}px ${
+      textFontOptions[currentDrawingElemId.current[0]]
+    }`;
     const textWidth = ctx.measureText(text).width;
     ctx.restore();
 
-    const textHeight = TEXT_FONT_SIZE;
+    const textHeight = textSizes[currentDrawingElemId.current];
     updateElement(
       elementId,
       x1,
@@ -270,6 +274,7 @@ export default function Canvas() {
     if (e.button === PERIPHERAL_CODES.RIGHT_MOUSE) {
       return;
     }
+
     // If we're writing, then we've clicked away after an edit
     // so we handle this with handle blur instead of creating a new element.
     if (action === 'writing') {
@@ -283,6 +288,8 @@ export default function Canvas() {
       panMouseStartPosition.current = { x: clientX, y: clientY };
       return;
     }
+
+    const prevSelectionId = selectedElementIds[0];
     setSelectedElements([]);
     if (tool === 'select') {
       // Using selection tool. Check if cursor is near an element.
@@ -318,6 +325,17 @@ export default function Canvas() {
       const selectOffsetY = clientY - p1[selectedElement.id].y;
       selectOffset.current = { x: selectOffsetX, y: selectOffsetY };
       setSelectedElements([selectedElement.id]);
+
+      // If we've mouse down on previously selected text element, then initiate an edit.
+      if (
+        types[selectedElement.id] === 'text' &&
+        selectedElement.id === prevSelectionId &&
+        selectedElement?.position === 'inside'
+      ) {
+        // We've clicked a text element, without dragging. Initiate an edit
+        setAction('writing');
+        return;
+      }
 
       // If the cursor is inside the element's BB, we're translating.
       // We are resizing otherwise.
@@ -386,23 +404,8 @@ export default function Canvas() {
     if (e.button === PERIPHERAL_CODES.RIGHT_MOUSE) {
       return;
     }
-    const { clientX, clientY } = getMouseCoordinates(e);
     // Destroy the selection frame
     setSelectionFrame(null);
-
-    // If we've mouse uped, and the position is close to the selection
-    // position of a text eleement, then initiate an edit.
-    if (
-      selectedElementIds.length === 1 &&
-      types[selectedElementIds[0]] === 'text' &&
-      clientX - (selectOffset.current?.x ?? 0) - p1[selectedElementIds[0]].x <
-        1 &&
-      clientY - (selectOffset.current?.y ?? 0) - p1[selectedElementIds[0]].y < 1
-    ) {
-      // We've clicked a text element, without dragging. Initiate an edit
-      setAction('writing');
-      return;
-    }
 
     // Reorder corners to align with the x1, y1 top left convention. This
     // is only needed if we were drawing, or resizing (otherwise, the corners wouldn't change).
@@ -622,7 +625,7 @@ export default function Canvas() {
             top:
               ((p1[selectedElementIds[0]]?.y ??
                 p1[currentDrawingElemId.current]?.y) -
-                3 +
+                5 +
                 panOffset.y) *
                 zoom -
               scaleOffset.y,
@@ -632,7 +635,15 @@ export default function Canvas() {
                 panOffset.x) *
                 zoom -
               scaleOffset.x,
-            font: `${TEXT_FONT_SIZE * zoom}px ${TEXT_FONT_FAMILY}`,
+            font: `${
+              textSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
+            }px ${
+              textFontOptions[
+                selectedElementIds[0] ?? currentDrawingElemId.current
+              ]
+            }`,
+            color:
+              fillColors[selectedElementIds[0] ?? currentDrawingElemId.current],
             margin: 0,
             padding: 0,
             border: 0,
