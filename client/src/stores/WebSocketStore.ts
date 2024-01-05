@@ -7,7 +7,11 @@ import { createStoreWithSelectors } from './utils';
  * @author Abdalla Abdelhadi
  */
 
-export const Actions = ['addCanvasShape', 'addCanvasFreehand'] as const;
+export const Actions = [
+  'addCanvasShape',
+  'addCanvasFreehand',
+  'editCanvasElement',
+] as const;
 export type ActionsType = typeof Actions;
 
 /** Definitions */
@@ -43,9 +47,7 @@ const setRoomID = (set: SetState<WebSocketStore>) => (roomID: string | null) =>
 const setWebsocketAction =
   (set: SetState<WebSocketStore>) => (actionElementID: string, tool: string) =>
     set(() => {
-      const action =
-        tool === 'freehand' ? 'addCanvasFreehand' : 'addCanvasShape';
-      return { actionElementID, action };
+      return { actionElementID, action: tool };
     });
 
 /** Store Hook */

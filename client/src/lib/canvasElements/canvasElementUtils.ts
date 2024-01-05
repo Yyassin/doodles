@@ -1,13 +1,13 @@
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { generator } from './generator';
-import { CanvasElementType, Vector2 } from '@/types';
+import { CanvasElementFillStyle, CanvasElementType, Vector2 } from '@/types';
 
 const stroke = '#000000';
 const fill = undefined as string | undefined;
 const bowing = 0;
 const roughness = 0;
 const strokeWidth = 3;
-const fillStyle = 'none';
+const fillStyle = 'none' as CanvasElementFillStyle;
 const strokeLineDash = [0];
 const opacity = 1;
 
@@ -69,12 +69,12 @@ const createElement = (
     type,
     strokeColor: options.stroke,
     fillColor: options.fill,
-    bowing,
-    roughness,
-    strokeWidth,
-    fillStyle,
-    strokeLineDash,
-    opacity,
+    bowing: options.bowing,
+    roughness: options.roughness,
+    strokeWidth: options.strokeWidth,
+    fillStyle: options.fillStyle,
+    strokeLineDash: options.strokeLineDash,
+    opacity: options.opacity,
     roughElement,
     text: options.text,
     freehandPoints: newPoints,

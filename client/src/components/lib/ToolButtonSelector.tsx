@@ -6,6 +6,7 @@ import {
   useCanvasElementStore,
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 
 /**
  * This file defines the ToolButton component, which represents a button for a toolbar tool.
@@ -13,7 +14,7 @@ import { createElement } from '@/lib/canvasElements/canvasElementUtils';
  * The currently active tool is highlighted. The ToolButton component is used in various
  * tool groups in the CustomizabilityToolbar to allow the user to select different options
  * for customizing the canvas elements.
- * @author Eebro
+ * @author Eebro, Abdalla
  */
 
 /**
@@ -69,6 +70,8 @@ const ToolButton = ({
     'textStrings',
   ]);
 
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
+
   const onClick = () => {
     // If the user was able to see the panel, only one element is selected.
     const selectedElementId = selectedElementIds[0];
@@ -106,12 +109,14 @@ const ToolButton = ({
         text: textStrings[selectedElementId],
       },
     );
+
     editCanvasElement(selectedElementId, {
       roughElement,
       //set explicity becaue its changed in the function createElement
       fillColor,
       ...customizabilityDict,
     });
+    setWebsocketAction(selectedElementId, 'editCanvasElement');
   };
 
   return (

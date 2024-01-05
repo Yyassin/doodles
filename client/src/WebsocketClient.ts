@@ -11,6 +11,7 @@ import { ValueOf } from './lib/misc';
 interface CallBacksType {
   addCanvasShape: (element: CanvasElement) => void;
   addCanvasFreehand: (element: CanvasElement) => void;
+  editCanvasElement: (element: CanvasElement) => void;
 }
 
 interface WSMessageType {
@@ -84,7 +85,9 @@ export default class WebsocketClient {
         }
         return;
       }
-
+      if (jsonMsg.topic === 'editCanvasElement') {
+        console.log('heloolo');
+      }
       this.callBacks[jsonMsg.topic](jsonMsg.payload);
     });
   }

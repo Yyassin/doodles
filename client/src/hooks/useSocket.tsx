@@ -13,15 +13,18 @@ import { useEffect, useRef } from 'react';
  */
 
 export const useSocket = () => {
-  const { roomID, actionElementID, action } = useWebSocketStore([
-    'roomID',
-    'actionElementID',
-    'action',
-  ]);
+  const { roomID, actionElementID, action, setWebsocketAction } =
+    useWebSocketStore([
+      'roomID',
+      'actionElementID',
+      'action',
+      'setWebsocketAction',
+    ]);
 
   const {
     addCanvasShape,
     addCanvasFreehand,
+    editCanvasElement,
     types,
     strokeColors,
     fillColors,
@@ -38,6 +41,7 @@ export const useSocket = () => {
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
+    'editCanvasElement',
     'types',
     'strokeColors',
     'fillColors',
@@ -104,6 +108,31 @@ export const useSocket = () => {
       );
       addCanvasFreehand(newElement);
     },
+    editCanvasElement: (element: CanvasElement) => {
+      const newElement = createElement(
+        element.id,
+        element.p1.x,
+        element.p1.y,
+        element.p2.x,
+        element.p2.y,
+        element.type,
+        element.freehandPoints,
+        {
+          stroke: element.strokeColor,
+          fill: element.fillColor,
+          bowing: element.bowing,
+          roughness: element.roughness,
+          strokeWidth: element.strokeWidth,
+          fillStyle: element.fillStyle,
+          strokeLineDash: element.strokeLineDash,
+          opacity: element.opacity,
+          text: element.text,
+        },
+        true,
+      );
+      console.log(element.fillStyle);
+      editCanvasElement(element.id, newElement);
+    },
   };
 
   //intialize socket
@@ -156,6 +185,28 @@ export const useSocket = () => {
 
     delete element.roughElement;
 
+    if (action === 'editCanvasElement') {
+      console.log('hello');
+      console.log(fillStyles[actionElementID]);
+    }
+
     socket.current?.sendMsgRoom(action, element);
-  }, [actionElementID]);
+    setWebsocketAction('', '');
+  }, [
+    actionElementID,
+    action,
+    p1,
+    p2,
+    types,
+    freehandPoints,
+    strokeColors,
+    fillColors,
+    bowings,
+    roughnesses,
+    strokeWidths,
+    fillStyles,
+    strokeLineDashes,
+    opacities,
+    textStrings,
+  ]);
 };

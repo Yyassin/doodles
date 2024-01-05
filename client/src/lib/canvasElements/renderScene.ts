@@ -126,16 +126,18 @@ export const renderCanvasElements = (
         }
       }
     } else {
-      const roughElement =
-        offset !== undefined
-          ? createElement(id, x1, y1, x2, y2, types[id], undefined, {
-              ...defaultOptions,
-              ...roughElements[id]?.options,
-              opacity: 1,
-              text: '',
-            }).roughElement
-          : roughElements[id];
-      roughElement && roughCanvas.draw(roughElement);
+      const originalRoughElement = roughElements[id];
+      if (originalRoughElement !== undefined) {
+        const roughElement =
+          offset !== undefined
+            ? createElement(id, x1, y1, x2, y2, types[id], undefined, {
+                ...defaultOptions,
+                ...(originalRoughElement.options as unknown as typeof defaultOptions),
+                text: '',
+              }).roughElement
+            : originalRoughElement;
+        roughElement && roughCanvas.draw(roughElement);
+      }
     }
 
     // Cleanup

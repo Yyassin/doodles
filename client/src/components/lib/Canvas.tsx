@@ -420,7 +420,9 @@ export default function Canvas() {
     }
 
     if (action === 'drawing') {
-      setWebsocketAction(currentDrawingElemId.current, tool);
+      const action =
+        tool === 'freehand' ? 'addCanvasFreehand' : 'addCanvasShape';
+      setWebsocketAction(currentDrawingElemId.current, action);
     }
 
     // Return to idle none action state, unless it's writing. We want to
