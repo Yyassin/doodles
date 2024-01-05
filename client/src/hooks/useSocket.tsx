@@ -6,7 +6,6 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { useEffect, useRef } from 'react';
-import { rescalePointsInElem } from '@/lib/canvasElements/resize';
 
 /**
  * Defines a hook that controls all socket related activities
