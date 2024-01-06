@@ -1,3 +1,14 @@
+import { ElectronAPI } from '@electron-toolkit/preload';
+
+declare global {
+  // Electron APIs injected in preload.ts
+  interface Window {
+    ipcAPI: Record<string, (...args: unknown[]) => unknown> & {
+      electron: ElectronAPI;
+    };
+  }
+}
+
 /**
  * Extensions to the API types for image-blob-reduce compatibility
  * with pica: https://github.com/nodeca/image-blob-reduce/issues/23#issuecomment-783271848

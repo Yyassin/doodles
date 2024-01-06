@@ -26,7 +26,12 @@ const Viewport = () => {
 
   return (
     <RadixContextMenu.Root>
-      <div id="Viewport" className="select-none" ref={viewportRef}>
+      <div
+        id="Viewport"
+        className="select-none"
+        ref={viewportRef}
+        style={{ position: 'relative', height: '100%', width: '100%' }}
+      >
         <ToolBar />
         {/* Only show the toolbar is an element is selected */}
         {selectedElementIds.length === 1 && <CustomToolbar />}
