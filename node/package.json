@@ -6,7 +6,9 @@
   "scripts": {
     "emulator:start": "npx firebase emulators:start --only firestore",
     "emulator-test": "npx firebase emulators:exec --only firestore \"npm run test\" || exit 0",
-    "test": "set TEST=1 && mocha -r ts-node/register --exit 'test/**/*.test.ts'",
+    "test": "set TEST=1 && mocha --timeout 5000 -r ts-node/register --exit 'test/**/*.spec.ts'",
+    "emulator-test-api": "npx firebase emulators:exec --only firestore \"npm run test-api\" || exit 0",
+    "test-api": "set TEST=1 && mocha --timeout 5000 -r ts-node/register --exit 'test/**/api/*.test.ts'",
     "posttest": "npx kill-port 8000 8080",
     "dev": "nodemon --esm ./src/app.ts",
     "check-types": "tsc --noemit",
@@ -39,6 +41,7 @@
     "@types/multer": "^1.4.8",
     "@types/node": "^20.8.3",
     "@types/sinon": "^17.0.2",
+    "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "chai": "^4.3.10",
     "eslint": "^8.48.0",
@@ -55,7 +58,6 @@
     "nodemon": "^3.0.1",
     "sinon": "^17.0.1",
     "supertest": "^6.3.3",
-    "superwstest": "^2.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }

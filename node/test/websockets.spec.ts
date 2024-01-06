@@ -6,7 +6,12 @@
 
 import * as sinon from 'sinon';
 import { expect } from 'chai';
-import http from 'http';
+import http, {
+  IncomingMessage,
+  Server,
+  ServerOptions,
+  ServerResponse,
+} from 'http';
 import WebsocketHelper from '../src/lib/websocket/websocketHelpers';
 
 // Create stubs for WebSocketHelper methods
@@ -17,8 +22,36 @@ let sendErrorResponseStub = sinon
   .stub(WebsocketHelper, 'sendErrorResponse' as any)
   .returns('Error response sent');
 
+// Create a stub for the server.listen method
+const listenStub = sinon.stub().callsArg(1);
+
+// Create a stub for the server.close method
+const closeStub = sinon.stub().callsArg(0);
+
+// Create a fake server instance
+const server: any = {
+  on: sinon.stub(),
+  listen: listenStub,
+  close: closeStub,
+};
+// Create a stub for the http.createServer method
+const createServerStub = sinon.stub(http, 'createServer');
+// Configure the createServerStub to return the fake server
+createServerStub.callsFake(
+  (
+    options: ServerOptions<typeof IncomingMessage, typeof ServerResponse>,
+    requestListener?: http.RequestListener,
+  ) => {
+    if (requestListener) {
+      server.on('request', requestListener);
+    }
+    return server as Server;
+  },
+);
+
 // Import WebSocketManager for testing; AFTER stubbing, so it uses the stubs.
 import WebSocketManager from '../src/lib/websocket/WebSocketManager';
+import { WS_TOPICS } from '../src/constants';
 
 // Helper to encode json into byte array
 const rawData = (json: object) => {
@@ -56,13 +89,9 @@ class MockWebSocket {
 // Test suite for WebSocketManager
 describe('WebSocketManager', () => {
   const id = 'anId';
-  let server: http.Server;
   let webSocketManager: WebSocketManager;
-  let sandbox: sinon.SinonSandbox;
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    server = http.createServer();
     webSocketManager = WebSocketManager.Instance;
   });
 
@@ -82,7 +111,7 @@ describe('WebSocketManager', () => {
   it('should handle joinRoom event', () => {
     const socket = new MockWebSocket() as any;
     webSocketManager.init(server);
-    const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
+    const joinRoomCallback = webSocketManager.callbacks[WS_TOPICS.JOIN_ROOM];
     // Simulate a joinRoom event and check if it sends a success response
     joinRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
     expect(sendSuccessResponseStub.calledWith(socket, 'Socket joined room!')).to
@@ -92,7 +121,7 @@ describe('WebSocketManager', () => {
   it('should handle failed leaveRoom event', () => {
     const socket = new MockWebSocket() as any;
     webSocketManager.init(server);
-    const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
+    const leaveRoomCallback = webSocketManager.callbacks[WS_TOPICS.LEAVE_ROOM];
 
     // Simulate a leaveRoom event without joining and check for an error response
     leaveRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
@@ -106,8 +135,8 @@ describe('WebSocketManager', () => {
   it('should handle leaveRoom event', () => {
     const socket = new MockWebSocket() as any;
     webSocketManager.init(server);
-    const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
-    const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
+    const joinRoomCallback = webSocketManager.callbacks[WS_TOPICS.JOIN_ROOM];
+    const leaveRoomCallback = webSocketManager.callbacks[WS_TOPICS.LEAVE_ROOM];
 
     // Simulate a joinRoom and leaveRoom event and check for a success response
     joinRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
@@ -124,8 +153,8 @@ describe('WebSocketManager', () => {
 
     webSocketManager.init(server);
     const handleMsgSpy = sinon.spy(webSocketManager, 'handleMsg' as any);
-    const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
-    const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
+    const joinRoomCallback = webSocketManager.callbacks[WS_TOPICS.JOIN_ROOM];
+    const leaveRoomCallback = webSocketManager.callbacks[WS_TOPICS.LEAVE_ROOM];
 
     // The first three socket will be in room A, the next two are in room B
     for (let i = 0; i < 5; i++) {
@@ -216,7 +245,7 @@ describe('WebSocketManager', () => {
 
     webSocketManager.init(server);
 
-    const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
+    const joinRoomCallback = webSocketManager.callbacks[WS_TOPICS.JOIN_ROOM];
     joinRoomCallback({ socket: socketA, room: 'A', payload: 'data', id });
 
     const msg = { topic: 'someTopic', payload: 'somePayload' };
