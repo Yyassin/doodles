@@ -34,6 +34,7 @@ jobs:
         with:
           node-version: "18.x"
           cache: "yarn"
+          cache-dependency-path: "./mod/fastfire/yarn.lock"
 
       - uses: pnpm/action-setup@v2
         with:
