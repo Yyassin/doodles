@@ -37,7 +37,6 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "./mod/fastfire/yarn.lock"
       - run: npm install -g firebase-tools
-      - run: npm ci
 
       - uses: pnpm/action-setup@v2
         with:
