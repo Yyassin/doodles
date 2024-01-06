@@ -98,16 +98,11 @@ const setIsSharingScreen =
 const setIsInCall = (set: SetState<AppStore>) => (isInCall: boolean) =>
   set(() => ({ isInCall }));
 const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
-  set((state) =>
-    state.isInCall
-      ? state
-      : {
-          ...state,
-          zoom,
-        },
-  );
+  set(() => ({
+    zoom,
+  }));
 const setPanOffset = (set: SetState<AppStore>) => (x: number, y: number) =>
-  set((state) => (state.isInCall ? state : { ...state, panOffset: { x, y } }));
+  set(() => ({ panOffset: { x, y } }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({

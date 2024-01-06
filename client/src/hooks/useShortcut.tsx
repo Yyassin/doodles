@@ -51,11 +51,15 @@ export const useShortcuts = () => {
     setSelectedElements,
     removeCanvasElements,
     pushCanvasHistory,
+    undoCanvasHistory,
+    redoCanvasHistory,
   } = useCanvasElementStore([
     'selectedElementIds',
     'setSelectedElements',
     'removeCanvasElements',
     'pushCanvasHistory',
+    'undoCanvasHistory',
+    'redoCanvasHistory',
   ]);
 
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
@@ -74,13 +78,34 @@ export const useShortcuts = () => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (shouldIgnoreKeyPress(e)) return;
 
-      // Delete the selected element on backspace
-      if (e.code === 'Backspace' && selectedElementIds.length) {
-        const ids = selectedElementIds;
-        setSelectedElements([]);
-        removeCanvasElements(ids);
-        pushCanvasHistory();
-        setWebsocketAction(ids, 'removeCanvasElements');
+      switch (e.code) {
+        case 'Backspace': {
+          // Delete the selected elemenst on backspace
+          if (selectedElementIds.length) {
+            const ids = selectedElementIds;
+            setSelectedElements([]);
+            removeCanvasElements(ids);
+            pushCanvasHistory();
+            setWebsocketAction(ids, 'removeCanvasElements');
+          }
+          break;
+        }
+        case 'KeyZ': {
+          // Undo
+          if (e.ctrlKey) {
+            undoCanvasHistory();
+            setWebsocketAction('undo', 'undoCanvasHistory');
+          }
+          break;
+        }
+        case 'KeyY': {
+          // Redo
+          if (e.ctrlKey) {
+            redoCanvasHistory();
+            setWebsocketAction('redo', 'redoCanvasHistory');
+          }
+          break;
+        }
       }
     };
 

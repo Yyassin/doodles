@@ -91,42 +91,53 @@ const ShareScreen = () => {
     setVideoDimensions(w, h);
   }, [screenStream, appHeight, appWidth]);
 
-  //const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
+  const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
 
-  // Temporarily apply scaling
-  // Panning & zooming
   return (
     screenStream !== null && (
       <div
-        className="flex flex-row items-center justify-center"
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: screenStream !== null ? 'transparent' : 'white',
-          zIndex: -1,
           overflow: 'hidden',
+          zIndex: -1,
         }}
       >
-        <video
+        <div
+          className="flex flex-row items-center justify-center"
           style={{
             position: 'absolute',
-            left: 0,
             top: 0,
-            transform: `scaleX(${zoom}) scaleY(${zoom}) translate(${panOffset.x}px, ${panOffset.y}px)`,
-            maxWidth: '10000px',
-            maxHeight: '10000px',
+            left: 0,
+            width: '100%',
+            height: '100%',
+            transformOrigin: 'top left',
+            transform: ` translate(${panOffset.x * zoom - scaleOffset.x}px, ${
+              panOffset.y * zoom - scaleOffset.y
+            }px) scaleX(${zoom}) scaleY(${zoom})`,
+            backgroundColor: screenStream !== null ? 'transparent' : 'white',
           }}
-          ref={videoRef}
-          width={trueVideoWidth}
-          height={trueVideoHeight}
-          id="localElement"
-          playsInline
-          muted
-          autoPlay
-        />
+        >
+          <video
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              maxWidth: '10000px',
+              maxHeight: '10000px',
+            }}
+            ref={videoRef}
+            width={trueVideoWidth}
+            height={trueVideoHeight}
+            id="localElement"
+            playsInline
+            muted
+            autoPlay
+          />
+        </div>
       </div>
     )
   );
