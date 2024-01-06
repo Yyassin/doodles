@@ -33,6 +33,8 @@ interface AppState {
   zoom: number;
   //Panning offset
   panOffset: { x: number; y: number };
+  // Canvas Background Color
+  canvasColor: string;
 }
 /** Reducers */
 interface AppActions {
@@ -46,6 +48,7 @@ interface AppActions {
   setPanOffset: (x: number, y: number) => void;
   setIsSharingScreen: (isShareScreen: boolean) => void;
   setIsInCall: (isInCall: boolean) => void;
+  setCanvasBackground: (canvasColor: string) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -62,6 +65,7 @@ export const initialAppState: AppState = {
   appHeight: window.innerHeight,
   zoom: 1, // 100%
   panOffset: { x: 0, y: 0 },
+  canvasColor: '#fff',
 };
 
 /** Actions / Reducers */
@@ -90,6 +94,9 @@ const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
   }));
 const setPanOffset = (set: SetState<AppStore>) => (x: number, y: number) =>
   set(() => ({ panOffset: { x, y } }));
+const setCanvasBackground =
+  (set: SetState<AppStore>) => (canvasColor: string) =>
+    set(() => ({ canvasColor }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
@@ -104,5 +111,6 @@ const appStore = create<AppStore>()((set) => ({
   setAppZoom: setAppZoom(set),
   setPanOffset: setPanOffset(set),
   setIsInCall: setIsInCall(set),
+  setCanvasBackground: setCanvasBackground(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);

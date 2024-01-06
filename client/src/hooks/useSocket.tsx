@@ -212,6 +212,7 @@ export const useSocket = () => {
       return;
     }
 
+    //Check if the actionElementID is string[] (collection of ids)
     if (typeof actionElementID === 'object') {
       socket.current?.sendMsgRoom(action, actionElementID);
       setWebsocketAction('', '');

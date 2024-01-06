@@ -27,7 +27,7 @@ interface WebSocketState {
   roomID: string | null;
   // The current action
   action: string;
-  // The last websocket publishable action's ID.
+  // Modifed element ID
   actionElementID: string | string[];
 }
 

@@ -8,8 +8,10 @@ import {
   Pencil2Icon,
   InfoCircledIcon,
   Share1Icon,
+  BlendingModeIcon,
 } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
+import CanvasColorToolGroup, { canvasColourTypes } from './CanvasBackground';
 
 /**
  * Creates a DropDownMenu for Canvas
@@ -81,7 +83,19 @@ const DropDownMenu = ({
             <Pencil2Icon /> Edit Canvas
           </DropdownMenu.Item>
           <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
+
           <ResetCanvasDropDownMenu />
+          <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
+
+          <DropdownMenu.Item
+            className="group text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 hover:bg-indigo-200"
+            disabled={true}
+          >
+            <BlendingModeIcon /> Canvas Background
+          </DropdownMenu.Item>
+
+          <CanvasColorToolGroup colorList={[...canvasColourTypes]} />
+
           <DropdownMenu.Arrow className="fill-white" />
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
