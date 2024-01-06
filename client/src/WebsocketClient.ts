@@ -28,7 +28,7 @@ interface WSMessageType {
   msg?: string;
 }
 
-//class that provides functionality to interact with websockets
+// Encapsualtes functionality to interact with websockets
 export default class WebsocketClient {
   userId: string;
   reconnectInterval: number;
@@ -59,15 +59,19 @@ export default class WebsocketClient {
     this.connect(); // Create a socket
   }
 
+  /**
+   * Method that adds a callback function for a specific handle.
+   * @param handle String, the handle to identify the callback.
+   * @param callback Function, the callback function to be executed.
+   */
   public on(handle: string, callback: (payload: unknown) => void) {
     this.injectableCallbacks[handle] = callback;
   }
 
   /**
-   * Asychronous promise that resolves when the socket
-   * is open, we block on this (without blocking the main thread)
-   * to ensure we don't attempt to send messages on a closed
-   * connection, since that throws.
+   * Asynchronous promise that resolves when the socket is open.
+   * It blocks on this to ensure messages are sent on an open connection.
+   * @param maximumAttempts Number, the maximum number of attempts to connect.
    * @returns Promise, resolved when connected, or rejects after max attempts.
    */
   private waitForOpenConnection = (maximumAttempts = 10) => {
@@ -111,7 +115,6 @@ export default class WebsocketClient {
     ) {
       throw 'Socket is already initalized';
     }
-
     this.socket = new WebSocket(WS_URL);
 
     this.socket.addEventListener(EVENT.OPEN, () => {
@@ -162,6 +165,10 @@ export default class WebsocketClient {
     });
   }
 
+  /**
+   * Method that sends a message over the WebSocket connection.
+   * @param msg Object, the message object to be sent.
+   */
   async send(msg: object) {
     if (!this.checkSocket()) return;
     try {
@@ -211,7 +218,7 @@ export default class WebsocketClient {
   }
 
   /**
-   * Metthod to Join room
+   * Method to Join room
    *
    * @param room String, the room id
    */
@@ -238,10 +245,12 @@ export default class WebsocketClient {
     this.room = null;
   }
 
+  /**
+   * Method that sends a message indicating the end of this client's WebRTC session.
+   */
   async rtcEnd() {
     if (this.room === null) throw "Socket isn't in a room";
     this.checkSocket();
-    console.log('SEND', this.room);
     return this.send({
       topic: 'rtc-end',
       room: this.room,
@@ -249,12 +258,12 @@ export default class WebsocketClient {
     });
   }
 
+  /**
+   * Method that sends an ICE candidate for WebRTC communication.
+   * @param candidate RTCIceCandidate, the ICE candidate to send.
+   */
   async iceCandidate(candidate: RTCIceCandidate) {
     this.checkSocket();
-
-    console.log(this.room);
-    console.log(candidate);
-
     return this.send({
       topic: 'ice-candidate',
       payload: { candidate },

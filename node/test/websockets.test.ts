@@ -1,8 +1,15 @@
+/**
+ * Unit Tests for WebSocketManager
+ * Uses Sinon for stubs and Chai for assertions.
+ * @author Yousef Yassin, Adbdalla Abdelhadi
+ */
+
 import * as sinon from 'sinon';
 import { expect } from 'chai';
 import http from 'http';
 import WebsocketHelper from '../src/lib/websocket/websocketHelpers';
 
+// Create stubs for WebSocketHelper methods
 let sendSuccessResponseStub = sinon
   .stub(WebsocketHelper, 'sendSuccessResponse' as any)
   .returns('Socket left room!');
@@ -10,6 +17,7 @@ let sendErrorResponseStub = sinon
   .stub(WebsocketHelper, 'sendErrorResponse' as any)
   .returns('Error response sent');
 
+// Import WebSocketManager for testing; AFTER stubbing, so it uses the stubs.
 import WebSocketManager from '../src/lib/websocket/WebSocketManager';
 
 // Helper to encode json into byte array
@@ -45,6 +53,7 @@ class MockWebSocket {
   }
 }
 
+// Test suite for WebSocketManager
 describe('WebSocketManager', () => {
   const id = 'anId';
   let server: http.Server;
@@ -66,6 +75,7 @@ describe('WebSocketManager', () => {
   it('should initialize WebSocketManager', () => {
     const initWSSpy = sinon.spy(webSocketManager, 'initWSS' as any);
     webSocketManager.init(server);
+    // Assert that the initWSS method is called with the server parameter
     expect(initWSSpy.calledWith(server)).to.be.true;
   });
 
@@ -73,9 +83,8 @@ describe('WebSocketManager', () => {
     const socket = new MockWebSocket() as any;
     webSocketManager.init(server);
     const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
-
+    // Simulate a joinRoom event and check if it sends a success response
     joinRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
-
     expect(sendSuccessResponseStub.calledWith(socket, 'Socket joined room!')).to
       .be.true;
   });
@@ -85,12 +94,12 @@ describe('WebSocketManager', () => {
     webSocketManager.init(server);
     const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
 
-    // Leave without ever joining
+    // Simulate a leaveRoom event without joining and check for an error response
     leaveRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
-
     expect(
       sendErrorResponseStub.calledWith(socket, 'Socket already is not room!'),
     ).to.be.true;
+    // Ensure success response is not called
     expect(sendSuccessResponseStub.called).to.be.false;
   });
 
@@ -100,12 +109,12 @@ describe('WebSocketManager', () => {
     const joinRoomCallback = webSocketManager.callbacks['joinRoom'];
     const leaveRoomCallback = webSocketManager.callbacks['leaveRoom'];
 
-    // Join then leave
+    // Simulate a joinRoom and leaveRoom event and check for a success response
     joinRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
     leaveRoomCallback({ socket, room: 'testRoom', payload: 'data', id });
-
     expect(sendSuccessResponseStub.calledWith(socket, 'Socket left room!')).to
       .be.true;
+    // Ensure error response is not called
     expect(sendErrorResponseStub.called).to.be.false;
   });
 
@@ -139,7 +148,7 @@ describe('WebSocketManager', () => {
     //@ts-ignore
     webSocketManager.handleMsg(socketsA[0], rawData(msg));
 
-    // Everyone in A except the first should have got a message
+    // Check if each socket in room A receives the message except the sender
     socketsA.forEach((socket, idx) => {
       expect(socket.getData().length).equal(idx === 0 ? 0 : 1);
       if (socket.getData().length) {
@@ -150,11 +159,14 @@ describe('WebSocketManager', () => {
         });
       }
     });
+    // Check if sockets in room B do not receive the message
     socketsB.forEach((socket) => {
       expect(socket.getData().length).equal(0);
     });
+    // Ensure handleMsg was called once only
     expect(handleMsgSpy.calledOnce).to.be.true;
 
+    // Repeat similar logic for subsequent messages and socket removal
     // Now send another message, but from the second socket in A
     //@ts-ignore
     webSocketManager.handleMsg(socketsA[1], rawData(msg));

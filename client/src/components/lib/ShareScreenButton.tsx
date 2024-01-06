@@ -2,6 +2,15 @@ import React from 'react';
 import { CanvasButton } from './CanvasButton';
 import { useAppStore } from '@/stores/AppStore';
 
+/**
+ * Defines a button component for starting/stopping screen sharing.
+ * @author Yousef Yassin
+ */
+
+/**
+ * Icon component for sharing screen, used in the ShareScreenButton component.
+ * @param {string} className - CSS class names for styling.
+ */
 const ShareScreenIcon = ({ className }: { className: string }) => {
   return (
     <svg
@@ -22,6 +31,10 @@ const ShareScreenIcon = ({ className }: { className: string }) => {
   );
 };
 
+/**
+ * Icon component for stopping screen sharing, used in the ShareScreenButton component.
+ * @param {string} className - CSS class names for styling.
+ */
 const UnshareScreenIcon = ({ className }: { className: string }) => {
   return (
     <svg
@@ -40,6 +53,9 @@ const UnshareScreenIcon = ({ className }: { className: string }) => {
   );
 };
 
+/**
+ * Button component for starting/stopping screen sharing.
+ */
 const defaultClassName = 'disabled:opacity-40 disabled:cursor-not-allowed';
 const ShareScreenButton = () => {
   const { isSharingScreen, setIsSharingScreen, isInCall } = useAppStore([

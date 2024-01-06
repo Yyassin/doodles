@@ -6,6 +6,7 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { useEffect, useRef } from 'react';
+import { useAuthStore } from '@/stores/AuthStore';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -13,21 +14,15 @@ import { useEffect, useRef } from 'react';
  */
 
 export const useSocket = () => {
-  const {
-    roomID,
-    actionElementID,
-    action,
-    userId,
-    setSocket,
-    setWebsocketAction,
-  } = useWebSocketStore([
-    'roomID',
-    'actionElementID',
-    'action',
-    'userId',
-    'setSocket',
-    'setWebsocketAction',
-  ]);
+  const { userEmail: userId } = useAuthStore(['userEmail']);
+  const { roomID, actionElementID, action, setSocket, setWebsocketAction } =
+    useWebSocketStore([
+      'roomID',
+      'actionElementID',
+      'action',
+      'setSocket',
+      'setWebsocketAction',
+    ]);
 
   const {
     addCanvasShape,
@@ -86,7 +81,6 @@ export const useSocket = () => {
   //setup callBack object based on actions
   const callBacks = {
     addCanvasShape: (element: CanvasElement) => {
-      console.log(element);
       const newElement = createElement(
         element.id,
         element.p1.x,

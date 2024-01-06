@@ -8,9 +8,10 @@ import { Logger } from '../../utils/Logger';
  * @author Zakariyya Almalki
  */
 
+/** Logger */
 const authLogger = new Logger('Auth', LOG_LEVEL);
 
-// Given token
+/** Verifies token for authentication */
 export const handleGetToken = async (req: Request, res: Response) => {
   try {
     const authToken = await admin.auth().verifyIdToken(req.body.body.token);

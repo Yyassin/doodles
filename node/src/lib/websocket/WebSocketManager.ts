@@ -7,6 +7,15 @@ import { LOG_LEVEL } from '../../constants';
 
 const { sendErrorResponse, sendSuccessResponse } = helpers;
 
+/**
+ * Defines WebSocket Manager to manage connections, rooms, and message handling.
+ * @authors Abdalla Abdelhadi, Yousef Yassin
+ */
+
+/**
+ * WSCallback Type
+ * Defines the callback function signature for WebSocket events.
+ */
 export type WSCallback = ({
   socket,
   room,
@@ -20,22 +29,24 @@ export type WSCallback = ({
 }) => void;
 
 /**
- * Define and setup websocket server
- * @author Abdalla Abdelhadi
- */
-
-// Singleton better than static for testing.
-class WebSocketManager extends Singleton<WebSocketManager>() {
+ * Encapsulates WebSocket connection management and provides functionality
+ * for joining, leaving rooms, and handling messages.
+ */ class WebSocketManager extends Singleton<WebSocketManager>() {
   #wss = new WebSocket.Server({ noServer: true });
   #sockets = {} as Record<string, Record<string, WebSocket>>;
   #logger = new Logger(WebSocketManager.name, LOG_LEVEL);
   callbacks = {} as Record<string, WSCallback>;
 
+  /** Creates a new WebSocket Manager instance */
   constructor() {
     super();
     this.#logger.debug('Instantiated.');
   }
 
+  /**
+   * Initializes the WebSocketManager with the provided HTTP server.
+   * @param server The HTTP server instance.
+   */
   public init(server: http.Server) {
     // Add socket to room specified
     this.on('joinRoom', ({ socket, room, id }) => {
@@ -61,14 +72,28 @@ class WebSocketManager extends Singleton<WebSocketManager>() {
     this.#logger.info('Websocket server running on server.');
   }
 
+  /**
+   * Gets the WebSocket instances grouped by room.
+   * @returns The WebSocket instances.
+   */
   public get sockets() {
     return this.#sockets;
   }
 
+  /**
+   * Registers a callback function for a WebSocket message topic.
+   * @param handle The event handle or topic.
+   * @param callback The callback function.
+   */
   public on(handle: string, callback: WSCallback) {
     this.callbacks[handle] = callback;
   }
 
+  /**
+   * Handles incoming WebSocket messages.
+   * @param socket The WebSocket instance.
+   * @param msg The raw message data.
+   */
   private handleMsg = (socket: WebSocket, msg: RawData) => {
     // Parse message to JSON
     const jsonMsg = JSON.parse(Buffer.from(msg as ArrayBuffer).toString());
@@ -97,8 +122,12 @@ class WebSocketManager extends Singleton<WebSocketManager>() {
     callback({ socket, room, payload, id });
   };
 
+  /**
+   * Initializes the WebSocket Server and handles upgrade and connection events.
+   * @param server The HTTP server instance.
+   */
   private initWSS(server: http.Server) {
-    //handles upgrade of request
+    // Handles upgrade of request
     server.on('upgrade', (req, socket, head) => {
       try {
         this.#wss.handleUpgrade(req, socket, head, (ws) => {
@@ -110,7 +139,7 @@ class WebSocketManager extends Singleton<WebSocketManager>() {
       }
     });
 
-    //upon connection, register callbacks
+    // Upon connection, register callbacks
     this.#wss.on('connection', (socket) => {
       socket.on('message', (msg) => this.handleMsg(socket, msg));
 
@@ -118,11 +147,12 @@ class WebSocketManager extends Singleton<WebSocketManager>() {
         sendSuccessResponse(socket, 'Socket closed!');
       });
 
-      //Send a succes message
+      // Send a succes message
       sendSuccessResponse(socket, 'Socket Created!');
     });
   }
 }
 
+// Create a singleton instance of WebSocketManager
 export const websocketManager = WebSocketManager.Instance;
 export default WebSocketManager;

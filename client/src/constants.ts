@@ -7,13 +7,21 @@
  */
 // Websockets
 const WS_PORT = 3005 as number;
+const REST_PORT = 3005 as number;
 export const WS_URL = `ws://localhost:${WS_PORT}`;
 export const ACCESS_TOKEN_TAG = 'accessToken';
-export const REST_ROOT = 'http://localhost:3005';
-export const REST_URL = { auth: `${REST_ROOT}/auth/token` };
-export const GET_USER_URL = {
-  getUser: `${REST_ROOT}/user/getUser`,
-  createUser: `${REST_ROOT}/user/createUser`,
+export const REST_ROOT = `http://localhost:${REST_PORT}`;
+export const REST = {
+  user: {
+    get: `${REST_ROOT}/user/getUser`,
+    create: `${REST_ROOT}/user/createUser`,
+  },
+  sfu: {
+    poll: `${REST_ROOT}/sfu/poll`,
+  },
+  auth: {
+    token: `${REST_ROOT}/auth/token`,
+  },
 };
 export const HTTP_STATUS = {
   SUCCESS: 200,
@@ -36,7 +44,9 @@ export const ZOOM = {
 // Maximum image dims in pixels
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 // Maximum single file size in cache
-export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
+export const KB = 1024;
+export const MB = KB * KB;
+export const MAX_ALLOWED_FILE_BYTES = 2 * MB * MB;
 export const DRAGGING_THRESHOLD = 10;
 
 /**

@@ -27,8 +27,7 @@ interface WebSocketState {
   roomID: string | null;
   // The current action
   action: string;
-  // Temporary, move to authStore
-  userId: string;
+  // The last websocket publishable action's ID.
   actionElementID: string | string[];
 }
 
@@ -49,7 +48,6 @@ export const initialWebSocketState: WebSocketState = {
   roomID: null,
   action: '',
   actionElementID: '',
-  userId: generateRandId(),
 };
 
 /** Actions / Reducers */

@@ -613,7 +613,7 @@ export default function Canvas() {
     <>
       <canvas
         id="canvas"
-        style={{ backgroundColor: 'transparent', border: 'black' }}
+        style={{ backgroundColor: 'transparent' }}
         width={appWidth}
         height={appHeight}
         onMouseDown={handleMouseDown}

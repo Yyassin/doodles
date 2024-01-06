@@ -17,11 +17,11 @@ import boardRoutes from './api/board/board.route';
 import authRoutes from './api/auth/auth.route';
 import sfuRoutes from './api/sfu/sfu.route';
 
-FastFire.initialize(firestore as Firestore);
-
-const app = express();
-const port = 3005;
 const mainLogger = new Logger('MainModule', LOG_LEVEL);
+const port = 3005;
+
+FastFire.initialize(firestore as Firestore);
+const app = express();
 
 export const server = http.createServer(app);
 app.use(express.json()); // parse application/json
