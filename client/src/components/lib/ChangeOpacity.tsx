@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { debounce } from 'lodash';
 
 /**
  * This file defines the OpacitySlider component, which allows the user to adjust
@@ -11,19 +13,32 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
  */
 
 const OpacitySlider = () => {
-  const { editCanvasElement, selectedElementIds, opacities } =
-    useCanvasElementStore([
-      'editCanvasElement',
-      'selectedElementIds',
-      'opacities',
-    ]);
-
+  const {
+    editCanvasElement,
+    pushCanvasHistory,
+    selectedElementIds,
+    opacities,
+  } = useCanvasElementStore([
+    'editCanvasElement',
+    'pushCanvasHistory',
+    'selectedElementIds',
+    'opacities',
+  ]);
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
+  const commitOpacityDebounced = useCallback(
+    debounce(() => {
+      pushCanvasHistory();
+      setWebsocketAction(selectedElementIds[0], 'editCanvasElement');
+    }, 500),
+    [selectedElementIds],
+  );
   return (
     <Slider.Root
       className="relative flex items-center select-none touch-none w-[200px] h-5"
       value={[opacities[selectedElementIds[0]] ?? 1]}
       onValueChange={(value) => {
         editCanvasElement(selectedElementIds[0], { opacity: value[0] });
+        commitOpacityDebounced();
       }}
       min={0}
       max={1}

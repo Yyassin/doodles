@@ -20,13 +20,13 @@ export const fontTypes = [
 export type fontType = (typeof fontTypes)[number];
 
 //Defines fonts as CSS properties for the Toolbar Icons
-const fontStyles: Record<fontType, React.CSSProperties> = {
-  trebuchetMS: { fontFamily: 'Trebuchet MS' },
-  timesNewRoman: { fontFamily: 'Times New Roman' },
-  garamond: { fontFamily: 'Garamond' },
-  courierNew: { fontFamily: 'Courier New' },
-  brushScriptMT: { fontFamily: 'Brush Script MT, cursive' },
-  comicSans: { fontFamily: 'Comic Sans MS' },
+const fontStyles: Record<fontType, string> = {
+  trebuchetMS: 'Trebuchet MS',
+  timesNewRoman: 'Times New Roman',
+  garamond: 'Garamond',
+  courierNew: 'Courier New',
+  brushScriptMT: 'Brush Script MT, cursive',
+  comicSans: 'Comic Sans MS',
 };
 
 //Maps each font to its label
@@ -66,7 +66,7 @@ const FontFamily = ({ tools }: { tools: fontType[] }) => {
             <div
               className="rounded-full"
               style={{
-                ...fontStyles[toolName], //Can make it more spaced out in future
+                fontFamily: fontStyles[toolName], //Can make it more spaced out in future
               }}
             >
               A

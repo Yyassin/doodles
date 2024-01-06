@@ -2,6 +2,7 @@ import { ZOOM } from '@/constants';
 import { clamp } from '@/lib/misc';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { AppTool, AppTools, EVENT } from '@/types';
 import { useEffect } from 'react';
 
@@ -57,6 +58,8 @@ export const useShortcuts = () => {
     'pushCanvasHistory',
   ]);
 
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
+
   useEffect(() => {
     const onKeyPress = (e: KeyboardEvent) => {
       if (shouldIgnoreKeyPress(e)) return;
@@ -77,6 +80,7 @@ export const useShortcuts = () => {
         setSelectedElements([]);
         removeCanvasElements(ids);
         pushCanvasHistory();
+        setWebsocketAction(ids, 'removeCanvasElements');
       }
     };
 

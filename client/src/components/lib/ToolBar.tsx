@@ -20,6 +20,7 @@ import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { generateRandId } from '@/lib/bytes';
 import { fileOpen } from '@/lib/fs';
 import { injectImageElement } from '@/lib/image';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 
 /**
  * This is the toolbar that is displayed on the canvas.
@@ -82,6 +83,8 @@ const ToolButton = ({
     'editCanvasElement',
   ]);
 
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
+
   // Temporary. For now we erase the selected element. In the
   // future we can add a context menu with delete and make erase
   // a drag operation.
@@ -92,6 +95,7 @@ const ToolButton = ({
         setSelectedElements([]);
         removeCanvasElements(ids);
         pushCanvasHistory();
+        setWebsocketAction(ids, 'removeCanvasElements');
         setCursor('');
       }
     : tool === 'image'
