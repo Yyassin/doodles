@@ -36,8 +36,8 @@ export const useSocket = () => {
     types,
     strokeColors,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -61,8 +61,8 @@ export const useSocket = () => {
     'types',
     'strokeColors',
     'fillColors',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -92,8 +92,8 @@ export const useSocket = () => {
         {
           stroke: element.strokeColor,
           fill: element.fillColor,
-          font: element.textFontOption,
-          size: element.textSize,
+          font: element.fontFamily,
+          size: element.fontSize,
           bowing: element.bowing,
           roughness: element.roughness,
           strokeWidth: element.strokeWidth,
@@ -119,8 +119,8 @@ export const useSocket = () => {
         {
           stroke: element.strokeColor,
           fill: element.fillColor,
-          font: element.textFontOption,
-          size: element.textSize,
+          font: element.fontFamily,
+          size: element.fontSize,
           bowing: element.bowing,
           roughness: element.roughness,
           strokeWidth: element.strokeWidth,
@@ -154,8 +154,8 @@ export const useSocket = () => {
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
           text: element.text,
-          font: element.textFontOption,
-          size: element.textSize,
+          font: element.fontFamily,
+          size: element.fontSize,
           angle: element.angle,
         },
         true,
@@ -231,8 +231,8 @@ export const useSocket = () => {
       {
         stroke: strokeColors[actionElementID],
         fill: fillColors[actionElementID],
-        font: textFontOptions[actionElementID],
-        size: textSizes[actionElementID],
+        font: fontFamilies[actionElementID],
+        size: fontSizes[actionElementID],
         bowing: bowings[actionElementID],
         roughness: roughnesses[actionElementID],
         strokeWidth: strokeWidths[actionElementID],
@@ -246,8 +246,6 @@ export const useSocket = () => {
     );
 
     delete element.roughElement;
-
-    console.log(element);
     socket.current?.sendMsgRoom(action, element);
     setWebsocketAction('', '');
   }, [

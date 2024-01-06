@@ -21,7 +21,7 @@ interface AuthActions {
   setUser: (
     userFirstName: string,
     userLastName: string,
-    userEmail: string,
+    userEmail: string | null,
     userPicture: string,
   ) => void;
 }

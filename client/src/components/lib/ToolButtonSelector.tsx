@@ -42,8 +42,8 @@ const ToolButton = ({
     pushCanvasHistory,
     selectedElementIds,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     types,
     strokeColors,
     bowings,
@@ -61,8 +61,8 @@ const ToolButton = ({
     'pushCanvasHistory',
     'selectedElementIds',
     'fillColors',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'types',
     'strokeColors',
     'bowings',
@@ -96,10 +96,8 @@ const ToolButton = ({
           customizabilityDict.strokeColor ?? strokeColors[selectedElementId],
 
         fill: customizabilityDict.fillColor ?? fillColors[selectedElementId],
-        font:
-          customizabilityDict.textFontOption ??
-          textFontOptions[selectedElementId],
-        size: customizabilityDict.textSize ?? textSizes[selectedElementId],
+        font: customizabilityDict.fontFamily ?? fontFamilies[selectedElementId],
+        size: customizabilityDict.fontSize ?? fontSizes[selectedElementId],
 
         bowing: customizabilityDict.bowing ?? bowings[selectedElementId],
 
@@ -131,21 +129,20 @@ const ToolButton = ({
       const { ctx } = getCanvasContext();
       if (ctx === null) throw 'ctx null';
 
-      const textSize =
-        customizabilityDict.textSize ?? textSizes[selectedElementId];
+      const fontSize =
+        customizabilityDict.fontSize ?? fontSizes[selectedElementId];
 
       const textFont =
-        customizabilityDict.textFontOption ??
-        textFontOptions[selectedElementId];
+        customizabilityDict.fontFamily ?? fontFamilies[selectedElementId];
 
       ctx.save();
       ctx.textBaseline = 'top';
-      ctx.font = ` ${textSize}px ${textFont}`;
+      ctx.font = ` ${fontSize}px ${textFont}`;
       const textWidth = ctx.measureText(textStrings[selectedElementId]).width;
       ctx.restore();
 
       const { x, y } = p1[selectedElementId];
-      extraOptions = { p2: { x: x + textWidth, y: y + textSize } };
+      extraOptions = { p2: { x: x + textWidth, y: y + fontSize } };
     }
 
     editCanvasElement(selectedElementId, {

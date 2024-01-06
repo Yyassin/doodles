@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
 import WebsocketClient from '@/WebsocketClient';
-import { generateRandId } from '@/lib/bytes';
 
 /**
  * Define Global WebSocket states and reducers

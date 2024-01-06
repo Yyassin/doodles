@@ -8,6 +8,7 @@ import {
   HTTP_STATUS,
   WS_RECONNECT_INTERVAL,
   SECONDS_TO_MS,
+  WS_TOPICS,
 } from '@/constants';
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { EVENT } from './types';
@@ -225,7 +226,7 @@ export default class WebsocketClient {
   async joinRoom(room: string) {
     this.room = room;
     return this.send({
-      topic: 'joinRoom',
+      topic: WS_TOPICS.JOIN_ROOM,
       room: this.room,
       id: this.userId,
     });
@@ -238,7 +239,7 @@ export default class WebsocketClient {
     if (this.room === null) throw "Socket isn't in a room";
     this.checkSocket();
     await this.send({
-      topic: 'leaveRoom',
+      topic: WS_TOPICS.LEAVE_ROOM,
       room: this.room,
       id: this.userId,
     });
@@ -252,7 +253,7 @@ export default class WebsocketClient {
     if (this.room === null) throw "Socket isn't in a room";
     this.checkSocket();
     return this.send({
-      topic: 'rtc-end',
+      topic: WS_TOPICS.RTC_END_CALL,
       room: this.room,
       id: this.userId,
     });
@@ -265,7 +266,7 @@ export default class WebsocketClient {
   async iceCandidate(candidate: RTCIceCandidate) {
     this.checkSocket();
     return this.send({
-      topic: 'ice-candidate',
+      topic: WS_TOPICS.ICE_CANDIDATE,
       payload: { candidate },
       room: this.room,
       id: this.userId,

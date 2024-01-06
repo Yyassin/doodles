@@ -48,8 +48,8 @@ export const renderElementsOnOffscreenCanvas = (
     angles: Record<string, CanvasElement['angle']>;
     types: Record<string, CanvasElement['type']>;
     fillColors: Record<string, CanvasElement['fillColor']>;
-    textFontOptions: Record<string, CanvasElement['textFontOption']>;
-    textSizes: Record<string, CanvasElement['textSize']>;
+    fontFamilies: Record<string, CanvasElement['fontFamily']>;
+    fontSizes: Record<string, CanvasElement['fontSize']>;
     freehandPoints: Record<string, CanvasElement['freehandPoints']>;
     freehandBounds: Record<string, [Vector2, Vector2]>;
     textStrings: Record<string, CanvasElement['text']>;
@@ -62,9 +62,7 @@ export const renderElementsOnOffscreenCanvas = (
   },
   options?: {
     margin: number;
-    fillColour: string;
-    textFontOption: string;
-    textSize: number;
+    canvasColor: string;
     renderTextPredicate?: (id: string) => boolean;
   },
 ) => {
@@ -78,8 +76,8 @@ export const renderElementsOnOffscreenCanvas = (
     angles,
     types,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     freehandPoints,
     freehandBounds,
     textStrings,
@@ -116,10 +114,7 @@ export const renderElementsOnOffscreenCanvas = (
   ctx.canvas.height = height;
 
   ctx.save();
-  options?.fillColour && (ctx.fillStyle = options.fillColour);
-  options?.textFontOption &&
-    options?.textSize &&
-    (ctx.font = options.textSize + options.textFontOption);
+  ctx.fillStyle = options?.canvasColor || 'white';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
 
@@ -133,8 +128,8 @@ export const renderElementsOnOffscreenCanvas = (
       angles,
       types,
       fillColors,
-      textFontOptions,
-      textSizes,
+      fontFamilies,
+      fontSizes,
       freehandPoints,
       freehandBounds,
       textStrings,

@@ -1,3 +1,4 @@
+import { WS_TOPICS } from '../../constants';
 import { ConsumerPeer, StreamerPeer } from '../../types';
 import { Logger } from '../../utils/Logger';
 import { truncateString } from '../../utils/misc';
@@ -115,7 +116,10 @@ export class RoomSFU {
             ([socketId, socket]) => {
               if (socketId !== id) {
                 socket.send(
-                  JSON.stringify({ topic: 'webrtc-new-streamer', payload: {} }),
+                  JSON.stringify({
+                    topic: WS_TOPICS.RTC_NEW_PRODUCER,
+                    payload: {},
+                  }),
                 );
               }
             },
@@ -222,7 +226,7 @@ export class RoomSFU {
         if (socketId !== this.#producer?.id) {
           socket.send(
             JSON.stringify({
-              topic: 'webrtc-disconnect-streamer',
+              topic: WS_TOPICS.RTC_DISCONNECT_PRODUCER,
             }),
           );
           this.#logger.debug(`Removed consumer [${socketId}] from room`);

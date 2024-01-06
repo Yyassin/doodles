@@ -16,23 +16,21 @@ import { renderCanvasElements } from '@/lib/canvasElements/renderScene';
  * @authors Yousef Yassin, Dana El Sherif
  */
 const useDrawElements = () => {
-  const { appHeight, appWidth, zoom, panOffset, action, canvasColor } =
-    useAppStore([
-      'appHeight',
-      'appWidth',
-      'zoom',
-      'panOffset',
-      'action',
-      'canvasColor',
-    ]);
+  const { appHeight, appWidth, zoom, panOffset, action } = useAppStore([
+    'appHeight',
+    'appWidth',
+    'zoom',
+    'panOffset',
+    'action',
+  ]);
   const {
     selectedElementIds,
     p1,
     p2,
     types,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     allIds,
     freehandPoints,
     freehandBounds,
@@ -52,8 +50,8 @@ const useDrawElements = () => {
     'p2',
     'types',
     'fillColors',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'allIds',
     'freehandPoints',
     'freehandBounds',
@@ -73,9 +71,7 @@ const useDrawElements = () => {
     if (ctx === null || canvas === null) return;
 
     // Clear on each rerender
-    //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = canvasColor || 'white';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Retrieve the scaling offset to apply for centered zoom
     // (TODO: We can change this to zoom towards mouse position)
@@ -101,8 +97,8 @@ const useDrawElements = () => {
         angles,
         types,
         fillColors,
-        textFontOptions,
-        textSizes,
+        fontFamilies,
+        fontSizes,
         freehandPoints,
         freehandBounds,
         textStrings,
@@ -135,8 +131,8 @@ const useDrawElements = () => {
     selectedElementIds,
     types,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     p1,
     p2,
     appWidth,
@@ -152,7 +148,6 @@ const useDrawElements = () => {
     opacities,
     strokeColors,
     strokeWidths,
-    canvasColor,
   ]);
 };
 

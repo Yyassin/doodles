@@ -3,7 +3,7 @@ import http from 'http';
 import { Singleton } from '../../utils/Singleton';
 import helpers from './websocketHelpers';
 import { Logger } from '../../utils/Logger';
-import { LOG_LEVEL } from '../../constants';
+import { LOG_LEVEL, WS_TOPICS, preLeaveRoomTopic } from '../../constants';
 
 const { sendErrorResponse, sendSuccessResponse } = helpers;
 
@@ -49,7 +49,7 @@ export type WSCallback = ({
    */
   public init(server: http.Server) {
     // Add socket to room specified
-    this.on('joinRoom', ({ socket, room, id }) => {
+    this.on(WS_TOPICS.JOIN_ROOM, ({ socket, room, id }) => {
       if (this.sockets[room] === undefined) {
         this.sockets[room] = {};
       } else if (this.sockets[room][id]) {
@@ -59,9 +59,9 @@ export type WSCallback = ({
       return sendSuccessResponse(socket, 'Socket joined room!');
     });
     // Remove socket from room
-    this.on('leaveRoom', ({ socket, room, payload, id }) => {
-      this.callbacks['preLeaveRoom'] &&
-        this.callbacks['preLeaveRoom']({ socket, room, payload, id });
+    this.on(WS_TOPICS.LEAVE_ROOM, ({ socket, room, payload, id }) => {
+      this.callbacks[preLeaveRoomTopic] &&
+        this.callbacks[preLeaveRoomTopic]({ socket, room, payload, id });
       if (!(this.sockets[room] && this.sockets[room][id])) {
         return sendErrorResponse(socket, 'Socket already is not room!');
       }
@@ -99,7 +99,8 @@ export type WSCallback = ({
     const jsonMsg = JSON.parse(Buffer.from(msg as ArrayBuffer).toString());
     const { topic, room, payload, id } = jsonMsg;
 
-    if (room === undefined && topic !== 'joinRoom') {
+    // The only message that can be received without a room is join-room
+    if (room === undefined && topic !== WS_TOPICS.JOIN_ROOM) {
       const err = 'Received non-join message without room, ignoring!';
       this.#logger.error(err);
       return sendErrorResponse(socket, err);
@@ -115,7 +116,7 @@ export type WSCallback = ({
       // Send message and topic to sockets in room
       return Object.values(sockets).forEach((roomSocket) => {
         if (socket != roomSocket) {
-          roomSocket.send(JSON.stringify({ topic: topic, payload: payload }));
+          roomSocket.send(JSON.stringify({ topic, payload }));
         }
       });
     }

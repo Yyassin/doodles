@@ -1,5 +1,5 @@
 import webrtc from 'wrtc';
-import { ICE_SERVERS } from '../../constants';
+import { ICE_SERVERS, WS_TOPICS } from '../../constants';
 import { websocketManager } from '../websocket/WebSocketManager';
 import { Logger } from '../../utils/Logger';
 
@@ -55,7 +55,7 @@ export const hookSignals = async (
 
       socket?.send(
         JSON.stringify({
-          topic: 'new-ice-candidate',
+          topic: WS_TOPICS.ICE_CANDIDATE,
           payload: { candidate },
         }),
       );

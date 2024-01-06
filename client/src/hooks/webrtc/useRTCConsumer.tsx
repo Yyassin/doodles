@@ -1,4 +1,4 @@
-import { REST, SECONDS_TO_MS } from '@/constants';
+import { REST, SECONDS_TO_MS, WS_TOPICS } from '@/constants';
 import { createPeer, handleNegotiationNeededEvent } from '@/lib/webrtc';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
@@ -70,8 +70,8 @@ const useRTCConsumer = (
   // Socket hooks; if a new streamer joins, create a consumer
   // and if a streamer leaves, cleanup the consumer.
   useEffect(() => {
-    socket?.on('webrtc-new-streamer', initConsumer);
-    socket?.on('webrtc-disconnect-streamer', cleanup);
+    socket?.on(WS_TOPICS.RTC_NEW_PRODUCER, initConsumer);
+    socket?.on(WS_TOPICS.RTC_DISCONNECT_PRODUCER, cleanup);
   }, [roomID, socket, userId]);
 
   /**

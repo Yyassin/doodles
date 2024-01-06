@@ -1,3 +1,4 @@
+import { WS_TOPICS } from '@/constants';
 import useRTCConsumer from '@/hooks/webrtc/useRTCConsumer';
 import useRTCProducer from '@/hooks/webrtc/useRTCProducer';
 import { getScaleOffset } from '@/lib/canvasElements/render';
@@ -10,10 +11,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
  * @author Yousef Yassin
  */
 
+// TODO: Send these, since consumers can't read them.
 const getStreamDetails = (stream: MediaStream | null) =>
-  (stream?.getVideoTracks()[0].getSettings() ?? {
-    aspectRatio: 1,
-  }) as { aspectRatio: number; height: 1; width: 1 };
+  ({
+    aspectRatio: 1920 / 1080,
+    height: 1080,
+    width: 1920,
+    ...stream?.getVideoTracks()[0].getSettings(),
+  }) as { aspectRatio: number; height: number; width: number };
 
 const ShareScreen = () => {
   /** Reference for the video element */
@@ -30,6 +35,7 @@ const ShareScreen = () => {
     setAppZoom,
     zoom,
     panOffset,
+    canvasColor,
   } = useAppStore([
     'setIsInCall',
     'appWidth',
@@ -38,6 +44,7 @@ const ShareScreen = () => {
     'setAppZoom',
     'zoom',
     'panOffset',
+    'canvasColor',
   ]);
   /** RTCPeer references, for cleanup; the hooks handle the connections. */
   const producerPeerRef = useRTCProducer(screenStream, setScreenStream);
@@ -55,7 +62,7 @@ const ShareScreen = () => {
   // Subscribe to remote incoming ICE candidates, and add them to the active peer connection.
   // These are necessary to establish a connection reliably.
   useEffect(() => {
-    socket?.on('new-ice-candidate', (msg) => {
+    socket?.on(WS_TOPICS.ICE_CANDIDATE, (msg) => {
       const {
         payload: { candidate },
       } = msg as { payload: { candidate: RTCIceCandidate } };
@@ -94,20 +101,21 @@ const ShareScreen = () => {
   // The video element with a wrapper to clip overflow. We use CSS transformation
   // to scale and translate the video according to our zoom and pan offsets.
   return (
-    screenStream !== null && (
-      <div
-        // Everything is positioned relative to the top left origin,
-        // so we can mimic the canvas element's coordinate system.
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden',
-          zIndex: -1,
-        }}
-      >
+    <div
+      // Everything is positioned relative to the top left origin,
+      // so we can mimic the canvas element's coordinate system.
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        zIndex: -1,
+        backgroundColor: canvasColor,
+      }}
+    >
+      {screenStream !== null && (
         <div
           className="flex flex-row items-center justify-center"
           style={{
@@ -121,7 +129,6 @@ const ShareScreen = () => {
             transform: ` translate(${panOffset.x * zoom - scaleOffset.x}px, ${
               panOffset.y * zoom - scaleOffset.y
             }px) scaleX(${zoom}) scaleY(${zoom})`,
-            backgroundColor: screenStream !== null ? 'transparent' : 'white',
           }}
         >
           <video
@@ -145,8 +152,8 @@ const ShareScreen = () => {
             autoPlay
           />
         </div>
-      </div>
-    )
+      )}
+    </div>
   );
 };
 

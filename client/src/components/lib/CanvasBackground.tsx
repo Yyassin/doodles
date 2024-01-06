@@ -64,7 +64,7 @@ const CanvasColorToolGroup = ({
             ' ' +
             (canvasColor === mapStrokeColour[color]
               ? 'border-gray-900'
-              : 'border-transparent')
+              : 'border-gray-500')
           }
           onClick={() => handleColorSelection(color)}
           key={color}

@@ -47,8 +47,8 @@ const mapFonts = {
  * to highlight the selected font.
  */
 const FontFamily = ({ tools }: { tools: fontType[] }) => {
-  const { textFontOptions, selectedElementIds } = useCanvasElementStore([
-    'textFontOptions',
+  const { fontFamilies, selectedElementIds } = useCanvasElementStore([
+    'fontFamilies',
     'selectedElementIds',
   ]);
 
@@ -57,10 +57,10 @@ const FontFamily = ({ tools }: { tools: fontType[] }) => {
       {tools.map((toolName) => (
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
-            customizabilityDict={{ textFontOption: mapFonts[toolName] }}
+            customizabilityDict={{ fontFamily: mapFonts[toolName] }}
             label={toolName}
             active={
-              textFontOptions[selectedElementIds[0]] === fontStyles[toolName]
+              fontFamilies[selectedElementIds[0]] === fontStyles[toolName]
             }
           >
             <div

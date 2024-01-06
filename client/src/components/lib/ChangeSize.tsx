@@ -26,8 +26,8 @@ const mapsize = {
  * to highlight the selected tool.
  */
 const SizeOptions = ({ tools }: { tools: size[] }) => {
-  const { textSizes, selectedElementIds } = useCanvasElementStore([
-    'textSizes',
+  const { fontSizes, selectedElementIds } = useCanvasElementStore([
+    'fontSizes',
     'selectedElementIds',
   ]);
   return (
@@ -35,9 +35,9 @@ const SizeOptions = ({ tools }: { tools: size[] }) => {
       {tools.map((toolName) => (
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
-            customizabilityDict={{ textSize: mapsize[toolName] }}
+            customizabilityDict={{ fontSize: mapsize[toolName] }}
             label={toolName}
-            active={textSizes[selectedElementIds[0]] === mapsize[toolName]}
+            active={fontSizes[selectedElementIds[0]] === mapsize[toolName]}
           >
             <div className={'w-5 h-5 rounded-full ' + mapsize[toolName]}>
               {mapsize[toolName]}

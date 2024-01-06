@@ -30,6 +30,14 @@ export const HTTP_STATUS = {
 } as const;
 export const SECONDS_TO_MS = 1e3;
 export const WS_RECONNECT_INTERVAL = (1 * SECONDS_TO_MS) as number;
+export enum WS_TOPICS {
+  JOIN_ROOM = 'join-room',
+  LEAVE_ROOM = 'leave-room',
+  RTC_END_CALL = 'rtc-end-call',
+  RTC_NEW_PRODUCER = 'rtc-new-producer',
+  RTC_DISCONNECT_PRODUCER = 'rtc-disconnect-producer',
+  ICE_CANDIDATE = 'ice-candidate',
+}
 
 // Zoom Constraints
 export const ZOOM = {

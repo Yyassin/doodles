@@ -1,4 +1,4 @@
-import { LOG_LEVEL } from '../../constants';
+import { LOG_LEVEL, WS_TOPICS, preLeaveRoomTopic } from '../../constants';
 import { Logger } from '../../utils/Logger';
 import { Singleton } from '../../utils/Singleton';
 import { WSCallback, websocketManager } from '../websocket/WebSocketManager';
@@ -39,12 +39,12 @@ export class SFUManager extends Singleton<SFUManager>() {
       const response = success ? sendSuccessResponse : sendErrorResponse;
       response(socket, 'Stream Ended!');
     };
-    websocketManager.on('rtc-end', terminateConnection);
-    websocketManager.on('preLeaveRoom', terminateConnection);
+    websocketManager.on(WS_TOPICS.RTC_END_CALL, terminateConnection);
+    websocketManager.on(preLeaveRoomTopic, terminateConnection);
 
     // Callback for handling incoming ICE candidates to be added.
     websocketManager.on(
-      'ice-candidate',
+      WS_TOPICS.ICE_CANDIDATE,
       async ({ socket, room, id, payload }) => {
         const { candidate } = payload as unknown as {
           candidate: RTCIceCandidate;
