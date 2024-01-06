@@ -94,16 +94,15 @@ function createWindow() {
     }
   });
 }
-
 app.on('window-all-closed', () => {
   win = null;
   app.quit();
 });
 
-// Titlebar
 app.on('browser-window-focus', () => {
   win && win.webContents.send('focused');
 });
+
 app.on('browser-window-blur', () => {
   win && win.webContents.send('blurred');
 });

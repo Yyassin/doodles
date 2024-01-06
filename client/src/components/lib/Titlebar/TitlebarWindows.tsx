@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ipcAPI, ipcRenderer } from '@/data/ipc/ipcMessages';
 import './TitlebarWindows.css';
 
@@ -6,21 +6,27 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
   const [isActive, setIsActive] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
 
-  ipcRenderer.on('focused', () => {
-    setIsActive(true);
-  });
+  useEffect(() => {
+    ipcRenderer.on('focused', () => {
+      setIsActive(true);
+    });
 
-  ipcRenderer.on('blurred', () => {
-    setIsActive(false);
-  });
+    ipcRenderer.on('blurred', () => {
+      setIsActive(false);
+    });
 
-  ipcRenderer.on('maximized', () => {
-    setIsMaximized(true);
-  });
+    ipcRenderer.on('maximized', () => {
+      setIsMaximized(true);
+    });
 
-  ipcRenderer.on('unmaximized', () => {
-    setIsMaximized(false);
-  });
+    ipcRenderer.on('unmaximized', () => {
+      setIsMaximized(false);
+    });
+    ipcRenderer.removeAllListeners('focused');
+    ipcRenderer.removeAllListeners('blurred');
+    ipcRenderer.removeAllListeners('maximized');
+    ipcRenderer.removeAllListeners('unmaximized');
+  }, []);
 
   const minimizeHandler = () => {
     ipcAPI.minimize('minimize');

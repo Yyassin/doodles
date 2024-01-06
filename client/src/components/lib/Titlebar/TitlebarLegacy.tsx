@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ipcAPI, ipcRenderer } from '@/data/ipc/ipcMessages';
 import './TitlebarLegacy.css';
 
@@ -6,23 +6,27 @@ const TitlebarLeg = ({ title }: { title: string }) => {
   const [isActive, setIsActive] = useState(true);
   const [isMaximized, setIsMaximized] = useState(true);
 
-  ipcRenderer.on('focused', () => {
-    setIsActive(true);
-    console.log('active');
-  });
+  useEffect(() => {
+    ipcRenderer.on('focused', () => {
+      setIsActive(true);
+    });
 
-  ipcRenderer.on('blurred', () => {
-    setIsActive(false);
-  });
+    ipcRenderer.on('blurred', () => {
+      setIsActive(false);
+    });
 
-  ipcRenderer.on('maximized', () => {
-    setIsMaximized(true);
-    console.log('maxii');
-  });
+    ipcRenderer.on('maximized', () => {
+      setIsMaximized(true);
+    });
 
-  ipcRenderer.on('unmaximized', () => {
-    setIsMaximized(false);
-  });
+    ipcRenderer.on('unmaximized', () => {
+      setIsMaximized(false);
+    });
+    ipcRenderer.removeAllListeners('focused');
+    ipcRenderer.removeAllListeners('blurred');
+    ipcRenderer.removeAllListeners('maximized');
+    ipcRenderer.removeAllListeners('unmaximized');
+  }, []);
 
   const minimizeHandler = () => {
     ipcAPI.minimize('minimize');
