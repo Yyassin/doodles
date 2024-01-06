@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TEST: 1
+      FIREBASE_EMULATORS_PATH: ${{ github.workspace }}/emulator-cache
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -42,10 +43,12 @@ jobs:
           run_install: false
 
       - name: Cache firebase emulators
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
-          path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-${{ steps.cache-npm.outputs.firebase-tools }}
+          path: ${{ env.FIREBASE_EMULATORS_PATH }}
+          key: ${{ runner.os }}-firebase-emulators-${{
+            hashFiles('emulator-cache/**') }}
+        continue-on-error: true
 
       - name: Get pnpm store directory
         shell: bash
