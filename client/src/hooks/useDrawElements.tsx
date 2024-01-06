@@ -16,13 +16,15 @@ import { renderCanvasElements } from '@/lib/canvasElements/renderScene';
  * @authors Yousef Yassin, Dana El Sherif
  */
 const useDrawElements = () => {
-  const { appHeight, appWidth, zoom, panOffset, action } = useAppStore([
-    'appHeight',
-    'appWidth',
-    'zoom',
-    'panOffset',
-    'action',
-  ]);
+  const { appHeight, appWidth, zoom, panOffset, action, canvasColor } =
+    useAppStore([
+      'appHeight',
+      'appWidth',
+      'zoom',
+      'panOffset',
+      'action',
+      'canvasColor',
+    ]);
   const {
     selectedElementIds,
     p1,
@@ -40,7 +42,6 @@ const useDrawElements = () => {
     angles,
     selectionFrame,
     roughElements,
-    //fillColors,
     opacities,
     strokeColors,
     strokeWidths,
@@ -61,7 +62,6 @@ const useDrawElements = () => {
     'isImagePlaceds',
     'angles',
     'selectionFrame',
-    //'fillColors',
     'opacities',
     'strokeColors',
     'strokeWidths',
@@ -73,9 +73,9 @@ const useDrawElements = () => {
     if (ctx === null || canvas === null) return;
 
     // Clear on each rerender
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // ctx.fillStyle = 'blue';
-    // ctx.fillRect(0, 0, canvas.width, canvas.height);
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = canvasColor || 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Retrieve the scaling offset to apply for centered zoom
     // (TODO: We can change this to zoom towards mouse position)
@@ -152,6 +152,7 @@ const useDrawElements = () => {
     opacities,
     strokeColors,
     strokeWidths,
+    canvasColor,
   ]);
 };
 
