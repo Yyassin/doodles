@@ -42,40 +42,37 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('~/.cache/firebase/emulators/**') }}
-        continue-on-error: true
+          key: ${{ runner.os }}-firebase-${{ steps.cache-npm.outputs.firebase-tools }}
 
-      - name: Cache node dependencies
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-deps
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
         with:
-          path: ~/.npm
-          key: npm-${{ hashFiles('./node/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('./node/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Get yarn cache directory path
-        working-directory: ./mod/fastfire
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Cache mod dependencies
         uses: actions/cache@v3
-        env:
-          cache-name: cache-mod-deps
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
-          path: $ {{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-build-${{ env.cache-name }}\
-            -${{ hashFiles('./mod/fastfire/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+          ${{ runner.os }}-yarn-
 
       - name: Install Fastfire
         working-directory: ./mod/fastfire
-        run: npm i --global yarn && yarn install && yarn build
+        run: npm i --global yarn && yarn install --prefer-offline && yarn build
 
       - name: Install dependencies
         working-directory: ./node
