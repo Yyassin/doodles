@@ -1,6 +1,8 @@
 import { BrowserWindow, IpcMainEvent, ipcMain } from 'electron';
 import { IPC_ACTIONS } from './ipcActions';
 
+export const shared = { global_RecvMaximizedEventFlag: false };
+
 const { MAXIMIZE_WINDOW, UNMAXIMIZE_WINDOW, MINIMIZE_WINDOW, CLOSE_WINDOW } =
   IPC_ACTIONS;
 
@@ -10,6 +12,9 @@ const getWindow = (event: IpcMainEvent) => {
 };
 
 const handleWindowTitlebarEvent = (event: IpcMainEvent, type: string) => {
+  if (type === MAXIMIZE_WINDOW) {
+    shared.global_RecvMaximizedEventFlag = true;
+  }
   const window = getWindow(event);
   console.log(type);
   window?.[type](); // The type for title bar events is the same as the method name

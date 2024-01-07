@@ -12,6 +12,7 @@ import {
 } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
 import CanvasColorToolGroup, { canvasColourTypes } from './CanvasBackground';
+import { IS_ELECTRON_INSTANCE } from '@/constants';
 
 /**
  * Creates a DropDownMenu for Canvas
@@ -23,7 +24,10 @@ const DropDownMenu = ({
 }: {
   viewportRef: React.RefObject<HTMLDivElement>;
 }) => {
-  const { isFullscreen } = useAppStore(['isFullscreen']);
+  const { isFullscreen, isTransparent } = useAppStore([
+    'isFullscreen',
+    'isTransparent',
+  ]);
   //Handle button functionailities
 
   const handleInfo = () => {
@@ -41,7 +45,13 @@ const DropDownMenu = ({
       <DropdownMenu.Trigger asChild>
         <button
           className="rounded-md w-[25px] h-[25px] inline-flex items-center justify-center text-violet11 bg-white outline outline-offset-2 outline-indigo-400 hover:bg-violet3"
-          style={{ position: 'absolute', top: '1rem', right: '1rem' }}
+          style={{
+            position: 'absolute',
+            top: `calc(1rem + ${
+              IS_ELECTRON_INSTANCE && isTransparent ? '30px' : '0px'
+            })`,
+            right: '1rem',
+          }}
         >
           <HamburgerMenuIcon />
         </button>

@@ -12,6 +12,8 @@ import ContextMenu from '@/components/lib/ContextMenu';
 import * as RadixContextMenu from '@radix-ui/react-context-menu';
 import ShareScreen from '@/components/lib/ShareScreen';
 import ShareScreenButton from '@/components/lib/ShareScreenButton';
+import TransparencyButton from '@/components/lib/TransparencyButton';
+import { IS_ELECTRON_INSTANCE } from '@/constants';
 
 /**
  * Primary viewport that houses the canvas
@@ -20,7 +22,7 @@ import ShareScreenButton from '@/components/lib/ShareScreenButton';
  * @authors Yousef Yassin
  */
 const Viewport = () => {
-  const { setMode } = useAppStore(['setMode']);
+  const { setMode, isTransparent } = useAppStore(['setMode', 'isTransparent']);
   const viewportRef = useRef<HTMLDivElement>(null);
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
 
@@ -30,7 +32,12 @@ const Viewport = () => {
         id="Viewport"
         className="select-none"
         ref={viewportRef}
-        style={{ position: 'relative', height: '100%', width: '100%' }}
+        style={{
+          position: 'relative',
+          height: '100%',
+          width: '100%',
+          backgroundColor: 'transparent',
+        }}
       >
         <ToolBar />
         {/* Only show the toolbar is an element is selected */}
@@ -49,6 +56,7 @@ const Viewport = () => {
           <UndoRedoButtons />
           <FullScreenButton viewportRef={viewportRef} />
           <ShareScreenButton />
+          {IS_ELECTRON_INSTANCE && <TransparencyButton />}
         </div>
 
         {/* Temp */}
@@ -56,7 +64,9 @@ const Viewport = () => {
           style={{
             position: 'absolute',
             left: '1rem',
-            top: '1rem',
+            top: `calc(1rem + ${
+              IS_ELECTRON_INSTANCE && isTransparent ? '30px' : '0px'
+            })`,
           }}
           onClick={() => setMode('dashboard')}
         >

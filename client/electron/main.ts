@@ -9,7 +9,7 @@ import {
 } from 'electron';
 import isDev from 'electron-is-dev';
 import path from 'node:path';
-import { registerIPCHandlers } from './ipc/ipcHandlers';
+import { registerIPCHandlers, shared } from './ipc/ipcHandlers';
 
 // The built directory structure
 //
@@ -30,6 +30,7 @@ let tray: Tray | null;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
 
+let isClickThrough = false;
 function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.PUBLIC ?? './', 'doodles-icon.png'),
@@ -38,9 +39,9 @@ function createWindow() {
       nodeIntegration: true,
       webSecurity: false,
     },
+    transparent: true,
     frame: false,
     title: 'Doodles',
-    backgroundColor: '#000',
   });
   tray = new Tray(path.join(process.env.PUBLIC ?? './', 'doodles-icon.png'));
   tray.setIgnoreDoubleClickEvents(true);
@@ -81,6 +82,18 @@ function createWindow() {
   win.on('unmaximize', () => {
     win && win.webContents.send('unmaximized');
   });
+  win.on('move', () => {
+    if (!shared.global_RecvMaximizedEventFlag) {
+      win?.unmaximize();
+    } else {
+      shared.global_RecvMaximizedEventFlag = false;
+    }
+    win && win.webContents.send('bounds-changed', win.getBounds());
+  });
+  win.on('resize', () => {
+    win && win.webContents.send('unmaximized');
+    win && win.webContents.send('bounds-changed', win.getBounds());
+  });
   win.on('closed', () => (win = null));
 
   if (VITE_DEV_SERVER_URL) {
@@ -92,6 +105,14 @@ function createWindow() {
   globalShortcut.register('Alt+1', () => {
     if (isDev) {
       win && win.webContents.openDevTools({ mode: 'detach' });
+    }
+  });
+  globalShortcut.register('Ctrl+T', () => {
+    if (isDev) {
+      isClickThrough = !isClickThrough;
+      win?.setIgnoreMouseEvents(isClickThrough);
+      win?.setAlwaysOnTop(isClickThrough);
+      win?.webContents.send('click-through', isClickThrough);
     }
   });
 }

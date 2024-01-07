@@ -35,6 +35,7 @@ const ShareScreen = () => {
     zoom,
     panOffset,
     canvasColor,
+    isTransparent,
   } = useAppStore([
     'setIsInCall',
     'appWidth',
@@ -44,6 +45,7 @@ const ShareScreen = () => {
     'zoom',
     'panOffset',
     'canvasColor',
+    'isTransparent',
   ]);
   /** RTCPeer references, for cleanup; the hooks handle the connections. */
   const { peerRef: producerPeerRef, setSelectedSourceId } = useRTCProducer(
@@ -109,10 +111,15 @@ const ShareScreen = () => {
   }, [screenStream, videoRef.current]);
 
   useEffect(() => {
-    const { width, height } = trueVideoDimensions;
-    const [tx, ty] = [(appWidth - width) / 2, (appHeight - height) / 2];
-    setPanOffset(tx, ty);
-    setAppZoom(1);
+    // We only want to set the offset when the video is loaded; we also don't
+    // load our own video in transparency mode so we don't want this to fire (it should
+    // be disabled in the store anyway).
+    if (videoRef.current !== null) {
+      const { width, height } = trueVideoDimensions;
+      const [tx, ty] = [(appWidth - width) / 2, (appHeight - height) / 2];
+      setPanOffset(tx, ty);
+      setAppZoom(1);
+    }
   }, [trueVideoDimensions]);
 
   // The video element with a wrapper to clip overflow. We use CSS transformation
@@ -130,10 +137,10 @@ const ShareScreen = () => {
           height: '100%',
           overflow: 'hidden',
           zIndex: -1,
-          backgroundColor: canvasColor,
+          backgroundColor: isTransparent ? 'transparent' : canvasColor,
         }}
       >
-        {screenStream !== null && (
+        {screenStream !== null && !isTransparent && (
           <div
             className="flex flex-row items-center justify-center"
             style={{

@@ -8,6 +8,7 @@ import {
 } from '@/lib/canvasElements/render';
 import { getCanvasContext } from '@/lib/misc';
 import { renderCanvasElements } from '@/lib/canvasElements/renderScene';
+import { useElectronIPCStore } from '@/stores/ElectronIPCStore';
 
 /**
  * Hook that's subscribed to the roughElements
@@ -16,6 +17,7 @@ import { renderCanvasElements } from '@/lib/canvasElements/renderScene';
  * @authors Yousef Yassin, Dana El Sherif
  */
 const useDrawElements = () => {
+  const { windowBounds } = useElectronIPCStore(['windowBounds']);
   const { appHeight, appWidth, zoom, panOffset, action } = useAppStore([
     'appHeight',
     'appWidth',
@@ -76,13 +78,16 @@ const useDrawElements = () => {
     // Retrieve the scaling offset to apply for centered zoom
     // (TODO: We can change this to zoom towards mouse position)
     const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
+    const { x: boundsTx, y: boundsTy } = windowBounds;
+
+    console.log(boundsTx, boundsTy);
 
     // Temporarily apply scaling
     // Panning & zooming
     ctx.save();
     ctx.translate(
-      panOffset.x * zoom - scaleOffset.x,
-      panOffset.y * zoom - scaleOffset.y,
+      boundsTx + panOffset.x * zoom - scaleOffset.x,
+      boundsTy + panOffset.y * zoom - scaleOffset.y,
     );
     ctx.scale(zoom, zoom);
 

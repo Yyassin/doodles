@@ -1,37 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ipcAPI, ipcRenderer } from '@/data/ipc/ipcMessages';
+import React, { useCallback } from 'react';
+import { ipcAPI } from '@/data/ipc/ipcMessages';
 import './TitlebarWindows.css';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useAppStore } from '@/stores/AppStore';
+import { useElectronIPCStore } from '@/stores/ElectronIPCStore';
 
 const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
-  const [isActive, setIsActive] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
-  // TODO: Move outside if using both titles
+  const { isTransparent } = useAppStore(['isTransparent']);
   const { socket, roomID } = useWebSocketStore(['socket', 'roomID']);
   const { userEmail: userId } = useAuthStore(['userEmail']);
-
-  useEffect(() => {
-    ipcRenderer.on('focused', () => {
-      setIsActive(true);
-    });
-
-    ipcRenderer.on('blurred', () => {
-      setIsActive(false);
-    });
-
-    ipcRenderer.on('maximized', () => {
-      setIsMaximized(true);
-    });
-
-    ipcRenderer.on('unmaximized', () => {
-      setIsMaximized(false);
-    });
-    ipcRenderer.removeAllListeners('focused');
-    ipcRenderer.removeAllListeners('blurred');
-    ipcRenderer.removeAllListeners('maximized');
-    ipcRenderer.removeAllListeners('unmaximized');
-  }, []);
+  const { isWindowActive, isWindowMaximized } = useElectronIPCStore([
+    'isWindowActive',
+    'isWindowMaximized',
+  ]);
 
   const minimizeHandler = () => {
     ipcAPI.minimize('minimize');
@@ -57,9 +39,11 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
   return (
     <div className="TitlebarWin">
       <div
-        className={isActive ? 'Title-Bar' : 'Title-Bar-inactive'}
+        className={isWindowActive ? 'Title-Bar' : 'Title-Bar-inactive'}
         style={{
-          backgroundColor: `rgba(129, 140, 248, ${isActive ? 0.5 : 0.3})`,
+          backgroundColor: `rgba(129, 140, 248, ${isWindowActive ? 0.8 : 0.6})`,
+          ...(isTransparent && { position: 'absolute' }),
+          zIndex: 10,
         }}
       >
         <div className="TitlebarWin-drag-region"></div>
@@ -80,7 +64,9 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
               viewBox="0 0 10 10"
               strokeLinejoin="round"
               className={
-                isActive ? 'minimize-active_logo' : 'minimize-inactive_logo'
+                isWindowActive
+                  ? 'minimize-active_logo'
+                  : 'minimize-inactive_logo'
               }
             >
               <rect
@@ -92,7 +78,7 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
               />
             </svg>
           </div>
-          {isMaximized ? (
+          {isWindowMaximized ? (
             <div
               className="section-windows-control_box-unmax"
               onClick={unmaximizeHandler}
@@ -104,7 +90,9 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
                 viewBox="0 0 10 10"
                 strokeLinejoin="round"
                 className={
-                  isActive ? 'maximize-active_logo' : 'maximize-inactive_logo'
+                  isWindowActive
+                    ? 'maximize-active_logo'
+                    : 'maximize-inactive_logo'
                 }
                 style={{ fill: fg }}
               >
@@ -126,7 +114,9 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
                 viewBox="0 0 10 10"
                 strokeLinejoin="round"
                 className={
-                  isActive ? 'maximize-active_logo' : 'maximize-inactive_logo'
+                  isWindowActive
+                    ? 'maximize-active_logo'
+                    : 'maximize-inactive_logo'
                 }
               >
                 <path d="M0,0v10h10V0H0z M9,9H1V1h8V9z" style={{ fill: fg }} />
@@ -143,7 +133,9 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
               height="10"
               viewBox="0 0 10 10"
               strokeLinejoin="round"
-              className={isActive ? 'close-active_logo' : 'close-inactive_logo'}
+              className={
+                isWindowActive ? 'close-active_logo' : 'close-inactive_logo'
+              }
             >
               <polygon
                 points="10.2,0.7 9.5,0 5.1,4.4 0.7,0 0,0.7 4.4,5.1 0,9.5 0.7,10.2 5.1,5.8 9.5,10.2 10.2,9.5 5.8,5.1"
@@ -153,7 +145,7 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
           </div>
         </div>
         <div
-          style={isMaximized ? { display: 'none' } : {}}
+          style={isWindowMaximized ? { display: 'none' } : {}}
           className="resizer"
         ></div>
       </div>

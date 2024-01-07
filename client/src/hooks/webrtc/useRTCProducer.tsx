@@ -4,7 +4,6 @@ import { useAppStore } from '@/stores/AppStore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { StreamSource } from '@/types';
-import { set } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 
 /**

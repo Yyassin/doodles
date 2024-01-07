@@ -33,28 +33,30 @@ const ScreenSelectDialog = ({
             Let the annotation begin!
           </AlertDialogDescription>
           <div className="flex flex-wrap justify-center gap-4 overflow-y-scroll max-h-96 p-[1rem]">
-            {streamSources.map((source) => (
-              <div key={source.id} className="flex flex-col">
-                <div
-                  className={`w-[10rem] overflow-hidden rounded-md ${
-                    source.id === selectedSourceId
-                      ? 'ring-4 ring-offset-2 ring-blue-500'
-                      : 'hover:ring-2 hover:ring-offset-2 hover:ring-blue-500'
-                  }`}
-                  onClick={() => setSelectedSourceId(source.id)}
-                >
-                  <AspectRatio.Root ratio={source.thumbnail.aspect}>
-                    <img
-                      className="h-full w-full object-cover"
-                      src={source.thumbnail.dataURL}
-                    />
-                  </AspectRatio.Root>
+            {streamSources
+              // Only screen sources are supported in transparent mode.
+              .map((source) => (
+                <div key={source.id} className="flex flex-col">
+                  <div
+                    className={`w-[10rem] overflow-hidden rounded-md ${
+                      source.id === selectedSourceId
+                        ? 'ring-4 ring-offset-2 ring-blue-500'
+                        : 'hover:ring-2 hover:ring-offset-2 hover:ring-blue-500'
+                    }`}
+                    onClick={() => setSelectedSourceId(source.id)}
+                  >
+                    <AspectRatio.Root ratio={source.thumbnail.aspect}>
+                      <img
+                        className="h-full w-full object-cover"
+                        src={source.thumbnail.dataURL}
+                      />
+                    </AspectRatio.Root>
+                  </div>
+                  <p className="text-sm font-medium w-[10rem] truncate pt-[0.5rem]">
+                    {source.name}
+                  </p>
                 </div>
-                <p className="text-sm font-medium w-[10rem] truncate pt-[0.5rem]">
-                  {source.name}
-                </p>
-              </div>
-            ))}
+              ))}
           </div>
         </AlertDialogHeader>
         <AlertDialogFooter>
