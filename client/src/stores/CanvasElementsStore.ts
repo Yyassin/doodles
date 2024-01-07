@@ -3,6 +3,7 @@ import { SetState } from './types';
 import { create } from 'zustand';
 import { createStoreWithSelectors } from './utils';
 import { CanvasElementFillStyle, CanvasElementType, Vector2 } from '@/types';
+import { fill } from 'lodash';
 
 /**
  * Defines canvas drawable element state
@@ -35,6 +36,20 @@ export interface CanvasElement {
   id: string; // Element id
 }
 
+export const tool = [
+  'line',
+  'rectangle',
+  'circle',
+  'freehand',
+  'text',
+] as const;
+export type tools = (typeof tool)[number];
+
+interface options {
+  strokeColor: string;
+  fillColor: string;
+}
+
 export interface CanvasElementState {
   isSelectionFrameSet: boolean;
   selectionFrame: Pick<CanvasElement, 'p1' | 'p2'> | null;
@@ -61,6 +76,7 @@ export interface CanvasElementState {
   fileIds: Record<string, CanvasElement['fileId']>;
   isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
   angles: Record<string, CanvasElement['angle']>;
+  toolOptions: Record<tools, options>;
 }
 
 interface CanvasElementActions {
@@ -112,6 +128,28 @@ export const initialCanvasElementState: CanvasElementState = {
   fileIds: {},
   isImagePlaceds: {},
   angles: {},
+  toolOptions: {
+    line: {
+      strokeColor: '#FF0000',
+      fillColor: '#FF0000',
+    },
+    rectangle: {
+      strokeColor: '#FF0000',
+      fillColor: '#FF0000',
+    },
+    circle: {
+      strokeColor: '#FF0000',
+      fillColor: '#FF0000',
+    },
+    freehand: {
+      strokeColor: '#FF0000',
+      fillColor: '#FF0000',
+    },
+    text: {
+      strokeColor: '#FF0000',
+      fillColor: '#FF0000',
+    },
+  },
 };
 
 // History of prior canvas element stores for undo/redo.
@@ -423,6 +461,20 @@ const editCanvasElement =
       };
     });
 
+const setToolOptions =
+  (set: SetState<CanvasElementState>) =>
+  (tool: tools, option: keyof options, newValue: string) =>
+    set((state) => ({
+      ...state,
+      toolOptions: {
+        ...state.toolOptions,
+        [tool]: {
+          ...state.toolOptions[tool],
+          [option]: newValue,
+        },
+      },
+    }));
+
 /**
  * Removes the canvas element with the specfied state
  * from the store.
@@ -639,6 +691,7 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   pushCanvasHistory: pushCanvasHistory(set),
   redoCanvasHistory: redoCanvasHistory(set),
   resetCanvas: resetCanvas(set),
+  setToolOptions: setToolOptions(set),
 }));
 export const useCanvasElementStore =
   createStoreWithSelectors(canvasElementStore);

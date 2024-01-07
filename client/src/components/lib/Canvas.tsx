@@ -91,6 +91,7 @@ export default function Canvas() {
     fileIds,
     angles,
     isSelectionFrameSet,
+    toolOptions,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -121,6 +122,7 @@ export default function Canvas() {
     'fileIds',
     'angles',
     'isSelectionFrameSet',
+    'toolOptions',
   ]);
 
   const { setWebsocketAction, setRoomID } = useWebSocketStore([
@@ -197,7 +199,7 @@ export default function Canvas() {
       type,
       options?.points,
       {
-        stroke: strokeColors[id],
+        stroke: toolOptions[type as keyof typeof toolOptions].strokeColor,
         fill: fillColors[id],
         font: textFontOptions[id],
         size: textSizes[id],
