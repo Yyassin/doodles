@@ -1,10 +1,16 @@
 import { BrowserWindow, IpcMainEvent, ipcMain } from 'electron';
 import { IPC_ACTIONS } from './ipcActions';
+import { notification } from '../main';
 
 export const shared = { global_RecvMaximizedEventFlag: false };
 
-const { MAXIMIZE_WINDOW, UNMAXIMIZE_WINDOW, MINIMIZE_WINDOW, CLOSE_WINDOW } =
-  IPC_ACTIONS;
+const {
+  MAXIMIZE_WINDOW,
+  UNMAXIMIZE_WINDOW,
+  MINIMIZE_WINDOW,
+  CLOSE_WINDOW,
+  HANDLE_NOTIFICATION,
+} = IPC_ACTIONS;
 
 const getWindow = (event: IpcMainEvent) => {
   const webContents = event?.sender;
@@ -23,11 +29,21 @@ const handleWindowTitlebarEvent = (event: IpcMainEvent, type: string) => {
   }
 };
 
+const handleNotification = (
+  event: IpcMainEvent,
+  { title, body }: { title: string; body: string },
+) => {
+  notification.title = title;
+  notification.body = body;
+  notification.show();
+};
+
 const eventToCallback = {
   [MAXIMIZE_WINDOW]: handleWindowTitlebarEvent,
   [UNMAXIMIZE_WINDOW]: handleWindowTitlebarEvent,
   [MINIMIZE_WINDOW]: handleWindowTitlebarEvent,
   [CLOSE_WINDOW]: handleWindowTitlebarEvent,
+  [HANDLE_NOTIFICATION]: handleNotification,
 };
 
 export const registerIPCHandlers = () => {

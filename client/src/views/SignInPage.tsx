@@ -140,7 +140,7 @@ export default function SignInPage() {
   };
 
   return (
-    <Card>
+    <Card className="rounded-none">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Log In</CardTitle>
         <CardDescription>

@@ -4,4 +4,5 @@ export const IPC_ACTIONS = {
   UNMAXIMIZE_WINDOW: 'unmaximize',
   MINIMIZE_WINDOW: 'minimize',
   CLOSE_WINDOW: 'close',
+  HANDLE_NOTIFICATION: 'notification',
 };

@@ -5,6 +5,7 @@ import {
   globalShortcut,
   ipcMain,
   Menu,
+  Notification,
   Tray,
 } from 'electron';
 import isDev from 'electron-is-dev';
@@ -25,7 +26,10 @@ process.env.PUBLIC = app.isPackaged
   ? process.env.DIST
   : path.join(process.env.DIST, '../public');
 
+const iconPath = path.join(process.env.PUBLIC ?? './', 'doodles-icon.png');
+
 let win: BrowserWindow | null;
+export let notification: Notification;
 let tray: Tray | null;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
@@ -33,7 +37,7 @@ const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
 let isClickThrough = false;
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.PUBLIC ?? './', 'doodles-icon.png'),
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
@@ -43,7 +47,7 @@ function createWindow() {
     frame: false,
     title: 'Doodles',
   });
-  tray = new Tray(path.join(process.env.PUBLIC ?? './', 'doodles-icon.png'));
+  tray = new Tray(iconPath);
   tray.setIgnoreDoubleClickEvents(true);
   const trayMenu = Menu.buildFromTemplate([
     {
@@ -70,6 +74,13 @@ function createWindow() {
 
   tray.setContextMenu(trayMenu);
   tray.setToolTip('Doodles');
+
+  notification = new Notification({ icon: iconPath });
+  notification.on('click', () => {
+    if (!win?.isVisible() || win?.isMinimized()) {
+      win?.show();
+    }
+  });
 
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {

@@ -182,7 +182,7 @@ export default function SignUp() {
   >(null);
 
   return (
-    <Card>
+    <Card className="rounded-none">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Create an account</CardTitle>
         <CardDescription>

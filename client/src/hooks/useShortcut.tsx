@@ -1,4 +1,5 @@
 import { ZOOM } from '@/constants';
+import { ipcAPI } from '@/data/ipc/ipcMessages';
 import { clamp } from '@/lib/misc';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
@@ -105,6 +106,11 @@ export const useShortcuts = () => {
             setWebsocketAction('redo', 'redoCanvasHistory');
           }
           break;
+        }
+        case 'KeyR': {
+          if (e.ctrlKey) {
+            ipcAPI.notification({ title: 'Test', body: 'Test Body' });
+          }
         }
       }
     };
