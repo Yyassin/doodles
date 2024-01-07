@@ -24,6 +24,9 @@ import { getCanvasContext, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
 import { normalizeAngle } from '@/lib/math';
+import { ipcAPI } from '@/data/ipc/ipcMessages';
+
+const titleBarOffset = ipcAPI ? 30 : 0;
 
 /**
  * Main Canvas View
@@ -171,7 +174,8 @@ export default function Canvas() {
    */
   const getMouseCoordinates = (e: MouseEvent<HTMLCanvasElement>) => {
     const clientX = (e.clientX - panOffset.x * zoom + scaleOffset.x) / zoom;
-    const clientY = (e.clientY - panOffset.y * zoom + scaleOffset.y) / zoom;
+    const clientY =
+      (e.clientY - titleBarOffset - panOffset.y * zoom + scaleOffset.y) / zoom;
     return { clientX, clientY };
   };
 

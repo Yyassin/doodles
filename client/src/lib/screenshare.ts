@@ -3,13 +3,16 @@
  * @author Yousef Yassin
  */
 
+import { ipcAPI } from '@/data/ipc/ipcMessages';
+import { StreamSource } from '@/types';
+
 /**
  * Function to initiate screen sharing, capturing the user's screen and creating a MediaRecorder instance.
  * @param setScreenStream Callback function to set the captured screen stream.
  * @param onRecoderStop Callback function to be executed when the MediaRecorder stops recording.
  * @returns A promise resolving to an object containing the captured screen stream and MediaRecorder instance.
  */
-export const startScreenShare = async (
+const startScreenShareBrowser = async (
   setScreenStream: (stream: MediaStream) => void,
   onRecoderStop: () => void,
 ) => {
@@ -50,3 +53,23 @@ export const startScreenShare = async (
     return {};
   }
 };
+
+const startScreenShareElectron = async (
+  _setScreenStream: (stream: MediaStream) => void,
+  _onRecoderStop: () => void,
+  onScreenSelect: (streamSources: StreamSource[]) => void,
+) => {
+  try {
+    // Defined in electron
+    const streams =
+      (await navigator.mediaDevices.enumerateDevices()) as unknown as StreamSource[];
+    onScreenSelect(streams);
+  } catch (error) {
+    console.error('Error starting screen share:', error);
+    return {};
+  }
+};
+
+export const startScreenShare = ipcAPI
+  ? startScreenShareElectron
+  : startScreenShareBrowser;

@@ -1,6 +1,7 @@
 import {
   app,
   BrowserWindow,
+  desktopCapturer,
   globalShortcut,
   ipcMain,
   Menu,
@@ -53,7 +54,7 @@ function createWindow() {
     {
       label: 'Exit',
       click: () => {
-        app.quit();
+        win && win.close();
       },
     },
   ]);
@@ -96,7 +97,6 @@ function createWindow() {
 }
 app.on('window-all-closed', () => {
   win = null;
-  app.quit();
 });
 
 app.on('browser-window-focus', () => {
@@ -116,4 +116,22 @@ ipcMain.handle('close-event', (e) => {
 app.whenReady().then(() => {
   registerIPCHandlers();
   createWindow();
+
+  ipcMain.handle('get-sources', () => {
+    try {
+      return desktopCapturer
+        .getSources({ types: ['window', 'screen'] })
+        .then((sources) =>
+          sources.map((source) => ({
+            ...source,
+            thumbnail: {
+              dataURL: source.thumbnail.toDataURL(),
+              aspect: source.thumbnail.getAspectRatio(),
+            },
+          })),
+        );
+    } catch (e) {
+      return [];
+    }
+  });
 });

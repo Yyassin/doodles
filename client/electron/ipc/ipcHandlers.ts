@@ -13,6 +13,9 @@ const handleWindowTitlebarEvent = (event: IpcMainEvent, type: string) => {
   const window = getWindow(event);
   console.log(type);
   window?.[type](); // The type for title bar events is the same as the method name
+  if (type === CLOSE_WINDOW) {
+    window?.destroy();
+  }
 };
 
 const eventToCallback = {

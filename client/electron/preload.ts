@@ -1,6 +1,8 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, desktopCapturer, ipcRenderer } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
 import { IPC_ACTIONS } from './ipc/ipcActions';
+import { readFileSync } from 'fs';
+import path from 'path';
 
 function domReady(
   condition: DocumentReadyState[] = ['complete', 'interactive'],
@@ -94,6 +96,15 @@ domReady().then(appendLoading);
 window.onmessage = (ev) => {
   ev.data.payload === 'removeLoading' && removeLoading();
 };
+// inject renderer.js into the web page
+window.addEventListener('DOMContentLoaded', () => {
+  const rendererScript = document.createElement('script');
+  rendererScript.text = readFileSync(
+    path.join(__dirname, 'renderer.js'),
+    'utf8',
+  );
+  document.body.appendChild(rendererScript);
+});
 
 setTimeout(removeLoading, 4999);
 
@@ -106,6 +117,9 @@ contextBridge.exposeInMainWorld(
     },
     // Expose the electron API to receive messages from the main process.
     // This is a workaround for dynamic import.
-    { electron: electronAPI },
+    {
+      electron: electronAPI,
+      getSources: () => ipcRenderer.invoke('get-sources'),
+    },
   ),
 );

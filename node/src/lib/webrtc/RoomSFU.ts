@@ -21,17 +21,19 @@ export class RoomSFU {
   #consumers: Record<string, ConsumerPeer>;
   #roomId: string;
   #logger: Logger;
+  #onCleanup: (id: string) => void;
 
   /**
    * Creates an SFU for the specified room.
    * @param roomId The unique identifier for the room.
    * @param logger The logger instance for logging room-specific events.
    */
-  constructor(roomId: string, logger: Logger) {
+  constructor(roomId: string, logger: Logger, onCleanup: (id: string) => void) {
     this.#producer = null;
     this.#consumers = {} as Record<string, ConsumerPeer>;
     this.#roomId = roomId;
     this.#logger = logger.deriveLogger(`Room-${truncateString(roomId, 5)}`);
+    this.#onCleanup = onCleanup;
   }
 
   /**
@@ -135,7 +137,10 @@ export class RoomSFU {
       this.#roomId,
       this.#logger,
       // OnClose Cleanup
-      () => this.removeProducer(),
+      () => {
+        this.#logger.debug(`Producer [${id}] peer disconnected`);
+        this.#onCleanup(id);
+      },
     );
     return localDescription;
   };
@@ -175,7 +180,10 @@ export class RoomSFU {
       this.#roomId,
       this.#logger,
       // OnClose Cleanup
-      () => this.removeConsumer(id),
+      () => {
+        this.#logger.debug(`Consumer [${id}] peer disconnected`);
+        this.#onCleanup(id);
+      },
     );
     // Only add the consumer after negotiation (to prevent adding ice candidates before acquiring the local description)
     this.#consumers[id] = consumer;
@@ -213,16 +221,20 @@ export class RoomSFU {
    * @returns A boolean indicating whether the producer was successfully removed.
    */
   removeProducer = () => {
+    this.#logger.debug(`Removing producer [${this.#producer?.id}] from room`);
     if (this.#producer === null) {
-      this.#logger.error(
-        "Attempted to remove producer from room but there isn't one. This should never happen.",
+      this.#logger.debug(
+        "Attempted to remove producer from room but there isn't one. Ignore if cleanup.",
       );
       return false;
     }
 
     // Notify all consumers to disconnect
-    Object.entries(websocketManager.sockets[this.#roomId]).forEach(
-      ([socketId, socket]) => {
+    const sockets = websocketManager.sockets[this.#roomId];
+    if (sockets === undefined) {
+      this.#logger.error(`Failed to get sockets for room [${this.#roomId}]`);
+    } else {
+      Object.entries(sockets).forEach(([socketId, socket]) => {
         if (socketId !== this.#producer?.id) {
           socket.send(
             JSON.stringify({
@@ -232,8 +244,9 @@ export class RoomSFU {
           this.#logger.debug(`Removed consumer [${socketId}] from room`);
           this.removeConsumer(socketId);
         }
-      },
-    );
+      });
+    }
+
     // Remove all the consumer peers on the server cleanly
     if (Object.keys(this.#consumers).length !== 0) {
       this.#logger.error(`Found stale consumers in room [${this.#roomId}]`);

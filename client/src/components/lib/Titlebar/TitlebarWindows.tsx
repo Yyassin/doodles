@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ipcAPI, ipcRenderer } from '@/data/ipc/ipcMessages';
 import './TitlebarWindows.css';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { useAuthStore } from '@/stores/AuthStore';
 
 const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
   const [isActive, setIsActive] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
+  // TODO: Move outside if using both titles
+  const { socket, roomID } = useWebSocketStore(['socket', 'roomID']);
+  const { userEmail: userId } = useAuthStore(['userEmail']);
 
   useEffect(() => {
     ipcRenderer.on('focused', () => {
@@ -40,9 +45,14 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
     ipcAPI.unmaximize('unmaximize');
   };
 
-  const closeHandler = () => {
-    ipcAPI.close('close');
-  };
+  const closeHandler = useCallback(() => {
+    // Need to wait for the message to send.
+    socket?.leaveRoom().then(() => {
+      ipcAPI.close('close');
+    });
+    // HACK: We need to listen to these to get the updated socket since
+    // the socket is mutable, it won't trigger rerenders on change.
+  }, [socket, userId, roomID]);
 
   return (
     <div className="TitlebarWin">
