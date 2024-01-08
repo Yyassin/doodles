@@ -8,7 +8,6 @@ import {
 } from '@/lib/canvasElements/render';
 import { getCanvasContext } from '@/lib/misc';
 import { renderCanvasElements } from '@/lib/canvasElements/renderScene';
-import { useElectronIPCStore } from '@/stores/ElectronIPCStore';
 
 /**
  * Hook that's subscribed to the roughElements
