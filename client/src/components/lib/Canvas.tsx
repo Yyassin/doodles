@@ -24,7 +24,6 @@ import { getCanvasContext, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
 import { normalizeAngle } from '@/lib/math';
-import { useElectronIPCStore } from '@/stores/ElectronIPCStore';
 
 /**
  * Main Canvas View

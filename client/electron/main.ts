@@ -2,16 +2,21 @@ import {
   app,
   BrowserWindow,
   desktopCapturer,
-  globalShortcut,
   ipcMain,
-  Menu,
   Notification,
   Tray,
 } from 'electron';
-import isDev from 'electron-is-dev';
 import path from 'node:path';
-import { registerIPCHandlers, shared } from './ipc/ipcHandlers';
+import { registerIPCHandlers } from './ipc/ipcHandlers';
+import { registerGlobalShortcuts, setupTray, setupWindow } from './window';
 
+/**
+ * @file Main Electron process handling application initialization and window creation.
+ * This is the entry point for the main process.
+ * @author Yousef Yassin
+ */
+
+// Set environment variables for the build directory structure
 // The built directory structure
 //
 // ├─┬─┬ dist
@@ -26,16 +31,21 @@ process.env.PUBLIC = app.isPackaged
   ? process.env.DIST
   : path.join(process.env.DIST, '../public');
 
-const iconPath = path.join(process.env.PUBLIC ?? './', 'doodles-icon.png');
-
-let win: BrowserWindow | null;
-export let notification: Notification;
-let tray: Tray | null;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
+const APP_NAME = 'Doodles';
+const iconPath = path.join(process.env.PUBLIC ?? './', 'doodles-icon.png');
 
-let isClickThrough = false;
-function createWindow() {
+// Global variables for notification, main window, and tray. They
+// must be global to prevent garbage collection.
+export let notification: Notification;
+let win: BrowserWindow | null;
+let tray: Tray | null;
+
+/**
+ * Creates the main application window.
+ */
+const createWindow = () => {
   win = new BrowserWindow({
     icon: iconPath,
     webPreferences: {
@@ -45,36 +55,16 @@ function createWindow() {
     },
     transparent: true,
     frame: false,
-    title: 'Doodles',
+    title: APP_NAME,
   });
+  setupWindow(win, VITE_DEV_SERVER_URL ?? '');
+  win.on('closed', () => (win = null));
+
+  // Setup the tray icon
   tray = new Tray(iconPath);
-  tray.setIgnoreDoubleClickEvents(true);
-  const trayMenu = Menu.buildFromTemplate([
-    {
-      label: 'Show App',
-      click: () => {
-        win && win.show();
-      },
-    },
-    {
-      label: 'Exit',
-      click: () => {
-        win && win.close();
-      },
-    },
-  ]);
-  tray.on('click', () => {
-    if (win === null) return;
-    if (win.isVisible()) {
-      win.hide();
-    } else {
-      win.show();
-    }
-  });
+  setupTray(win, tray, APP_NAME);
 
-  tray.setContextMenu(trayMenu);
-  tray.setToolTip('Doodles');
-
+  // Setup notification with click handling
   notification = new Notification({ icon: iconPath });
   notification.on('click', () => {
     if (!win?.isVisible() || win?.isMinimized()) {
@@ -82,73 +72,35 @@ function createWindow() {
     }
   });
 
-  // Test active push message to Renderer-process.
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', new Date().toLocaleString());
-  });
-  win.on('maximize', () => {
-    win && win.webContents.send('maximized');
-  });
+  // Register global shortcuts for the main window
+  registerGlobalShortcuts(win);
+};
 
-  win.on('unmaximize', () => {
-    win && win.webContents.send('unmaximized');
-  });
-  win.on('move', () => {
-    if (!shared.global_RecvMaximizedEventFlag) {
-      win?.unmaximize();
-    } else {
-      shared.global_RecvMaximizedEventFlag = false;
-    }
-    win && win.webContents.send('bounds-changed', win.getBounds());
-  });
-  win.on('resize', () => {
-    win && win.webContents.send('unmaximized');
-    win && win.webContents.send('bounds-changed', win.getBounds());
-  });
-  win.on('closed', () => (win = null));
-
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
-  } else {
-    // win.loadFile('dist/index.html')
-    win.loadFile(path.join(process.env.DIST ?? './', 'index.html'));
-  }
-  globalShortcut.register('Alt+1', () => {
-    if (isDev) {
-      win && win.webContents.openDevTools({ mode: 'detach' });
-    }
-  });
-  globalShortcut.register('Ctrl+T', () => {
-    if (isDev) {
-      isClickThrough = !isClickThrough;
-      win?.setIgnoreMouseEvents(isClickThrough);
-      win?.setAlwaysOnTop(isClickThrough);
-      win?.webContents.send('click-through', isClickThrough);
-    }
-  });
-}
+// Event handlers for app lifecycle and window focus/blur
 app.on('window-all-closed', () => {
   win = null;
 });
-
 app.on('browser-window-focus', () => {
   win && win.webContents.send('focused');
 });
-
 app.on('browser-window-blur', () => {
   win && win.webContents.send('blurred');
 });
-
+// Handle 'close-event' IPC event to hide the window instead of closing
 ipcMain.handle('close-event', (e) => {
   e.preventDefault();
   win && win.hide();
   e.returnValue = false;
 });
 
+// Application setup when app is ready
 app.whenReady().then(() => {
+  // Register IPC handlers, create the main window.
   registerIPCHandlers();
   createWindow();
-
+  // Bridge the get-sources IPC event, fired from the renderer process,
+  // to the main process. This is necessary because desktopCapturer
+  // is only available in the main process.
   ipcMain.handle('get-sources', () => {
     try {
       return desktopCapturer
@@ -157,6 +109,9 @@ app.whenReady().then(() => {
           sources.map((source) => ({
             ...source,
             thumbnail: {
+              // We need to invoke the thumbnail image methods
+              // in the main process since they can't be
+              // passed through the context bridge.
               dataURL: source.thumbnail.toDataURL(),
               aspect: source.thumbnail.getAspectRatio(),
             },

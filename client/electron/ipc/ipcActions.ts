@@ -1,4 +1,6 @@
-// VALUES MUST BE UNIQUE
+/**
+ * Defines the action handles that can be sent to the main process from the renderer process via IPC.
+ */
 export const IPC_ACTIONS = {
   MAXIMIZE_WINDOW: 'maximize',
   UNMAXIMIZE_WINDOW: 'unmaximize',

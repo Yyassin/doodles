@@ -1,9 +1,9 @@
-import { ipcAPI } from '@/data/ipc/ipcMessages';
+import { IS_ELECTRON_INSTANCE } from '@/constants';
 import { useAppStore } from '@/stores/AppStore';
 import { EVENT } from '@/types';
 import { useEffect } from 'react';
 
-const titleBarOffset = ipcAPI ? 30 : 0;
+const titleBarOffset = IS_ELECTRON_INSTANCE ? 30 : 0;
 
 /**
  * Hook that's subscribed to resize events to
@@ -18,6 +18,7 @@ const useWindowResize = () => {
 
   useEffect(() => {
     window.addEventListener(EVENT.RESIZE, handleResize);
+    handleResize();
     return () => window.removeEventListener(EVENT.RESIZE, handleResize);
   }, []);
 };
