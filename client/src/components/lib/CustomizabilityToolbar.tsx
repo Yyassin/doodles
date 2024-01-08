@@ -48,30 +48,17 @@ const CustomToolbar = () => {
   return (
     <Toolbar.Root className="p-[0.3rem] gap-[0.3rem] min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] mt-40 absolute ml-3">
       {/* Background Color */}
-      {colorSet.has(types[selectedElementIds[0]]) &&
-        fillStyles[selectedElementIds[0]] != 'none' && (
-          <>
-            <h2 className="text-sm font-semibold mb-2">Color</h2>{' '}
-            <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-            <ToolGroup tools={[...colourTypes]} />
-          </>
-        )}
+      <h2 className="text-sm font-semibold mb-2">Color</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <ToolGroup tools={[...colourTypes]} />
       {/* Text Font */}
-      {fontSizeSet.has(types[selectedElementIds[0]]) && (
-        <>
-          <h2 className="text-sm font-semibold mb-2">Font</h2>{' '}
-          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-          <FontFamily tools={[...fontTypes]} />
-        </>
-      )}
+      <h2 className="text-sm font-semibold mb-2">Font</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <FontFamily tools={[...fontTypes]} />
       {/* Text Size */}
-      {fontSizeSet.has(types[selectedElementIds[0]]) && (
-        <>
-          <h2 className="text-sm font-semibold mb-2">Size</h2>{' '}
-          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-          <SizeOptions tools={[...sizes]} />
-        </>
-      )}
+      <h2 className="text-sm font-semibold mb-2">Size</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <SizeOptions tools={[...sizes]} />
       {/* Stroke Thickness */}
       {strokeThicknessSet.has(types[selectedElementIds[0]]) && (
         <>
@@ -81,13 +68,9 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Stroke Color (border for shapes) */}
-      {strokeColorSet.has(types[selectedElementIds[0]]) && (
-        <>
-          <h2 className="text-sm font-semibold mb-2">Stroke Color</h2>{' '}
-          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-          <StrokeColorToolGroup tools={[...strokeColourTypes]} />
-        </>
-      )}
+      <h2 className="text-sm font-semibold mb-2">Stroke Color</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <StrokeColorToolGroup tools={[...strokeColourTypes]} />
       {/* Stroke Roughness */}
       {strokeRoughnessSet.has(types[selectedElementIds[0]]) && (
         <>

@@ -200,15 +200,16 @@ export default function Canvas() {
       options?.points,
       {
         stroke: toolOptions[type as keyof typeof toolOptions].strokeColor,
-        fill: fillColors[id],
-        font: textFontOptions[id],
-        size: textSizes[id],
-        bowing: bowings[id],
-        roughness: roughnesses[id],
-        strokeWidth: strokeWidths[id],
-        fillStyle: fillStyles[id],
-        strokeLineDash: strokeLineDashes[id],
-        opacity: opacities[id],
+        fill: toolOptions[type as keyof typeof toolOptions].fillColor,
+        font: toolOptions[type as keyof typeof toolOptions].textFontOptions,
+        size: toolOptions[type as keyof typeof toolOptions].textSize,
+        bowing: toolOptions[type as keyof typeof toolOptions].bowing,
+        roughness: toolOptions[type as keyof typeof toolOptions].roughness,
+        strokeWidth: toolOptions[type as keyof typeof toolOptions].strokeWidth,
+        fillStyle: toolOptions[type as keyof typeof toolOptions].fillStyle,
+        strokeLineDash:
+          toolOptions[type as keyof typeof toolOptions].strokeLineDashes,
+        opacity: toolOptions[type as keyof typeof toolOptions].opacities,
         text: options?.text ?? '',
         angle: angles[id],
       },
@@ -638,10 +639,10 @@ export default function Canvas() {
                 zoom -
               scaleOffset.x,
             font: `${
-              textSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
+              textSizes[selectedElementIds[0] ?? toolOptions.text.textSize]
             }px ${
               textFontOptions[
-                selectedElementIds[0] ?? currentDrawingElemId.current
+                selectedElementIds[0] ?? toolOptions.text.textSize
               ]
             }`,
             color:

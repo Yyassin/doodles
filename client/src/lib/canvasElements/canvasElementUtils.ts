@@ -12,7 +12,7 @@ const strokeLineDash = [0];
 const opacity = 1;
 const angle = 0;
 const font = 'trebuchet MS';
-const size = 30;
+const size = 24;
 
 export const defaultOptions = {
   stroke,

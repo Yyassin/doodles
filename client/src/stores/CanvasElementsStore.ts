@@ -42,12 +42,21 @@ export const tool = [
   'circle',
   'freehand',
   'text',
+  'image',
 ] as const;
 export type tools = (typeof tool)[number];
 
-interface options {
+export interface options {
   strokeColor: string;
-  fillColor: string;
+  fillColor: string | undefined;
+  textFontOptions: string;
+  textSize: number;
+  roughness: number;
+  strokeWidth: number;
+  fillStyle: CanvasElementFillStyle;
+  strokeLineDashes: number[];
+  opacities: number;
+  bowing: number;
 }
 
 export interface CanvasElementState {
@@ -130,24 +139,76 @@ export const initialCanvasElementState: CanvasElementState = {
   angles: {},
   toolOptions: {
     line: {
-      strokeColor: '#FF0000',
-      fillColor: '#FF0000',
+      strokeColor: '#000000',
+      fillColor: undefined as string | undefined,
+      textFontOptions: 'none',
+      textSize: 0,
+      roughness: 0.01,
+      strokeWidth: 3,
+      fillStyle: 'none' as CanvasElementFillStyle,
+      strokeLineDashes: [0],
+      opacities: 1,
+      bowing: 0,
     },
     rectangle: {
-      strokeColor: '#FF0000',
-      fillColor: '#FF0000',
+      strokeColor: '#000000',
+      fillColor: undefined as string | undefined,
+      textFontOptions: 'none',
+      textSize: 0,
+      roughness: 0.01,
+      strokeWidth: 3,
+      fillStyle: 'none',
+      strokeLineDashes: [0],
+      opacities: 1,
+      bowing: 0,
     },
     circle: {
-      strokeColor: '#FF0000',
-      fillColor: '#FF0000',
+      strokeColor: '#000000',
+      fillColor: undefined as string | undefined,
+      textFontOptions: 'none',
+      textSize: 0,
+      roughness: 0.01,
+      strokeWidth: 3,
+      fillStyle: 'none',
+      strokeLineDashes: [0],
+      opacities: 1,
+      bowing: 0,
     },
     freehand: {
-      strokeColor: '#FF0000',
-      fillColor: '#FF0000',
+      strokeColor: '#000000',
+      fillColor: undefined as string | undefined,
+      textFontOptions: 'none',
+      textSize: 0,
+      roughness: 0.01,
+      strokeWidth: 3,
+      fillStyle: 'none',
+      strokeLineDashes: [0],
+      opacities: 1,
+      bowing: 0,
     },
     text: {
-      strokeColor: '#FF0000',
-      fillColor: '#FF0000',
+      textFontOptions: 'trebuchet MS',
+      textSize: 24,
+      opacities: 1,
+      strokeColor: '#000000',
+      fillColor: undefined as string | undefined,
+      roughness: 0,
+      strokeWidth: 0,
+      fillStyle: 'none',
+      strokeLineDashes: [0],
+      bowing: 0,
+    },
+    image: {
+      opacities: 1,
+      strokeColor: 'none',
+      fillColor: undefined as string | undefined,
+      textFontOptions: 'none',
+      textSize: 0,
+      roughness: 0,
+      strokeWidth: 0,
+      fillStyle: 'none',
+      strokeLineDashes: [0],
+      bowing: 0,
     },
   },
 };

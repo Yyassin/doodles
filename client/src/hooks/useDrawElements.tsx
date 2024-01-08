@@ -44,6 +44,7 @@ const useDrawElements = () => {
     opacities,
     strokeColors,
     strokeWidths,
+    toolOptions,
   } = useCanvasElementStore([
     'roughElements',
     'selectedElementIds',
@@ -65,6 +66,7 @@ const useDrawElements = () => {
     'opacities',
     'strokeColors',
     'strokeWidths',
+    'toolOptions',
   ]);
 
   // Effect fires after DOM is mounted
@@ -112,6 +114,7 @@ const useDrawElements = () => {
         opacities,
         strokeColors,
         strokeWidths,
+        toolOptions,
       },
       undefined,
       (id: string) =>
@@ -152,6 +155,7 @@ const useDrawElements = () => {
     opacities,
     strokeColors,
     strokeWidths,
+    toolOptions,
   ]);
 };
 

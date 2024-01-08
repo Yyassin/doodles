@@ -10,6 +10,7 @@ import CustomToolbar from '@/components/lib/CustomizabilityToolbar';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ContextMenu from '@/components/lib/ContextMenu';
 import * as RadixContextMenu from '@radix-ui/react-context-menu';
+import { AppTool } from '@/types';
 
 /**
  * Primary viewport that houses the canvas
@@ -18,16 +19,32 @@ import * as RadixContextMenu from '@radix-ui/react-context-menu';
  * @authors Yousef Yassin
  */
 const Viewport = () => {
-  const { setMode } = useAppStore(['setMode']);
+  const { setMode, tool } = useAppStore(['setMode', 'tool']);
   const viewportRef = useRef<HTMLDivElement>(null);
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
+  const drawingTools = [
+    'line',
+    'rectangle',
+    'circle',
+    'freehand',
+    'text',
+  ] as const;
+  const drawingToolsSet = new Set(drawingTools);
+  const isDrawingTool = (
+    tool: AppTool,
+  ): tool is (typeof drawingTools)[number] =>
+    drawingToolsSet.has(tool as (typeof drawingTools)[number]);
+
+  const isDrawingSelected = isDrawingTool(tool);
 
   return (
     <RadixContextMenu.Root>
       <div id="Viewport" className="select-none" ref={viewportRef}>
         <ToolBar />
         {/* Only show the toolbar is an element is selected */}
-        {selectedElementIds.length === 1 && <CustomToolbar />}
+        {(selectedElementIds.length === 1 || isDrawingSelected) && (
+          <CustomToolbar />
+        )}
         <DropDownMenu viewportRef={viewportRef} />
 
         <div
