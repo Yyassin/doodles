@@ -1,4 +1,4 @@
-import { REST, SECONDS_TO_MS, WS_TOPICS } from '@/constants';
+import { SECONDS_TO_MS, WS_TOPICS } from '@/constants';
 import { createPeer, handleNegotiationNeededEvent } from '@/lib/webrtc';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
