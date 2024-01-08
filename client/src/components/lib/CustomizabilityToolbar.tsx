@@ -4,7 +4,7 @@ import ToolGroup, { colourTypes } from './ChangeColor';
 import StrokeToolGroup, { strokeTypes } from './ChangeThickness';
 import StrokeColorToolGroup, { strokeColourTypes } from './ChangeStrokeColor';
 import RoughnessToolGroup, { roughnessTypes } from './ChangeRoughness';
-import { AppTool, CanvasElementFillStyles } from '@/types';
+import { CanvasElementFillStyles } from '@/types';
 import FillStyleToolGroup from './ChangeFillStyle';
 import OpacitySlider from './ChangeOpacity';
 import FontFamily, { fontTypes } from './ChangeFont';
@@ -33,7 +33,13 @@ const opacitySet = new Set([
 ]);
 const colorSet = new Set(['rectangle', 'circle', 'line']);
 const strokeThicknessSet = new Set(['freehand', 'rectangle', 'circle', 'line']);
-const strokeColorSet = new Set(['freehand', 'rectangle', 'circle', 'line']);
+const strokeColorSet = new Set([
+  'freehand',
+  'rectangle',
+  'circle',
+  'line',
+  'text',
+]);
 const strokeRoughnessSet = new Set(['rectangle', 'circle', 'line']);
 const fillStyleSet = new Set(['rectangle', 'circle', 'line']);
 
@@ -42,20 +48,6 @@ const fillStyleSet = new Set(['rectangle', 'circle', 'line']);
  */
 const CustomToolbar = () => {
   const { tool } = useAppStore(['tool']);
-  const drawingTools = [
-    'line',
-    'rectangle',
-    'circle',
-    'freehand',
-    'text',
-  ] as const;
-  const drawingToolsSet = new Set(drawingTools);
-  const isDrawingTool = (
-    tool: AppTool,
-  ): tool is (typeof drawingTools)[number] =>
-    drawingToolsSet.has(tool as (typeof drawingTools)[number]);
-  const isDrawingSelected = isDrawingTool(tool);
-
   const { types, selectedElementIds } = useCanvasElementStore([
     'types',
     'selectedElementIds',
@@ -64,7 +56,7 @@ const CustomToolbar = () => {
     <Toolbar.Root className="p-[0.3rem] gap-[0.3rem] min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] mt-40 absolute ml-3">
       {/* Stroke Color */}
       {(strokeColorSet.has(types[selectedElementIds[0]]) ||
-        isDrawingSelected) && (
+        strokeColorSet.has(tool)) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Stroke Color</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
@@ -72,7 +64,8 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Text Font */}
-      {(fontSizeSet.has(types[selectedElementIds[0]]) || isDrawingSelected) && (
+      {(fontSizeSet.has(types[selectedElementIds[0]]) ||
+        fontSizeSet.has(tool)) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Font</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
@@ -80,7 +73,8 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Text Size */}
-      {(fontSizeSet.has(types[selectedElementIds[0]]) || isDrawingSelected) && (
+      {(fontSizeSet.has(types[selectedElementIds[0]]) ||
+        fontSizeSet.has(tool)) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Size</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
@@ -89,7 +83,7 @@ const CustomToolbar = () => {
       )}
       {/* Stroke Thickness */}
       {(strokeThicknessSet.has(types[selectedElementIds[0]]) ||
-        isDrawingSelected) && (
+        strokeThicknessSet.has(tool)) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Stroke Thickness</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
@@ -98,7 +92,7 @@ const CustomToolbar = () => {
       )}
       {/* Stroke Roughness */}
       {(strokeRoughnessSet.has(types[selectedElementIds[0]]) ||
-        isDrawingSelected) && (
+        strokeRoughnessSet.has(tool)) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Roughness</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
@@ -106,7 +100,7 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Background Color */}
-      {(colorSet.has(types[selectedElementIds[0]]) || isDrawingSelected) && (
+      {(colorSet.has(types[selectedElementIds[0]]) || colorSet.has(tool)) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Fill Color</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
@@ -114,8 +108,7 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Fill Style */}
-      {(fillStyleSet.has(types[selectedElementIds[0]]) ||
-        isDrawingSelected) && (
+      {(fillStyleSet.has(types[selectedElementIds[0]]) || fillStyleSet) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Fill Style</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
@@ -123,7 +116,7 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Opacity */}
-      {(opacitySet.has(types[selectedElementIds[0]]) || isDrawingSelected) && (
+      {(opacitySet.has(types[selectedElementIds[0]]) || opacitySet) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Opacity</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
