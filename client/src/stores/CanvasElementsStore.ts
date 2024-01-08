@@ -321,7 +321,7 @@ const addCanvasFreehand =
     set((state) => {
       const allIds = [...state.allIds];
       const types = { ...state.types };
-      const fillColors = { ...state.fillColors };
+      const strokeColors = { ...state.strokeColors };
       const strokeWidths = { ...state.strokeWidths };
       const opacities = { ...state.opacities };
       const freehandPoints = { ...state.freehandPoints };
@@ -332,7 +332,7 @@ const addCanvasFreehand =
       const {
         id,
         type,
-        fillColor,
+        strokeColor,
         strokeWidth,
         opacity,
         freehandPoints: elemFreehandPoints,
@@ -340,7 +340,7 @@ const addCanvasFreehand =
       } = element;
       allIds.push(id);
       types[id] = type;
-      fillColors[id] = fillColor;
+      strokeColors[id] = strokeColor;
       strokeWidths[id] = strokeWidth;
       opacities[id] = opacity;
       freehandPoints[id] = elemFreehandPoints;
@@ -366,7 +366,7 @@ const addCanvasFreehand =
         ...state,
         allIds,
         types,
-        fillColors,
+        strokeColors,
         strokeWidths,
         opacities,
         freehandPoints,
