@@ -1,11 +1,11 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { server } from '../src/app';
-import superwstest from 'superwstest';
-import { Board, findBoardById } from '../src/models/board';
-import { Collaborator } from '../src/models/collaborator';
-import { User } from '../src/models/user';
-import { HTTP_STATUS } from '../src/constants';
+import { server } from '../../src/app';
+import supertest from 'supertest';
+import { Board, findBoardById } from '../../src/models/board';
+import { Collaborator } from '../../src/models/collaborator';
+import { User } from '../../src/models/user';
+import { HTTP_STATUS } from '../../src/constants';
 
 /**
  * Defines Board tests.
@@ -13,7 +13,7 @@ import { HTTP_STATUS } from '../src/constants';
  */
 
 // Connect to the server instance
-const request = superwstest(server);
+const request = supertest(server);
 
 // sample test user data
 const expectedUser = {

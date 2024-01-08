@@ -1,22 +1,28 @@
 import express from 'express';
 import http from 'http';
-import setUpWSS from './websockets';
 import { FastFire } from 'fastfire';
 import { Firestore } from 'fastfire/dist/firestore';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import { firestore } from './firebase/firebaseApp';
-import userRoutes from './routes/user.route';
-import collaboratorRoutes from './routes/collaborator.route';
-import commentRoutes from './routes/comment.route';
-import boardRoutes from './routes/board.route';
-import authRoutes from './routes/auth.route';
+import { websocketManager } from './lib/websocket/WebSocketManager';
+import { Logger } from './utils/Logger';
+import { LOG_LEVEL } from './constants';
+import { sfuManager } from './lib/webrtc/SFUManager';
+import userRoutes from './api/user/user.route';
+import collaboratorRoutes from './api/collaborator/collaborator.route';
+import commentRoutes from './api/comment/comment.route';
+import boardRoutes from './api/board/board.route';
+import authRoutes from './api/auth/auth.route';
+import sfuRoutes from './api/sfu/sfu.route';
+
+const mainLogger = new Logger('MainModule', LOG_LEVEL);
+const port = 3005;
 
 FastFire.initialize(firestore as Firestore);
-
 const app = express();
-const port = 3005;
+
 export const server = http.createServer(app);
 app.use(express.json()); // parse application/json
 app.use(bodyParser.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded
@@ -31,9 +37,11 @@ app.use('/collaborator', collaboratorRoutes);
 app.use('/comment', commentRoutes);
 app.use('/board', boardRoutes);
 app.use('/auth', authRoutes);
+app.use('/sfu', sfuRoutes);
 
 server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  mainLogger.info(`Example app listening on port ${port}.`);
 });
 
-setUpWSS(server);
+websocketManager.init(server);
+sfuManager.init();

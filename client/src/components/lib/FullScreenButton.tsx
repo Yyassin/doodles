@@ -27,6 +27,7 @@ const FullScreenButton = ({
         setIsFullscreen(!isFullscreen);
         toggleFullscreen(viewportRef.current);
       }}
+      className="bg-white"
       tooltip={{
         content: isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
         side: 'top',

@@ -7,6 +7,7 @@ import {
   renderElementsOnOffscreenCanvas,
 } from '@/lib/export';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useAppStore } from '@/stores/AppStore';
 
 /**
  * Provides Exporting as PDF and PNG files buttons and functionality in DropDownMenu
@@ -14,6 +15,7 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
  */
 
 export const ExportingDropDownMenu = () => {
+  const { canvasColor } = useAppStore(['canvasColor']);
   const {
     allIds,
     p1,
@@ -22,9 +24,9 @@ export const ExportingDropDownMenu = () => {
     freehandPoints,
     freehandBounds,
     textStrings,
-    textFontOptions,
+    fontFamilies,
     fillColors,
-    textSizes,
+    fontSizes,
     fileIds,
     isImagePlaceds,
     angles,
@@ -40,8 +42,8 @@ export const ExportingDropDownMenu = () => {
     'freehandPoints',
     'freehandBounds',
     'textStrings',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'fillColors',
     'fileIds',
     'isImagePlaceds',
@@ -77,8 +79,8 @@ export const ExportingDropDownMenu = () => {
                     freehandPoints,
                     freehandBounds,
                     textStrings,
-                    textFontOptions,
-                    textSizes,
+                    fontFamilies,
+                    fontSizes,
                     fillColors,
                     isImagePlaceds,
                     fileIds,
@@ -89,9 +91,7 @@ export const ExportingDropDownMenu = () => {
                   },
                   {
                     margin: 20,
-                    fillColour: 'white',
-                    textFontOption: 'Trebuchet MS',
-                    textSize: 30,
+                    canvasColor,
                   },
                 );
                 canvas && handlePDFExport(canvas.toDataURL('image/png'));
@@ -113,8 +113,8 @@ export const ExportingDropDownMenu = () => {
                     freehandBounds,
                     textStrings,
                     fillColors,
-                    textFontOptions,
-                    textSizes,
+                    fontFamilies,
+                    fontSizes,
                     isImagePlaceds,
                     fileIds,
                     roughElements,
@@ -124,9 +124,7 @@ export const ExportingDropDownMenu = () => {
                   },
                   {
                     margin: 20,
-                    fillColour: 'white',
-                    textFontOption: 'Trebuchet MS',
-                    textSize: 30,
+                    canvasColor,
                   },
                 );
                 canvas && handlePNGExport(canvas.toDataURL('image/png'));

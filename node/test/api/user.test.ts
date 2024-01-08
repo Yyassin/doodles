@@ -1,9 +1,9 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { server } from '../src/app';
-import superwstest from 'superwstest';
-import { User, findUserById } from '../src/models/user';
-import { HTTP_STATUS } from '../src/constants';
+import { server } from '../../src/app';
+import supertest from 'supertest';
+import { User, findUserById } from '../../src/models/user';
+import { HTTP_STATUS } from '../../src/constants';
 
 /**
  * Defines User tests.
@@ -11,7 +11,7 @@ import { HTTP_STATUS } from '../src/constants';
  */
 
 // Connect to the server instance
-const request = superwstest(server);
+const request = supertest(server);
 
 // sample test user data
 const expectedUser = {
@@ -46,13 +46,12 @@ describe('Test Users', () => {
 
   it("Should read user's name", async () => {
     if (testUser) {
-      const getUserNameResponse = await request.get('/user/getUser').send({
-        id: testUser.id,
+      const getUserNameResponse = await request.get('/user/getUser').query({
+        email: testUser.email,
       });
 
       expect(getUserNameResponse.status).to.equal(HTTP_STATUS.SUCCESS);
       const createdUser = getUserNameResponse.body.user as User;
-
       expect(createdUser).to.include(expectedUser);
     }
   });

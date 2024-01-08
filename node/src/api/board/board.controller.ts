@@ -4,8 +4,8 @@ import {
   findBoardById,
   updateBoard,
   deleteBoard,
-} from '../models/board';
-import { HTTP_STATUS } from '../constants';
+} from '../../models/board';
+import { HTTP_STATUS } from '../../constants';
 
 /**
  * Firebase API controllers, logic for endpoint routes.

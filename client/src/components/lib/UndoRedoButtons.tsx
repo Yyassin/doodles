@@ -40,7 +40,7 @@ const UndoRedoButtons = () => {
       }}
     >
       <CanvasFlatButton
-        className="rounded-l-md"
+        className="rounded-l-md bg-white"
         disabled={historyIndex <= 0}
         onClick={undo}
         tooltip={{
@@ -52,7 +52,7 @@ const UndoRedoButtons = () => {
         <ResetIcon />
       </CanvasFlatButton>
       <CanvasFlatButton
-        className="rounded-r-md"
+        className="rounded-r-md bg-white"
         disabled={historyIndex >= history.length - 1}
         onClick={redo}
         tooltip={{

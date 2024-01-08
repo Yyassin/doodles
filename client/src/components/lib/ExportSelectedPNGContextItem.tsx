@@ -3,6 +3,7 @@ import React from 'react';
 import { ImageIcon } from '@radix-ui/react-icons';
 import { handlePNGExport, renderElementsOnOffscreenCanvas } from '@/lib/export';
 import ContextMenuItem from './ContextMenuItem';
+import { useAppStore } from '@/stores/AppStore';
 
 /**
  * Context Menu options that supports exporting only selected
@@ -11,6 +12,7 @@ import ContextMenuItem from './ContextMenuItem';
  */
 
 const ExportSelectedPNGContextItem = () => {
+  const { canvasColor } = useAppStore(['canvasColor']);
   const {
     selectedElementIds,
     p1,
@@ -19,8 +21,8 @@ const ExportSelectedPNGContextItem = () => {
     freehandPoints,
     freehandBounds,
     textStrings,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     fillColors,
     fileIds,
     isImagePlaceds,
@@ -37,8 +39,8 @@ const ExportSelectedPNGContextItem = () => {
     'freehandPoints',
     'freehandBounds',
     'textStrings',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'fillColors',
     'fileIds',
     'isImagePlaceds',
@@ -62,8 +64,8 @@ const ExportSelectedPNGContextItem = () => {
             freehandPoints,
             freehandBounds,
             textStrings,
-            textFontOptions,
-            textSizes,
+            fontFamilies,
+            fontSizes,
             fillColors,
             isImagePlaceds,
             fileIds,
@@ -74,9 +76,7 @@ const ExportSelectedPNGContextItem = () => {
           },
           {
             margin: 20,
-            fillColour: 'white',
-            textFontOption: 'Trebuchet MS',
-            textSize: 30,
+            canvasColor,
           },
         );
         canvas && handlePNGExport(canvas.toDataURL('image/png'));

@@ -1,11 +1,11 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { server } from '../src/app';
-import superwstest from 'superwstest';
-import { Comment, findCommentById } from '../src/models/comment';
-import { Collaborator } from '../src/models/collaborator';
-import { User } from '../src/models/user';
-import { HTTP_STATUS } from '../src/constants';
+import { server } from '../../src/app';
+import supertest from 'supertest';
+import { Comment, findCommentById } from '../../src/models/comment';
+import { Collaborator } from '../../src/models/collaborator';
+import { User } from '../../src/models/user';
+import { HTTP_STATUS } from '../../src/constants';
 
 /**
  * Defines Comment tests.
@@ -13,7 +13,7 @@ import { HTTP_STATUS } from '../src/constants';
  */
 
 // Connect to the server instance
-const request = superwstest(server);
+const request = supertest(server);
 
 // sample test user data
 const expectedUser = {

@@ -4,8 +4,8 @@ import {
   findCommentById,
   updateComment,
   deleteComment,
-} from '../models/comment';
-import { HTTP_STATUS } from '../constants';
+} from '../../models/comment';
+import { HTTP_STATUS } from '../../constants';
 
 /**
  * Firebase API controllers, logic for endpoint routes.

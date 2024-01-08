@@ -78,8 +78,8 @@ export default function Canvas() {
     setPendingImageElement,
     strokeColors,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -108,8 +108,8 @@ export default function Canvas() {
     'setPendingImageElement',
     'strokeColors',
     'fillColors',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -199,8 +199,8 @@ export default function Canvas() {
       {
         stroke: strokeColors[id],
         fill: fillColors[id],
-        font: textFontOptions[id],
-        size: textSizes[id],
+        font: fontFamilies[id],
+        size: fontSizes[id],
         bowing: bowings[id],
         roughness: roughnesses[id],
         strokeWidth: strokeWidths[id],
@@ -243,13 +243,13 @@ export default function Canvas() {
     // calculates the correct width.
     ctx.save();
     ctx.textBaseline = 'top';
-    ctx.font = ` ${textSizes[currentDrawingElemId.current]}px ${
-      textFontOptions[currentDrawingElemId.current[0]]
+    ctx.font = ` ${fontSizes[currentDrawingElemId.current]}px ${
+      fontFamilies[currentDrawingElemId.current[0]]
     }`;
     const textWidth = ctx.measureText(text).width;
     ctx.restore();
 
-    const textHeight = textSizes[currentDrawingElemId.current];
+    const textHeight = fontSizes[currentDrawingElemId.current];
     updateElement(
       elementId,
       x1,
@@ -609,7 +609,7 @@ export default function Canvas() {
     <>
       <canvas
         id="canvas"
-        style={{ backgroundColor: 'white' }}
+        style={{ backgroundColor: 'transparent' }}
         width={appWidth}
         height={appHeight}
         onMouseDown={handleMouseDown}
@@ -636,9 +636,9 @@ export default function Canvas() {
                 zoom -
               scaleOffset.x,
             font: `${
-              textSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
+              fontSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
             }px ${
-              textFontOptions[
+              fontFamilies[
                 selectedElementIds[0] ?? currentDrawingElemId.current
               ]
             }`,

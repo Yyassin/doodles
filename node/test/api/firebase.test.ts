@@ -4,7 +4,7 @@ import {
   checkImageExistsInStorage,
   deleteImageFromStorage,
   uploadImageToStorage,
-} from '../src/firebase/firebaseDB';
+} from '../../src/firebase/firebaseDB';
 
 /**
  * Firebase tests to exercise reading and writing

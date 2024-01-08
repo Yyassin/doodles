@@ -4,8 +4,8 @@ import {
   findCollaboratorById,
   updateCollaborator,
   deleteCollaborator,
-} from '../models/collaborator';
-import { HTTP_STATUS } from '../constants';
+} from '../../models/collaborator';
+import { HTTP_STATUS } from '../../constants';
 
 /**
  * Firebase API controllers, logic for endpoint routes.
