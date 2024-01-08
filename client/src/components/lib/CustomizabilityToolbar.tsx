@@ -30,7 +30,7 @@ const opacitySet = new Set([
   'line',
   'image',
 ]);
-const colorSet = new Set(['rectangle', 'circle', 'line']);
+const colorSet = new Set(['rectangle', 'circle', 'line', 'text']);
 const strokeThicknessSet = new Set(['freehand', 'rectangle', 'circle', 'line']);
 const strokeColorSet = new Set(['freehand', 'rectangle', 'circle', 'line']);
 const strokeRoughnessSet = new Set(['rectangle', 'circle', 'line']);
@@ -49,7 +49,8 @@ const CustomToolbar = () => {
     <Toolbar.Root className="p-[0.3rem] gap-[0.3rem] min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] mt-40 absolute ml-3">
       {/* Background Color */}
       {colorSet.has(types[selectedElementIds[0]]) &&
-        fillStyles[selectedElementIds[0]] != 'none' && (
+        (fillStyles[selectedElementIds[0]] !== 'none' ||
+          types[selectedElementIds[0]] === 'text') && (
           <>
             <h2 className="text-sm font-semibold mb-2">Color</h2>{' '}
             <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />

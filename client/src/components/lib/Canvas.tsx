@@ -19,7 +19,7 @@ import {
 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import { PERIPHERAL_CODES } from '@/constants';
+import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES } from '@/constants';
 import { getCanvasContext, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
@@ -61,6 +61,7 @@ export default function Canvas() {
     'panOffset',
     'setPanOffset',
     'setAction',
+    'isTransparent',
   ]);
   const {
     addCanvasShape,
@@ -169,9 +170,11 @@ export default function Canvas() {
    * @param e The mouse event containing the raw mouse coordinates.
    * @returns The normalized mouse coordinates.
    */
+  const titlebarHeight = IS_ELECTRON_INSTANCE ? 30 : 0;
   const getMouseCoordinates = (e: MouseEvent<HTMLCanvasElement>) => {
     const clientX = (e.clientX - panOffset.x * zoom + scaleOffset.x) / zoom;
-    const clientY = (e.clientY - panOffset.y * zoom + scaleOffset.y) / zoom;
+    const clientY =
+      (e.clientY - titlebarHeight - panOffset.y * zoom + scaleOffset.y) / zoom;
     return { clientX, clientY };
   };
 
@@ -609,7 +612,9 @@ export default function Canvas() {
     <>
       <canvas
         id="canvas"
-        style={{ backgroundColor: 'transparent' }}
+        style={{
+          backgroundColor: 'transparent',
+        }}
         width={appWidth}
         height={appHeight}
         onMouseDown={handleMouseDown}

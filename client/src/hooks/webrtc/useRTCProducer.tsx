@@ -3,7 +3,8 @@ import { createPeer, handleNegotiationNeededEvent } from '@/lib/webrtc';
 import { useAppStore } from '@/stores/AppStore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
-import { useEffect, useRef } from 'react';
+import { StreamSource } from '@/types';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * Hook that handles creating a producer if a stream is started inside a room.
@@ -18,6 +19,8 @@ import { useEffect, useRef } from 'react';
 const useRTCProducer = (
   screenStream: MediaStream | null,
   setScreenStream: (stream: MediaStream | null) => void,
+  setScreenSelectDialogOpen: (value: boolean) => void,
+  setStreamSources: (streamSources: StreamSource[]) => void,
 ) => {
   const peerRef = useRef<RTCPeerConnection>();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -27,7 +30,7 @@ const useRTCProducer = (
   ]);
   const { socket, roomID } = useWebSocketStore(['socket', 'roomID']);
   const { userEmail: userId } = useAuthStore(['userEmail']);
-
+  const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
   useEffect(() => {
     // Cleanup on component unmount
     return () => {
@@ -52,31 +55,42 @@ const useRTCProducer = (
     if (isSharingScreen) {
       initProducer();
     } else {
-      cleanup();
+      // Recorder on stop will handle cleanup
       stopScreenShare();
+      cleanup();
     }
   }, [isSharingScreen]);
+  useEffect(() => {
+    if (selectedSourceId !== null) {
+      setStreamFromId(selectedSourceId);
+    }
+  }, [selectedSourceId]);
 
   /**
    * Initializes a screenshare recorder, and producer for sharing screen streams.
    */
   const initProducer = async () => {
-    if (!isSharingScreen) {
+    // If we're using electron then we set the sharing screen
+    // state after already initializing the producer, in which
+    // case there will be a selected source id.
+    if (!isSharingScreen || selectedSourceId !== null) {
       return;
     }
     // Start the screenshare.
-    const { stream, recorder } = await startScreenShare(
+    const { stream, recorder } = ((await startScreenShare(
       setScreenStream,
       async () => {
         setScreenStream(null);
         setIsSharingScreen(false);
-        await socket?.rtcEnd();
-        peerRef.current?.close();
-        peerRef.current = undefined;
+        cleanup();
       },
-    );
+      (streamSources) => {
+        setScreenSelectDialogOpen(true);
+        setStreamSources(streamSources);
+      },
+    )) ?? {}) as unknown as { stream: MediaStream; recorder: MediaRecorder };
     if (stream === undefined || recorder === undefined) {
-      console.log('canceled');
+      console.log('pending or cancelled');
       setIsSharingScreen(false);
       return;
     }
@@ -121,10 +135,39 @@ const useRTCProducer = (
   /**
    * Clean up resources when the component unmounts or the room changes.
    */
-  const cleanup = () => {
-    peerRef.current?.close();
-    peerRef.current = undefined;
-    stopScreenShare();
+  const cleanup = async () => {
+    if (peerRef.current !== undefined) {
+      await socket?.rtcEnd();
+      peerRef.current?.close();
+      peerRef.current = undefined;
+      stopScreenShare();
+      setSelectedSourceId(null);
+    }
+  };
+
+  /**
+   * In Electron, the streamId will be set by the alert dialog.
+   * On set, we can fetch the media stream from the desktop capture API
+   * using getDisplayMedia and start the stream this way.
+   * @param streamId The Id of the stream to fetch.
+   */
+  const setStreamFromId = async (streamId: string) => {
+    // Overriden by electron in renderer.js
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const stream = await navigator.mediaDevices.getDisplayMedia(streamId);
+    setScreenStream(stream);
+    // Create the producer peer.
+    const peer = createProducer();
+    if (peer === undefined) {
+      setIsSharingScreen(false);
+      return;
+    }
+
+    peerRef.current = peer;
+    // TODO: Store senders with labels in ref
+    stream.getTracks().forEach((track) => peer.addTrack(track, stream));
+    setIsSharingScreen(true);
   };
 
   /**
@@ -148,7 +191,7 @@ const useRTCProducer = (
     setIsSharingScreen(false);
   };
 
-  return peerRef;
+  return { peerRef, setSelectedSourceId };
 };
 
 export default useRTCProducer;

@@ -15,7 +15,7 @@ const { sendErrorResponse, sendSuccessResponse } = helpers;
 
 /**
  * SFUManager Singleton Class
- * Manages instances of RoomSFU for each room, coordinating producers and consumers.
+ * Manages instances of RoomSFU for each room to coordinate producers and consumers.
  */
 export class SFUManager extends Singleton<SFUManager>() {
   #SFUs = {} as Record<string, RoomSFU>;
@@ -129,9 +129,11 @@ export class SFUManager extends Singleton<SFUManager>() {
       return null;
     }
 
-    const roomSFU = new RoomSFU(roomId, this.#logger);
+    const roomSFU = new RoomSFU(roomId, this.#logger, (id) =>
+      this.remove(id, roomId),
+    );
     const localDescription = await roomSFU.addProducer(id, sdp);
-    this.#logger.debug(
+    this.#logger.info(
       `Added producer [${id}] to room [${roomId}]: ${
         localDescription !== null
       }.`,
@@ -160,7 +162,7 @@ export class SFUManager extends Singleton<SFUManager>() {
       return null;
     }
     const localDescription = roomSFU.addConsumer(id, sdp);
-    this.#logger.debug(
+    this.#logger.info(
       `Added consumer [${id}] to room [${roomId}]: ${
         localDescription !== null
       }.`,
@@ -184,7 +186,7 @@ export class SFUManager extends Singleton<SFUManager>() {
     }
     const success = roomSFU.removeProducer();
     delete this.#SFUs[roomId];
-    this.#logger.debug(
+    this.#logger.info(
       `Removed producer [${id}] from room [${roomId}]: ${success}`,
     );
     return success;
@@ -205,7 +207,7 @@ export class SFUManager extends Singleton<SFUManager>() {
       return false;
     }
     const success = roomSFU.removeConsumer(id);
-    this.#logger.debug(
+    this.#logger.info(
       `Removed consumer [${id}] from room [${roomId}]: ${success}`,
     );
     return success;

@@ -2,6 +2,8 @@
  * Various constants used throughout the application.
  */
 
+import { ipcAPI } from './data/ipc/ipcMessages';
+
 /**
  * REST & Websockets
  */
@@ -68,3 +70,6 @@ export const PERIPHERAL_CODES = {
  * Misc
  */
 export const EPSILON = 1e-8;
+// True if running in electron, false otherwise (ipcAPI is injected by
+// electron's main process).
+export const IS_ELECTRON_INSTANCE = ipcAPI !== undefined;

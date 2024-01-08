@@ -35,6 +35,8 @@ interface AppState {
   panOffset: { x: number; y: number };
   // Canvas Background Color
   canvasColor: string;
+  // Whether app is in transparent canvas mode.
+  isTransparent: boolean;
 }
 /** Reducers */
 interface AppActions {
@@ -49,6 +51,7 @@ interface AppActions {
   setIsSharingScreen: (isShareScreen: boolean) => void;
   setIsInCall: (isInCall: boolean) => void;
   setCanvasBackground: (canvasColor: string) => void;
+  setIsTransparent: (isTransparent: boolean) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -66,6 +69,7 @@ export const initialAppState: AppState = {
   zoom: 1, // 100%
   panOffset: { x: 0, y: 0 },
   canvasColor: '#fff',
+  isTransparent: false,
 };
 
 /** Actions / Reducers */
@@ -88,12 +92,23 @@ const setIsSharingScreen =
     set(() => ({ isSharingScreen }));
 const setIsInCall = (set: SetState<AppStore>) => (isInCall: boolean) =>
   set(() => ({ isInCall }));
+const setIsTransparent =
+  (set: SetState<AppStore>) => (isTransparent: boolean) =>
+    set(() => ({ isTransparent }));
+// Zoom and Panning are disabled in transparent mode.
 const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
-  set(() => ({
-    zoom,
-  }));
+  set((state) =>
+    state.isTransparent
+      ? state
+      : {
+          ...state,
+          zoom,
+        },
+  );
 const setPanOffset = (set: SetState<AppStore>) => (x: number, y: number) =>
-  set(() => ({ panOffset: { x, y } }));
+  set((state) =>
+    state.isTransparent ? state : { ...state, panOffset: { x, y } },
+  );
 const setCanvasBackground =
   (set: SetState<AppStore>) => (canvasColor: string) =>
     set(() => ({ canvasColor }));
@@ -112,5 +127,6 @@ const appStore = create<AppStore>()((set) => ({
   setPanOffset: setPanOffset(set),
   setIsInCall: setIsInCall(set),
   setCanvasBackground: setCanvasBackground(set),
+  setIsTransparent: setIsTransparent(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);

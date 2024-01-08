@@ -36,7 +36,6 @@ jobs:
           node-version: "18.x"
           cache: "yarn"
           cache-dependency-path: "./mod/fastfire/yarn.lock"
-      - run: npm install -g firebase-tools
 
       - uses: pnpm/action-setup@v2
         with:
@@ -50,6 +49,7 @@ jobs:
           key: ${{ runner.os }}-firebase-emulators-${{
             hashFiles('./emulator-cache/**') }}
         continue-on-error: true
+      # - run: npm install -g firebase-tools
 
       - name: Get pnpm store directory
         shell: bash
