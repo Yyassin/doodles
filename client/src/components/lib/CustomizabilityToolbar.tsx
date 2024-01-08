@@ -60,13 +60,9 @@ const CustomToolbar = () => {
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
       <SizeOptions tools={[...sizes]} />
       {/* Stroke Thickness */}
-      {strokeThicknessSet.has(types[selectedElementIds[0]]) && (
-        <>
-          <h2 className="text-sm font-semibold mb-2">Stroke Thickness</h2>{' '}
-          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-          <StrokeToolGroup tools={[...strokeTypes]} />
-        </>
-      )}
+      <h2 className="text-sm font-semibold mb-2">Stroke Thickness</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <StrokeToolGroup tools={[...strokeTypes]} />
       {/* Stroke Color (border for shapes) */}
       <h2 className="text-sm font-semibold mb-2">Stroke Color</h2>{' '}
       <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
@@ -80,21 +76,13 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Fill Style */}
-      {fillStyleSet.has(types[selectedElementIds[0]]) && (
-        <>
-          <h2 className="text-sm font-semibold mb-2">Fill Style</h2>{' '}
-          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-          <FillStyleToolGroup tools={[...CanvasElementFillStyles]} />
-        </>
-      )}
+      <h2 className="text-sm font-semibold mb-2">Fill Style</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <FillStyleToolGroup tools={[...CanvasElementFillStyles]} />
       {/* Opacity */}
-      {opacitySet.has(types[selectedElementIds[0]]) && (
-        <>
-          <h2 className="text-sm font-semibold mb-2">Opacity</h2>{' '}
-          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-          <OpacitySlider />
-        </>
-      )}
+      <h2 className="text-sm font-semibold mb-2">Opacity</h2>{' '}
+      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+      <OpacitySlider />
     </Toolbar.Root>
   );
 };

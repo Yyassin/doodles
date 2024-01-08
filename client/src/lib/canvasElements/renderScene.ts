@@ -1,4 +1,4 @@
-import { CanvasElement, tools, options } from '@/stores/CanvasElementsStore';
+import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { Vector2 } from '@/types';
 import rough from 'roughjs';
 import { drawImagePlaceholder, drawStroke } from './render';
@@ -42,7 +42,6 @@ export const renderCanvasElements = (
     opacities: Record<string, CanvasElement['opacity']>;
     strokeColors: Record<string, CanvasElement['strokeColor']>;
     strokeWidths: Record<string, CanvasElement['strokeWidth']>;
-    toolOptions: Record<tools, options>;
   },
   offset?: Vector2,
   renderTextPredicate: (id: string) => boolean = () => true,
@@ -64,7 +63,6 @@ export const renderCanvasElements = (
     opacities,
     strokeColors,
     strokeWidths,
-    toolOptions,
   } = appState;
   const roughElements = appState.roughElements ?? {};
   const { x: offsetX, y: offsetY } = offset ?? { x: 0, y: 0 };
@@ -116,8 +114,8 @@ export const renderCanvasElements = (
       // Skip anything being edited
       if (renderTextPredicate(id)) {
         ctx.textBaseline = 'top';
-        ctx.font = `${textSizes[id] ?? toolOptions.text.textSize}px ${
-          textFontOptions[id] ?? toolOptions.text.textFontOptions
+        ctx.font = `${textSizes[id] ?? 30}px ${
+          textFontOptions[id] ?? 'trebuchet MS'
         }`;
         const fillColor = fillColors[id] ?? '#000000';
         ctx.fillStyle = fillColor;

@@ -114,7 +114,6 @@ const useDrawElements = () => {
         opacities,
         strokeColors,
         strokeWidths,
-        toolOptions,
       },
       undefined,
       (id: string) =>

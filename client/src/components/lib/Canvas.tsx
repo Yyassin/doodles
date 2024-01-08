@@ -363,6 +363,20 @@ export default function Canvas() {
         clientY,
         tool,
         points,
+        {
+          stroke: toolOptions[tool].strokeColor,
+          font: toolOptions[tool].textFontOptions,
+          size: toolOptions[tool].textSize,
+          fill: toolOptions[tool].fillColor,
+          bowing: toolOptions[tool].bowing,
+          roughness: toolOptions[tool].roughness,
+          strokeWidth: toolOptions[tool].strokeWidth,
+          fillStyle: toolOptions[tool].fillStyle,
+          strokeLineDash: toolOptions[tool].strokeLineDashes,
+          opacity: toolOptions[tool].opacities,
+          text: '',
+          angle: 0,
+        },
       );
       if (tool === 'text') {
         element.text = '';
@@ -639,10 +653,10 @@ export default function Canvas() {
                 zoom -
               scaleOffset.x,
             font: `${
-              textSizes[selectedElementIds[0] ?? toolOptions.text.textSize]
+              textSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
             }px ${
               textFontOptions[
-                selectedElementIds[0] ?? toolOptions.text.textSize
+                selectedElementIds[0] ?? currentDrawingElemId.current
               ]
             }`,
             color:
