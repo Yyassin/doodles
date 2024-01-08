@@ -49,7 +49,7 @@ jobs:
           key: ${{ runner.os }}-firebase-emulators-${{
             hashFiles('./emulator-cache/**') }}
         continue-on-error: true
-      - run: npm install -g firebase-tools
+      # - run: npm install -g firebase-tools
 
       - name: Get pnpm store directory
         shell: bash
