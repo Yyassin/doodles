@@ -20,8 +20,9 @@ import {
 import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
 import axios from 'axios';
-import { REST_URL } from '@/constants';
+import { REST } from '@/constants';
 import { ACCESS_TOKEN_TAG } from '@/constants';
+import { useAuthStore } from '@/stores/AuthStore';
 
 /**
  * It is the sign in page where user either inputs email and password or
@@ -38,13 +39,43 @@ export function signin(email: string, password: string) {
 }
 
 export function checkToken(token: string) {
-  return axios.post(REST_URL.auth, {
+  return axios.post(REST.auth.token, {
     body: { token: token },
   });
 }
 
+export async function getUserDetails(
+  email: string,
+  setUser: (
+    userFirstName: string,
+    userLastName: string,
+    userEmail: string | null,
+    userPicture: string,
+  ) => void,
+) {
+  await axios
+    .get(REST.user.get, {
+      params: { email },
+    })
+    .then((response) => {
+      setUser(
+        response.data.user.firstname ?? '',
+        response.data.user.lastname ?? '',
+        response.data.user.email ?? '',
+        response.data.user.avatar ?? '',
+      );
+    })
+    .catch((error) => {
+      console.error(
+        'Error:',
+        error.response ? error.response.data : error.message,
+      );
+    });
+}
+
 export default function SignInPage() {
   const { setMode } = useAppStore(['setMode']);
+  const { setUser } = useAuthStore(['setUser']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false); // State to disable sign in button while loading
@@ -60,6 +91,8 @@ export default function SignInPage() {
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
       );
+      getUserDetails(emailRef.current?.value ?? '', setUser); //get name, email, avatar of user
+
       localStorage.setItem(
         ACCESS_TOKEN_TAG,
         await signInToken.user.getIdToken(),
@@ -69,8 +102,6 @@ export default function SignInPage() {
     } catch (error: unknown) {
       setError((error as Error).message); //if error thrown, setState and will display on page
     }
-    //get reqs name, id, avatar
-    //store in zustand store
     setLoading(false);
   };
 
@@ -81,27 +112,42 @@ export default function SignInPage() {
 
     try {
       const googleSignInToken = await signInWithPopup(auth, provider);
-      localStorage.setItem(
-        ACCESS_TOKEN_TAG,
-        await googleSignInToken.user.getIdToken(),
-      );
-      setMode('dashboard'); //bring user to dashboard page if sign in complete
+
+      await axios
+        .get(REST.user.get, {
+          params: { email: googleSignInToken.user.email },
+        })
+        .then(async () => {
+          setUser(
+            googleSignInToken.user.displayName ?? '',
+            '',
+            googleSignInToken.user.email ?? '',
+            googleSignInToken.user.photoURL ?? '', // add image implementation when API is done
+          );
+          localStorage.setItem(
+            ACCESS_TOKEN_TAG,
+            await googleSignInToken.user.getIdToken(),
+          );
+
+          setMode('dashboard'); //bring user to dashboard page if sign in complete
+        })
+        .catch(() => {
+          setError('Email is not associated with an Account. Sign Up First!');
+        });
     } catch (error: unknown) {
       setError((error as Error).message);
     }
   };
 
   return (
-    <Card>
+    <Card className="rounded-none">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Log In</CardTitle>
         <CardDescription>
           Enter your email and password below to Log In
         </CardDescription>
         {error && ( // Conditional rendering of error message
-          <div className="text-red-500 text-center mt-2">
-            {'Invalid Email or Password'}
-          </div>
+          <div className="text-red-500 text-center mt-2">{error}</div>
         )}
       </CardHeader>
       <CardContent className="grid gap-1">

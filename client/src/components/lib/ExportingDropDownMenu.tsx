@@ -7,6 +7,7 @@ import {
   renderElementsOnOffscreenCanvas,
 } from '@/lib/export';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useAppStore } from '@/stores/AppStore';
 
 /**
  * Provides Exporting as PDF and PNG files buttons and functionality in DropDownMenu
@@ -14,6 +15,7 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
  */
 
 export const ExportingDropDownMenu = () => {
+  const { canvasColor } = useAppStore(['canvasColor']);
   const {
     allIds,
     p1,
@@ -22,10 +24,16 @@ export const ExportingDropDownMenu = () => {
     freehandPoints,
     freehandBounds,
     textStrings,
+    fontFamilies,
+    fillColors,
+    fontSizes,
     fileIds,
     isImagePlaceds,
     angles,
     roughElements,
+    opacities,
+    strokeColors,
+    strokeWidths,
   } = useCanvasElementStore([
     'allIds',
     'p1',
@@ -34,10 +42,16 @@ export const ExportingDropDownMenu = () => {
     'freehandPoints',
     'freehandBounds',
     'textStrings',
+    'fontFamilies',
+    'fontSizes',
+    'fillColors',
     'fileIds',
     'isImagePlaceds',
     'angles',
     'roughElements',
+    'opacities',
+    'strokeColors',
+    'strokeWidths',
   ]);
 
   return (
@@ -65,11 +79,20 @@ export const ExportingDropDownMenu = () => {
                     freehandPoints,
                     freehandBounds,
                     textStrings,
+                    fontFamilies,
+                    fontSizes,
+                    fillColors,
                     isImagePlaceds,
                     fileIds,
                     roughElements,
+                    opacities,
+                    strokeColors,
+                    strokeWidths,
                   },
-                  { margin: 20, fillColour: 'white' },
+                  {
+                    margin: 20,
+                    canvasColor,
+                  },
                 );
                 canvas && handlePDFExport(canvas.toDataURL('image/png'));
               }}
@@ -89,11 +112,20 @@ export const ExportingDropDownMenu = () => {
                     freehandPoints,
                     freehandBounds,
                     textStrings,
+                    fillColors,
+                    fontFamilies,
+                    fontSizes,
                     isImagePlaceds,
                     fileIds,
                     roughElements,
+                    opacities,
+                    strokeColors,
+                    strokeWidths,
                   },
-                  { margin: 20, fillColour: 'white' },
+                  {
+                    margin: 20,
+                    canvasColor,
+                  },
                 );
                 canvas && handlePNGExport(canvas.toDataURL('image/png'));
               }}

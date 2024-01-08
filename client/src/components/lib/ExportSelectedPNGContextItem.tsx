@@ -3,6 +3,7 @@ import React from 'react';
 import { ImageIcon } from '@radix-ui/react-icons';
 import { handlePNGExport, renderElementsOnOffscreenCanvas } from '@/lib/export';
 import ContextMenuItem from './ContextMenuItem';
+import { useAppStore } from '@/stores/AppStore';
 
 /**
  * Context Menu options that supports exporting only selected
@@ -11,6 +12,7 @@ import ContextMenuItem from './ContextMenuItem';
  */
 
 const ExportSelectedPNGContextItem = () => {
+  const { canvasColor } = useAppStore(['canvasColor']);
   const {
     selectedElementIds,
     p1,
@@ -19,10 +21,16 @@ const ExportSelectedPNGContextItem = () => {
     freehandPoints,
     freehandBounds,
     textStrings,
+    fontFamilies,
+    fontSizes,
+    fillColors,
     fileIds,
     isImagePlaceds,
     angles,
     roughElements,
+    opacities,
+    strokeColors,
+    strokeWidths,
   } = useCanvasElementStore([
     'selectedElementIds',
     'p1',
@@ -31,10 +39,16 @@ const ExportSelectedPNGContextItem = () => {
     'freehandPoints',
     'freehandBounds',
     'textStrings',
+    'fontFamilies',
+    'fontSizes',
+    'fillColors',
     'fileIds',
     'isImagePlaceds',
     'angles',
     'roughElements',
+    'opacities',
+    'strokeColors',
+    'strokeWidths',
   ]);
   return (
     <ContextMenuItem
@@ -50,11 +64,20 @@ const ExportSelectedPNGContextItem = () => {
             freehandPoints,
             freehandBounds,
             textStrings,
+            fontFamilies,
+            fontSizes,
+            fillColors,
             isImagePlaceds,
             fileIds,
             roughElements,
+            opacities,
+            strokeColors,
+            strokeWidths,
           },
-          { margin: 20, fillColour: 'white' },
+          {
+            margin: 20,
+            canvasColor,
+          },
         );
         canvas && handlePNGExport(canvas.toDataURL('image/png'));
       }}

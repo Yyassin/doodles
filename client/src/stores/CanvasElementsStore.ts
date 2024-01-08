@@ -15,7 +15,7 @@ import { CanvasElementFillStyle, CanvasElementType, Vector2 } from '@/types';
 export interface CanvasElement {
   type: CanvasElementType; // The element's type
   strokeColor: string; // Stroke color, in hex
-  fillColor: string; // Inside fill color, in hex
+  fillColor?: string; // Inside fill color, in hex
   bowing: number; // [0, 1], specifies stroke curviness
   roughness: number; // Specified line roughness
   strokeWidth: number; // Stroke width in pixels
@@ -27,6 +27,8 @@ export interface CanvasElement {
   fileId?: string; // For image elements; the id of the image in cache.
   isImagePlaced: boolean; // For image elements; true if the element has been placed, false otherwise.
   text: string; // Container stringW
+  fontFamily: string; // Font Family
+  fontSize: number; // Font Size
   p1: Vector2; // Top left coordinate, or center for circles
   p2: Vector2; // Bottom right coordinate
   angle: number; // Element orientation, in radians
@@ -42,6 +44,8 @@ export interface CanvasElementState {
   types: Record<string, CanvasElement['type']>;
   strokeColors: Record<string, CanvasElement['strokeColor']>;
   fillColors: Record<string, CanvasElement['fillColor']>;
+  fontFamilies: Record<string, CanvasElement['fontFamily']>;
+  fontSizes: Record<string, CanvasElement['fontSize']>;
   bowings: Record<string, CanvasElement['bowing']>;
   roughnesses: Record<string, CanvasElement['roughness']>;
   strokeWidths: Record<string, CanvasElement['strokeWidth']>;
@@ -65,6 +69,7 @@ interface CanvasElementActions {
   editCanvasElement: (
     id: string,
     partialElement: Partial<CanvasElement>,
+    isLive?: boolean,
   ) => void;
   removeCanvasElements: (ids: string[]) => void;
   setSelectedElements: (ids: string[]) => void;
@@ -90,6 +95,8 @@ export const initialCanvasElementState: CanvasElementState = {
   types: {},
   strokeColors: {},
   fillColors: {},
+  fontFamilies: {},
+  fontSizes: {},
   bowings: {},
   roughnesses: {},
   strokeWidths: {},
@@ -125,6 +132,8 @@ const addCanvasShape =
       const types = { ...state.types };
       const strokeColors = { ...state.strokeColors };
       const fillColors = { ...state.fillColors };
+      const fontFamilies = { ...state.fontFamilies };
+      const fontSizes = { ...state.fontSizes };
       const bowings = { ...state.bowings };
       const roughnesses = { ...state.roughnesses };
       const strokeWidths = { ...state.strokeWidths };
@@ -144,6 +153,8 @@ const addCanvasShape =
         type,
         strokeColor,
         fillColor,
+        fontFamily,
+        fontSize,
         bowing,
         roughness,
         strokeWidth,
@@ -162,6 +173,8 @@ const addCanvasShape =
       types[id] = type;
       strokeColors[id] = strokeColor;
       fillColors[id] = fillColor;
+      fontFamilies[id] = fontFamily;
+      fontSizes[id] = fontSize;
       bowings[id] = bowing;
       roughnesses[id] = roughness;
       strokeWidths[id] = strokeWidth;
@@ -181,6 +194,8 @@ const addCanvasShape =
         types,
         strokeColors,
         fillColors,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,
@@ -273,7 +288,7 @@ const addCanvasFreehand =
 const editCanvasElement =
   (set: SetState<CanvasElementState>) =>
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  (id: string, partialElement: Partial<CanvasElement>) =>
+  (id: string, partialElement: Partial<CanvasElement>, isLive = false) =>
     set((state) => {
       // Edit shouldn't add a new id
       const types = partialElement.type
@@ -291,6 +306,18 @@ const editCanvasElement =
             [id]: partialElement.fillColor,
           }
         : state.fillColors;
+      const fontFamilies = partialElement.fontFamily
+        ? {
+            ...state.fontFamilies,
+            [id]: partialElement.fontFamily,
+          }
+        : state.fontFamilies;
+      const fontSizes = partialElement.fontSize
+        ? {
+            ...state.fontSizes,
+            [id]: partialElement.fontSize,
+          }
+        : state.fontSizes;
       const bowings = partialElement.bowing
         ? { ...state.bowings, [id]: partialElement.bowing }
         : state.bowings;
@@ -364,8 +391,10 @@ const editCanvasElement =
           ],
         };
 
-        p1s = { ...state.p1, [id]: { x: minX, y: minY } };
-        p2s = { ...state.p2, [id]: { x: maxX, y: maxY } };
+        if (!isLive) {
+          p1s = { ...state.p1, [id]: { x: minX, y: minY } };
+          p2s = { ...state.p2, [id]: { x: maxX, y: maxY } };
+        }
       }
 
       return {
@@ -374,6 +403,8 @@ const editCanvasElement =
         types,
         strokeColors,
         fillColors,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,
@@ -405,6 +436,8 @@ const removeCanvasElements =
       const types = { ...state.types };
       const strokeColors = { ...state.strokeColors };
       const fillColors = { ...state.fillColors };
+      const fontFamilies = { ...state.fontFamilies };
+      const fontSizes = { ...state.fontSizes };
       const bowings = { ...state.bowings };
       const roughnesses = { ...state.roughnesses };
       const strokeWidths = { ...state.strokeWidths };
@@ -422,6 +455,8 @@ const removeCanvasElements =
         delete types[id];
         delete strokeColors[id];
         delete fillColors[id];
+        delete fontFamilies[id];
+        delete fontSizes[id];
         delete bowings[id];
         delete roughnesses[id];
         delete strokeWidths[id];
@@ -441,6 +476,8 @@ const removeCanvasElements =
         types,
         strokeColors,
         fillColors,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,
@@ -552,6 +589,8 @@ const setCanvasElementState =
         types,
         strokeColors,
         fillColors,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,
@@ -570,6 +609,8 @@ const setCanvasElementState =
         types,
         strokeColors,
         fillColors,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,

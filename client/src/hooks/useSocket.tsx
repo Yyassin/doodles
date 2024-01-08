@@ -6,6 +6,7 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { useEffect, useRef } from 'react';
+import { useAuthStore } from '@/stores/AuthStore';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -13,18 +14,30 @@ import { useEffect, useRef } from 'react';
  */
 
 export const useSocket = () => {
-  const { roomID, actionElementID, action } = useWebSocketStore([
-    'roomID',
-    'actionElementID',
-    'action',
-  ]);
+  const { userEmail: userId } = useAuthStore(['userEmail']);
+  const { roomID, actionElementID, action, setSocket, setWebsocketAction } =
+    useWebSocketStore([
+      'roomID',
+      'actionElementID',
+      'action',
+      'setSocket',
+      'setWebsocketAction',
+    ]);
 
   const {
     addCanvasShape,
     addCanvasFreehand,
+    editCanvasElement,
+    undoCanvasHistory,
+    redoCanvasHistory,
+    pushCanvasHistory,
+    removeCanvasElements,
+    setSelectedElements,
     types,
     strokeColors,
     fillColors,
+    fontFamilies,
+    fontSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -32,15 +45,24 @@ export const useSocket = () => {
     strokeLineDashes,
     opacities,
     freehandPoints,
+    angles,
     p1,
     p2,
     textStrings,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
+    'editCanvasElement',
+    'undoCanvasHistory',
+    'redoCanvasHistory',
+    'pushCanvasHistory',
+    'removeCanvasElements',
+    'setSelectedElements',
     'types',
     'strokeColors',
     'fillColors',
+    'fontFamilies',
+    'fontSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -48,6 +70,7 @@ export const useSocket = () => {
     'strokeLineDashes',
     'opacities',
     'freehandPoints',
+    'angles',
     'p1',
     'p2',
     'textStrings',
@@ -69,6 +92,8 @@ export const useSocket = () => {
         {
           stroke: element.strokeColor,
           fill: element.fillColor,
+          font: element.fontFamily,
+          size: element.fontSize,
           bowing: element.bowing,
           roughness: element.roughness,
           strokeWidth: element.strokeWidth,
@@ -76,11 +101,41 @@ export const useSocket = () => {
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
           text: element.text,
+          angle: element.angle,
         },
       );
       addCanvasShape(newElement);
+      pushCanvasHistory();
     },
     addCanvasFreehand: (element: CanvasElement) => {
+      const newElement = createElement(
+        element.id,
+        element.p1.x,
+        element.p1.y,
+        element.p2.x,
+        element.p2.y,
+        element.type,
+        element.freehandPoints,
+        {
+          stroke: element.strokeColor,
+          fill: element.fillColor,
+          font: element.fontFamily,
+          size: element.fontSize,
+          bowing: element.bowing,
+          roughness: element.roughness,
+          strokeWidth: element.strokeWidth,
+          fillStyle: element.fillStyle,
+          strokeLineDash: element.strokeLineDash,
+          opacity: element.opacity,
+          text: element.text,
+          angle: element.angle,
+        },
+        true,
+      );
+      addCanvasFreehand(newElement);
+      pushCanvasHistory();
+    },
+    editCanvasElement: (element: CanvasElement) => {
       const newElement = createElement(
         element.id,
         element.p1.x,
@@ -99,22 +154,44 @@ export const useSocket = () => {
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
           text: element.text,
+          font: element.fontFamily,
+          size: element.fontSize,
+          angle: element.angle,
         },
         true,
       );
-      addCanvasFreehand(newElement);
+      editCanvasElement(element.id, newElement, true);
+      pushCanvasHistory();
+    },
+    removeCanvasElements: (ids: string[]) => {
+      setSelectedElements([]);
+      removeCanvasElements(ids);
+      pushCanvasHistory();
+    },
+    undoCanvasHistory: () => {
+      undoCanvasHistory();
+    },
+    redoCanvasHistory: () => {
+      redoCanvasHistory();
     },
   };
 
-  //intialize socket
+  // Intialize socket
   useEffect(() => {
-    socket.current = new WebsocketClient(callBacks);
+    if (!userId) {
+      return;
+    }
+    socket.current = new WebsocketClient(callBacks, userId);
+    setSocket(socket.current);
     return () => {
+      if (socket.current?.room !== null) {
+        socket.current?.leaveRoom();
+      }
       socket.current?.disconnect();
     };
-  }, []);
+  }, [userId]);
 
-  //The socket joins room or leaves once the roomID changes
+  // The socket joins room or leaves once the roomID changes
   useEffect(() => {
     if (roomID === null) {
       if (socket.current?.room !== null) {
@@ -125,9 +202,22 @@ export const useSocket = () => {
     }
   }, [roomID]);
 
-  //Send message once action gets set. Note: will be changed
+  // Send message once action gets set. Note: will be changed
   useEffect(() => {
     if (actionElementID === '') return;
+
+    if (action === 'undoCanvasHistory' || action === 'redoCanvasHistory') {
+      socket.current?.sendMsgRoom(action, null);
+      setWebsocketAction('', '');
+      return;
+    }
+
+    //Check if the actionElementID is string[] (collection of ids)
+    if (typeof actionElementID === 'object') {
+      socket.current?.sendMsgRoom(action, actionElementID);
+      setWebsocketAction('', '');
+      return;
+    }
 
     //Create element to send to other sockets in room
     const element = createElement(
@@ -137,12 +227,12 @@ export const useSocket = () => {
       p2[actionElementID].x,
       p2[actionElementID].y,
       types[actionElementID],
-      action === 'addCanvasFreehand'
-        ? freehandPoints[actionElementID]
-        : undefined,
+      freehandPoints[actionElementID],
       {
         stroke: strokeColors[actionElementID],
         fill: fillColors[actionElementID],
+        font: fontFamilies[actionElementID],
+        size: fontSizes[actionElementID],
         bowing: bowings[actionElementID],
         roughness: roughnesses[actionElementID],
         strokeWidth: strokeWidths[actionElementID],
@@ -150,12 +240,29 @@ export const useSocket = () => {
         strokeLineDash: strokeLineDashes[actionElementID],
         opacity: opacities[actionElementID],
         text: textStrings[actionElementID],
+        angle: angles[actionElementID],
       },
       true,
     );
 
     delete element.roughElement;
-
     socket.current?.sendMsgRoom(action, element);
-  }, [actionElementID]);
+    setWebsocketAction('', '');
+  }, [
+    actionElementID,
+    action,
+    p1,
+    p2,
+    types,
+    freehandPoints,
+    strokeColors,
+    fillColors,
+    bowings,
+    roughnesses,
+    strokeWidths,
+    fillStyles,
+    strokeLineDashes,
+    opacities,
+    textStrings,
+  ]);
 };

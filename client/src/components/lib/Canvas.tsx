@@ -19,11 +19,7 @@ import {
 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import {
-  PERIPHERAL_CODES,
-  TEXT_FONT_FAMILY,
-  TEXT_FONT_SIZE,
-} from '@/constants';
+import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES } from '@/constants';
 import { getCanvasContext, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
@@ -65,6 +61,7 @@ export default function Canvas() {
     'panOffset',
     'setPanOffset',
     'setAction',
+    'isTransparent',
   ]);
   const {
     addCanvasShape,
@@ -82,6 +79,8 @@ export default function Canvas() {
     setPendingImageElement,
     strokeColors,
     fillColors,
+    fontFamilies,
+    fontSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -110,6 +109,8 @@ export default function Canvas() {
     'setPendingImageElement',
     'strokeColors',
     'fillColors',
+    'fontFamilies',
+    'fontSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -169,9 +170,11 @@ export default function Canvas() {
    * @param e The mouse event containing the raw mouse coordinates.
    * @returns The normalized mouse coordinates.
    */
+  const titlebarHeight = IS_ELECTRON_INSTANCE ? 30 : 0;
   const getMouseCoordinates = (e: MouseEvent<HTMLCanvasElement>) => {
     const clientX = (e.clientX - panOffset.x * zoom + scaleOffset.x) / zoom;
-    const clientY = (e.clientY - panOffset.y * zoom + scaleOffset.y) / zoom;
+    const clientY =
+      (e.clientY - titlebarHeight - panOffset.y * zoom + scaleOffset.y) / zoom;
     return { clientX, clientY };
   };
 
@@ -199,6 +202,8 @@ export default function Canvas() {
       {
         stroke: strokeColors[id],
         fill: fillColors[id],
+        font: fontFamilies[id],
+        size: fontSizes[id],
         bowing: bowings[id],
         roughness: roughnesses[id],
         strokeWidth: strokeWidths[id],
@@ -206,6 +211,7 @@ export default function Canvas() {
         strokeLineDash: strokeLineDashes[id],
         opacity: opacities[id],
         text: options?.text ?? '',
+        angle: angles[id],
       },
     );
     editCanvasElement(id, {
@@ -240,11 +246,13 @@ export default function Canvas() {
     // calculates the correct width.
     ctx.save();
     ctx.textBaseline = 'top';
-    ctx.font = `${TEXT_FONT_SIZE}px ${TEXT_FONT_FAMILY}`;
+    ctx.font = ` ${fontSizes[currentDrawingElemId.current]}px ${
+      fontFamilies[currentDrawingElemId.current[0]]
+    }`;
     const textWidth = ctx.measureText(text).width;
     ctx.restore();
 
-    const textHeight = TEXT_FONT_SIZE;
+    const textHeight = fontSizes[currentDrawingElemId.current];
     updateElement(
       elementId,
       x1,
@@ -256,6 +264,9 @@ export default function Canvas() {
         text,
       },
     );
+
+    setWebsocketAction(elementId, 'addCanvasShape');
+    pushCanvasHistory();
 
     // Cleanup
     setAction('none');
@@ -419,9 +430,14 @@ export default function Canvas() {
     }
 
     if (action === 'drawing') {
-      setWebsocketAction(currentDrawingElemId.current, tool);
+      const action =
+        tool === 'freehand' ? 'addCanvasFreehand' : 'addCanvasShape';
+      setWebsocketAction(currentDrawingElemId.current, action);
     }
 
+    if (action === 'moving' || action === 'resizing' || action === 'rotating') {
+      setWebsocketAction(selectedElementIds[0], 'editCanvasElement');
+    }
     // Return to idle none action state, unless it's writing. We want to
     // write after a mouse up, so we'll set none explicitly.
     action !== 'writing' && setAction('none');
@@ -463,6 +479,7 @@ export default function Canvas() {
             clientY - selectOffset.current.y + height,
             elementType,
           );
+
           break;
         }
         case 'rotating': {
@@ -595,7 +612,9 @@ export default function Canvas() {
     <>
       <canvas
         id="canvas"
-        style={{ backgroundColor: 'white' }}
+        style={{
+          backgroundColor: 'transparent',
+        }}
         width={appWidth}
         height={appHeight}
         onMouseDown={handleMouseDown}
@@ -611,7 +630,7 @@ export default function Canvas() {
             top:
               ((p1[selectedElementIds[0]]?.y ??
                 p1[currentDrawingElemId.current]?.y) -
-                3 +
+                5 +
                 panOffset.y) *
                 zoom -
               scaleOffset.y,
@@ -621,7 +640,15 @@ export default function Canvas() {
                 panOffset.x) *
                 zoom -
               scaleOffset.x,
-            font: `${TEXT_FONT_SIZE * zoom}px ${TEXT_FONT_FAMILY}`,
+            font: `${
+              fontSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
+            }px ${
+              fontFamilies[
+                selectedElementIds[0] ?? currentDrawingElemId.current
+              ]
+            }`,
+            color:
+              fillColors[selectedElementIds[0] ?? currentDrawingElemId.current],
             margin: 0,
             padding: 0,
             border: 0,

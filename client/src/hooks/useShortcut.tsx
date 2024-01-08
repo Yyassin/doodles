@@ -1,7 +1,9 @@
 import { ZOOM } from '@/constants';
+import { ipcAPI } from '@/data/ipc/ipcMessages';
 import { clamp } from '@/lib/misc';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { AppTool, AppTools, EVENT } from '@/types';
 import { useEffect } from 'react';
 
@@ -50,12 +52,18 @@ export const useShortcuts = () => {
     setSelectedElements,
     removeCanvasElements,
     pushCanvasHistory,
+    undoCanvasHistory,
+    redoCanvasHistory,
   } = useCanvasElementStore([
     'selectedElementIds',
     'setSelectedElements',
     'removeCanvasElements',
     'pushCanvasHistory',
+    'undoCanvasHistory',
+    'redoCanvasHistory',
   ]);
+
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
   useEffect(() => {
     const onKeyPress = (e: KeyboardEvent) => {
@@ -71,12 +79,40 @@ export const useShortcuts = () => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (shouldIgnoreKeyPress(e)) return;
 
-      // Delete the selected element on backspace
-      if (e.code === 'Backspace' && selectedElementIds.length) {
-        const ids = selectedElementIds;
-        setSelectedElements([]);
-        removeCanvasElements(ids);
-        pushCanvasHistory();
+      switch (e.code) {
+        case 'Backspace': {
+          // Delete the selected elemenst on backspace
+          if (selectedElementIds.length) {
+            const ids = selectedElementIds;
+            setSelectedElements([]);
+            removeCanvasElements(ids);
+            pushCanvasHistory();
+            setWebsocketAction(ids, 'removeCanvasElements');
+          }
+          break;
+        }
+        case 'KeyZ': {
+          // Undo
+          if (e.ctrlKey) {
+            undoCanvasHistory();
+            setWebsocketAction('undo', 'undoCanvasHistory');
+          }
+          break;
+        }
+        case 'KeyY': {
+          // Redo
+          if (e.ctrlKey) {
+            redoCanvasHistory();
+            setWebsocketAction('redo', 'redoCanvasHistory');
+          }
+          break;
+        }
+        // Test notification
+        case 'KeyR': {
+          if (e.ctrlKey) {
+            ipcAPI.notification({ title: 'Test', body: 'Test Body' });
+          }
+        }
       }
     };
 

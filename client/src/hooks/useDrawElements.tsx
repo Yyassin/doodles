@@ -28,6 +28,9 @@ const useDrawElements = () => {
     p1,
     p2,
     types,
+    fillColors,
+    fontFamilies,
+    fontSizes,
     allIds,
     freehandPoints,
     freehandBounds,
@@ -37,12 +40,18 @@ const useDrawElements = () => {
     angles,
     selectionFrame,
     roughElements,
+    opacities,
+    strokeColors,
+    strokeWidths,
   } = useCanvasElementStore([
     'roughElements',
     'selectedElementIds',
     'p1',
     'p2',
     'types',
+    'fillColors',
+    'fontFamilies',
+    'fontSizes',
     'allIds',
     'freehandPoints',
     'freehandBounds',
@@ -51,6 +60,9 @@ const useDrawElements = () => {
     'isImagePlaceds',
     'angles',
     'selectionFrame',
+    'opacities',
+    'strokeColors',
+    'strokeWidths',
   ]);
 
   // Effect fires after DOM is mounted
@@ -84,12 +96,18 @@ const useDrawElements = () => {
         p2,
         angles,
         types,
+        fillColors,
+        fontFamilies,
+        fontSizes,
         freehandPoints,
         freehandBounds,
         textStrings,
         isImagePlaceds,
         fileIds,
         roughElements,
+        opacities,
+        strokeColors,
+        strokeWidths,
       },
       undefined,
       (id: string) =>
@@ -103,7 +121,6 @@ const useDrawElements = () => {
         renderTransformFrame(ctx, { p1, p2, angles, types }, id);
       });
     }
-
     // Draw the selection frame, if any
     selectionFrame && renderSelectionFrame(selectionFrame, zoom, ctx);
 
@@ -113,6 +130,9 @@ const useDrawElements = () => {
     allIds,
     selectedElementIds,
     types,
+    fillColors,
+    fontFamilies,
+    fontSizes,
     p1,
     p2,
     appWidth,
@@ -125,6 +145,9 @@ const useDrawElements = () => {
     angles,
     roughElements,
     selectionFrame,
+    opacities,
+    strokeColors,
+    strokeWidths,
   ]);
 };
 

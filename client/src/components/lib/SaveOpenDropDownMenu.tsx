@@ -24,6 +24,8 @@ export const SaveOpenDropDownMenu = () => {
     types,
     strokeColors,
     fillColors,
+    fontFamilies,
+    fontSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -39,6 +41,8 @@ export const SaveOpenDropDownMenu = () => {
     'types',
     'strokeColors',
     'fillColors',
+    'fontFamilies',
+    'fontSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -79,6 +83,8 @@ export const SaveOpenDropDownMenu = () => {
         const options = {
           stroke: state.strokeColors[key],
           fill: state.fillColors[key],
+          font: state.fontFamilies[key],
+          size: state.fontSizes[key],
           bowing: state.bowings[key],
           roughness: state.roughnesses[key],
           strokeWidth: state.strokeWidths[key],
@@ -86,6 +92,7 @@ export const SaveOpenDropDownMenu = () => {
           strokeLineDash: state.strokeLineDashes[key],
           opacity: state.opacities[key],
           text: state.textStrings[key],
+          angle: state.angles[key],
         };
 
         roughElements[key] = createElement(
@@ -113,6 +120,8 @@ export const SaveOpenDropDownMenu = () => {
       types,
       strokeColors,
       fillColors,
+      fontFamilies,
+      fontSizes,
       bowings,
       roughnesses,
       strokeWidths,

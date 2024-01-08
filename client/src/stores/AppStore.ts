@@ -21,6 +21,10 @@ interface AppState {
   theme: AppTheme;
   // Whether app is fullscreen or not
   isFullscreen: boolean;
+  // Whether sharing screen or not
+  isSharingScreen: boolean;
+  // Whether in an RTC call or not.
+  isInCall: boolean;
   // Viewport width
   appWidth: number;
   // Viewport Height
@@ -29,23 +33,25 @@ interface AppState {
   zoom: number;
   //Panning offset
   panOffset: { x: number; y: number };
+  // Canvas Background Color
+  canvasColor: string;
+  // Whether app is in transparent canvas mode.
+  isTransparent: boolean;
 }
+/** Reducers */
 interface AppActions {
-  // Reducer to set the canvas action
   setAction: (action: Action) => void;
-  // Reducer to set the app mode
   setMode: (mode: AppMode) => void;
-  // Reducer to set the app tool
   setTool: (tool: AppTool) => void;
-  // Reducer to set the app theme
   setTheme: (theme: AppTheme) => void;
-  // Reducer to set app window dimensions
   setAppDimensions: (width: number, height: number) => void;
-  // Reducer to set full screen mode
   setIsFullscreen: (isFullscreen: boolean) => void;
-  // Reducer to set zoom level
   setAppZoom: (zoom: number) => void;
   setPanOffset: (x: number, y: number) => void;
+  setIsSharingScreen: (isShareScreen: boolean) => void;
+  setIsInCall: (isInCall: boolean) => void;
+  setCanvasBackground: (canvasColor: string) => void;
+  setIsTransparent: (isTransparent: boolean) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -56,10 +62,14 @@ export const initialAppState: AppState = {
   tool: 'line',
   theme: 'dark',
   isFullscreen: false,
+  isSharingScreen: false,
+  isInCall: false,
   appWidth: window.innerWidth,
   appHeight: window.innerHeight,
   zoom: 1, // 100%
   panOffset: { x: 0, y: 0 },
+  canvasColor: '#fff',
+  isTransparent: false,
 };
 
 /** Actions / Reducers */
@@ -77,12 +87,31 @@ const setAppDimensions =
     set(() => ({ appWidth: width, appHeight: height }));
 const setIsFullscreen = (set: SetState<AppStore>) => (isFullscreen: boolean) =>
   set(() => ({ isFullscreen }));
+const setIsSharingScreen =
+  (set: SetState<AppStore>) => (isSharingScreen: boolean) =>
+    set(() => ({ isSharingScreen }));
+const setIsInCall = (set: SetState<AppStore>) => (isInCall: boolean) =>
+  set(() => ({ isInCall }));
+const setIsTransparent =
+  (set: SetState<AppStore>) => (isTransparent: boolean) =>
+    set(() => ({ isTransparent }));
+// Zoom and Panning are disabled in transparent mode.
 const setAppZoom = (set: SetState<AppStore>) => (zoom: number) =>
-  set(() => ({
-    zoom,
-  }));
+  set((state) =>
+    state.isTransparent
+      ? state
+      : {
+          ...state,
+          zoom,
+        },
+  );
 const setPanOffset = (set: SetState<AppStore>) => (x: number, y: number) =>
-  set(() => ({ panOffset: { x, y } }));
+  set((state) =>
+    state.isTransparent ? state : { ...state, panOffset: { x, y } },
+  );
+const setCanvasBackground =
+  (set: SetState<AppStore>) => (canvasColor: string) =>
+    set(() => ({ canvasColor }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
@@ -92,8 +121,12 @@ const appStore = create<AppStore>()((set) => ({
   setMode: setMode(set),
   setTheme: setTheme(set),
   setIsFullscreen: setIsFullscreen(set),
+  setIsSharingScreen: setIsSharingScreen(set),
   setAppDimensions: setAppDimensions(set),
   setAppZoom: setAppZoom(set),
   setPanOffset: setPanOffset(set),
+  setIsInCall: setIsInCall(set),
+  setCanvasBackground: setCanvasBackground(set),
+  setIsTransparent: setIsTransparent(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);

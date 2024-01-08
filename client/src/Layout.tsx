@@ -9,6 +9,8 @@ import useWindowResize from './hooks/useWindowResize';
 import { useSocket } from './hooks/useSocket';
 import { useShortcuts } from './hooks/useShortcut';
 import Viewport from './views/Viewport';
+import useIPCListener from './hooks/useIPCListener';
+import { IS_ELECTRON_INSTANCE } from './constants';
 
 /**
  * Layout component that handles routing between pages, and
@@ -22,6 +24,7 @@ const Layout = () => {
   useWindowResize();
   useShortcuts();
   useSocket();
+  IS_ELECTRON_INSTANCE && useIPCListener();
   const { mode } = useAppStore(['mode']);
 
   switch (mode) {

@@ -20,7 +20,9 @@ import {
 } from 'firebase/auth';
 import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
-import { ACCESS_TOKEN_TAG } from '@/constants';
+import { ACCESS_TOKEN_TAG, REST } from '@/constants';
+import { useAuthStore } from '@/stores/AuthStore';
+import axios from 'axios';
 
 /**
  * It is the sign up page where user either inputs email and password or
@@ -37,6 +39,7 @@ export function signup(
 ): Promise<UserCredential> {
   return new Promise(async (resolve, reject) => {
     const auth = getAuth(firebaseApp);
+    console.log(profilePicture);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -48,17 +51,17 @@ export function signup(
 
       // send the data as a JSON payload:
       const userData = {
+        username: ' user.displayName',
         email: user.email,
         password,
-        firstName,
-        lastName,
-        profilePicture,
+        firstname: firstName,
+        lastname: lastName,
+        avatar: 'profilePicture',
         // handle uploading the profile picture to backend
       };
-      // API call to backend something like axios.post('/api/signup', userData)
 
-      console.log(userData); // to be delete when api call for userdata to backend in written
-      console.log(userCredential);
+      await axios.post(REST.user.create, userData);
+
       resolve(userCredential);
     } catch (error: unknown) {
       reject(error as Error);
@@ -68,6 +71,7 @@ export function signup(
 
 export default function SignUp() {
   const { setMode } = useAppStore(['setMode']);
+  const { setUser } = useAuthStore(['setUser']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const firstNameRef = useRef<HTMLInputElement | null>(null);
@@ -93,6 +97,13 @@ export default function SignUp() {
           ? profilePictureRef.current?.files[0]
           : null,
       );
+      setUser(
+        firstNameRef.current?.value ?? '',
+        lastNameRef.current?.value ?? '',
+        emailRef.current?.value ?? '',
+        '', // add image implementation when API is done
+      );
+
       localStorage.setItem(
         ACCESS_TOKEN_TAG,
         await signUpToken.user.getIdToken(),
@@ -110,15 +121,39 @@ export default function SignUp() {
     const provider = new GoogleAuthProvider();
 
     try {
-      await signInWithPopup(auth, provider);
-      const userData = {
-        firstname: auth.currentUser?.displayName,
-        avatar: auth.currentUser?.photoURL,
-      };
-      // await axois.post('/api/googleSignUp', userData);  when endpoints are ready, we use them to send info to backend/dB
-      console.log(userData); // to be delete when api call for userdata to backend in written
+      const googleSignInToken = await signInWithPopup(auth, provider);
 
-      setMode('dashboard'); //bring user to dashboard page if sign in complete
+      const userData = {
+        username: '  ',
+        email: googleSignInToken.user.email,
+        password: '  ',
+        firstname: googleSignInToken.user.displayName,
+        lastname: '  ',
+        avatar: googleSignInToken.user.photoURL,
+      };
+
+      await axios
+        .get(REST.user.get, {
+          params: { email: googleSignInToken.user.email },
+        })
+        .then(() => {
+          setError('Account is already registered. Go to Sign In Page!');
+        })
+        .catch(async () => {
+          await axios.post(REST.user.create, userData);
+          setUser(
+            googleSignInToken.user.displayName ?? '',
+            '',
+            googleSignInToken.user.email ?? '',
+            googleSignInToken.user.photoURL ?? '',
+          );
+          localStorage.setItem(
+            ACCESS_TOKEN_TAG,
+            await googleSignInToken.user.getIdToken(),
+          );
+
+          setMode('dashboard'); //bring user to dashboard page if sign in complete
+        });
     } catch (error: unknown) {
       setError((error as Error).message);
     }
@@ -147,18 +182,14 @@ export default function SignUp() {
   >(null);
 
   return (
-    <Card>
+    <Card className="rounded-none">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Create an account</CardTitle>
         <CardDescription>
           Enter your information below to create your account
         </CardDescription>
         {error && ( // Conditional rendering of error message
-          <div className="text-red-500 text-center mt-2">
-            {
-              'Please make sure: valid email is used and password is minimum 6 characters long'
-            }
-          </div>
+          <div className="text-red-500 text-center mt-2">{error}</div>
         )}
       </CardHeader>
       <CardContent className="grid gap-1">

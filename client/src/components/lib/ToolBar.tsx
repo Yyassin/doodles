@@ -20,6 +20,8 @@ import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { generateRandId } from '@/lib/bytes';
 import { fileOpen } from '@/lib/fs';
 import { injectImageElement } from '@/lib/image';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { IS_ELECTRON_INSTANCE } from '@/constants';
 
 /**
  * This is the toolbar that is displayed on the canvas.
@@ -82,6 +84,8 @@ const ToolButton = ({
     'editCanvasElement',
   ]);
 
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
+
   // Temporary. For now we erase the selected element. In the
   // future we can add a context menu with delete and make erase
   // a drag operation.
@@ -92,6 +96,7 @@ const ToolButton = ({
         setSelectedElements([]);
         removeCanvasElements(ids);
         pushCanvasHistory();
+        setWebsocketAction(ids, 'removeCanvasElements');
         setCursor('');
       }
     : tool === 'image'
@@ -169,7 +174,7 @@ const ToolGroup = ({
  * The toolbar that is displayed on the canvas.
  */
 const ToolBar = () => {
-  const { tool } = useAppStore(['tool']);
+  const { tool, isTransparent } = useAppStore(['tool', 'isTransparent']);
   return (
     <Toolbar.Root
       className="flex p-[0.3rem] gap-[0.3rem] w-full min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)]"
@@ -179,7 +184,9 @@ const ToolBar = () => {
         right: 0,
         // centering
         margin: 'auto',
-        top: '1rem',
+        top: `calc(1rem + ${
+          IS_ELECTRON_INSTANCE && isTransparent ? '30px' : '0px'
+        })`,
         width: 'fit-content',
       }}
     >
