@@ -46,7 +46,6 @@ export const useSocket = () => {
     p1,
     p2,
     textStrings,
-    toolOptions,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -72,7 +71,6 @@ export const useSocket = () => {
     'p1',
     'p2',
     'textStrings',
-    'toolOptions',
   ]);
 
   const socket = useRef<WebsocketClient>();

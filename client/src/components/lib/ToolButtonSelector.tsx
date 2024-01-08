@@ -17,16 +17,16 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
  * @author Eebro, Abdalla
  */
 
-import { AppTool } from '@/types';
 import { useAppStore } from '@/stores/AppStore';
 
 /**
  * Primary viewport that houses the canvas
  * and accompanying widgets/buttons that lie
  * on top of it (absolutely positioned).
- * @authors Yousef Yassin
+ * @authors Yousef Yassin, Dana El Sherif
  */
 
+//Will change later to export
 const useToolFromAppStore = () => {
   const { tool } = useAppStore(['tool']);
   return tool;
@@ -100,10 +100,8 @@ const ToolButton = ({
 
   const onClick = () => {
     console.log(selectedElementIds[0]);
-    // If the user was able to see the panel, only one element is selected.
+    // A new and customized element will be drawn
     if (selectedElementIds[0] === undefined) {
-      console.log(tool);
-
       toolOptions[tool as keyof typeof toolOptions].strokeColor =
         customizabilityDict.strokeColor ??
         toolOptions[tool as keyof typeof toolOptions].strokeColor;
@@ -139,11 +137,8 @@ const ToolButton = ({
       toolOptions[tool as keyof typeof toolOptions].opacities =
         customizabilityDict.opacity ??
         toolOptions[tool as keyof typeof toolOptions].opacities;
-
-      // toolOptions[tool as keyof typeof toolOptions].strokeColor =
-      //   customizabilityDict.strokeColor ??
-      //   toolOptions[tool as keyof typeof toolOptions].strokeColor;
-    } else {
+    } // An element is selected.
+    else {
       const selectedElementId = selectedElementIds[0];
       const { roughElement, fillColor } = createElement(
         selectedElementId,

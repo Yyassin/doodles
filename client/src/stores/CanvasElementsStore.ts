@@ -46,6 +46,7 @@ export const tool = [
 ] as const;
 export type tools = (typeof tool)[number];
 
+//Default customizability options
 export interface options {
   strokeColor: string;
   fillColor: string | undefined;
@@ -85,7 +86,7 @@ export interface CanvasElementState {
   fileIds: Record<string, CanvasElement['fileId']>;
   isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
   angles: Record<string, CanvasElement['angle']>;
-  toolOptions: Record<tools, options>;
+  toolOptions: Record<string, options>;
 }
 
 interface CanvasElementActions {
@@ -138,78 +139,16 @@ export const initialCanvasElementState: CanvasElementState = {
   isImagePlaceds: {},
   angles: {},
   toolOptions: {
-    line: {
-      strokeColor: '#000000',
-      fillColor: undefined as string | undefined,
-      textFontOptions: 'none',
-      textSize: 0,
-      roughness: 0.01,
-      strokeWidth: 3,
-      fillStyle: 'none' as CanvasElementFillStyle,
-      strokeLineDashes: [0],
-      opacities: 1,
-      bowing: 0,
-    },
-    rectangle: {
-      strokeColor: '#000000',
-      fillColor: undefined as string | undefined,
-      textFontOptions: 'none',
-      textSize: 0,
-      roughness: 0.01,
-      strokeWidth: 3,
-      fillStyle: 'none',
-      strokeLineDashes: [0],
-      opacities: 1,
-      bowing: 0,
-    },
-    circle: {
-      strokeColor: '#000000',
-      fillColor: undefined as string | undefined,
-      textFontOptions: 'none',
-      textSize: 0,
-      roughness: 0.01,
-      strokeWidth: 3,
-      fillStyle: 'none',
-      strokeLineDashes: [0],
-      opacities: 1,
-      bowing: 0,
-    },
-    freehand: {
-      strokeColor: '#000000',
-      fillColor: undefined as string | undefined,
-      textFontOptions: 'none',
-      textSize: 0,
-      roughness: 0.01,
-      strokeWidth: 3,
-      fillStyle: 'none',
-      strokeLineDashes: [0],
-      opacities: 1,
-      bowing: 0,
-    },
-    text: {
-      textFontOptions: 'trebuchet MS',
-      textSize: 24,
-      opacities: 1,
-      strokeColor: '#000000',
-      fillColor: undefined as string | undefined,
-      roughness: 0,
-      strokeWidth: 0,
-      fillStyle: 'solid',
-      strokeLineDashes: [0],
-      bowing: 0,
-    },
-    image: {
-      opacities: 1,
-      strokeColor: 'none',
-      fillColor: undefined as string | undefined,
-      textFontOptions: 'none',
-      textSize: 0,
-      roughness: 0,
-      strokeWidth: 0,
-      fillStyle: 'none',
-      strokeLineDashes: [0],
-      bowing: 0,
-    },
+    strokeColor: '#000000',
+    fillColor: undefined as string | undefined,
+    textFontOptions: 'none',
+    textSize: 0,
+    roughness: 0.01,
+    strokeWidth: 3,
+    fillStyle: 'none' as CanvasElementFillStyle,
+    strokeLineDashes: [0],
+    opacities: 1,
+    bowing: 0,
   },
 };
 
@@ -524,7 +463,7 @@ const editCanvasElement =
 
 const setToolOptions =
   (set: SetState<CanvasElementState>) =>
-  (tool: tools, option: keyof options, newValue: string) =>
+  (tool: tools, option: keyof options, newValue: string | number | undefined) =>
     set((state) => ({
       ...state,
       toolOptions: {
