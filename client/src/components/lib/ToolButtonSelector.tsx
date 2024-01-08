@@ -14,10 +14,8 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
  * The currently active tool is highlighted. The ToolButton component is used in various
  * tool groups in the CustomizabilityToolbar to allow the user to select different options
  * for customizing the canvas elements.
- * @author Eebro, Abdalla
+ * @author Eebro, Abdalla, Dana
  */
-
-import { useAppStore } from '@/stores/AppStore';
 
 /**
  * Primary viewport that houses the canvas
@@ -25,12 +23,6 @@ import { useAppStore } from '@/stores/AppStore';
  * on top of it (absolutely positioned).
  * @authors Yousef Yassin, Dana El Sherif
  */
-
-//Will change later to export
-const useToolFromAppStore = () => {
-  const { tool } = useAppStore(['tool']);
-  return tool;
-};
 
 /**
  * Defines a button for a toolbar tool. Contains

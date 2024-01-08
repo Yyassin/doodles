@@ -36,16 +36,6 @@ export interface CanvasElement {
   id: string; // Element id
 }
 
-export const tool = [
-  'line',
-  'rectangle',
-  'circle',
-  'freehand',
-  'text',
-  'image',
-] as const;
-export type tools = (typeof tool)[number];
-
 //Default customizability options
 export interface options {
   strokeColor: string;

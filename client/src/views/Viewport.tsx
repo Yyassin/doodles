@@ -34,7 +34,6 @@ const Viewport = () => {
     tool: AppTool,
   ): tool is (typeof drawingTools)[number] =>
     drawingToolsSet.has(tool as (typeof drawingTools)[number]);
-
   const isDrawingSelected = isDrawingTool(tool);
 
   return (

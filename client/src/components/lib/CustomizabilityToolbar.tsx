@@ -4,12 +4,13 @@ import ToolGroup, { colourTypes } from './ChangeColor';
 import StrokeToolGroup, { strokeTypes } from './ChangeThickness';
 import StrokeColorToolGroup, { strokeColourTypes } from './ChangeStrokeColor';
 import RoughnessToolGroup, { roughnessTypes } from './ChangeRoughness';
-import { CanvasElementFillStyles } from '@/types';
+import { AppTool, CanvasElementFillStyles } from '@/types';
 import FillStyleToolGroup from './ChangeFillStyle';
 import OpacitySlider from './ChangeOpacity';
 import FontFamily, { fontTypes } from './ChangeFont';
 import SizeOptions, { sizes } from './ChangeSize';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useAppStore } from '@/stores/AppStore';
 
 /**
  * This file defines the CustomToolbar component, which is the main toolbar displayed
@@ -40,49 +41,95 @@ const fillStyleSet = new Set(['rectangle', 'circle', 'line']);
  * The toolbar that is displayed on the canvas.
  */
 const CustomToolbar = () => {
-  const { types, selectedElementIds, fillStyles } = useCanvasElementStore([
+  const { tool } = useAppStore(['tool']);
+  const drawingTools = [
+    'line',
+    'rectangle',
+    'circle',
+    'freehand',
+    'text',
+  ] as const;
+  const drawingToolsSet = new Set(drawingTools);
+  const isDrawingTool = (
+    tool: AppTool,
+  ): tool is (typeof drawingTools)[number] =>
+    drawingToolsSet.has(tool as (typeof drawingTools)[number]);
+  const isDrawingSelected = isDrawingTool(tool);
+
+  const { types, selectedElementIds } = useCanvasElementStore([
     'types',
     'selectedElementIds',
-    'fillStyles',
   ]);
   return (
     <Toolbar.Root className="p-[0.3rem] gap-[0.3rem] min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] mt-40 absolute ml-3">
-      {/* Background Color */}
-      <h2 className="text-sm font-semibold mb-2">Color</h2>{' '}
-      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <ToolGroup tools={[...colourTypes]} />
+      {/* Stroke Color */}
+      {(strokeColorSet.has(types[selectedElementIds[0]]) ||
+        isDrawingSelected) && (
+        <>
+          <h2 className="text-sm font-semibold mb-2">Stroke Color</h2>{' '}
+          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+          <StrokeColorToolGroup tools={[...strokeColourTypes]} />
+        </>
+      )}
       {/* Text Font */}
-      <h2 className="text-sm font-semibold mb-2">Font</h2>{' '}
-      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <FontFamily tools={[...fontTypes]} />
+      {(fontSizeSet.has(types[selectedElementIds[0]]) || isDrawingSelected) && (
+        <>
+          <h2 className="text-sm font-semibold mb-2">Font</h2>{' '}
+          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+          <FontFamily tools={[...fontTypes]} />
+        </>
+      )}
       {/* Text Size */}
-      <h2 className="text-sm font-semibold mb-2">Size</h2>{' '}
-      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <SizeOptions tools={[...sizes]} />
+      {(fontSizeSet.has(types[selectedElementIds[0]]) || isDrawingSelected) && (
+        <>
+          <h2 className="text-sm font-semibold mb-2">Size</h2>{' '}
+          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+          <SizeOptions tools={[...sizes]} />
+        </>
+      )}
       {/* Stroke Thickness */}
-      <h2 className="text-sm font-semibold mb-2">Stroke Thickness</h2>{' '}
-      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <StrokeToolGroup tools={[...strokeTypes]} />
-      {/* Stroke Color (border for shapes) */}
-      <h2 className="text-sm font-semibold mb-2">Stroke Color</h2>{' '}
-      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <StrokeColorToolGroup tools={[...strokeColourTypes]} />
+      {(strokeThicknessSet.has(types[selectedElementIds[0]]) ||
+        isDrawingSelected) && (
+        <>
+          <h2 className="text-sm font-semibold mb-2">Stroke Thickness</h2>{' '}
+          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+          <StrokeToolGroup tools={[...strokeTypes]} />
+        </>
+      )}
       {/* Stroke Roughness */}
-      {strokeRoughnessSet.has(types[selectedElementIds[0]]) && (
+      {(strokeRoughnessSet.has(types[selectedElementIds[0]]) ||
+        isDrawingSelected) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Roughness</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
           <RoughnessToolGroup tools={[...roughnessTypes]} />
         </>
       )}
+      {/* Background Color */}
+      {(colorSet.has(types[selectedElementIds[0]]) || isDrawingSelected) && (
+        <>
+          <h2 className="text-sm font-semibold mb-2">Fill Color</h2>{' '}
+          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+          <ToolGroup tools={[...colourTypes]} />
+        </>
+      )}
       {/* Fill Style */}
-      <h2 className="text-sm font-semibold mb-2">Fill Style</h2>{' '}
-      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <FillStyleToolGroup tools={[...CanvasElementFillStyles]} />
+      {(fillStyleSet.has(types[selectedElementIds[0]]) ||
+        isDrawingSelected) && (
+        <>
+          <h2 className="text-sm font-semibold mb-2">Fill Style</h2>{' '}
+          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+          <FillStyleToolGroup tools={[...CanvasElementFillStyles]} />
+        </>
+      )}
       {/* Opacity */}
-      <h2 className="text-sm font-semibold mb-2">Opacity</h2>{' '}
-      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
-      <OpacitySlider />
+      {(opacitySet.has(types[selectedElementIds[0]]) || isDrawingSelected) && (
+        <>
+          <h2 className="text-sm font-semibold mb-2">Opacity</h2>{' '}
+          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+          <OpacitySlider />
+        </>
+      )}
     </Toolbar.Root>
   );
 };
