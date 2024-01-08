@@ -32,6 +32,7 @@ def pil_image_to_data_url(pil_image: Image.Image, format: str = "PNG") -> str:
     return data_url
 
 
+# B64 padding
 PADDING_MULTIPLE = 4
 
 

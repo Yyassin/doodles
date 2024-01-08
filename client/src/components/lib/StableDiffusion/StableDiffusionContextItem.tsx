@@ -4,8 +4,7 @@ import { useAppStore } from '@/stores/AppStore';
 import ContextMenuItem from '../ContextMenuItem';
 
 /**
- * Context Menu options that supports exporting only selected
- * items as a PNG image.
+ * Context Menu option that opens up the Stable Diffusion Sheet.
  * @author Yousef Yassin
  */
 

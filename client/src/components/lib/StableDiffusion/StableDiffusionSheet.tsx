@@ -24,6 +24,11 @@ import {
 } from '@/lib/bytes';
 import { injectImageElement } from '@/lib/image';
 
+/**
+ * Sidebar sheet that allows the user to generate images using Stable Diffusion.
+ * @author Yousef Yassin
+ */
+
 const StableDiffusionSheet = () => {
   const { setPendingImageElement, addCanvasShape, editCanvasElement } =
     useCanvasElementStore([

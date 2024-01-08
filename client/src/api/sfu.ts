@@ -2,6 +2,11 @@ import { REST } from '@/constants';
 import axios from 'axios';
 
 /**
+ * Defines REST methods for the SFU API.
+ * @author Yousef Yassin
+ */
+
+/**
  * Function to poll for an ongoing stream in a room and initialize a consumer if available.
  * @param roomID String, the ID of the room to poll.
  * @param initConsumer Function, callback to initialize the consumer when a stream is available.

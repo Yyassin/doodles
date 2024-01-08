@@ -117,6 +117,7 @@ export const useShortcuts = () => {
     };
 
     const onWheel = (e: WheelEvent) => {
+      // Ignore wheel events not on canvas, for example, on a sheet.
       if ((e.target as HTMLElement)?.id !== 'canvas') return;
       if (e.ctrlKey) {
         // Zoom event
