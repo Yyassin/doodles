@@ -112,6 +112,10 @@ const ToolButton = ({
         customizabilityDict.fillColor ??
         toolOptions[tool as keyof typeof toolOptions].fillColor;
 
+      toolOptions[tool as keyof typeof toolOptions].fillStyle =
+        customizabilityDict.fillStyle ??
+        toolOptions[tool as keyof typeof toolOptions].fillStyle;
+
       toolOptions[tool as keyof typeof toolOptions].textSize =
         customizabilityDict.textSize ??
         toolOptions[tool as keyof typeof toolOptions].textSize;
@@ -119,6 +123,22 @@ const ToolButton = ({
       toolOptions[tool as keyof typeof toolOptions].textFontOptions =
         customizabilityDict.textFontOption ??
         toolOptions[tool as keyof typeof toolOptions].textFontOptions;
+
+      toolOptions[tool as keyof typeof toolOptions].bowing =
+        customizabilityDict.bowing ??
+        toolOptions[tool as keyof typeof toolOptions].bowing;
+
+      toolOptions[tool as keyof typeof toolOptions].strokeWidth =
+        customizabilityDict.strokeWidth ??
+        toolOptions[tool as keyof typeof toolOptions].strokeWidth;
+
+      toolOptions[tool as keyof typeof toolOptions].roughness =
+        customizabilityDict.roughness ??
+        toolOptions[tool as keyof typeof toolOptions].roughness;
+
+      toolOptions[tool as keyof typeof toolOptions].opacities =
+        customizabilityDict.opacity ??
+        toolOptions[tool as keyof typeof toolOptions].opacities;
 
       // toolOptions[tool as keyof typeof toolOptions].strokeColor =
       //   customizabilityDict.strokeColor ??

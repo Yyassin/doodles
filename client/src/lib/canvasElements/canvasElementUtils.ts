@@ -38,7 +38,7 @@ const createElement = (
   y2: number,
   type: CanvasElementType,
   points?: Vector2[],
-  options = defaultOptions,
+  options: Partial<typeof defaultOptions> = defaultOptions,
   isLive = false,
 ): CanvasElement => {
   let roughElement;
@@ -73,21 +73,15 @@ const createElement = (
     p1: { x: x1, y: y1 },
     p2: { x: x2, y: y2 },
     type,
-    strokeColor: options.stroke,
+    ...defaultOptions,
+    strokeColor: options.stroke ? options.stroke : defaultOptions.stroke,
+    textFontOption: options.font ? options.font : defaultOptions.font,
+    textSize: options.size ? options.size : defaultOptions.size,
     fillColor: options.fill,
-    bowing: options.bowing,
-    roughness: options.roughness,
-    strokeWidth: options.strokeWidth,
-    fillStyle: options.fillStyle,
-    strokeLineDash: options.strokeLineDash,
-    opacity: options.opacity,
-    textFontOption: options.font,
-    textSize: options.size,
+    ...options,
     roughElement,
-    text: options.text,
     freehandPoints: newPoints,
     isImagePlaced: false,
-    angle: options.angle,
   };
 };
 

@@ -373,8 +373,6 @@ export default function Canvas() {
           fillStyle: toolOptions[tool].fillStyle,
           strokeLineDash: toolOptions[tool].strokeLineDashes,
           opacity: toolOptions[tool].opacities,
-          text: '',
-          angle: 0,
         },
       );
       if (tool === 'text') {

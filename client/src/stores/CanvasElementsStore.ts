@@ -194,7 +194,7 @@ export const initialCanvasElementState: CanvasElementState = {
       fillColor: undefined as string | undefined,
       roughness: 0,
       strokeWidth: 0,
-      fillStyle: 'none',
+      fillStyle: 'solid',
       strokeLineDashes: [0],
       bowing: 0,
     },
