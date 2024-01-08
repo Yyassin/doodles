@@ -15,7 +15,7 @@ const { sendErrorResponse, sendSuccessResponse } = helpers;
 
 /**
  * SFUManager Singleton Class
- * Manages instances of RoomSFU for each room, coordinating producers and consumers.
+ * Manages instances of RoomSFU for each room to coordinate producers and consumers.
  */
 export class SFUManager extends Singleton<SFUManager>() {
   #SFUs = {} as Record<string, RoomSFU>;
