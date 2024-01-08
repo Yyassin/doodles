@@ -108,7 +108,8 @@ const CustomToolbar = () => {
         </>
       )}
       {/* Fill Style */}
-      {(fillStyleSet.has(types[selectedElementIds[0]]) || fillStyleSet) && (
+      {(fillStyleSet.has(types[selectedElementIds[0]]) ||
+        fillStyleSet.has(tool)) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Fill Style</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
