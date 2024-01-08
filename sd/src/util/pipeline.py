@@ -1,5 +1,5 @@
 import torch
-from diffusers import DiffusionPipeline
+from diffusers import DiffusionPipeline, StableDiffusionImg2ImgPipeline
 
 
 def load_model(model_name: str):
@@ -10,6 +10,17 @@ def load_model(model_name: str):
                 revision="fb9c5d167af11fd84454ae6493878b10bb63b067",
                 safety_checker=None,
                 custom_pipeline="latent_consistency_img2img",
+            )
+            pipeline.to(torch_device="cuda", torch_dtype=torch.float16)
+            pipeline.set_progress_bar_config(disable=True)
+            return pipeline
+
+        case "stable_diffusion_14":
+            pipeline = StableDiffusionImg2ImgPipeline.from_pretrained(
+                "CompVis/stable-diffusion-v1-4",
+                revision="fp16",
+                torch_dtype=torch.float16,
+                use_auth_token=True,
             )
             pipeline.to(torch_device="cuda", torch_dtype=torch.float16)
             pipeline.set_progress_bar_config(disable=True)

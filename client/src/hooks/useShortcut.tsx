@@ -117,6 +117,7 @@ export const useShortcuts = () => {
     };
 
     const onWheel = (e: WheelEvent) => {
+      if ((e.target as HTMLElement)?.id !== 'canvas') return;
       if (e.ctrlKey) {
         // Zoom event
         setAppZoom(clamp(zoom - e.deltaY * ZOOM.INC * 0.1, ZOOM.MIN, ZOOM.MAX));

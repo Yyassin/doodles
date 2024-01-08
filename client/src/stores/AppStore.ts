@@ -37,6 +37,7 @@ interface AppState {
   canvasColor: string;
   // Whether app is in transparent canvas mode.
   isTransparent: boolean;
+  isUsingStableDiffusion: boolean;
 }
 /** Reducers */
 interface AppActions {
@@ -52,6 +53,7 @@ interface AppActions {
   setIsInCall: (isInCall: boolean) => void;
   setCanvasBackground: (canvasColor: string) => void;
   setIsTransparent: (isTransparent: boolean) => void;
+  setIsUsingStableDiffusion: (isUsingStableDiffusion: boolean) => void;
 }
 type AppStore = AppState & AppActions;
 
@@ -70,6 +72,7 @@ export const initialAppState: AppState = {
   panOffset: { x: 0, y: 0 },
   canvasColor: '#fff',
   isTransparent: false,
+  isUsingStableDiffusion: false,
 };
 
 /** Actions / Reducers */
@@ -112,6 +115,9 @@ const setPanOffset = (set: SetState<AppStore>) => (x: number, y: number) =>
 const setCanvasBackground =
   (set: SetState<AppStore>) => (canvasColor: string) =>
     set(() => ({ canvasColor }));
+const setIsUsingStableDiffusion =
+  (set: SetState<AppStore>) => (isUsingStableDiffusion: boolean) =>
+    set(() => ({ isUsingStableDiffusion }));
 
 /** Store Hook */
 const appStore = create<AppStore>()((set) => ({
@@ -128,5 +134,6 @@ const appStore = create<AppStore>()((set) => ({
   setIsInCall: setIsInCall(set),
   setCanvasBackground: setCanvasBackground(set),
   setIsTransparent: setIsTransparent(set),
+  setIsUsingStableDiffusion: setIsUsingStableDiffusion(set),
 }));
 export const useAppStore = createStoreWithSelectors(appStore);

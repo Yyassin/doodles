@@ -14,6 +14,7 @@ import ShareScreen from '@/components/lib/ShareScreen';
 import ShareScreenButton from '@/components/lib/ShareScreenButton';
 import TransparencyButton from '@/components/lib/TransparencyButton';
 import { IS_ELECTRON_INSTANCE } from '@/constants';
+import StableDiffusionSheet from '@/components/lib/StableDiffusion/StableDiffusionSheet';
 
 /**
  * Primary viewport that houses the canvas
@@ -75,6 +76,7 @@ const Viewport = () => {
         <RadixContextMenu.Trigger>
           <ShareScreen />
           <Canvas />
+          <StableDiffusionSheet />
         </RadixContextMenu.Trigger>
       </div>
       <ContextMenu />

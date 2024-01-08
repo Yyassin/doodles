@@ -1,4 +1,5 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 from .util.bytes import pil_image_to_data_url, data_url_to_pil_image
 from .util.pipeline import DiffuserPipeline
@@ -6,7 +7,8 @@ from .models.SDRequest import SDRequestSchema
 
 
 app = Flask(__name__)
-pipeline = DiffuserPipeline(model_name="dreamshaper")
+CORS(app)
+pipeline = DiffuserPipeline(model_name="stable_diffusion_14")
 
 
 @app.route("/test")
@@ -23,14 +25,16 @@ def post_diffusion():
         init_image=init_image,
         num_images=5,
         # TODO: These will be passed in req
-        num_inference_steps=10,
-        guidance_scale=8.0,
-        lcm_origin_steps=50,
-        strength=0.8,
+        num_inference_steps=40,
+        strength=0.5,
+        guidance_scale=7.5,
+        # lcm_origin_steps=50,
+        # strength=0.8,
     )
     # TODO: Use generator
     image_data_urls = [pil_image_to_data_url(image) for image in images]
-    return image_data_urls
+    response = jsonify({"image_data_urls": image_data_urls})
+    return response
 
 
 if __name__ == "__main__":

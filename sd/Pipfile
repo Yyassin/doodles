@@ -29,6 +29,7 @@ gradio = "==3.50.2"
 torch = {version = "==2.0.1", index = "downloadpytorch"}
 torchvision = {version = "*", index = "downloadpytorch"}
 torchaudio = {version = "*", index = "downloadpytorch"}
+flask-cors = "*"
 
 [dev-packages]
 
