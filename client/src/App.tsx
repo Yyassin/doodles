@@ -9,6 +9,8 @@ import { useElectronIPCStore } from './stores/ElectronIPCStore';
 function App() {
   const { isTransparent } = useAppStore(['isTransparent']);
   const { isWindowActive } = useElectronIPCStore(['isWindowActive']);
+
+  // Set root height to 100% when transparent
   useEffect(() => {
     const root = document.getElementById('root');
     const radixThemes = document.getElementsByClassName(
@@ -22,10 +24,12 @@ function App() {
       radixThemes && (radixThemes.style.height = '100%');
     }
   }, [isTransparent]);
+
   return (
     <div
       style={{
         backgroundColor: 'transparent',
+        // Add border when transparent
         ...(isTransparent && {
           height: '100%',
           boxShadow: `0px 0px 0px 2px rgba(129, 140, 248, ${

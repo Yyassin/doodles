@@ -3,11 +3,11 @@ import { CanvasButton } from './CanvasButton';
 import { useAppStore } from '@/stores/AppStore';
 
 /**
- * Defines a button component for starting/stopping screen sharing.
+ * Defines a button component for starting/stopping transparency mode.
  * @author Yousef Yassin
  */
 
-const SetTransparencyIcon = ({ className }: { className: string }) => {
+const TransparencyIcon = ({ className }: { className: string }) => {
   return (
     <svg
       className={className}
@@ -28,7 +28,7 @@ const SetTransparencyIcon = ({ className }: { className: string }) => {
 };
 
 /**
- * Button component for starting/stopping screen sharing.
+ * Button component for starting/stopping transparency mode.
  */
 const defaultClassName = 'disabled:opacity-40 disabled:cursor-not-allowed';
 const TransparencyButton = () => {
@@ -58,7 +58,7 @@ const TransparencyButton = () => {
         sideOffset: 5,
       }}
     >
-      <SetTransparencyIcon className="fill-current text-black" />
+      <TransparencyIcon className="fill-current text-black" />
     </CanvasButton>
   );
 };

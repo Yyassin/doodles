@@ -95,7 +95,6 @@ const useRTCConsumer = (
     peerRef.current = peer;
     // On incoming stream, set the video element's srcObject to the stream.
     peer.ontrack = (e) => {
-      console.log(e);
       setScreenStream(e.streams[0]);
     };
     // Only listen for video tracks

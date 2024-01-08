@@ -2,17 +2,22 @@ import { ipcRenderer } from '@/data/ipc/ipcMessages';
 import { useElectronIPCStore } from '@/stores/ElectronIPCStore';
 import { useEffect } from 'react';
 
+/**
+ * @file React hook for listening to Electron IPC events and updating corresponding state in the store.
+ * @author Yousef Yassin
+ */
+
 const useIPCListener = () => {
   const {
     setIsWindowActive,
     setIsWindowMaximized,
     setIsWindowClickThrough,
-    setWindowBounds,
+    // setWindowBounds,
   } = useElectronIPCStore([
     'setIsWindowActive',
     'setIsWindowMaximized',
     'setIsWindowClickThrough',
-    'setWindowBounds',
+    // 'setWindowBounds',
   ]);
   useEffect(() => {
     const listeners = {
@@ -20,16 +25,18 @@ const useIPCListener = () => {
       blurred: () => setIsWindowActive(false),
       maximized: () => setIsWindowMaximized(true),
       unmaximized: () => setIsWindowMaximized(false),
-      ['bounds-changed']: (
-        _event: unknown,
-        { x, y, height, width }: Electron.Rectangle,
-      ) => setWindowBounds(x, y, width, height),
+      // Unused for now
+      // ['bounds-changed']: (
+      //   _event: unknown,
+      //   { x, y, height, width }: Electron.Rectangle,
+      // ) => setWindowBounds(x, y, width, height),
       ['click-through']: (_event: unknown, clickThrough: boolean) =>
         setIsWindowClickThrough(clickThrough),
     };
     Object.entries(listeners).forEach(([handle, callback]) =>
       ipcRenderer.on(handle, callback),
     );
+    // Cleanup
     return () => {
       Object.keys(listeners).forEach((handle) =>
         ipcRenderer.removeAllListeners(handle),

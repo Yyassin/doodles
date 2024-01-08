@@ -145,6 +145,12 @@ const useRTCProducer = (
     }
   };
 
+  /**
+   * In Electron, the streamId will be set by the alert dialog.
+   * On set, we can fetch the media stream from the desktop capture API
+   * using getDisplayMedia and start the stream this way.
+   * @param streamId The Id of the stream to fetch.
+   */
   const setStreamFromId = async (streamId: string) => {
     // Overriden by electron in renderer.js
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

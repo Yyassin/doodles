@@ -107,6 +107,7 @@ export const useShortcuts = () => {
           }
           break;
         }
+        // Test notification
         case 'KeyR': {
           if (e.ctrlKey) {
             ipcAPI.notification({ title: 'Test', body: 'Test Body' });

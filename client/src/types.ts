@@ -152,6 +152,7 @@ export type BinaryFileData = {
   lastRetrieved?: number;
 };
 
+// Electron Media stream source.
 export interface StreamSource {
   name: string;
   id: string;

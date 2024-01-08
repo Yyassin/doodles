@@ -6,6 +6,11 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { useAppStore } from '@/stores/AppStore';
 import { useElectronIPCStore } from '@/stores/ElectronIPCStore';
 
+/**
+ * Defines the titlebar for the Windows platform.
+ * @author Yousef Yassin
+ */
+
 const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
   const { isTransparent } = useAppStore(['isTransparent']);
   const { socket, roomID } = useWebSocketStore(['socket', 'roomID']);

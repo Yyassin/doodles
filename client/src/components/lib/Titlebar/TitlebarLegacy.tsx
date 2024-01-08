@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { ipcAPI, ipcRenderer } from '@/data/ipc/ipcMessages';
 import './TitlebarLegacy.css';
 
+/**
+ * Defines the titlebar for the MacOS platform.
+ * @author Yousef Yassin
+ */
+
 const TitlebarLeg = ({ title }: { title: string }) => {
   const [isActive, setIsActive] = useState(true);
   const [isMaximized, setIsMaximized] = useState(true);

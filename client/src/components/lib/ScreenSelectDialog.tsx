@@ -12,6 +12,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import * as AspectRatio from '@radix-ui/react-aspect-ratio';
 
+/**
+ * An alert dialog that is controlled by the `open` prop. It displays a list of
+ * screen sources and allows the user to select one. When the user clicks
+ * continue, the `onContinue` callback is called with the selected source ID.
+ * @author Yousef Yassin
+ */
+
 const ScreenSelectDialog = ({
   open,
   setOpen,
@@ -40,8 +47,8 @@ const ScreenSelectDialog = ({
                   <div
                     className={`w-[10rem] overflow-hidden rounded-md ${
                       source.id === selectedSourceId
-                        ? 'ring-4 ring-offset-2 ring-blue-500'
-                        : 'hover:ring-2 hover:ring-offset-2 hover:ring-blue-500'
+                        ? 'ring-4 ring-offset-2 ring-[#818cf8]'
+                        : 'hover:ring-2 hover:ring-offset-2 hover:ring-[#818cf8]'
                     }`}
                     onClick={() => setSelectedSourceId(source.id)}
                   >
@@ -60,10 +67,14 @@ const ScreenSelectDialog = ({
           </div>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setSelectedSourceId(null)}>
+          <AlertDialogCancel
+            className="text-[#818cf8] border-[#818cf8] hover:text-[#6c75c1] hover:border-[#6c75c1]"
+            onClick={() => setSelectedSourceId(null)}
+          >
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
+            className="bg-[#818cf8] hover:bg-[#6c75c1]"
             disabled={selectedSourceId === null}
             onClick={() => selectedSourceId && onContinue(selectedSourceId)}
           >

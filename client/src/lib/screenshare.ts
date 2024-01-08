@@ -54,6 +54,13 @@ const startScreenShareBrowser = async (
   }
 };
 
+/**
+ * Function to initiate screen sharing for electron. This consists of two phases. Here, we fetch
+ * all the available input sources and prompt the user with a dialog with onScreenSelect. Selection
+ * in this dialog will trigger the second phase by setting the sourceId in the RTCProducer hook.
+ * @param onScreenSelect Callback function to open a dialog with the available input sources.
+ * Note that the first two parameters are unused, they are defined to maintain signature.
+ */
 const startScreenShareElectron = async (
   _setScreenStream: (stream: MediaStream) => void,
   _onRecoderStop: () => void,
