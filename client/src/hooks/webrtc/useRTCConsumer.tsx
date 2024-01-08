@@ -1,30 +1,14 @@
-import { REST, SECONDS_TO_MS, WS_TOPICS } from '@/constants';
+import { SECONDS_TO_MS, WS_TOPICS } from '@/constants';
 import { createPeer, handleNegotiationNeededEvent } from '@/lib/webrtc';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
-import axios from 'axios';
 import { useEffect, useRef } from 'react';
+import { sfu } from '@/api';
 
 /**
  * Hook that handles creating a consumer if a stream is initiated inside a room.
  * @author Yousef Yassin
  */
-
-/**
- * Function to poll for an ongoing stream in a room and initialize a consumer if available.
- * @param roomID String, the ID of the room to poll.
- * @param initConsumer Function, callback to initialize the consumer when a stream is available.
- */
-const pollOngoingStream = async (roomID: string, initConsumer: () => void) => {
-  try {
-    const { data } = await axios.put(REST.sfu.poll, {
-      roomId: roomID,
-    });
-    data.roomHasProducer && initConsumer();
-  } catch (e) {
-    console.error('Failed to poll for ongoing stream');
-  }
-};
 
 /**
  * Hook for managing the WebRTC consumer logic.
@@ -50,10 +34,7 @@ const useRTCConsumer = (
     // On mount, check if there's a stream in the room. If so, initiate a consumer connection.
     // Give a second for socket to connect
     roomID &&
-      setTimeout(
-        () => pollOngoingStream(roomID, initConsumer),
-        1 * SECONDS_TO_MS,
-      );
+      setTimeout(() => sfu.poll(roomID, initConsumer), 1 * SECONDS_TO_MS);
   }, [roomID]);
 
   // Cleanup on page refresh, close, or tab close

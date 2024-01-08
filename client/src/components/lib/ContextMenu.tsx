@@ -5,6 +5,7 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ExportSelectedPNGContextItem from './ExportSelectedPNGContextItem';
 import ContextMenuItem from './ContextMenuItem';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
+import StableDiffusionContextItem from './StableDiffusion/StableDiffusionContextItem';
 
 /**
  * Defines a context menu, with options, that is revealed
@@ -55,6 +56,7 @@ const ContextMenu = () => {
               </div>
             </ContextMenuItem>
             <ExportSelectedPNGContextItem />
+            <StableDiffusionContextItem />
           </>
         ) : null}
       </RadixContextMenu.Content>
