@@ -363,16 +363,16 @@ export default function Canvas() {
         tool,
         points,
         {
-          stroke: toolOptions[tool].strokeColor,
-          font: toolOptions[tool].textFontOptions,
-          size: toolOptions[tool].textSize,
-          fill: toolOptions[tool].fillColor,
-          bowing: toolOptions[tool].bowing,
-          roughness: toolOptions[tool].roughness,
-          strokeWidth: toolOptions[tool].strokeWidth,
-          fillStyle: toolOptions[tool].fillStyle,
-          strokeLineDash: toolOptions[tool].strokeLineDashes,
-          opacity: toolOptions[tool].opacities,
+          stroke: toolOptions.strokeColor,
+          font: toolOptions.textFontOptions,
+          size: toolOptions.textSize,
+          fill: toolOptions.fillColor,
+          bowing: toolOptions.bowing,
+          roughness: toolOptions.roughness,
+          strokeWidth: toolOptions.strokeWidth,
+          fillStyle: toolOptions.fillStyle,
+          strokeLineDash: toolOptions.strokeLineDashes,
+          opacity: toolOptions.opacities,
         },
       );
       if (tool === 'text') {
@@ -657,7 +657,9 @@ export default function Canvas() {
               ]
             }`,
             color:
-              fillColors[selectedElementIds[0] ?? currentDrawingElemId.current],
+              strokeColors[
+                selectedElementIds[0] ?? currentDrawingElemId.current
+              ],
             margin: 0,
             padding: 0,
             border: 0,

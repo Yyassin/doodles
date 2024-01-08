@@ -86,7 +86,7 @@ export interface CanvasElementState {
   fileIds: Record<string, CanvasElement['fileId']>;
   isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
   angles: Record<string, CanvasElement['angle']>;
-  toolOptions: Record<string, options>;
+  toolOptions: options;
 }
 
 interface CanvasElementActions {
@@ -139,15 +139,15 @@ export const initialCanvasElementState: CanvasElementState = {
   isImagePlaceds: {},
   angles: {},
   toolOptions: {
+    textFontOptions: 'trebuchet MS',
+    textSize: 24,
+    opacities: 1,
     strokeColor: '#000000',
     fillColor: undefined as string | undefined,
-    textFontOptions: 'none',
-    textSize: 0,
     roughness: 0.01,
     strokeWidth: 3,
     fillStyle: 'none' as CanvasElementFillStyle,
     strokeLineDashes: [0],
-    opacities: 1,
     bowing: 0,
   },
 };
@@ -461,19 +461,10 @@ const editCanvasElement =
       };
     });
 
-const setToolOptions =
-  (set: SetState<CanvasElementState>) =>
-  (tool: tools, option: keyof options, newValue: string | number | undefined) =>
-    set((state) => ({
-      ...state,
-      toolOptions: {
-        ...state.toolOptions,
-        [tool]: {
-          ...state.toolOptions[tool],
-          [option]: newValue,
-        },
-      },
-    }));
+const setToolOptions = (set: SetState<CanvasElementState>) =>
+  set((state) => ({
+    ...state,
+  }));
 
 /**
  * Removes the canvas element with the specfied state

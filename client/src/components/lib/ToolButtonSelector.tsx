@@ -95,48 +95,37 @@ const ToolButton = ({
     'textFontOptions',
     'toolOptions',
   ]);
-  const tool = useToolFromAppStore();
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
   const onClick = () => {
     console.log(selectedElementIds[0]);
     // A new and customized element will be drawn
     if (selectedElementIds[0] === undefined) {
-      toolOptions[tool as keyof typeof toolOptions].strokeColor =
-        customizabilityDict.strokeColor ??
-        toolOptions[tool as keyof typeof toolOptions].strokeColor;
+      toolOptions.strokeColor =
+        customizabilityDict.strokeColor ?? toolOptions.strokeColor;
 
-      toolOptions[tool as keyof typeof toolOptions].fillColor =
-        customizabilityDict.fillColor ??
-        toolOptions[tool as keyof typeof toolOptions].fillColor;
+      toolOptions.fillColor =
+        customizabilityDict.fillColor ?? toolOptions.fillColor;
 
-      toolOptions[tool as keyof typeof toolOptions].fillStyle =
-        customizabilityDict.fillStyle ??
-        toolOptions[tool as keyof typeof toolOptions].fillStyle;
+      toolOptions.fillStyle =
+        customizabilityDict.fillStyle ?? toolOptions.fillStyle;
 
-      toolOptions[tool as keyof typeof toolOptions].textSize =
-        customizabilityDict.textSize ??
-        toolOptions[tool as keyof typeof toolOptions].textSize;
+      toolOptions.textSize =
+        customizabilityDict.textSize ?? toolOptions.textSize;
 
-      toolOptions[tool as keyof typeof toolOptions].textFontOptions =
-        customizabilityDict.textFontOption ??
-        toolOptions[tool as keyof typeof toolOptions].textFontOptions;
+      toolOptions.textFontOptions =
+        customizabilityDict.textFontOption ?? toolOptions.textFontOptions;
 
-      toolOptions[tool as keyof typeof toolOptions].bowing =
-        customizabilityDict.bowing ??
-        toolOptions[tool as keyof typeof toolOptions].bowing;
+      toolOptions.bowing = customizabilityDict.bowing ?? toolOptions.bowing;
 
-      toolOptions[tool as keyof typeof toolOptions].strokeWidth =
-        customizabilityDict.strokeWidth ??
-        toolOptions[tool as keyof typeof toolOptions].strokeWidth;
+      toolOptions.strokeWidth =
+        customizabilityDict.strokeWidth ?? toolOptions.strokeWidth;
 
-      toolOptions[tool as keyof typeof toolOptions].roughness =
-        customizabilityDict.roughness ??
-        toolOptions[tool as keyof typeof toolOptions].roughness;
+      toolOptions.roughness =
+        customizabilityDict.roughness ?? toolOptions.roughness;
 
-      toolOptions[tool as keyof typeof toolOptions].opacities =
-        customizabilityDict.opacity ??
-        toolOptions[tool as keyof typeof toolOptions].opacities;
+      toolOptions.opacities =
+        customizabilityDict.opacity ?? toolOptions.opacities;
     } // An element is selected.
     else {
       const selectedElementId = selectedElementIds[0];
