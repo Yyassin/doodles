@@ -20,7 +20,7 @@ import {
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
 import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES } from '@/constants';
-import { getCanvasContext, setCursor } from '@/lib/misc';
+import { getCanvasContext, isDrawingTool, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
 import { normalizeAngle } from '@/lib/math';
@@ -29,17 +29,6 @@ import { normalizeAngle } from '@/lib/math';
  * Main Canvas View
  * @authors Yousef Yassin, Dana El Sherif
  */
-
-const drawingTools = [
-  'line',
-  'rectangle',
-  'circle',
-  'freehand',
-  'text',
-] as const;
-const drawingToolsSet = new Set(drawingTools);
-const isDrawingTool = (tool: AppTool): tool is (typeof drawingTools)[number] =>
-  drawingToolsSet.has(tool as (typeof drawingTools)[number]);
 
 export default function Canvas() {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -368,8 +357,8 @@ export default function Canvas() {
         {
           // These require renaming because I was an idiot
           stroke: toolOptions.strokeColor,
-          font: toolOptions.textFontOptions,
-          size: toolOptions.textSize,
+          font: toolOptions.fontFamily,
+          size: toolOptions.fontSize,
           fill: toolOptions.fillColor,
           ...toolOptions,
         },

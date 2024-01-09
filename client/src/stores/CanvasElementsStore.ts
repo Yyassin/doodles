@@ -3,7 +3,6 @@ import { SetState } from './types';
 import { create } from 'zustand';
 import { createStoreWithSelectors } from './utils';
 import { CanvasElementFillStyle, CanvasElementType, Vector2 } from '@/types';
-import { fill } from 'lodash';
 
 /**
  * Defines canvas drawable element state
@@ -40,8 +39,8 @@ export interface CanvasElement {
 export interface ToolOptions {
   strokeColor: string;
   fillColor: string | undefined;
-  textFontOptions: string;
-  textSize: number;
+  fontFamily: string;
+  fontSize: number;
   roughness: number;
   strokeWidth: number;
   fillStyle: CanvasElementFillStyle;
@@ -130,8 +129,8 @@ export const initialCanvasElementState: CanvasElementState = {
   isImagePlaceds: {},
   angles: {},
   toolOptions: {
-    textFontOptions: 'trebuchet MS',
-    textSize: 24,
+    fontFamily: 'trebuchet MS',
+    fontSize: 24,
     opacity: 1,
     strokeColor: '#000000',
     fillColor: undefined as string | undefined,

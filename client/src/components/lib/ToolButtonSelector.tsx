@@ -85,7 +85,7 @@ const ToolButton = ({
   const onClick = () => {
     // If the user was able to see the panel, only one element is selected.
     const selectedElementId = selectedElementIds[0];
-    if (!selectedElementId) {
+    if (selectedElementId === undefined) {
       // If no element is selected, then set the tool options
       setToolOptions(customizabilityDict);
     }

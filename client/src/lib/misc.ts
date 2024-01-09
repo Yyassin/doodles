@@ -3,6 +3,8 @@
  * @authors Yousef Yassin
  */
 
+import { AppTool, DrawingTool, drawingToolsSet } from '@/types';
+
 /**
  * Typed version of object.values.
  * @param obj The object to get typed values for.
@@ -100,3 +102,10 @@ export const debounce = <T extends unknown[]>(
 
   return ret;
 };
+
+/**
+ * Checks if the specified tool is a drawing tool.
+ * @returns True if the tool is a drawing tool, false otherwise.
+ */
+export const isDrawingTool = (tool: AppTool): tool is DrawingTool =>
+  drawingToolsSet.has(tool as DrawingTool);

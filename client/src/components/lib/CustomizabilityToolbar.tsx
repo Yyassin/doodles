@@ -31,7 +31,7 @@ const opacitySet = new Set([
   'line',
   'image',
 ]);
-const colorSet = new Set(['rectangle', 'circle', 'line', 'text']);
+const fillColorSet = new Set(['rectangle', 'circle', 'line', 'text']);
 const strokeThicknessSet = new Set(['freehand', 'rectangle', 'circle', 'line']);
 const strokeColorSet = new Set([
   'freehand',
@@ -99,8 +99,9 @@ const CustomToolbar = () => {
           <RoughnessToolGroup tools={[...roughnessTypes]} />
         </>
       )}
-      {/* Background Color */}
-      {(colorSet.has(types[selectedElementIds[0]]) || colorSet.has(tool)) && (
+      {/* Fill Color */}
+      {(fillColorSet.has(types[selectedElementIds[0]]) ||
+        fillColorSet.has(tool)) && (
         <>
           <h2 className="text-sm font-semibold mb-2">Fill Color</h2>{' '}
           <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />

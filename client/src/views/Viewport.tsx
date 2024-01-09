@@ -16,6 +16,7 @@ import ShareScreenButton from '@/components/lib/ShareScreenButton';
 import TransparencyButton from '@/components/lib/TransparencyButton';
 import { IS_ELECTRON_INSTANCE } from '@/constants';
 import StableDiffusionSheet from '@/components/lib/StableDiffusion/StableDiffusionSheet';
+import { isDrawingTool } from '@/lib/misc';
 
 /**
  * Primary viewport that houses the canvas
@@ -31,19 +32,6 @@ const Viewport = () => {
   ]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
-  // TODO: Make const
-  const drawingTools = [
-    'line',
-    'rectangle',
-    'circle',
-    'freehand',
-    'text',
-  ] as const;
-  const drawingToolsSet = new Set(drawingTools);
-  const isDrawingTool = (
-    tool: AppTool,
-  ): tool is (typeof drawingTools)[number] =>
-    drawingToolsSet.has(tool as (typeof drawingTools)[number]);
   const isDrawingSelected = isDrawingTool(tool);
 
   return (
