@@ -52,7 +52,6 @@ export const renderCanvasElements = (
     p2,
     angles,
     types,
-    fillColors,
     fontFamilies,
     fontSizes,
     freehandPoints,

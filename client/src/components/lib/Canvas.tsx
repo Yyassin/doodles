@@ -11,12 +11,7 @@ import {
 } from '@/lib/canvasElements/selection';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
-import {
-  AppTool,
-  CanvasElementType,
-  TransformHandleDirection,
-  Vector2,
-} from '@/types';
+import { CanvasElementType, TransformHandleDirection, Vector2 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
 import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES } from '@/constants';

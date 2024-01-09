@@ -10,7 +10,6 @@ import CustomToolbar from '@/components/lib/CustomizabilityToolbar';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ContextMenu from '@/components/lib/ContextMenu';
 import * as RadixContextMenu from '@radix-ui/react-context-menu';
-import { AppTool } from '@/types';
 import ShareScreen from '@/components/lib/ShareScreen';
 import ShareScreenButton from '@/components/lib/ShareScreenButton';
 import TransparencyButton from '@/components/lib/TransparencyButton';
