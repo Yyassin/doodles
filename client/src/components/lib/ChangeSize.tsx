@@ -33,7 +33,7 @@ const SizeOptions = ({ tools }: { tools: size[] }) => {
   ]);
   const interestValue = selectedElementIds[0]
     ? fontSizes[selectedElementIds[0]]
-    : toolOptions.textSize;
+    : toolOptions.fontSize;
   return (
     <div className="flex">
       {tools.map((toolName) => (

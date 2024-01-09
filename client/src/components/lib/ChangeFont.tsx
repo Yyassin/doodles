@@ -56,7 +56,7 @@ const FontFamily = ({ tools }: { tools: fontType[] }) => {
 
   const interestValue = selectedElementIds[0]
     ? fontFamilies[selectedElementIds[0]]
-    : toolOptions.textFontOptions;
+    : toolOptions.fontFamily;
   return (
     <div className="flex">
       {tools.map((toolName) => (
