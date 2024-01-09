@@ -151,3 +151,17 @@ export type BinaryFileData = {
    */
   lastRetrieved?: number;
 };
+
+// Electron Media stream source.
+export interface StreamSource {
+  name: string;
+  id: string;
+  thumbnail: {
+    dataURL: string;
+    aspect: number;
+  };
+  display_id: string;
+  appIcon: {
+    dataURL: string;
+  };
+}

@@ -16,8 +16,6 @@ import { fill } from 'lodash';
 export interface CanvasElement {
   type: CanvasElementType; // The element's type
   strokeColor: string; // Stroke color, in hex
-  textFontOption: string; //Text fonts
-  textSize: number; //Text size
   fillColor?: string; // Inside fill color, in hex
   bowing: number; // [0, 1], specifies stroke curviness
   roughness: number; // Specified line roughness
@@ -30,6 +28,8 @@ export interface CanvasElement {
   fileId?: string; // For image elements; the id of the image in cache.
   isImagePlaced: boolean; // For image elements; true if the element has been placed, false otherwise.
   text: string; // Container stringW
+  fontFamily: string; // Font Family
+  fontSize: number; // Font Size
   p1: Vector2; // Top left coordinate, or center for circles
   p2: Vector2; // Bottom right coordinate
   angle: number; // Element orientation, in radians
@@ -59,8 +59,8 @@ export interface CanvasElementState {
   types: Record<string, CanvasElement['type']>;
   strokeColors: Record<string, CanvasElement['strokeColor']>;
   fillColors: Record<string, CanvasElement['fillColor']>;
-  textFontOptions: Record<string, CanvasElement['textFontOption']>;
-  textSizes: Record<string, CanvasElement['textSize']>;
+  fontFamilies: Record<string, CanvasElement['fontFamily']>;
+  fontSizes: Record<string, CanvasElement['fontSize']>;
   bowings: Record<string, CanvasElement['bowing']>;
   roughnesses: Record<string, CanvasElement['roughness']>;
   strokeWidths: Record<string, CanvasElement['strokeWidth']>;
@@ -112,8 +112,8 @@ export const initialCanvasElementState: CanvasElementState = {
   types: {},
   strokeColors: {},
   fillColors: {},
-  textFontOptions: {},
-  textSizes: {},
+  fontFamilies: {},
+  fontSizes: {},
   bowings: {},
   roughnesses: {},
   strokeWidths: {},
@@ -161,8 +161,8 @@ const addCanvasShape =
       const types = { ...state.types };
       const strokeColors = { ...state.strokeColors };
       const fillColors = { ...state.fillColors };
-      const textFontOptions = { ...state.textFontOptions };
-      const textSizes = { ...state.textSizes };
+      const fontFamilies = { ...state.fontFamilies };
+      const fontSizes = { ...state.fontSizes };
       const bowings = { ...state.bowings };
       const roughnesses = { ...state.roughnesses };
       const strokeWidths = { ...state.strokeWidths };
@@ -182,8 +182,8 @@ const addCanvasShape =
         type,
         strokeColor,
         fillColor,
-        textFontOption,
-        textSize,
+        fontFamily,
+        fontSize,
         bowing,
         roughness,
         strokeWidth,
@@ -202,8 +202,8 @@ const addCanvasShape =
       types[id] = type;
       strokeColors[id] = strokeColor;
       fillColors[id] = fillColor;
-      textFontOptions[id] = textFontOption;
-      textSizes[id] = textSize;
+      fontFamilies[id] = fontFamily;
+      fontSizes[id] = fontSize;
       bowings[id] = bowing;
       roughnesses[id] = roughness;
       strokeWidths[id] = strokeWidth;
@@ -223,8 +223,8 @@ const addCanvasShape =
         types,
         strokeColors,
         fillColors,
-        textFontOptions,
-        textSizes,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,
@@ -335,18 +335,18 @@ const editCanvasElement =
             [id]: partialElement.fillColor,
           }
         : state.fillColors;
-      const textFontOptions = partialElement.textFontOption
+      const fontFamilies = partialElement.fontFamily
         ? {
-            ...state.textFontOptions,
-            [id]: partialElement.textFontOption,
+            ...state.fontFamilies,
+            [id]: partialElement.fontFamily,
           }
-        : state.textFontOptions;
-      const textSizes = partialElement.textSize
+        : state.fontFamilies;
+      const fontSizes = partialElement.fontSize
         ? {
-            ...state.textSizes,
-            [id]: partialElement.textSize,
+            ...state.fontSizes,
+            [id]: partialElement.fontSize,
           }
-        : state.textSizes;
+        : state.fontSizes;
       const bowings = partialElement.bowing
         ? { ...state.bowings, [id]: partialElement.bowing }
         : state.bowings;
@@ -432,8 +432,8 @@ const editCanvasElement =
         types,
         strokeColors,
         fillColors,
-        textFontOptions,
-        textSizes,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,
@@ -471,8 +471,8 @@ const removeCanvasElements =
       const types = { ...state.types };
       const strokeColors = { ...state.strokeColors };
       const fillColors = { ...state.fillColors };
-      const textFontOptions = { ...state.textFontOptions };
-      const textSizes = { ...state.textSizes };
+      const fontFamilies = { ...state.fontFamilies };
+      const fontSizes = { ...state.fontSizes };
       const bowings = { ...state.bowings };
       const roughnesses = { ...state.roughnesses };
       const strokeWidths = { ...state.strokeWidths };
@@ -490,8 +490,8 @@ const removeCanvasElements =
         delete types[id];
         delete strokeColors[id];
         delete fillColors[id];
-        delete textFontOptions[id];
-        delete textSizes[id];
+        delete fontFamilies[id];
+        delete fontSizes[id];
         delete bowings[id];
         delete roughnesses[id];
         delete strokeWidths[id];
@@ -511,8 +511,8 @@ const removeCanvasElements =
         types,
         strokeColors,
         fillColors,
-        textFontOptions,
-        textSizes,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,
@@ -624,8 +624,8 @@ const setCanvasElementState =
         types,
         strokeColors,
         fillColors,
-        textFontOptions,
-        textSizes,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,
@@ -644,8 +644,8 @@ const setCanvasElementState =
         types,
         strokeColors,
         fillColors,
-        textFontOptions,
-        textSizes,
+        fontFamilies,
+        fontSizes,
         bowings,
         roughnesses,
         strokeWidths,

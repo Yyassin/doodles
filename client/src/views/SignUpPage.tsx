@@ -20,7 +20,7 @@ import {
 } from 'firebase/auth';
 import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
-import { ACCESS_TOKEN_TAG, GET_USER_URL } from '@/constants';
+import { ACCESS_TOKEN_TAG, REST } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
 import axios from 'axios';
 
@@ -60,7 +60,7 @@ export function signup(
         // handle uploading the profile picture to backend
       };
 
-      await axios.post(GET_USER_URL.createUser, userData);
+      await axios.post(REST.user.create, userData);
 
       resolve(userCredential);
     } catch (error: unknown) {
@@ -133,14 +133,14 @@ export default function SignUp() {
       };
 
       await axios
-        .get(GET_USER_URL.getUser, {
+        .get(REST.user.get, {
           params: { email: googleSignInToken.user.email },
         })
         .then(() => {
           setError('Account is already registered. Go to Sign In Page!');
         })
         .catch(async () => {
-          await axios.post(GET_USER_URL.createUser, userData);
+          await axios.post(REST.user.create, userData);
           setUser(
             googleSignInToken.user.displayName ?? '',
             '',
@@ -182,7 +182,7 @@ export default function SignUp() {
   >(null);
 
   return (
-    <Card>
+    <Card className="rounded-none">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Create an account</CardTitle>
         <CardDescription>

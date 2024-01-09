@@ -6,6 +6,7 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { useEffect, useRef } from 'react';
+import { useAuthStore } from '@/stores/AuthStore';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -13,11 +14,13 @@ import { useEffect, useRef } from 'react';
  */
 
 export const useSocket = () => {
-  const { roomID, actionElementID, action, setWebsocketAction } =
+  const { userEmail: userId } = useAuthStore(['userEmail']);
+  const { roomID, actionElementID, action, setSocket, setWebsocketAction } =
     useWebSocketStore([
       'roomID',
       'actionElementID',
       'action',
+      'setSocket',
       'setWebsocketAction',
     ]);
 
@@ -33,8 +36,8 @@ export const useSocket = () => {
     types,
     strokeColors,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -58,8 +61,8 @@ export const useSocket = () => {
     'types',
     'strokeColors',
     'fillColors',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -89,8 +92,8 @@ export const useSocket = () => {
         {
           stroke: element.strokeColor,
           fill: element.fillColor,
-          font: element.textFontOption,
-          size: element.textSize,
+          font: element.fontFamily,
+          size: element.fontSize,
           bowing: element.bowing,
           roughness: element.roughness,
           strokeWidth: element.strokeWidth,
@@ -116,8 +119,8 @@ export const useSocket = () => {
         {
           stroke: element.strokeColor,
           fill: element.fillColor,
-          font: element.textFontOption,
-          size: element.textSize,
+          font: element.fontFamily,
+          size: element.fontSize,
           bowing: element.bowing,
           roughness: element.roughness,
           strokeWidth: element.strokeWidth,
@@ -151,8 +154,8 @@ export const useSocket = () => {
           strokeLineDash: element.strokeLineDash,
           opacity: element.opacity,
           text: element.text,
-          font: element.textFontOption,
-          size: element.textSize,
+          font: element.fontFamily,
+          size: element.fontSize,
           angle: element.angle,
         },
         true,
@@ -173,15 +176,22 @@ export const useSocket = () => {
     },
   };
 
-  //intialize socket
+  // Intialize socket
   useEffect(() => {
-    socket.current = new WebsocketClient(callBacks);
+    if (!userId) {
+      return;
+    }
+    socket.current = new WebsocketClient(callBacks, userId);
+    setSocket(socket.current);
     return () => {
+      if (socket.current?.room !== null) {
+        socket.current?.leaveRoom();
+      }
       socket.current?.disconnect();
     };
-  }, []);
+  }, [userId]);
 
-  //The socket joins room or leaves once the roomID changes
+  // The socket joins room or leaves once the roomID changes
   useEffect(() => {
     if (roomID === null) {
       if (socket.current?.room !== null) {
@@ -192,7 +202,7 @@ export const useSocket = () => {
     }
   }, [roomID]);
 
-  //Send message once action gets set. Note: will be changed
+  // Send message once action gets set. Note: will be changed
   useEffect(() => {
     if (actionElementID === '') return;
 
@@ -202,8 +212,8 @@ export const useSocket = () => {
       return;
     }
 
+    //Check if the actionElementID is string[] (collection of ids)
     if (typeof actionElementID === 'object') {
-      //Check if the actionElementID is string[]
       socket.current?.sendMsgRoom(action, actionElementID);
       setWebsocketAction('', '');
       return;
@@ -221,8 +231,8 @@ export const useSocket = () => {
       {
         stroke: strokeColors[actionElementID],
         fill: fillColors[actionElementID],
-        font: textFontOptions[actionElementID],
-        size: textSizes[actionElementID],
+        font: fontFamilies[actionElementID],
+        size: fontSizes[actionElementID],
         bowing: bowings[actionElementID],
         roughness: roughnesses[actionElementID],
         strokeWidth: strokeWidths[actionElementID],
@@ -236,7 +246,6 @@ export const useSocket = () => {
     );
 
     delete element.roughElement;
-
     socket.current?.sendMsgRoom(action, element);
     setWebsocketAction('', '');
   }, [

@@ -26,20 +26,20 @@ const mapsize = {
  * to highlight the selected tool.
  */
 const SizeOptions = ({ tools }: { tools: size[] }) => {
-  const { textSizes, selectedElementIds, toolOptions } = useCanvasElementStore([
-    'textSizes',
+  const { fontSizes, selectedElementIds, toolOptions } = useCanvasElementStore([
+    'fontSizes',
     'selectedElementIds',
     'toolOptions',
   ]);
   const interestValue = selectedElementIds[0]
-    ? textSizes[selectedElementIds[0]]
+    ? fontSizes[selectedElementIds[0]]
     : toolOptions.textSize;
   return (
     <div className="flex">
       {tools.map((toolName) => (
         <div key={`CustomToolbar-${toolName}`} className="relative">
           <ToolButton
-            customizabilityDict={{ textSize: mapsize[toolName] }}
+            customizabilityDict={{ fontSize: mapsize[toolName] }}
             label={toolName}
             active={interestValue === mapsize[toolName]}
           >

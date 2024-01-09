@@ -19,7 +19,7 @@ import {
 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import { PERIPHERAL_CODES } from '@/constants';
+import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES } from '@/constants';
 import { getCanvasContext, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
@@ -61,6 +61,7 @@ export default function Canvas() {
     'panOffset',
     'setPanOffset',
     'setAction',
+    'isTransparent',
   ]);
   const {
     addCanvasShape,
@@ -78,8 +79,8 @@ export default function Canvas() {
     setPendingImageElement,
     strokeColors,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     bowings,
     roughnesses,
     strokeWidths,
@@ -109,8 +110,8 @@ export default function Canvas() {
     'setPendingImageElement',
     'strokeColors',
     'fillColors',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'bowings',
     'roughnesses',
     'strokeWidths',
@@ -171,9 +172,11 @@ export default function Canvas() {
    * @param e The mouse event containing the raw mouse coordinates.
    * @returns The normalized mouse coordinates.
    */
+  const titlebarHeight = IS_ELECTRON_INSTANCE ? 30 : 0;
   const getMouseCoordinates = (e: MouseEvent<HTMLCanvasElement>) => {
     const clientX = (e.clientX - panOffset.x * zoom + scaleOffset.x) / zoom;
-    const clientY = (e.clientY - panOffset.y * zoom + scaleOffset.y) / zoom;
+    const clientY =
+      (e.clientY - titlebarHeight - panOffset.y * zoom + scaleOffset.y) / zoom;
     return { clientX, clientY };
   };
 
@@ -201,8 +204,8 @@ export default function Canvas() {
       {
         stroke: strokeColors[id],
         fill: fillColors[id],
-        font: textFontOptions[id],
-        size: textSizes[id],
+        font: fontFamilies[id],
+        size: fontSizes[id],
         bowing: bowings[id],
         roughness: roughnesses[id],
         strokeWidth: strokeWidths[id],
@@ -245,13 +248,13 @@ export default function Canvas() {
     // calculates the correct width.
     ctx.save();
     ctx.textBaseline = 'top';
-    ctx.font = ` ${textSizes[currentDrawingElemId.current]}px ${
-      textFontOptions[currentDrawingElemId.current[0]]
+    ctx.font = ` ${fontSizes[currentDrawingElemId.current]}px ${
+      fontFamilies[currentDrawingElemId.current[0]]
     }`;
     const textWidth = ctx.measureText(text).width;
     ctx.restore();
 
-    const textHeight = textSizes[currentDrawingElemId.current];
+    const textHeight = fontSizes[currentDrawingElemId.current];
     updateElement(
       elementId,
       x1,
@@ -619,7 +622,9 @@ export default function Canvas() {
     <>
       <canvas
         id="canvas"
-        style={{ backgroundColor: 'white' }}
+        style={{
+          backgroundColor: 'transparent',
+        }}
         width={appWidth}
         height={appHeight}
         onMouseDown={handleMouseDown}
@@ -646,9 +651,9 @@ export default function Canvas() {
                 zoom -
               scaleOffset.x,
             font: `${
-              textSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
+              fontSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
             }px ${
-              textFontOptions[
+              fontFamilies[
                 selectedElementIds[0] ?? currentDrawingElemId.current
               ]
             }`,

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
+import { generateRandId } from '@/lib/bytes';
 
 /**
  * Define Global Auth states and reducers
@@ -11,7 +12,7 @@ import { createStoreWithSelectors } from './utils';
 interface AuthState {
   userFirstName: string;
   userLastName: string;
-  userEmail: string | null;
+  userEmail: string;
   userPicture: string;
 }
 
@@ -45,7 +46,12 @@ const setUser =
     userPicture: string,
   ) =>
     set(() => {
-      return { userFirstName, userLastName, userEmail, userPicture };
+      return {
+        userFirstName,
+        userLastName,
+        userEmail: userEmail ?? generateRandId(),
+        userPicture,
+      };
     });
 
 /** Store Hook */

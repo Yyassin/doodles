@@ -29,8 +29,8 @@ const useDrawElements = () => {
     p2,
     types,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     allIds,
     freehandPoints,
     freehandBounds,
@@ -40,7 +40,6 @@ const useDrawElements = () => {
     angles,
     selectionFrame,
     roughElements,
-    //fillColors,
     opacities,
     strokeColors,
     strokeWidths,
@@ -52,8 +51,8 @@ const useDrawElements = () => {
     'p2',
     'types',
     'fillColors',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'allIds',
     'freehandPoints',
     'freehandBounds',
@@ -62,7 +61,6 @@ const useDrawElements = () => {
     'isImagePlaceds',
     'angles',
     'selectionFrame',
-    //'fillColors',
     'opacities',
     'strokeColors',
     'strokeWidths',
@@ -76,8 +74,6 @@ const useDrawElements = () => {
 
     // Clear on each rerender
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // ctx.fillStyle = 'blue';
-    // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Retrieve the scaling offset to apply for centered zoom
     // (TODO: We can change this to zoom towards mouse position)
@@ -103,8 +99,8 @@ const useDrawElements = () => {
         angles,
         types,
         fillColors,
-        textFontOptions,
-        textSizes,
+        fontFamilies,
+        fontSizes,
         freehandPoints,
         freehandBounds,
         textStrings,
@@ -137,8 +133,8 @@ const useDrawElements = () => {
     selectedElementIds,
     types,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     p1,
     p2,
     appWidth,

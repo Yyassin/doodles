@@ -24,36 +24,49 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TEST: 1
+      FIREBASE_EMULATORS_PATH: ${{ github.workspace }}/emulator-cache
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "18.x"
+          cache: "yarn"
+          cache-dependency-path: "./mod/fastfire/yarn.lock"
 
       - uses: pnpm/action-setup@v2
         with:
           version: 8
+          run_install: false
 
       - name: Cache firebase emulators
         uses: actions/cache@v2
         with:
-          path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('~/.cache/firebase/emulators/**') }}
+          path: ${{ env.FIREBASE_EMULATORS_PATH }}
+          key: ${{ runner.os }}-firebase-emulators-${{
+            hashFiles('./emulator-cache/**') }}
         continue-on-error: true
+      # - run: npm install -g firebase-tools
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
         with:
-          path: ~/.npm
-          key: npm-${{ hashFiles('./node/pnpm-lock.yaml') }}
-          restore-keys: npm-
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('./node/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install Fastfire
         working-directory: ./mod/fastfire
-        run: npm i --global yarn && yarn install && yarn build
+        run: npm i --global yarn && yarn install --prefer-offline && yarn build
 
       - name: Install dependencies
         working-directory: ./node
@@ -63,6 +76,10 @@ jobs:
         working-directory: ./node
         run: pnpm run lint
 
-      - name: Run test
+      - name: Run test SPEC
         working-directory: ./node
-        run: pnpm run emulator-test
+        run: pnpm run test
+
+      - name: Run test API
+        working-directory: ./node
+        run: pnpm run emulator-test-api

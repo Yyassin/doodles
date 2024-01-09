@@ -1,4 +1,5 @@
 import { ZOOM } from '@/constants';
+import { ipcAPI } from '@/data/ipc/ipcMessages';
 import { clamp } from '@/lib/misc';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
@@ -51,11 +52,15 @@ export const useShortcuts = () => {
     setSelectedElements,
     removeCanvasElements,
     pushCanvasHistory,
+    undoCanvasHistory,
+    redoCanvasHistory,
   } = useCanvasElementStore([
     'selectedElementIds',
     'setSelectedElements',
     'removeCanvasElements',
     'pushCanvasHistory',
+    'undoCanvasHistory',
+    'redoCanvasHistory',
   ]);
 
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
@@ -74,17 +79,46 @@ export const useShortcuts = () => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (shouldIgnoreKeyPress(e)) return;
 
-      // Delete the selected element on backspace
-      if (e.code === 'Backspace' && selectedElementIds.length) {
-        const ids = selectedElementIds;
-        setSelectedElements([]);
-        removeCanvasElements(ids);
-        pushCanvasHistory();
-        setWebsocketAction(ids, 'removeCanvasElements');
+      switch (e.code) {
+        case 'Backspace': {
+          // Delete the selected elemenst on backspace
+          if (selectedElementIds.length) {
+            const ids = selectedElementIds;
+            setSelectedElements([]);
+            removeCanvasElements(ids);
+            pushCanvasHistory();
+            setWebsocketAction(ids, 'removeCanvasElements');
+          }
+          break;
+        }
+        case 'KeyZ': {
+          // Undo
+          if (e.ctrlKey) {
+            undoCanvasHistory();
+            setWebsocketAction('undo', 'undoCanvasHistory');
+          }
+          break;
+        }
+        case 'KeyY': {
+          // Redo
+          if (e.ctrlKey) {
+            redoCanvasHistory();
+            setWebsocketAction('redo', 'redoCanvasHistory');
+          }
+          break;
+        }
+        // Test notification
+        case 'KeyR': {
+          if (e.ctrlKey) {
+            ipcAPI.notification({ title: 'Test', body: 'Test Body' });
+          }
+        }
       }
     };
 
     const onWheel = (e: WheelEvent) => {
+      // Ignore wheel events not on canvas, for example, on a sheet.
+      if ((e.target as HTMLElement)?.id !== 'canvas') return;
       if (e.ctrlKey) {
         // Zoom event
         setAppZoom(clamp(zoom - e.deltaY * ZOOM.INC * 0.1, ZOOM.MIN, ZOOM.MAX));

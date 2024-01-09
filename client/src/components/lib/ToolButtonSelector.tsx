@@ -14,14 +14,7 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
  * The currently active tool is highlighted. The ToolButton component is used in various
  * tool groups in the CustomizabilityToolbar to allow the user to select different options
  * for customizing the canvas elements.
- * @author Eebro, Abdalla, Dana
- */
-
-/**
- * Primary viewport that houses the canvas
- * and accompanying widgets/buttons that lie
- * on top of it (absolutely positioned).
- * @authors Yousef Yassin, Dana El Sherif
+ * @author Eebro, Abdalla
  */
 
 /**
@@ -49,8 +42,8 @@ const ToolButton = ({
     pushCanvasHistory,
     selectedElementIds,
     fillColors,
-    textFontOptions,
-    textSizes,
+    fontFamilies,
+    fontSizes,
     types,
     strokeColors,
     bowings,
@@ -69,8 +62,8 @@ const ToolButton = ({
     'pushCanvasHistory',
     'selectedElementIds',
     'fillColors',
-    'textFontOptions',
-    'textSizes',
+    'fontFamilies',
+    'fontSizes',
     'types',
     'strokeColors',
     'bowings',
@@ -84,95 +77,82 @@ const ToolButton = ({
     'p1',
     'p2',
     'textStrings',
-    'textFontOptions',
     'setToolOptions',
   ]);
+
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
   const onClick = () => {
-    console.log(selectedElementIds[0]);
-    // A new and customized element will be drawn
-    if (selectedElementIds[0] === undefined) {
+    // If the user was able to see the panel, only one element is selected.
+    const selectedElementId = selectedElementIds[0];
+    if (!selectedElementId) {
+      // If no element is selected, then set the tool options
       setToolOptions(customizabilityDict);
-    } // An element is selected.
-    else {
-      const selectedElementId = selectedElementIds[0];
-      const { roughElement, fillColor } = createElement(
-        selectedElementId,
-        p1[selectedElementId].x,
-        p1[selectedElementId].y,
-        p2[selectedElementId].x,
-        p2[selectedElementId].y,
-        types[selectedElementId],
-        undefined,
-        {
-          stroke:
-            customizabilityDict.strokeColor ?? strokeColors[selectedElementId],
-
-          fill: customizabilityDict.fillColor ?? fillColors[selectedElementId],
-          font:
-            customizabilityDict.textFontOption ??
-            textFontOptions[selectedElementId],
-          size: customizabilityDict.textSize ?? textSizes[selectedElementId],
-
-          bowing: customizabilityDict.bowing ?? bowings[selectedElementId],
-
-          roughness:
-            customizabilityDict.roughness ?? roughnesses[selectedElementId],
-
-          strokeWidth:
-            customizabilityDict.strokeWidth ?? strokeWidths[selectedElementId],
-
-          fillStyle:
-            customizabilityDict.fillStyle ?? fillStyles[selectedElementId],
-
-          strokeLineDash:
-            customizabilityDict.strokeLineDash ??
-            strokeLineDashes[selectedElementId],
-
-          opacity: customizabilityDict.opacity ?? opacities[selectedElementId],
-
-          text: textStrings[selectedElementId],
-
-          angle: angles[selectedElementId],
-        },
-      );
-
-      let extraOptions = {} as Partial<CanvasElement>;
-      if (types[selectedElementId] === 'text') {
-        // Set the element's font style so measuretext
-        // calculates the correct width.
-        const { ctx } = getCanvasContext();
-        if (ctx === null) throw 'ctx null';
-
-        const textSize =
-          customizabilityDict.textSize ?? textSizes[selectedElementId];
-
-        const textFont =
-          customizabilityDict.textFontOption ??
-          textFontOptions[selectedElementId];
-
-        ctx.save();
-        ctx.textBaseline = 'top';
-        ctx.font = ` ${textSize}px ${textFont}`;
-        const textWidth = ctx.measureText(textStrings[selectedElementId]).width;
-        ctx.restore();
-
-        const { x, y } = p1[selectedElementId];
-        extraOptions = { p2: { x: x + textWidth, y: y + textSize } };
-      }
-
-      editCanvasElement(selectedElementId, {
-        roughElement,
-        //set explicity becaue its changed in the function createElement
-        fillColor,
-        ...customizabilityDict,
-        ...extraOptions,
-      });
-      pushCanvasHistory();
-      setWebsocketAction(selectedElementId, 'editCanvasElement');
     }
+    const { roughElement, fillColor } = createElement(
+      selectedElementId,
+      p1[selectedElementId].x,
+      p1[selectedElementId].y,
+      p2[selectedElementId].x,
+      p2[selectedElementId].y,
+      types[selectedElementId],
+      undefined,
+      {
+        stroke:
+          customizabilityDict.strokeColor ?? strokeColors[selectedElementId],
+        fill: customizabilityDict.fillColor ?? fillColors[selectedElementId],
+        font: customizabilityDict.fontFamily ?? fontFamilies[selectedElementId],
+        size: customizabilityDict.fontSize ?? fontSizes[selectedElementId],
+        bowing: customizabilityDict.bowing ?? bowings[selectedElementId],
+        roughness:
+          customizabilityDict.roughness ?? roughnesses[selectedElementId],
+        strokeWidth:
+          customizabilityDict.strokeWidth ?? strokeWidths[selectedElementId],
+        fillStyle:
+          customizabilityDict.fillStyle ?? fillStyles[selectedElementId],
+        strokeLineDash:
+          customizabilityDict.strokeLineDash ??
+          strokeLineDashes[selectedElementId],
+        opacity: customizabilityDict.opacity ?? opacities[selectedElementId],
+        text: textStrings[selectedElementId],
+        angle: angles[selectedElementId],
+      },
+    );
+
+    let extraOptions = {} as Partial<CanvasElement>;
+    if (types[selectedElementId] === 'text') {
+      // Set the element's font style so measuretext
+      // calculates the correct width.
+      const { ctx } = getCanvasContext();
+      if (ctx === null) throw 'ctx null';
+
+      const fontSize =
+        customizabilityDict.fontSize ?? fontSizes[selectedElementId];
+
+      const textFont =
+        customizabilityDict.fontFamily ?? fontFamilies[selectedElementId];
+
+      ctx.save();
+      ctx.textBaseline = 'top';
+      ctx.font = ` ${fontSize}px ${textFont}`;
+      const textWidth = ctx.measureText(textStrings[selectedElementId]).width;
+      ctx.restore();
+
+      const { x, y } = p1[selectedElementId];
+      extraOptions = { p2: { x: x + textWidth, y: y + fontSize } };
+    }
+
+    editCanvasElement(selectedElementId, {
+      roughElement,
+      //set explicity becaue its changed in the function createElement
+      fillColor,
+      ...customizabilityDict,
+      ...extraOptions,
+    });
+    pushCanvasHistory();
+    setWebsocketAction(selectedElementId, 'editCanvasElement');
   };
+
   return (
     <IconButton label={capitalize(label)} active={active} onClick={onClick}>
       {children}

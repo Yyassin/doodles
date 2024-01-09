@@ -31,7 +31,7 @@ const opacitySet = new Set([
   'line',
   'image',
 ]);
-const colorSet = new Set(['rectangle', 'circle', 'line']);
+const colorSet = new Set(['rectangle', 'circle', 'line', 'text']);
 const strokeThicknessSet = new Set(['freehand', 'rectangle', 'circle', 'line']);
 const strokeColorSet = new Set([
   'freehand',

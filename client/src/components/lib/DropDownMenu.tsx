@@ -8,8 +8,11 @@ import {
   Pencil2Icon,
   InfoCircledIcon,
   Share1Icon,
+  BlendingModeIcon,
 } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
+import CanvasColorToolGroup, { canvasColourTypes } from './CanvasBackground';
+import { IS_ELECTRON_INSTANCE } from '@/constants';
 
 /**
  * Creates a DropDownMenu for Canvas
@@ -21,7 +24,10 @@ const DropDownMenu = ({
 }: {
   viewportRef: React.RefObject<HTMLDivElement>;
 }) => {
-  const { isFullscreen } = useAppStore(['isFullscreen']);
+  const { isFullscreen, isTransparent } = useAppStore([
+    'isFullscreen',
+    'isTransparent',
+  ]);
   //Handle button functionailities
 
   const handleInfo = () => {
@@ -39,7 +45,13 @@ const DropDownMenu = ({
       <DropdownMenu.Trigger asChild>
         <button
           className="rounded-md w-[25px] h-[25px] inline-flex items-center justify-center text-violet11 bg-white outline outline-offset-2 outline-indigo-400 hover:bg-violet3"
-          style={{ position: 'absolute', top: '1rem', right: '1rem' }}
+          style={{
+            position: 'absolute',
+            top: `calc(1rem + ${
+              IS_ELECTRON_INSTANCE && isTransparent ? '30px' : '0px'
+            })`,
+            right: '1rem',
+          }}
         >
           <HamburgerMenuIcon />
         </button>
@@ -81,7 +93,19 @@ const DropDownMenu = ({
             <Pencil2Icon /> Edit Canvas
           </DropdownMenu.Item>
           <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
+
           <ResetCanvasDropDownMenu />
+          <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
+
+          <DropdownMenu.Item
+            className="group text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 hover:bg-indigo-200"
+            disabled={true}
+          >
+            <BlendingModeIcon /> Canvas Background
+          </DropdownMenu.Item>
+
+          <CanvasColorToolGroup colorList={[...canvasColourTypes]} />
+
           <DropdownMenu.Arrow className="fill-white" />
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

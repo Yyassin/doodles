@@ -20,7 +20,7 @@ import {
 import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
 import axios from 'axios';
-import { GET_USER_URL, REST_URL } from '@/constants';
+import { REST } from '@/constants';
 import { ACCESS_TOKEN_TAG } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
 
@@ -39,7 +39,7 @@ export function signin(email: string, password: string) {
 }
 
 export function checkToken(token: string) {
-  return axios.post(REST_URL.auth, {
+  return axios.post(REST.auth.token, {
     body: { token: token },
   });
 }
@@ -54,7 +54,7 @@ export async function getUserDetails(
   ) => void,
 ) {
   await axios
-    .get(GET_USER_URL.getUser, {
+    .get(REST.user.get, {
       params: { email },
     })
     .then((response) => {
@@ -114,7 +114,7 @@ export default function SignInPage() {
       const googleSignInToken = await signInWithPopup(auth, provider);
 
       await axios
-        .get(GET_USER_URL.getUser, {
+        .get(REST.user.get, {
           params: { email: googleSignInToken.user.email },
         })
         .then(async () => {
@@ -140,7 +140,7 @@ export default function SignInPage() {
   };
 
   return (
-    <Card>
+    <Card className="rounded-none">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Log In</CardTitle>
         <CardDescription>
