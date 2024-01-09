@@ -391,6 +391,7 @@ export default function Canvas() {
         p1: { x: clientX - width / 2, y: clientY - height / 2 },
         p2: { x: clientX + width / 2, y: clientY + height / 2 },
       });
+      setWebsocketAction(pendingImageElementId, 'addCanvasShape');
       // Unselect current image and reset cursor
       setPendingImageElement('');
       setCursor('');

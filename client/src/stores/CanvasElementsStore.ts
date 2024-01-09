@@ -25,6 +25,7 @@ export interface CanvasElement {
   roughElement?: Drawable; // The underlying roughjs element, if applicable.
   freehandPoints?: Vector2[]; // Points for curves
   fileId?: string; // For image elements; the id of the image in cache.
+  imgDataURL?: string; // For image elements; the dataURL of the image. Used in exports.
   isImagePlaced: boolean; // For image elements; true if the element has been placed, false otherwise.
   text: string; // Container stringW
   fontFamily: string; // Font Family

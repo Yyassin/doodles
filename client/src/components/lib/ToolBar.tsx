@@ -61,11 +61,7 @@ const ToolButton = ({
   active: boolean;
   children?: React.ReactNode;
 }) => {
-  const { setTool, zoom, appHeight } = useAppStore([
-    'setTool',
-    'zoom',
-    'appHeight',
-  ]);
+  const { setTool } = useAppStore(['setTool']);
   const {
     removeCanvasElements,
     setSelectedElements,
@@ -119,7 +115,6 @@ const ToolButton = ({
             imageFile,
             addCanvasShape,
             editCanvasElement,
-            { zoom, appHeight },
             true,
           );
           // And let the user place the image

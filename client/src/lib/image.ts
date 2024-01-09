@@ -253,13 +253,76 @@ export const initializeImageDimensions = (
 };
 
 /**
+ * Commits the image file to the cache and updates the image element in state by
+ * adding the generated file ID, triggering a rerender to show the image.
+ * @param file The image file to be added to the cache.
+ * @param imageElement The image element to be updated in state.
+ * @param editImageInState The callback to update the image element in state.
+ * @param showCursorImagePreview The flag indicating whether to show a cursor image preview.
+ * @returns A Promise resolving to the inserted CanvasElement.
+ */
+export const commitImageToCache = (
+  file: BinaryFileData,
+  imageElement: CanvasElement,
+  editImageInState: (
+    id: string,
+    partialElement: Partial<CanvasElement>,
+  ) => void,
+  showCursorImagePreview?: boolean,
+) =>
+  new Promise<CanvasElement>(async (resolve, reject) => {
+    const initImageElement = { ...imageElement, fileId: file.id };
+
+    try {
+      // Add image file data to the file cache
+      fileCache.addFile(file.id, {
+        ...file,
+        created: Date.now(),
+        lastRetrieved: Date.now(),
+      });
+
+      // Check if the image data is already in image cache
+      const cachedImageData = imageCache.cache.get(file.id);
+      // Update the image cache if not
+      if (!cachedImageData) {
+        const fileIds = [initImageElement]
+          .map((element) => element.fileId ?? '')
+          .filter((id) => id);
+        await _updateImageCache({
+          imageCache,
+          fileIds,
+          files: fileCache.cache,
+        });
+      }
+
+      // If the image is still loading, wait for it to resolve
+      if (cachedImageData?.image instanceof Promise) {
+        await cachedImageData.image;
+      }
+
+      // Update the image element in the application state with the file ID
+      // once loaded, this will trigger a rerender to show the image, provided
+      // the element has been placed.
+      editImageInState(imageElement.id, { fileId: file.id });
+      // Resolve the Promise with the inserted image element
+      resolve(imageElement);
+    } catch (error: unknown) {
+      console.error(error);
+      reject(new Error('Error inserting image'));
+    } finally {
+      if (!showCursorImagePreview) {
+        setCursor('');
+      }
+    }
+  });
+
+/**
  * Inserts an image element into the canvas, handling resizing, caching, and cursor preview.
  *
  * @param imageElement Element representing the image to be inserted.
  * @param imageFile Tthe image file to be injected into the element.
  * @param addImageInState Callback to add the image element to the application state.
  * @param editImageInState Callback to update the image element in the application state.
- * @param appState State slice containing the current zoom level and canvas height.
  * @param showCursorImagePreview True to show a cursor image preview, false otherwise.
  * @returns A Promise resolving to the inserted CanvasElement.
  */
@@ -271,7 +334,6 @@ export const injectImageElement = async (
     id: string,
     partialElement: Partial<CanvasElement>,
   ) => void,
-  appState: { zoom: number; appHeight: number },
   showCursorImagePreview?: boolean,
 ) => {
   // Add proxy element to state.
@@ -329,54 +391,20 @@ export const injectImageElement = async (
     // Get the data URL for the image file
     const dataURL =
       fileCache.cache[fileId]?.dataURL || (await getDataURL(imageFile));
-    const initImageElement = { ...imageElement, fileId };
 
     // Return a promise which asynchronously loads the HTML image into cache.
-    return new Promise<CanvasElement>(async (resolve, reject) => {
-      try {
-        // Add image file data to the file cache
-        fileCache.addFile(fileId, {
-          mimeType,
-          id: fileId,
-          dataURL,
-          created: Date.now(),
-          lastRetrieved: Date.now(),
-        });
-
-        // Check if the image data is already in image cache
-        const cachedImageData = imageCache.cache.get(fileId);
-        // Update the image cache if not
-        if (!cachedImageData) {
-          const fileIds = [initImageElement]
-            .map((element) => element.fileId ?? '')
-            .filter((id) => id);
-          await _updateImageCache({
-            imageCache,
-            fileIds,
-            files: fileCache.cache,
-          });
-        }
-
-        // If the image is still loading, wait for it to resolve
-        if (cachedImageData?.image instanceof Promise) {
-          await cachedImageData.image;
-        }
-
-        // Update the image element in the application state with the file ID
-        // once loaded, this will trigger a rerender to show the image, provided
-        // the element has been placed.
-        editImageInState(imageElement.id, { fileId });
-        // Resolve the Promise with the inserted image element
-        resolve(imageElement);
-      } catch (error: unknown) {
-        console.error(error);
-        reject(new Error('Error inserting image'));
-      } finally {
-        if (!showCursorImagePreview) {
-          setCursor('');
-        }
-      }
-    });
+    return commitImageToCache(
+      {
+        mimeType,
+        id: fileId,
+        dataURL,
+        created: Date.now(),
+        lastRetrieved: Date.now(),
+      },
+      imageElement,
+      editImageInState,
+      showCursorImagePreview,
+    );
   } catch (error: unknown) {
     // TODO: Should handle deleting the image from state here
     console.error('Failed to insert image');

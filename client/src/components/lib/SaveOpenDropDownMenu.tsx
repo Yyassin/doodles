@@ -140,7 +140,7 @@ export const SaveOpenDropDownMenu = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <input
         type="file"
         ref={fileInputRef}
@@ -163,6 +163,6 @@ export const SaveOpenDropDownMenu = () => {
       >
         <DownloadIcon /> Save
       </DropdownMenu.Item>
-    </React.Fragment>
+    </>
   );
 };
