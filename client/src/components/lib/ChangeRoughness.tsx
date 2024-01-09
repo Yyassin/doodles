@@ -34,10 +34,11 @@ const mapRoughness = {
  * to highlight the selected tool.
  */
 const RoughnessToolGroup = ({ tools }: { tools: roughnessType[] }) => {
-  const { roughnesses, selectedElementIds } = useCanvasElementStore([
-    'roughnesses',
-    'selectedElementIds',
-  ]);
+  const { roughnesses, selectedElementIds, toolOptions } =
+    useCanvasElementStore(['roughnesses', 'selectedElementIds', 'toolOptions']);
+  const interestValue = selectedElementIds[0]
+    ? roughnesses[selectedElementIds[0]]
+    : toolOptions.roughness;
   return (
     <div className="flex">
       {tools.map((toolName) => (
@@ -45,9 +46,7 @@ const RoughnessToolGroup = ({ tools }: { tools: roughnessType[] }) => {
           <ToolButton
             customizabilityDict={{ roughness: mapRoughness[toolName] }}
             label={toolName}
-            active={
-              roughnesses[selectedElementIds[0]] === mapRoughness[toolName]
-            }
+            active={interestValue === mapRoughness[toolName]}
           >
             <div
               className={'w-5 h-5 square-full ' + roughnessMap[toolName]}

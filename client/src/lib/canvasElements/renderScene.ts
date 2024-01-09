@@ -52,7 +52,6 @@ export const renderCanvasElements = (
     p2,
     angles,
     types,
-    fillColors,
     fontFamilies,
     fontSizes,
     freehandPoints,
@@ -117,7 +116,7 @@ export const renderCanvasElements = (
         ctx.font = `${fontSizes[id] ?? 30}px ${
           fontFamilies[id] ?? 'trebuchet MS'
         }`;
-        const fillColor = fillColors[id] ?? '#000000';
+        const fillColor = strokeColors[id] ?? '#000000';
         ctx.fillStyle = fillColor;
         ctx.fillText(textStrings[id], x1, y1);
       }

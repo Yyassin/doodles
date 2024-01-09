@@ -41,11 +41,12 @@ const mapFillStyle = {
  * to highlight the selected tool.
  */
 const FillStyleToolGroup = ({ tools }: { tools: CanvasElementFillStyle[] }) => {
-  const { fillStyles, selectedElementIds } = useCanvasElementStore([
-    'fillStyles',
-    'selectedElementIds',
-  ]);
-
+  const { fillStyles, selectedElementIds, toolOptions } = useCanvasElementStore(
+    ['fillStyles', 'selectedElementIds', 'toolOptions'],
+  );
+  const interestValue = selectedElementIds[0]
+    ? fillStyles[selectedElementIds[0]]
+    : toolOptions.fillStyle;
   return (
     <div className="grid grid-cols-4">
       {tools.map((toolName) => (
@@ -53,9 +54,7 @@ const FillStyleToolGroup = ({ tools }: { tools: CanvasElementFillStyle[] }) => {
           <ToolButton
             customizabilityDict={{ fillStyle: mapFillStyle[toolName] }}
             label={toolName}
-            active={
-              fillStyles[selectedElementIds[0]] === mapFillStyle[toolName]
-            }
+            active={interestValue === mapFillStyle[toolName]}
           >
             <div
               className={'w-5 h-5 rounded-full ' + fillStyleMap[toolName]}

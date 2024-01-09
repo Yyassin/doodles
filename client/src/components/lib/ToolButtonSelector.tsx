@@ -56,6 +56,7 @@ const ToolButton = ({
     p1,
     p2,
     textStrings,
+    setToolOptions,
   } = useCanvasElementStore([
     'editCanvasElement',
     'pushCanvasHistory',
@@ -76,6 +77,7 @@ const ToolButton = ({
     'p1',
     'p2',
     'textStrings',
+    'setToolOptions',
   ]);
 
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
@@ -83,6 +85,10 @@ const ToolButton = ({
   const onClick = () => {
     // If the user was able to see the panel, only one element is selected.
     const selectedElementId = selectedElementIds[0];
+    if (selectedElementId === undefined) {
+      // If no element is selected, then set the tool options
+      setToolOptions(customizabilityDict);
+    }
     const { roughElement, fillColor } = createElement(
       selectedElementId,
       p1[selectedElementId].x,
@@ -94,30 +100,21 @@ const ToolButton = ({
       {
         stroke:
           customizabilityDict.strokeColor ?? strokeColors[selectedElementId],
-
         fill: customizabilityDict.fillColor ?? fillColors[selectedElementId],
         font: customizabilityDict.fontFamily ?? fontFamilies[selectedElementId],
         size: customizabilityDict.fontSize ?? fontSizes[selectedElementId],
-
         bowing: customizabilityDict.bowing ?? bowings[selectedElementId],
-
         roughness:
           customizabilityDict.roughness ?? roughnesses[selectedElementId],
-
         strokeWidth:
           customizabilityDict.strokeWidth ?? strokeWidths[selectedElementId],
-
         fillStyle:
           customizabilityDict.fillStyle ?? fillStyles[selectedElementId],
-
         strokeLineDash:
           customizabilityDict.strokeLineDash ??
           strokeLineDashes[selectedElementId],
-
         opacity: customizabilityDict.opacity ?? opacities[selectedElementId],
-
         text: textStrings[selectedElementId],
-
         angle: angles[selectedElementId],
       },
     );

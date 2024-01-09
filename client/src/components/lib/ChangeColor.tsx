@@ -44,10 +44,12 @@ const mapColour = {
  * to highlight the selected tool.
  */
 const ToolGroup = ({ tools }: { tools: colourType[] }) => {
-  const { fillColors, selectedElementIds } = useCanvasElementStore([
-    'fillColors',
-    'selectedElementIds',
-  ]);
+  const { fillColors, selectedElementIds, toolOptions } = useCanvasElementStore(
+    ['fillColors', 'selectedElementIds', 'toolOptions'],
+  );
+  const interestValue = selectedElementIds[0]
+    ? fillColors[selectedElementIds[0]]
+    : toolOptions.fillColor;
   return (
     <div className="flex">
       {tools.map((toolName) => (
@@ -55,7 +57,7 @@ const ToolGroup = ({ tools }: { tools: colourType[] }) => {
           <ToolButton
             customizabilityDict={{ fillColor: mapColour[toolName] }}
             label={toolName}
-            active={fillColors[selectedElementIds[0]] === mapColour[toolName]}
+            active={interestValue === mapColour[toolName]}
           >
             <div className={'w-5 h-5 rounded-full ' + colorMap[toolName]}></div>
           </ToolButton>

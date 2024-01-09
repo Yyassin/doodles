@@ -26,10 +26,14 @@ const mapsize = {
  * to highlight the selected tool.
  */
 const SizeOptions = ({ tools }: { tools: size[] }) => {
-  const { fontSizes, selectedElementIds } = useCanvasElementStore([
+  const { fontSizes, selectedElementIds, toolOptions } = useCanvasElementStore([
     'fontSizes',
     'selectedElementIds',
+    'toolOptions',
   ]);
+  const interestValue = selectedElementIds[0]
+    ? fontSizes[selectedElementIds[0]]
+    : toolOptions.fontSize;
   return (
     <div className="flex">
       {tools.map((toolName) => (
@@ -37,7 +41,7 @@ const SizeOptions = ({ tools }: { tools: size[] }) => {
           <ToolButton
             customizabilityDict={{ fontSize: mapsize[toolName] }}
             label={toolName}
-            active={fontSizes[selectedElementIds[0]] === mapsize[toolName]}
+            active={interestValue === mapsize[toolName]}
           >
             <div className={'w-5 h-5 rounded-full ' + mapsize[toolName]}>
               {mapsize[toolName]}

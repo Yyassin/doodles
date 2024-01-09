@@ -18,11 +18,15 @@ const OpacitySlider = () => {
     pushCanvasHistory,
     selectedElementIds,
     opacities,
+    setToolOptions,
+    toolOptions,
   } = useCanvasElementStore([
     'editCanvasElement',
     'pushCanvasHistory',
     'selectedElementIds',
     'opacities',
+    'setToolOptions',
+    'toolOptions',
   ]);
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
   const commitOpacityDebounced = useCallback(
@@ -35,10 +39,14 @@ const OpacitySlider = () => {
   return (
     <Slider.Root
       className="relative flex items-center select-none touch-none w-[200px] h-5"
-      value={[opacities[selectedElementIds[0]] ?? 1]}
+      value={[opacities[selectedElementIds[0]] ?? toolOptions.opacity]}
       onValueChange={(value) => {
-        editCanvasElement(selectedElementIds[0], { opacity: value[0] });
-        commitOpacityDebounced();
+        if (selectedElementIds[0]) {
+          editCanvasElement(selectedElementIds[0], { opacity: value[0] });
+          commitOpacityDebounced();
+        } else {
+          setToolOptions({ opacity: value[0] });
+        }
       }}
       min={0}
       max={1}

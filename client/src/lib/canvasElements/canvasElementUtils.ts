@@ -12,7 +12,7 @@ const strokeLineDash = [0];
 const opacity = 1;
 const angle = 0;
 const font = 'trebuchet MS';
-const size = 30;
+const size = 24;
 
 export const defaultOptions = {
   stroke,
@@ -38,7 +38,7 @@ const createElement = (
   y2: number,
   type: CanvasElementType,
   points?: Vector2[],
-  options = defaultOptions,
+  options: Partial<typeof defaultOptions> = defaultOptions,
   isLive = false,
 ): CanvasElement => {
   let roughElement;
@@ -73,21 +73,15 @@ const createElement = (
     p1: { x: x1, y: y1 },
     p2: { x: x2, y: y2 },
     type,
-    strokeColor: options.stroke,
+    ...defaultOptions,
+    strokeColor: options.stroke ? options.stroke : defaultOptions.stroke,
+    fontFamily: options.font ? options.font : defaultOptions.font,
+    fontSize: options.size ? options.size : defaultOptions.size,
     fillColor: options.fill,
-    bowing: options.bowing,
-    roughness: options.roughness,
-    strokeWidth: options.strokeWidth,
-    fillStyle: options.fillStyle,
-    strokeLineDash: options.strokeLineDash,
-    opacity: options.opacity,
-    fontFamily: options.font,
-    fontSize: options.size,
+    ...options,
     roughElement,
-    text: options.text,
     freehandPoints: newPoints,
     isImagePlaced: false,
-    angle: options.angle,
   };
 };
 

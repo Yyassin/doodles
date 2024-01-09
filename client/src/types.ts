@@ -63,6 +63,16 @@ export const AppTools = [
 ] as const;
 export type AppTool = (typeof AppTools)[number];
 
+export const DrawingTools = [
+  'line',
+  'rectangle',
+  'circle',
+  'freehand',
+  'text',
+] as const;
+export type DrawingTool = (typeof DrawingTools)[number];
+export const drawingToolsSet = new Set(DrawingTools);
+
 /* Suppored application themes, these change the app's global appearance. */
 export const AppThemes = ['light', 'dark'] as const;
 export type AppTheme = (typeof AppThemes)[number];

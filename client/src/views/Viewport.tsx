@@ -15,6 +15,7 @@ import ShareScreenButton from '@/components/lib/ShareScreenButton';
 import TransparencyButton from '@/components/lib/TransparencyButton';
 import { IS_ELECTRON_INSTANCE } from '@/constants';
 import StableDiffusionSheet from '@/components/lib/StableDiffusion/StableDiffusionSheet';
+import { isDrawingTool } from '@/lib/misc';
 
 /**
  * Primary viewport that houses the canvas
@@ -23,9 +24,14 @@ import StableDiffusionSheet from '@/components/lib/StableDiffusion/StableDiffusi
  * @authors Yousef Yassin
  */
 const Viewport = () => {
-  const { setMode, isTransparent } = useAppStore(['setMode', 'isTransparent']);
+  const { setMode, tool, isTransparent } = useAppStore([
+    'setMode',
+    'tool',
+    'isTransparent',
+  ]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
+  const isDrawingSelected = isDrawingTool(tool);
 
   return (
     <RadixContextMenu.Root>
@@ -42,7 +48,9 @@ const Viewport = () => {
       >
         <ToolBar />
         {/* Only show the toolbar is an element is selected */}
-        {selectedElementIds.length === 1 && <CustomToolbar />}
+        {(selectedElementIds.length === 1 || isDrawingSelected) && (
+          <CustomToolbar />
+        )}
         <DropDownMenu viewportRef={viewportRef} />
 
         <div

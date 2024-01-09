@@ -61,7 +61,7 @@ type AppStore = AppState & AppActions;
 export const initialAppState: AppState = {
   action: 'none',
   mode: 'signin',
-  tool: 'line',
+  tool: 'select',
   theme: 'dark',
   isFullscreen: false,
   isSharingScreen: false,

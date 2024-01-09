@@ -35,6 +35,20 @@ export interface CanvasElement {
   id: string; // Element id
 }
 
+//Default customizability options
+export interface ToolOptions {
+  strokeColor: string;
+  fillColor: string | undefined;
+  fontFamily: string;
+  fontSize: number;
+  roughness: number;
+  strokeWidth: number;
+  fillStyle: CanvasElementFillStyle;
+  strokeLineDash: number[];
+  opacity: number;
+  bowing: number;
+}
+
 export interface CanvasElementState {
   isSelectionFrameSet: boolean;
   selectionFrame: Pick<CanvasElement, 'p1' | 'p2'> | null;
@@ -61,6 +75,7 @@ export interface CanvasElementState {
   fileIds: Record<string, CanvasElement['fileId']>;
   isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
   angles: Record<string, CanvasElement['angle']>;
+  toolOptions: ToolOptions;
 }
 
 interface CanvasElementActions {
@@ -82,6 +97,7 @@ interface CanvasElementActions {
   setSelectionFrame: (
     selectionFrame: Partial<Pick<CanvasElement, 'p1' | 'p2'>> | null,
   ) => void;
+  setToolOptions: (toolOptions: Partial<ToolOptions>) => void;
 }
 type CanvasElementStore = CanvasElementState & CanvasElementActions;
 
@@ -112,6 +128,18 @@ export const initialCanvasElementState: CanvasElementState = {
   fileIds: {},
   isImagePlaceds: {},
   angles: {},
+  toolOptions: {
+    fontFamily: 'trebuchet MS',
+    fontSize: 24,
+    opacity: 1,
+    strokeColor: '#000000',
+    fillColor: undefined as string | undefined,
+    roughness: 0.01,
+    strokeWidth: 3,
+    fillStyle: 'none' as CanvasElementFillStyle,
+    strokeLineDash: [0],
+    bowing: 0,
+  },
 };
 
 // History of prior canvas element stores for undo/redo.
@@ -222,7 +250,7 @@ const addCanvasFreehand =
     set((state) => {
       const allIds = [...state.allIds];
       const types = { ...state.types };
-      const fillColors = { ...state.fillColors };
+      const strokeColors = { ...state.strokeColors };
       const strokeWidths = { ...state.strokeWidths };
       const opacities = { ...state.opacities };
       const freehandPoints = { ...state.freehandPoints };
@@ -233,7 +261,7 @@ const addCanvasFreehand =
       const {
         id,
         type,
-        fillColor,
+        strokeColor,
         strokeWidth,
         opacity,
         freehandPoints: elemFreehandPoints,
@@ -241,7 +269,7 @@ const addCanvasFreehand =
       } = element;
       allIds.push(id);
       types[id] = type;
-      fillColors[id] = fillColor;
+      strokeColors[id] = strokeColor;
       strokeWidths[id] = strokeWidth;
       opacities[id] = opacity;
       freehandPoints[id] = elemFreehandPoints;
@@ -267,7 +295,7 @@ const addCanvasFreehand =
         ...state,
         allIds,
         types,
-        fillColors,
+        strokeColors,
         strokeWidths,
         opacities,
         freehandPoints,
@@ -422,6 +450,12 @@ const editCanvasElement =
         angles,
       };
     });
+
+const setToolOptions =
+  (set: SetState<CanvasElementState>) => (toolOptions: Partial<ToolOptions>) =>
+    set((state) => ({
+      toolOptions: { ...state.toolOptions, ...toolOptions },
+    }));
 
 /**
  * Removes the canvas element with the specfied state
@@ -639,6 +673,7 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   pushCanvasHistory: pushCanvasHistory(set),
   redoCanvasHistory: redoCanvasHistory(set),
   resetCanvas: resetCanvas(set),
+  setToolOptions: setToolOptions(set),
 }));
 export const useCanvasElementStore =
   createStoreWithSelectors(canvasElementStore);
