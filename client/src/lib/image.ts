@@ -261,18 +261,16 @@ export const initializeImageDimensions = (
  * @param showCursorImagePreview The flag indicating whether to show a cursor image preview.
  * @returns A Promise resolving to the inserted CanvasElement.
  */
-export const commitImageToCache = (
+export const commitImageToCache = <T extends Pick<CanvasElement, 'id'>>(
   file: BinaryFileData,
-  imageElement: CanvasElement,
-  editImageInState: (
+  imageElement?: T,
+  editImageInState?: (
     id: string,
     partialElement: Partial<CanvasElement>,
   ) => void,
   showCursorImagePreview?: boolean,
 ) =>
-  new Promise<CanvasElement>(async (resolve, reject) => {
-    const initImageElement = { ...imageElement, fileId: file.id };
-
+  new Promise<T>(async (resolve, reject) => {
     try {
       // Add image file data to the file cache
       fileCache.addFile(file.id, {
@@ -285,15 +283,18 @@ export const commitImageToCache = (
       const cachedImageData = imageCache.cache.get(file.id);
       // Update the image cache if not
       if (!cachedImageData) {
-        const fileIds = [initImageElement]
-          .map((element) => element.fileId ?? '')
-          .filter((id) => id);
+        // const fileIds = [initImageElement]
+        //   .map((element) => element.fileId ?? '')
+        //   .filter((id) => id);
+        const fileIds = [file.id];
         await _updateImageCache({
           imageCache,
           fileIds,
           files: fileCache.cache,
         });
       }
+      if (!(imageElement !== undefined && editImageInState !== undefined))
+        return;
 
       // If the image is still loading, wait for it to resolve
       if (cachedImageData?.image instanceof Promise) {

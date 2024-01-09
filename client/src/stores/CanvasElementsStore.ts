@@ -618,46 +618,7 @@ const setPendingImageElement =
 const setCanvasElementState =
   (set: SetState<CanvasElementState>) =>
   (newCanvasElementState: CanvasElementState) =>
-    set((state) => {
-      const {
-        allIds,
-        types,
-        strokeColors,
-        fillColors,
-        fontFamilies,
-        fontSizes,
-        bowings,
-        roughnesses,
-        strokeWidths,
-        strokeLineDashes,
-        fillStyles,
-        opacities,
-        roughElements,
-        freehandPoints,
-        p1,
-        p2,
-      } = newCanvasElementState;
-
-      return {
-        ...state,
-        allIds,
-        types,
-        strokeColors,
-        fillColors,
-        fontFamilies,
-        fontSizes,
-        bowings,
-        roughnesses,
-        strokeWidths,
-        fillStyles,
-        strokeLineDashes,
-        opacities,
-        roughElements,
-        freehandPoints,
-        p1,
-        p2,
-      };
-    });
+    set((state) => ({ ...state, ...newCanvasElementState }));
 
 /** Store Hook */
 const canvasElementStore = create<CanvasElementStore>()((set) => ({

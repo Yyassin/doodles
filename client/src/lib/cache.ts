@@ -29,6 +29,10 @@ class FileCache {
     return this.#cache;
   }
 
+  public set cache(newCache: Record<string, BinaryFileData>) {
+    this.#cache = newCache;
+  }
+
   /**
    * Adds the provided file to the cache, corresponding
    * to the specified id.
