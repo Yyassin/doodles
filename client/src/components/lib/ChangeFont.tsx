@@ -47,11 +47,16 @@ const mapFonts = {
  * to highlight the selected font.
  */
 const FontFamily = ({ tools }: { tools: fontType[] }) => {
-  const { textFontOptions, selectedElementIds } = useCanvasElementStore([
-    'textFontOptions',
-    'selectedElementIds',
-  ]);
+  const { textFontOptions, selectedElementIds, toolOptions } =
+    useCanvasElementStore([
+      'textFontOptions',
+      'selectedElementIds',
+      'toolOptions',
+    ]);
 
+  const interestValue = selectedElementIds[0]
+    ? textFontOptions[selectedElementIds[0]]
+    : toolOptions.textFontOptions;
   return (
     <div className="flex">
       {tools.map((toolName) => (
@@ -59,9 +64,7 @@ const FontFamily = ({ tools }: { tools: fontType[] }) => {
           <ToolButton
             customizabilityDict={{ textFontOption: mapFonts[toolName] }}
             label={toolName}
-            active={
-              textFontOptions[selectedElementIds[0]] === fontStyles[toolName]
-            }
+            active={interestValue === fontStyles[toolName]}
           >
             <div
               className="rounded-full"

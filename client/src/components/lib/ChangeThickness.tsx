@@ -34,11 +34,15 @@ const mapStroke = {
  * to highlight the selected tool.
  */
 const StrokeToolGroup = ({ tools }: { tools: strokeType[] }) => {
-  const { strokeWidths, selectedElementIds } = useCanvasElementStore([
-    'strokeWidths',
-    'selectedElementIds',
-  ]);
-
+  const { strokeWidths, selectedElementIds, toolOptions } =
+    useCanvasElementStore([
+      'strokeWidths',
+      'selectedElementIds',
+      'toolOptions',
+    ]);
+  const interestValue = selectedElementIds[0]
+    ? strokeWidths[selectedElementIds[0]]
+    : toolOptions.strokeWidth;
   return (
     <div className="flex">
       {tools.map((toolName) => (
@@ -46,7 +50,7 @@ const StrokeToolGroup = ({ tools }: { tools: strokeType[] }) => {
           <ToolButton
             customizabilityDict={{ strokeWidth: mapStroke[toolName] }}
             label={toolName}
-            active={strokeWidths[selectedElementIds[0]] === mapStroke[toolName]}
+            active={interestValue === mapStroke[toolName]}
           >
             <div className={'w-5 h-5 square-full ' + strokeMap[toolName]}></div>
           </ToolButton>

@@ -44,11 +44,15 @@ const mapStrokeColour = {
  * to highlight the selected tool.
  */
 const StokeColorToolGroup = ({ tools }: { tools: strokeColourType[] }) => {
-  const { strokeColors, selectedElementIds } = useCanvasElementStore([
-    'strokeColors',
-    'selectedElementIds',
-  ]);
-
+  const { strokeColors, selectedElementIds, toolOptions } =
+    useCanvasElementStore([
+      'strokeColors',
+      'selectedElementIds',
+      'toolOptions',
+    ]);
+  const interestValue = selectedElementIds[0]
+    ? strokeColors[selectedElementIds[0]]
+    : toolOptions.strokeColor;
   return (
     <div className="flex">
       {tools.map((toolName) => (
@@ -56,9 +60,7 @@ const StokeColorToolGroup = ({ tools }: { tools: strokeColourType[] }) => {
           <ToolButton
             customizabilityDict={{ strokeColor: mapStrokeColour[toolName] }}
             label={toolName}
-            active={
-              strokeColors[selectedElementIds[0]] === mapStrokeColour[toolName]
-            }
+            active={interestValue === mapStrokeColour[toolName]}
           >
             <div
               className={'w-5 h-5 rounded-full ' + strokeColorMap[toolName]}

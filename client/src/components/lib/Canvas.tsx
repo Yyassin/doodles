@@ -363,16 +363,12 @@ export default function Canvas() {
         tool,
         points,
         {
+          // These require renaming because I was an idiot
           stroke: toolOptions.strokeColor,
           font: toolOptions.textFontOptions,
           size: toolOptions.textSize,
           fill: toolOptions.fillColor,
-          bowing: toolOptions.bowing,
-          roughness: toolOptions.roughness,
-          strokeWidth: toolOptions.strokeWidth,
-          fillStyle: toolOptions.fillStyle,
-          strokeLineDash: toolOptions.strokeLineDashes,
-          opacity: toolOptions.opacities,
+          ...toolOptions,
         },
       );
       if (tool === 'text') {

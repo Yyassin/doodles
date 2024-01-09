@@ -63,7 +63,7 @@ const ToolButton = ({
     p1,
     p2,
     textStrings,
-    toolOptions,
+    setToolOptions,
   } = useCanvasElementStore([
     'editCanvasElement',
     'pushCanvasHistory',
@@ -85,7 +85,7 @@ const ToolButton = ({
     'p2',
     'textStrings',
     'textFontOptions',
-    'toolOptions',
+    'setToolOptions',
   ]);
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
@@ -93,31 +93,7 @@ const ToolButton = ({
     console.log(selectedElementIds[0]);
     // A new and customized element will be drawn
     if (selectedElementIds[0] === undefined) {
-      toolOptions.strokeColor =
-        customizabilityDict.strokeColor ?? toolOptions.strokeColor;
-
-      toolOptions.fillColor =
-        customizabilityDict.fillColor ?? toolOptions.fillColor;
-
-      toolOptions.fillStyle =
-        customizabilityDict.fillStyle ?? toolOptions.fillStyle;
-
-      toolOptions.textSize =
-        customizabilityDict.textSize ?? toolOptions.textSize;
-
-      toolOptions.textFontOptions =
-        customizabilityDict.textFontOption ?? toolOptions.textFontOptions;
-
-      toolOptions.bowing = customizabilityDict.bowing ?? toolOptions.bowing;
-
-      toolOptions.strokeWidth =
-        customizabilityDict.strokeWidth ?? toolOptions.strokeWidth;
-
-      toolOptions.roughness =
-        customizabilityDict.roughness ?? toolOptions.roughness;
-
-      toolOptions.opacities =
-        customizabilityDict.opacity ?? toolOptions.opacities;
+      setToolOptions(customizabilityDict);
     } // An element is selected.
     else {
       const selectedElementId = selectedElementIds[0];

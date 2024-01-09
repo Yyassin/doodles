@@ -37,7 +37,7 @@ export interface CanvasElement {
 }
 
 //Default customizability options
-export interface options {
+export interface ToolOptions {
   strokeColor: string;
   fillColor: string | undefined;
   textFontOptions: string;
@@ -45,8 +45,8 @@ export interface options {
   roughness: number;
   strokeWidth: number;
   fillStyle: CanvasElementFillStyle;
-  strokeLineDashes: number[];
-  opacities: number;
+  strokeLineDash: number[];
+  opacity: number;
   bowing: number;
 }
 
@@ -76,7 +76,7 @@ export interface CanvasElementState {
   fileIds: Record<string, CanvasElement['fileId']>;
   isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
   angles: Record<string, CanvasElement['angle']>;
-  toolOptions: options;
+  toolOptions: ToolOptions;
 }
 
 interface CanvasElementActions {
@@ -98,6 +98,7 @@ interface CanvasElementActions {
   setSelectionFrame: (
     selectionFrame: Partial<Pick<CanvasElement, 'p1' | 'p2'>> | null,
   ) => void;
+  setToolOptions: (toolOptions: Partial<ToolOptions>) => void;
 }
 type CanvasElementStore = CanvasElementState & CanvasElementActions;
 
@@ -131,13 +132,13 @@ export const initialCanvasElementState: CanvasElementState = {
   toolOptions: {
     textFontOptions: 'trebuchet MS',
     textSize: 24,
-    opacities: 1,
+    opacity: 1,
     strokeColor: '#000000',
     fillColor: undefined as string | undefined,
     roughness: 0.01,
     strokeWidth: 3,
     fillStyle: 'none' as CanvasElementFillStyle,
-    strokeLineDashes: [0],
+    strokeLineDash: [0],
     bowing: 0,
   },
 };
@@ -451,10 +452,11 @@ const editCanvasElement =
       };
     });
 
-const setToolOptions = (set: SetState<CanvasElementState>) =>
-  set((state) => ({
-    ...state,
-  }));
+const setToolOptions =
+  (set: SetState<CanvasElementState>) => (toolOptions: Partial<ToolOptions>) =>
+    set((state) => ({
+      toolOptions: { ...state.toolOptions, ...toolOptions },
+    }));
 
 /**
  * Removes the canvas element with the specfied state
