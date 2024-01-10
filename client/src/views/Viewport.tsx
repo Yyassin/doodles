@@ -46,46 +46,95 @@ const Viewport = () => {
           backgroundColor: 'transparent',
         }}
       >
-        <ToolBar />
-        {/* Only show the toolbar is an element is selected */}
-        {(selectedElementIds.length === 1 || isDrawingSelected) && (
-          <CustomToolbar />
-        )}
-        <DropDownMenu viewportRef={viewportRef} />
-
-        <div
-          className="flex gap-[0.5rem]"
-          style={{
-            position: 'absolute',
-            bottom: '1rem',
-            left: '1rem',
-          }}
-        >
-          <ZoomButtons />
-          <UndoRedoButtons />
-          <FullScreenButton viewportRef={viewportRef} />
-          <ShareScreenButton />
-          {IS_ELECTRON_INSTANCE && <TransparencyButton />}
-        </div>
-
-        {/* Temp */}
-        <button
-          style={{
-            position: 'absolute',
-            left: '1rem',
-            top: `calc(1rem + ${
-              IS_ELECTRON_INSTANCE && isTransparent ? '30px' : '0px'
-            })`,
-          }}
-          onClick={() => setMode('dashboard')}
-        >
-          Dashboard
-        </button>
         <RadixContextMenu.Trigger>
           <ShareScreen />
           <Canvas />
           <StableDiffusionSheet />
         </RadixContextMenu.Trigger>
+        <div
+          className="flex flex-col"
+          style={{
+            height: '100%',
+            width: '100%',
+          }}
+        >
+          <div
+            className="flex flex-row justify-between"
+            style={{
+              backgroundColor: 'grey',
+              flexGrow: 1,
+              zIndex: 10,
+            }}
+          >
+            <div className="flex flex-row">
+              <div className="flex flex-row">
+                <div>Some Icon</div>
+                <div className="flex flex-col">
+                  <p>Sieve Principle Visuals</p>
+                  <p>Last Edited: September 23, 2023</p>
+                </div>
+              </div>
+            </div>
+            <div>Other Stuff</div>
+          </div>
+          <div
+            style={{
+              backgroundColor: 'transparent',
+              flexGrow: 90,
+            }}
+          >
+            <RadixContextMenu.Root>
+              <div
+                id="Viewport"
+                className="select-none"
+                ref={viewportRef}
+                style={{
+                  position: 'relative',
+                  height: '100%',
+                  width: '100%',
+                  backgroundColor: 'transparent',
+                }}
+              >
+                <ToolBar />
+                {/* Only show the toolbar is an element is selected */}
+                {(selectedElementIds.length === 1 || isDrawingSelected) && (
+                  <CustomToolbar />
+                )}
+                <DropDownMenu viewportRef={viewportRef} />
+
+                <div
+                  className="flex gap-[0.5rem] z-10"
+                  style={{
+                    position: 'absolute',
+                    bottom: '1rem',
+                    left: '1rem',
+                  }}
+                >
+                  <ZoomButtons />
+                  <UndoRedoButtons />
+                  <FullScreenButton viewportRef={viewportRef} />
+                  <ShareScreenButton />
+                  {IS_ELECTRON_INSTANCE && <TransparencyButton />}
+                </div>
+
+                {/* Temp */}
+                <button
+                  style={{
+                    position: 'absolute',
+                    left: '1rem',
+                    top: `calc(1rem + ${
+                      IS_ELECTRON_INSTANCE && isTransparent ? '30px' : '0px'
+                    })`,
+                  }}
+                  onClick={() => setMode('dashboard')}
+                >
+                  Dashboard
+                </button>
+              </div>
+              <ContextMenu />
+            </RadixContextMenu.Root>
+          </div>
+        </div>
       </div>
       <ContextMenu />
     </RadixContextMenu.Root>

@@ -44,7 +44,7 @@ const DropDownMenu = ({
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          className="rounded-md w-[25px] h-[25px] inline-flex items-center justify-center text-violet11 bg-white outline outline-offset-2 outline-indigo-400 hover:bg-violet3"
+          className="rounded-md w-[25px] h-[25px] inline-flex items-center justify-center text-violet11 bg-white outline outline-offset-2 outline-indigo-400 hover:bg-violet3 z-10"
           style={{
             position: 'absolute',
             top: `calc(1rem + ${

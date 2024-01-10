@@ -16,22 +16,17 @@ function App() {
     const radixThemes = document.getElementsByClassName(
       'radix-themes',
     )[0] as HTMLElement;
-    if (IS_ELECTRON_INSTANCE && isTransparent) {
-      root && (root.style.height = '100%');
-      radixThemes && (radixThemes.style.height = '100%');
-    } else {
-      root && (root.style.height = '');
-      radixThemes && (radixThemes.style.height = '100%');
-    }
-  }, [isTransparent]);
+    root && (root.style.height = '100%');
+    radixThemes && (radixThemes.style.height = '100%');
+  }, []);
 
   return (
     <div
       style={{
         backgroundColor: 'transparent',
+        height: '100%',
         // Add border when transparent
         ...(isTransparent && {
-          height: '100%',
           boxShadow: `0px 0px 0px 2px rgba(129, 140, 248, ${
             isWindowActive ? 0.8 : 0.5
           }) inset`,

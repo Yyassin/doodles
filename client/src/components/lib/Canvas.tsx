@@ -609,6 +609,8 @@ export default function Canvas() {
         id="canvas"
         style={{
           backgroundColor: 'transparent',
+          position: 'absolute',
+          zIndex: 5,
         }}
         width={appWidth}
         height={appHeight}

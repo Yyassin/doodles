@@ -53,7 +53,7 @@ const CustomToolbar = () => {
     'selectedElementIds',
   ]);
   return (
-    <Toolbar.Root className="p-[0.3rem] gap-[0.3rem] min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] mt-40 absolute ml-3">
+    <Toolbar.Root className="p-[0.3rem] gap-[0.3rem] min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] mt-40 absolute ml-3 z-10">
       {/* Stroke Color */}
       {(strokeColorSet.has(types[selectedElementIds[0]]) ||
         strokeColorSet.has(tool)) && (
