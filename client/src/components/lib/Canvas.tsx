@@ -412,15 +412,11 @@ export default function Canvas() {
         action === 'drawing'
           ? currentDrawingElemId.current
           : selectedElementIds[0];
-      const { x1, y1, x2, y2 } = adjustElementCoordinatesById(
-        id,
-        {
-          p1,
-          p2,
-          types,
-        },
-        types[id] === 'image',
-      );
+      const { x1, y1, x2, y2 } = adjustElementCoordinatesById(id, {
+        p1,
+        p2,
+        types,
+      });
       updateElement(id, x1, y1, x2, y2, types[id]);
     }
 

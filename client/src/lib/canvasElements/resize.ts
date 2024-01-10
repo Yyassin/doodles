@@ -169,17 +169,8 @@ export const adjustElementCoordinatesById = (
     p2: Record<string, CanvasElement['p2']>;
     types: Record<string, CanvasElement['type']>;
   },
-  skip = false,
 ) => {
   const { p1, p2, types } = appState;
-  if (skip) {
-    return {
-      x1: p1[elementId].x,
-      y1: p1[elementId].y,
-      x2: p2[elementId].x,
-      y2: p2[elementId].y,
-    };
-  }
   return adjustElementCoordinates(
     p1[elementId],
     p2[elementId],
