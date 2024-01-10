@@ -109,3 +109,17 @@ export const debounce = <T extends unknown[]>(
  */
 export const isDrawingTool = (tool: AppTool): tool is DrawingTool =>
   drawingToolsSet.has(tool as DrawingTool);
+
+/**
+ * Retrieves the initials for the provided name. If
+ * the name is only one word, returns the first initial.
+ * @param name The name to retrieve the initials for.
+ * @returns The initials.
+ */
+export const getInitials = (name: string) => {
+  const words = name.split(' ');
+  if (words.length === 1) {
+    return words[0][0].toUpperCase();
+  }
+  return words.map((word) => word[0].toUpperCase()).join('');
+};

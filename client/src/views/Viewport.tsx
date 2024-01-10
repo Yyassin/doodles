@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Canvas from '@/components/lib/Canvas';
 import DropDownMenu from '@/components/lib/DropDownMenu';
 import ToolBar from '@/components/lib/ToolBar';
@@ -15,7 +15,102 @@ import ShareScreenButton from '@/components/lib/ShareScreenButton';
 import TransparencyButton from '@/components/lib/TransparencyButton';
 import { IS_ELECTRON_INSTANCE } from '@/constants';
 import StableDiffusionSheet from '@/components/lib/StableDiffusion/StableDiffusionSheet';
-import { isDrawingTool } from '@/lib/misc';
+import { getInitials, isDrawingTool } from '@/lib/misc';
+import { ArrowLeftIcon, ChatBubbleIcon } from '@radix-ui/react-icons';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+import { Users2Icon } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import CanvasTooltip from '@/components/lib/CanvasTooltip';
+
+interface User {
+  username: string;
+  initials: string;
+  avatar: string;
+  outlineColor?: string; // Add an optional 'outlineColor' property
+}
+
+const UserList = ({ users }: { users: User[] }) => {
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+
+  const handleAvatarHover = (index: number) => {
+    setFocusedIndex(index);
+  };
+
+  const handleAvatarLeave = () => {
+    setFocusedIndex(null);
+  };
+
+  return (
+    <div className="flex items-center">
+      {users.map((user, index) => {
+        const outlineColour = user.outlineColor
+          ? `border-2 border-${user.outlineColor}`
+          : '';
+        return (
+          <div
+            key={index}
+            className={`relative transition-transform transform ${
+              focusedIndex !== null && focusedIndex !== index
+                ? index > focusedIndex
+                  ? 'translate-x-6 -ml-3'
+                  : '-translate-x-6 -ml-3'
+                : '-ml-3'
+            } `}
+            onMouseEnter={() => handleAvatarHover(index)}
+            onMouseLeave={handleAvatarLeave}
+          >
+            <CanvasTooltip
+              className="radix-themes-custom-fonts"
+              content={user.username}
+              side="bottom"
+              sideOffset={5}
+            >
+              <Avatar
+                className={`cursor-pointer ${
+                  focusedIndex === index ? 'transform scale-125' : ''
+                } ${outlineColour}`}
+              >
+                <AvatarImage src={user.avatar} />
+                <AvatarFallback>{user.initials}</AvatarFallback>
+              </Avatar>
+            </CanvasTooltip>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const username = 'Yousef Yassin';
+const avatar = 'https://github.com/shadcn.png';
+const users = [
+  {
+    username,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'indigo-300',
+  },
+  {
+    username,
+    avatar: '',
+    initials: getInitials(username),
+    outlineColor: 'red-500',
+  },
+  {
+    username,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'indigo-300',
+  },
+  {
+    username,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'red-500',
+  },
+];
 
 /**
  * Primary viewport that houses the canvas
@@ -24,11 +119,7 @@ import { isDrawingTool } from '@/lib/misc';
  * @authors Yousef Yassin
  */
 const Viewport = () => {
-  const { setMode, tool, isTransparent } = useAppStore([
-    'setMode',
-    'tool',
-    'isTransparent',
-  ]);
+  const { setMode, tool } = useAppStore(['setMode', 'tool']);
   const viewportRef = useRef<HTMLDivElement>(null);
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
   const isDrawingSelected = isDrawingTool(tool);
@@ -59,24 +150,62 @@ const Viewport = () => {
           }}
         >
           <div
-            className="flex flex-row justify-between"
+            className="flex flex-row justify-between items-center p-[0.5rem]"
             style={{
-              backgroundColor: 'grey',
+              backgroundColor: 'white',
               flexGrow: 1,
               zIndex: 10,
             }}
           >
             <div className="flex flex-row">
               <div className="flex flex-row">
-                <div>Some Icon</div>
+                <div
+                  className="flex items-center pr-[1.5rem] pl-[0.5rem]"
+                  style={{
+                    height: '100%',
+                  }}
+                >
+                  <Button
+                    variant="secondary"
+                    className="border-solid border-2 border-indigo-300 px-3 py-2"
+                    onClick={() => setMode('dashboard')}
+                  >
+                    <span className="sr-only">Show history</span>
+                    <ArrowLeftIcon className="h-4 w-4 stroke-indigo-300" />
+                  </Button>
+                </div>
                 <div className="flex flex-col">
-                  <p>Sieve Principle Visuals</p>
-                  <p>Last Edited: September 23, 2023</p>
+                  <h2 className="text-xl font-semibold tracking-tight">
+                    Sieve Principle Visuals
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Last Edited: September 23, 2023
+                  </p>
                 </div>
               </div>
             </div>
-            <div>Other Stuff</div>
+            <div className="flex flex-row gap-12 items-center">
+              <UserList users={users} />
+              <Button
+                variant="secondary"
+                className="border-solid border-2 border-indigo-300 px-3 py-2"
+                onClick={() => console.log('open the chat')}
+              >
+                <ChatBubbleIcon className="h-4 w-4 stroke-indigo-300" />
+              </Button>
+              <Button
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'h-9 w-90 bg-muted text-muted-foreground hover:bg-muted hover:text-black justify-start items-center',
+                )}
+              >
+                <Users2Icon className="h-4 w-4 mr-2" />
+                <span className="ml-auto  text-black">Share</span>
+              </Button>
+            </div>
           </div>
+          <Separator />
+
           <div
             style={{
               backgroundColor: 'transparent',
@@ -116,20 +245,6 @@ const Viewport = () => {
                   <ShareScreenButton />
                   {IS_ELECTRON_INSTANCE && <TransparencyButton />}
                 </div>
-
-                {/* Temp */}
-                <button
-                  style={{
-                    position: 'absolute',
-                    left: '1rem',
-                    top: `calc(1rem + ${
-                      IS_ELECTRON_INSTANCE && isTransparent ? '30px' : '0px'
-                    })`,
-                  }}
-                  onClick={() => setMode('dashboard')}
-                >
-                  Dashboard
-                </button>
               </div>
               <ContextMenu />
             </RadixContextMenu.Root>
