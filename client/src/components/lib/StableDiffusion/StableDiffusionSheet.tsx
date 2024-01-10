@@ -36,13 +36,10 @@ const StableDiffusionSheet = () => {
       'addCanvasShape',
       'editCanvasElement',
     ]);
-  const { isUsingStableDiffusion, setIsUsingStableDiffusion, zoom, appHeight } =
-    useAppStore([
-      'isUsingStableDiffusion',
-      'setIsUsingStableDiffusion',
-      'zoom',
-      'appHeight',
-    ]);
+  const { isUsingStableDiffusion, setIsUsingStableDiffusion } = useAppStore([
+    'isUsingStableDiffusion',
+    'setIsUsingStableDiffusion',
+  ]);
   const { canvasColor, setTool } = useAppStore(['canvasColor', 'setTool']);
   const {
     selectedElementIds,
@@ -219,7 +216,6 @@ const StableDiffusionSheet = () => {
                   imageFile,
                   addCanvasShape,
                   editCanvasElement,
-                  { zoom, appHeight },
                   true,
                 );
                 // And let the user place the image

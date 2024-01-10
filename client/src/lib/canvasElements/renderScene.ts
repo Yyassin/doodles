@@ -122,14 +122,23 @@ export const renderCanvasElements = (
       }
     } else if (type === 'image') {
       if (isImagePlaceds[id]) {
-        const [width, height] = [Math.abs(x2 - x1), Math.abs(y2 - y1)];
-
+        const [width, height] = [x2 - x1, y2 - y1];
         const imgFileId = fileIds[id];
         const img = imgFileId
           ? imageCache.cache.get(imgFileId)?.image
           : undefined;
         if (img !== undefined && !(img instanceof Promise)) {
           ctx.drawImage(img, x1, y1, width, height);
+          // const sX = Math.sign(width);
+          // const sY = Math.sign(height);
+          // ctx.scale(sX, sY);
+          // ctx.drawImage(
+          //   img,
+          //   sX * x1,
+          //   sY * y1,
+          //   Math.abs(width),
+          //   Math.abs(height),
+          // );
         } else {
           drawImagePlaceholder(width, height, ctx);
         }

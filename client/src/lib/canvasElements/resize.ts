@@ -125,8 +125,8 @@ export const adjustElementCoordinates = (
   p2: Vector2,
   elementType: CanvasElement['type'],
 ) => {
-  const { x: x1, y: y1 } = p1;
-  const { x: x2, y: y2 } = p2;
+  let { x: x1, y: y1 } = p1;
+  let { x: x2, y: y2 } = p2;
 
   if (
     elementType === 'rectangle' ||
@@ -134,13 +134,11 @@ export const adjustElementCoordinates = (
     elementType === 'image' ||
     elementType === 'freehand'
   ) {
-    const minX = Math.min(x1, x2);
-    const maxX = Math.max(x1, x2);
-    const minY = Math.min(y1, y2);
-    const maxY = Math.max(y1, y2);
+    [x1, x2] = [x1, x2].sort((a, b) => a - b);
+    [y1, y2] = [y1, y2].sort((a, b) => a - b);
 
-    // x1, x2 is top left (so min in both)
-    return { x1: minX, y1: minY, x2: maxX, y2: maxY };
+    // x1, y1 is top left (so min in both)
+    return { x1, y1, x2, y2 };
   } else {
     // This is a line. We make the left most, or
     // top most point (x1, y1).

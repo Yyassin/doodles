@@ -93,6 +93,8 @@ describe('WebSocketManager', () => {
 
   beforeEach(() => {
     webSocketManager = WebSocketManager.Instance;
+    // Simplifies counting for tests.
+    webSocketManager.shouldNotify = false;
   });
 
   afterEach(() => {

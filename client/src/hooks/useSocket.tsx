@@ -7,6 +7,9 @@ import {
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/stores/AuthStore';
+import { fileCache } from '@/lib/cache';
+import { dataURLToFile } from '@/lib/bytes';
+import { commitImageToCache, isSupportedImageFile } from '@/lib/image';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -49,6 +52,7 @@ export const useSocket = () => {
     p1,
     p2,
     textStrings,
+    fileIds,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -74,6 +78,7 @@ export const useSocket = () => {
     'p1',
     'p2',
     'textStrings',
+    'fileIds',
   ]);
 
   const socket = useRef<WebsocketClient>();
@@ -104,8 +109,31 @@ export const useSocket = () => {
           angle: element.angle,
         },
       );
-      addCanvasShape(newElement);
-      pushCanvasHistory();
+
+      if (element.type === 'image' && element.imgDataURL) {
+        // Add the file to the cache, and set the image as placed
+        newElement.isImagePlaced = true;
+        const imageFile = dataURLToFile(element.imgDataURL);
+        if (!isSupportedImageFile(imageFile)) {
+          throw new Error('Unsupported image type.');
+        }
+        addCanvasShape(newElement);
+        commitImageToCache(
+          {
+            mimeType: imageFile.type,
+            id: element.id,
+            dataURL: element.imgDataURL,
+            created: Date.now(),
+            lastRetrieved: Date.now(),
+          },
+          newElement,
+          editCanvasElement,
+          false,
+        ).then(pushCanvasHistory);
+      } else {
+        addCanvasShape(newElement);
+        pushCanvasHistory();
+      }
     },
     addCanvasFreehand: (element: CanvasElement) => {
       const newElement = createElement(
@@ -132,6 +160,7 @@ export const useSocket = () => {
         },
         true,
       );
+
       addCanvasFreehand(newElement);
       pushCanvasHistory();
     },
@@ -202,7 +231,49 @@ export const useSocket = () => {
     }
   }, [roomID]);
 
-  // Send message once action gets set. Note: will be changed
+  const processWebsocketAction = async (id: string) => {
+    //Create element to send to other sockets in room
+    const element = createElement(
+      id,
+      p1[id].x,
+      p1[id].y,
+      p2[id].x,
+      p2[id].y,
+      types[id],
+      freehandPoints[id],
+      {
+        stroke: strokeColors[id],
+        fill: fillColors[id],
+        font: fontFamilies[id],
+        size: fontSizes[id],
+        bowing: bowings[id],
+        roughness: roughnesses[id],
+        strokeWidth: strokeWidths[id],
+        fillStyle: fillStyles[id],
+        strokeLineDash: strokeLineDashes[id],
+        opacity: opacities[id],
+        text: textStrings[id],
+        angle: angles[id],
+      },
+      true,
+    );
+
+    if (element.type === 'image') {
+      const imageFileId = fileIds[id];
+      const imageFile = fileCache.cache[imageFileId ?? ''];
+      if (imageFileId === undefined || imageFile === undefined) {
+        throw new Error('Image file not found for transmision');
+      }
+      const imgDataURL = imageFile.dataURL;
+      element.imgDataURL = imgDataURL;
+    }
+
+    delete element.roughElement;
+    socket.current?.sendMsgRoom(action, element);
+    setWebsocketAction('', '');
+  };
+
+  // Send message once action gets set.
   useEffect(() => {
     if (actionElementID === '') return;
 
@@ -218,36 +289,7 @@ export const useSocket = () => {
       setWebsocketAction('', '');
       return;
     }
-
-    //Create element to send to other sockets in room
-    const element = createElement(
-      actionElementID,
-      p1[actionElementID].x,
-      p1[actionElementID].y,
-      p2[actionElementID].x,
-      p2[actionElementID].y,
-      types[actionElementID],
-      freehandPoints[actionElementID],
-      {
-        stroke: strokeColors[actionElementID],
-        fill: fillColors[actionElementID],
-        font: fontFamilies[actionElementID],
-        size: fontSizes[actionElementID],
-        bowing: bowings[actionElementID],
-        roughness: roughnesses[actionElementID],
-        strokeWidth: strokeWidths[actionElementID],
-        fillStyle: fillStyles[actionElementID],
-        strokeLineDash: strokeLineDashes[actionElementID],
-        opacity: opacities[actionElementID],
-        text: textStrings[actionElementID],
-        angle: angles[actionElementID],
-      },
-      true,
-    );
-
-    delete element.roughElement;
-    socket.current?.sendMsgRoom(action, element);
-    setWebsocketAction('', '');
+    processWebsocketAction(actionElementID);
   }, [
     actionElementID,
     action,

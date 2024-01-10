@@ -8,6 +8,9 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import saveAs from 'file-saver';
+import { fileCache } from '@/lib/cache';
+import { BinaryFileData } from '@/types';
+import { commitImageToCache } from '@/lib/image';
 
 /**
  * Component that the save and load button with their functionality in the drop down menu in the canavas
@@ -35,6 +38,12 @@ export const SaveOpenDropDownMenu = () => {
     freehandPoints,
     p1,
     p2,
+    editCanvasElement,
+    textStrings,
+    isImagePlaceds,
+    freehandBounds,
+    angles,
+    fileIds,
   } = useCanvasElementStore([
     'setCanvasElementState',
     'allIds',
@@ -52,6 +61,12 @@ export const SaveOpenDropDownMenu = () => {
     'freehandPoints',
     'p1',
     'p2',
+    'editCanvasElement',
+    'textStrings',
+    'isImagePlaceds',
+    'freehandBounds',
+    'angles',
+    'fileIds',
   ]);
 
   /**
@@ -75,7 +90,10 @@ export const SaveOpenDropDownMenu = () => {
     reader.readAsText(file[0]);
 
     reader.onload = () => {
-      const state: CanvasElementState = JSON.parse(reader.result as string);
+      const { fileData, ...state } = JSON.parse(
+        reader.result as string,
+      ) as CanvasElementState & { fileData: Record<string, BinaryFileData> };
+
       const roughElements: Record<string, CanvasElement['roughElement']> = {};
 
       //create the roughElements
@@ -107,7 +125,28 @@ export const SaveOpenDropDownMenu = () => {
         ).roughElement;
       }
       state.roughElements = roughElements;
+      // Reset all fileIds, they will get get set to show the imageswhen they resolve.
+      const fileIds = state.fileIds;
+      state.fileIds = {};
       setCanvasElementState(state);
+
+      // Populate the cache and images asynchronously
+      Object.entries(fileIds).forEach(([elemId, fileId]) => {
+        const binary = fileId && fileData[fileId];
+        if (!binary) throw new Error('Failed to resolve saved binary images');
+
+        const imageElement = { id: elemId };
+        commitImageToCache(
+          {
+            ...fileData[fileId],
+            lastRetrieved: Date.now(),
+          },
+          imageElement,
+          // Will set fileIds, triggering a rerender. A placeholder
+          // will be shown in the mean time.
+          editCanvasElement,
+        );
+      });
     };
   };
 
@@ -115,7 +154,7 @@ export const SaveOpenDropDownMenu = () => {
    * Serializes the data and saves it to local disk
    */
   const handleSave = () => {
-    const serializedState = JSON.stringify({
+    const state = {
       allIds,
       types,
       strokeColors,
@@ -131,7 +170,14 @@ export const SaveOpenDropDownMenu = () => {
       freehandPoints,
       p1,
       p2,
-    });
+      textStrings,
+      isImagePlaceds,
+      freehandBounds,
+      angles,
+      fileIds,
+      fileData: fileCache.cache,
+    };
+    const serializedState = JSON.stringify(state);
 
     const blob = new Blob([serializedState], {
       type: 'text/plain;charset=utf-8',
@@ -140,7 +186,7 @@ export const SaveOpenDropDownMenu = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <input
         type="file"
         ref={fileInputRef}
@@ -163,6 +209,6 @@ export const SaveOpenDropDownMenu = () => {
       >
         <DownloadIcon /> Save
       </DropdownMenu.Item>
-    </React.Fragment>
+    </>
   );
 };
