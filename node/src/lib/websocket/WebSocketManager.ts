@@ -36,11 +36,16 @@ export type WSCallback = ({
   #sockets = {} as Record<string, Record<string, WebSocket>>;
   #logger = new Logger(WebSocketManager.name, LOG_LEVEL);
   callbacks = {} as Record<string, WSCallback>;
+  #shouldNotify = true;
 
   /** Creates a new WebSocket Manager instance */
   constructor() {
     super();
     this.#logger.debug('Instantiated.');
+  }
+
+  public set shouldNotify(shouldNotify: boolean) {
+    this.#shouldNotify = shouldNotify;
   }
 
   /**
@@ -56,11 +61,12 @@ export type WSCallback = ({
         return sendErrorResponse(socket, 'Socket already in room!');
       }
       this.sockets[room][id] = socket;
-      this.handleMsg(socket, undefined, {
-        topic: WS_TOPICS.NOTIFY_JOIN_ROOM,
-        room,
-        payload: { id },
-      });
+      this.#shouldNotify &&
+        this.handleMsg(socket, undefined, {
+          topic: WS_TOPICS.NOTIFY_JOIN_ROOM,
+          room,
+          payload: { id },
+        });
       return sendSuccessResponse(socket, 'Socket joined room!');
     });
     // Remove socket from room
@@ -71,11 +77,12 @@ export type WSCallback = ({
         return sendErrorResponse(socket, 'Socket already is not room!');
       }
       delete this.sockets[room][id];
-      this.handleMsg(socket, undefined, {
-        topic: WS_TOPICS.NOTIFY_LEAVE_ROOM,
-        room,
-        payload: { id },
-      });
+      this.#shouldNotify &&
+        this.handleMsg(socket, undefined, {
+          topic: WS_TOPICS.NOTIFY_LEAVE_ROOM,
+          room,
+          payload: { id },
+        });
       return sendSuccessResponse(socket, 'Socket left room!');
     });
     this.initWSS(server);

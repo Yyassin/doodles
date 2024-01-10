@@ -8,7 +8,7 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import saveAs from 'file-saver';
-import { fileCache, imageCache } from '@/lib/cache';
+import { fileCache } from '@/lib/cache';
 import { BinaryFileData } from '@/types';
 import { commitImageToCache } from '@/lib/image';
 
