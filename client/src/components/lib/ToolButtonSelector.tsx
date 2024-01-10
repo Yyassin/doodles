@@ -88,6 +88,7 @@ const ToolButton = ({
     if (selectedElementId === undefined) {
       // If no element is selected, then set the tool options
       setToolOptions(customizabilityDict);
+      return;
     }
     const { roughElement, fillColor } = createElement(
       selectedElementId,

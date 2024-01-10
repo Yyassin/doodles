@@ -56,8 +56,14 @@ const getElementsWithinFrame = (
   const { elementIds, p1, p2, angles } = appState;
 
   // Destructure coordinates of the frame
-  const { x: frameX1, y: frameY1 } = frame.p1;
-  const { x: frameX2, y: frameY2 } = frame.p2;
+  let { x: frameX1, y: frameY1 } = frame.p1;
+  let { x: frameX2, y: frameY2 } = frame.p2;
+
+  // Adjust the coordinates so that x1 < x2 and y1 < y2
+  // this is needed in case we draw the frame from right to left or bottom to top and
+  // simplifies the logic of checking whether an element is within the frame
+  [frameX1, frameX2] = [frameX1, frameX2].sort((a, b) => a - b);
+  [frameY1, frameY2] = [frameY1, frameY2].sort((a, b) => a - b);
 
   // Filter element IDs based on whether their positions fall within the frame
   return elementIds.filter((id) => {
