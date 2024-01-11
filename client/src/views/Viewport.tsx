@@ -23,9 +23,11 @@ import { cn } from '@/lib/utils';
 import { Users2Icon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import CanvasTooltip from '@/components/lib/CanvasTooltip';
+import ShareBoardDialog from '@/components/lib/ShareBoardDialog';
 
-interface User {
+export interface User {
   username: string;
+  email: string;
   initials: string;
   avatar: string;
   outlineColor?: string; // Add an optional 'outlineColor' property
@@ -44,71 +46,94 @@ const UserList = ({ users }: { users: User[] }) => {
 
   return (
     <div className="flex items-center">
-      {users.map((user, index) => {
-        const outlineColour = user.outlineColor
-          ? `border-2 border-${user.outlineColor}`
-          : '';
-        return (
-          <div
-            key={index}
-            className={`relative transition-transform transform ${
-              focusedIndex !== null && focusedIndex !== index
-                ? index > focusedIndex
-                  ? 'translate-x-6 -ml-3'
-                  : '-translate-x-6 -ml-3'
-                : '-ml-3'
-            } `}
-            onMouseEnter={() => handleAvatarHover(index)}
-            onMouseLeave={handleAvatarLeave}
+      {users.map((user, index) => (
+        <div
+          key={index}
+          className={`relative transition-transform transform ${
+            focusedIndex !== null && focusedIndex !== index
+              ? index > focusedIndex
+                ? 'translate-x-6 -ml-3'
+                : '-translate-x-6 -ml-3'
+              : '-ml-3'
+          } `}
+        >
+          <CanvasTooltip
+            className="radix-themes-custom-fonts"
+            content={user.username}
+            side="bottom"
+            sideOffset={5}
           >
-            <CanvasTooltip
-              className="radix-themes-custom-fonts"
-              content={user.username}
-              side="bottom"
-              sideOffset={5}
+            <Avatar
+              className={`cursor-pointer ${
+                focusedIndex === index ? 'transform scale-125' : ''
+              } ${
+                user.outlineColor ? `border-[0.2rem] ${user.outlineColor}` : ''
+              }`}
+              onMouseEnter={() => handleAvatarHover(index)}
+              onMouseLeave={handleAvatarLeave}
             >
-              <Avatar
-                className={`cursor-pointer ${
-                  focusedIndex === index ? 'transform scale-125' : ''
-                } ${outlineColour}`}
-              >
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback>{user.initials}</AvatarFallback>
-              </Avatar>
-            </CanvasTooltip>
-          </div>
-        );
-      })}
+              <AvatarImage src={user.avatar} />
+              <AvatarFallback>{user.initials}</AvatarFallback>
+            </Avatar>
+          </CanvasTooltip>
+        </div>
+      ))}
     </div>
   );
 };
 
 const username = 'Yousef Yassin';
+const email = 'yousefyassin@cmail.carleton.ca';
 const avatar = 'https://github.com/shadcn.png';
 const users = [
   {
     username,
+    email,
     avatar,
     initials: getInitials(username),
-    outlineColor: 'indigo-300',
+    outlineColor: 'border-[#0000ff]',
   },
   {
     username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#0f0f00]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#ff0000]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#ff0000]',
+  },
+  {
+    username,
+    email,
     avatar: '',
     initials: getInitials(username),
-    outlineColor: 'red-500',
+    outlineColor: 'border-[#323232]',
   },
   {
     username,
+    email,
     avatar,
     initials: getInitials(username),
-    outlineColor: 'indigo-300',
+    outlineColor: 'border-[#243c5a]',
   },
   {
     username,
+    email,
     avatar,
     initials: getInitials(username),
-    outlineColor: 'red-500',
+    outlineColor: 'border-[#00ff00]',
   },
 ];
 
@@ -119,10 +144,23 @@ const users = [
  * @authors Yousef Yassin
  */
 const Viewport = () => {
-  const { setMode, tool } = useAppStore(['setMode', 'tool']);
+  const {
+    setMode,
+    tool,
+    isUsingStableDiffusion,
+    isViewingComments,
+    setIsViewingComments,
+  } = useAppStore([
+    'setMode',
+    'tool',
+    'isUsingStableDiffusion',
+    'isViewingComments',
+    'setIsViewingComments',
+  ]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
   const isDrawingSelected = isDrawingTool(tool);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
   return (
     <RadixContextMenu.Root>
@@ -140,7 +178,15 @@ const Viewport = () => {
         <RadixContextMenu.Trigger>
           <ShareScreen />
           <Canvas />
+          {/* Add the comments here, make the sheet purple */}
           <StableDiffusionSheet />
+          {/* Merge with screenselect */}
+          <ShareBoardDialog
+            open={isShareDialogOpen}
+            setOpen={setIsShareDialogOpen}
+            boardLink="https://doodles.com/SYSC4907"
+            users={users}
+          />
         </RadixContextMenu.Trigger>
         <div
           className="flex flex-col"
@@ -184,12 +230,16 @@ const Viewport = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-row gap-12 items-center">
+            <div
+              className={`flex flex-row gap-12 items-center transition-spacing duration-300 ease-in-out ${
+                isUsingStableDiffusion || isViewingComments ? 'mr-[25rem]' : ''
+              }`}
+            >
               <UserList users={users} />
               <Button
                 variant="secondary"
                 className="border-solid border-2 border-indigo-300 px-3 py-2"
-                onClick={() => console.log('open the chat')}
+                onClick={() => setIsViewingComments(!isViewingComments)}
               >
                 <ChatBubbleIcon className="h-4 w-4 stroke-indigo-300" />
               </Button>
@@ -198,6 +248,7 @@ const Viewport = () => {
                   buttonVariants({ variant: 'ghost', size: 'sm' }),
                   'h-9 w-90 bg-muted text-muted-foreground hover:bg-muted hover:text-black justify-start items-center',
                 )}
+                onClick={() => setIsShareDialogOpen(!isShareDialogOpen)}
               >
                 <Users2Icon className="h-4 w-4 mr-2" />
                 <span className="ml-auto  text-black">Share</span>

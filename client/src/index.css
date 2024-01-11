@@ -33,6 +33,9 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+    --scrollbar-w: 15px;
+    --scrollbar-colour: hsl(240, 15%, 39%);
+    --scrollbar-hover: hsl(240, 18%, 55%);
   }
 
   .dark {
@@ -63,6 +66,9 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    --scrollbar-w: 15px;
+    --scrollbar-colour: hsl(240, 15%, 39%);
+    --scrollbar-hover: hsl(240, 18%, 55%);
   }
 }
 
