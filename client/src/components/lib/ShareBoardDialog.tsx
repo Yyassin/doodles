@@ -1,5 +1,4 @@
-import { StreamSource } from '@/types';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +13,6 @@ import { Input } from '../ui/input';
 import { CopyIcon, PlusCircleIcon } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '@radix-ui/react-dropdown-menu';
-import { User } from '@/views/Viewport';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import {
   Select,
@@ -23,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import { User } from '@/stores/WebSocketStore';
 
 /**
  * An alert dialog that is controlled by the `open` prop. It displays a list of

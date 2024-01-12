@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  SheetClose,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { getInitials, unixToFormattedDate } from '@/lib/misc';
-import { set } from 'lodash';
 import { useAuthStore } from '@/stores/AuthStore';
 
 const LikeFilledIcon = ({ className }: { className: string }) => (

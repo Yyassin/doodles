@@ -4,7 +4,7 @@ import CanvasTooltip from './CanvasTooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { User, useWebSocketStore } from '@/stores/WebSocketStore';
 
-const UserList = ({ users }: { users: User[] }) => {
+const UserList = () => {
   const { activeTenants } = useWebSocketStore(['activeTenants']);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
@@ -43,6 +43,9 @@ const UserList = ({ users }: { users: User[] }) => {
               }`}
               onMouseEnter={() => handleAvatarHover(index)}
               onMouseLeave={handleAvatarLeave}
+              style={{
+                border: `0.2rem solid ${user.outlineColor ?? 'white'}`,
+              }}
             >
               <AvatarImage src={user.avatar} />
               <AvatarFallback>{user.initials}</AvatarFallback>

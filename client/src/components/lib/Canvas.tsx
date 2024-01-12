@@ -12,15 +12,21 @@ import {
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { CanvasElementType, TransformHandleDirection, Vector2 } from '@/types';
-import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { User, useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
 import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES, WS_TOPICS } from '@/constants';
-import { getCanvasContext, isDrawingTool, setCursor } from '@/lib/misc';
+import {
+  extractUsername,
+  getCanvasContext,
+  isDrawingTool,
+  setCursor,
+} from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
 import { normalizeAngle } from '@/lib/math';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { tenancy } from '@/api';
+import { useAuthStore } from '@/stores/AuthStore';
 
 /**
  * Main Canvas View
@@ -28,7 +34,6 @@ import { tenancy } from '@/api';
  */
 
 export default function Canvas() {
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const {
     action,
     tool,
@@ -112,22 +117,16 @@ export default function Canvas() {
     'toolOptions',
   ]);
 
-  const {
-    socket,
-    setWebsocketAction,
-    setRoomID,
-    addActiveTenant,
-    removeActiveTenant,
-    clearTenants,
-  } = useWebSocketStore([
-    'socket',
-    'setWebsocketAction',
-    'setRoomID',
-    'addActiveTenant',
-    'removeActiveTenant',
-    'clearTenants',
-  ]);
+  const { socket, setWebsocketAction, setRoomID, setTenants, clearTenants } =
+    useWebSocketStore([
+      'socket',
+      'setWebsocketAction',
+      'setRoomID',
+      'setTenants',
+      'clearTenants',
+    ]);
   const { boardMeta } = useCanvasBoardStore(['boardMeta']);
+  const { userEmail } = useAuthStore(['userEmail']);
 
   // Id of the element currently being drawn.
   const selectOffset = useRef<Vector2 | null>(null);
@@ -138,48 +137,44 @@ export default function Canvas() {
   const selectedHandlePositionRef = useRef<TransformHandleDirection | null>(
     null,
   );
+  // Text area input for text elements
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, (data) => {
-      const { id } = data as { id: string };
-      console.log('joined', id);
-      addActiveTenant({
-        username: id,
-        email: id,
-        initials: 'A',
-        avatar: 'https://github.com/shadcn.png',
-        outlineColor: `border-[${Math.floor(Math.random() * 16777215).toString(
-          16,
-        )}]`,
-      });
-    });
-    socket?.on(WS_TOPICS.NOTIFY_LEAVE_ROOM, (data) => {
-      const { id } = data as { id: string };
-      removeActiveTenant(id);
-    });
+    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, initTenants);
+    socket?.on(WS_TOPICS.NOTIFY_LEAVE_ROOM, initTenants);
     return clearTenants;
   }, [socket]);
 
   const initTenants = async () => {
-    const tenantIds = await tenancy.get(boardMeta.roomID);
-    tenantIds.forEach(({ id }: { id: string }) => {
-      addActiveTenant({
-        username: id,
-        email: id,
-        initials: 'A',
-        avatar: 'https://github.com/shadcn.png',
-      });
-    });
+    const tenantIds = (await tenancy.get(boardMeta.roomID)) as string[];
+    const activeTenants = tenantIds.reduce(
+      (acc, id) => {
+        id !== userEmail &&
+          (acc[id] = {
+            // Temp
+            username: extractUsername(id) ?? id,
+            email: id,
+            initials: 'A',
+            avatar: 'https://github.com/shadcn.png',
+            outlineColor: `#${Math.floor(Math.random() * 16777215).toString(
+              16,
+            )}`,
+          });
+        return acc;
+      },
+      {} as Record<string, User>,
+    );
+    setTenants(activeTenants);
   };
-  useEffect(() => {
-    initTenants();
-  }, [boardMeta]);
 
   // Remove room ID on unmount.
   useEffect(() => {
     setRoomID(boardMeta?.roomID ?? null);
+    // Some time to join the room.
+    setTimeout(initTenants, 1000);
     return () => setRoomID(null);
-  }, [boardMeta]);
+  }, [boardMeta, userEmail]);
 
   // Initializes text-area on text edit.
   useEffect(() => {

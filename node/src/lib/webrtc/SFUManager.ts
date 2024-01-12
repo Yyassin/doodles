@@ -37,7 +37,8 @@ export class SFUManager extends Singleton<SFUManager>() {
     const terminateConnection: WSCallback = ({ socket, room, id }) => {
       const success = sfuManager.remove(id, room);
       const response = success ? sendSuccessResponse : sendErrorResponse;
-      response(socket, 'Stream Ended!');
+      // Ignore if we try to remove when there is no rooml; it's redundancy.
+      success && response(socket, 'Stream Ended!');
     };
     websocketManager.on(WS_TOPICS.RTC_END_CALL, terminateConnection);
     websocketManager.on(preLeaveRoomTopic, terminateConnection);
@@ -80,7 +81,7 @@ export class SFUManager extends Singleton<SFUManager>() {
     const roomSFU = this.#SFUs[roomId];
     if (roomSFU === undefined) {
       this.#logger.error(
-        `Failed to remove peer [${id}] from room [${roomId}] since the room doesn't exist.`,
+        `Failed to add peer [${id}] ice candidate for room [${roomId}] since the room doesn't exist.`,
       );
       return null;
     }

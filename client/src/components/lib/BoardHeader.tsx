@@ -72,7 +72,7 @@ const BoardHeader = ({
           isUsingStableDiffusion || isViewingComments ? 'mr-[25rem]' : ''
         }`}
       >
-        <UserList users={users} />
+        <UserList />
         <Button
           variant="secondary"
           className="border-solid border-2 border-indigo-300 px-3 py-2"

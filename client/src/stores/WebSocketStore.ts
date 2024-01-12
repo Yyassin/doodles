@@ -3,7 +3,6 @@ import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
 import WebsocketClient from '@/WebsocketClient';
 import { getInitials } from '@/lib/misc';
-import { set } from 'lodash';
 
 /**
  * Define Global WebSocket states and reducers
@@ -48,8 +47,7 @@ interface WebSocketActions {
   setWebsocketAction: (elemID: string | string[], action: string) => void;
   // Set the socket reference
   setSocket: (socket: WebsocketClient) => void;
-  addActiveTenant: (user: User) => void;
-  removeActiveTenant: (email: string) => void;
+  setTenants: (tenants: Record<string, User>) => void;
   clearTenants: () => void;
 }
 
@@ -79,16 +77,9 @@ const setWebsocketAction =
       return { actionElementID, action };
     });
 
-const addActiveTenant = (set: SetState<WebSocketStore>) => (user: User) =>
-  set((state) => {
-    return { activeTenants: { ...state.activeTenants, [user.email]: user } };
-  });
-const removeActiveTenant = (set: SetState<WebSocketStore>) => (email: string) =>
-  set((state) => {
-    const activeTenants = { ...state.activeTenants };
-    delete activeTenants[email];
-    return { activeTenants };
-  });
+const setTenants =
+  (set: SetState<WebSocketStore>) => (activeTenants: Record<string, User>) =>
+    set(() => ({ activeTenants }));
 const clearTenants = (set: SetState<WebSocketStore>) => () =>
   set(() => ({ activeTenants: {} }));
 
@@ -98,8 +89,7 @@ const WebSocketStore = create<WebSocketStore>()((set) => ({
   setSocket: setSocket(set),
   setRoomID: setRoomID(set),
   setWebsocketAction: setWebsocketAction(set),
-  addActiveTenant: addActiveTenant(set),
-  removeActiveTenant: removeActiveTenant(set),
+  setTenants: setTenants(set),
   clearTenants: clearTenants(set),
 }));
 export const useWebSocketStore = createStoreWithSelectors(WebSocketStore);

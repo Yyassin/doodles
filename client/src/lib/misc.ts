@@ -165,3 +165,9 @@ export const unixToFormattedDate = (unix: number) => {
   // Construct the formatted date string
   return `${monthName} ${day}, ${year} ${formattedHours}:${minutes} ${amPm}`;
 };
+
+const emailMatch = /^([^@]+)/;
+export const extractUsername = (email: string): string | null => {
+  const match = email.match(emailMatch);
+  return match ? match[1] : null;
+};

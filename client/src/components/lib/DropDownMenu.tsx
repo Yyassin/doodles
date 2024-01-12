@@ -4,7 +4,6 @@ import { SaveOpenDropDownMenu } from '@/components/lib/SaveOpenDropDownMenu';
 import { ExportingDropDownMenu } from '@/components/lib/ExportingDropDownMenu';
 import { ResetCanvasDropDownMenu } from '@/components/lib/ResetCanvasDropDownMenu';
 import {
-  HamburgerMenuIcon,
   Pencil2Icon,
   InfoCircledIcon,
   Share1Icon,
