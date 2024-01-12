@@ -14,11 +14,13 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { CanvasElementType, TransformHandleDirection, Vector2 } from '@/types';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES } from '@/constants';
+import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES, WS_TOPICS } from '@/constants';
 import { getCanvasContext, isDrawingTool, setCursor } from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
 import { normalizeAngle } from '@/lib/math';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { tenancy } from '@/api';
 
 /**
  * Main Canvas View
@@ -110,10 +112,22 @@ export default function Canvas() {
     'toolOptions',
   ]);
 
-  const { setWebsocketAction, setRoomID } = useWebSocketStore([
+  const {
+    socket,
+    setWebsocketAction,
+    setRoomID,
+    addActiveTenant,
+    removeActiveTenant,
+    clearTenants,
+  } = useWebSocketStore([
+    'socket',
     'setWebsocketAction',
     'setRoomID',
+    'addActiveTenant',
+    'removeActiveTenant',
+    'clearTenants',
   ]);
+  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
 
   // Id of the element currently being drawn.
   const selectOffset = useRef<Vector2 | null>(null);
@@ -125,11 +139,47 @@ export default function Canvas() {
     null,
   );
 
-  // Initalize roomID upon entering the canvas
   useEffect(() => {
-    setRoomID('1'); // Change later
+    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, (data) => {
+      const { id } = data as { id: string };
+      console.log('joined', id);
+      addActiveTenant({
+        username: id,
+        email: id,
+        initials: 'A',
+        avatar: 'https://github.com/shadcn.png',
+        outlineColor: `border-[${Math.floor(Math.random() * 16777215).toString(
+          16,
+        )}]`,
+      });
+    });
+    socket?.on(WS_TOPICS.NOTIFY_LEAVE_ROOM, (data) => {
+      const { id } = data as { id: string };
+      removeActiveTenant(id);
+    });
+    return clearTenants;
+  }, [socket]);
+
+  const initTenants = async () => {
+    const tenantIds = await tenancy.get(boardMeta.roomID);
+    tenantIds.forEach(({ id }: { id: string }) => {
+      addActiveTenant({
+        username: id,
+        email: id,
+        initials: 'A',
+        avatar: 'https://github.com/shadcn.png',
+      });
+    });
+  };
+  useEffect(() => {
+    initTenants();
+  }, [boardMeta]);
+
+  // Remove room ID on unmount.
+  useEffect(() => {
+    setRoomID(boardMeta?.roomID ?? null);
     return () => setRoomID(null);
-  }, []);
+  }, [boardMeta]);
 
   // Initializes text-area on text edit.
   useEffect(() => {

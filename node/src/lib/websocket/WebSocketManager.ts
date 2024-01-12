@@ -67,6 +67,7 @@ export type WSCallback = ({
           room,
           payload: { id },
         });
+      this.#logger.debug(`Socket ${id} joined room ${room}`);
       return sendSuccessResponse(socket, 'Socket joined room!');
     });
     // Remove socket from room
@@ -83,6 +84,7 @@ export type WSCallback = ({
           room,
           payload: { id },
         });
+      this.#logger.debug(`Socket ${id} left room ${room}`);
       return sendSuccessResponse(socket, 'Socket left room!');
     });
     this.initWSS(server);

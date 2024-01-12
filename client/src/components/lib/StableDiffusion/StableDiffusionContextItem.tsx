@@ -9,14 +9,16 @@ import ContextMenuItem from '../ContextMenuItem';
  */
 
 const StableDiffusionContextItem = () => {
-  const { setIsUsingStableDiffusion } = useAppStore([
+  const { setIsUsingStableDiffusion, setIsViewingComments } = useAppStore([
     'setIsUsingStableDiffusion',
+    'setIsViewingComments',
   ]);
   return (
     <ContextMenuItem
       className="text-violet-500"
       onClick={() => {
         setIsUsingStableDiffusion(true);
+        setIsViewingComments(false);
       }}
     >
       Stable Diffusion

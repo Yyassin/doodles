@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   SheetClose,
@@ -7,7 +7,9 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { unixToFormattedDate } from '@/lib/misc';
+import { getInitials, unixToFormattedDate } from '@/lib/misc';
+import { set } from 'lodash';
+import { useAuthStore } from '@/stores/AuthStore';
 
 const LikeFilledIcon = ({ className }: { className: string }) => (
   <svg
@@ -59,58 +61,70 @@ const LikeOutlineIcon = ({ className }: { className: string }) => (
 
 const time = 1671880200;
 const avatar = 'https://github.com/shadcn.png';
-const comments = [
-  {
-    username: 'Zayn Malik',
-    avatar,
-    time,
-    comment:
-      'I haven’t seen it called the Sieve Principle... is that new? I’m used to calling this Inclusion-Exclusion.',
-    likes: 2,
-    initials: 'ZM',
-    outlineColor: 'border-[#0000ff]',
-    iLiked: true,
-  },
-  {
-    username: 'Yousef Yassin',
-    avatar,
-    time,
-    comment:
-      'Ah, yea Sieve is the more modern term -- you’re right it used to be I.E., I’ll add a note below',
-    likes: 1,
-    initials: 'YY',
-    outlineColor: 'border-[#ff0000]',
-    iLiked: true,
-  },
-  {
-    username: 'Zayn Malik',
-    avatar,
-    time,
-    comment: 'Ah, cool. Thanks for clarifying!!',
-    likes: 1,
-    initials: 'ZM',
-    outlineColor: 'border-[#0000ff]',
-    iLiked: false,
-  },
-];
 
 const CommentsSheetContent = () => {
+  const { userFirstName, userLastName, userPicture } = useAuthStore([
+    'userFirstName',
+    'userLastName',
+    'userPicture',
+  ]);
+  const [textInput, setTextInput] = useState('');
+  const [comments, setComments] = useState([
+    {
+      username: 'Zayn Malik',
+      avatar,
+      time: time - 1000,
+      comment:
+        'I haven’t seen it called the Sieve Principle... is that new? I’m used to calling this Inclusion-Exclusion.',
+      likes: 2,
+      initials: 'ZM',
+      outlineColor: 'border-[#0000ff]',
+      iLiked: true,
+    },
+    {
+      username: 'Yousef Yassin',
+      avatar,
+      time: time + 1000,
+      comment:
+        'Ah, yea Sieve is the more modern term -- you’re right it used to be I.E., I’ll add a note below',
+      likes: 1,
+      initials: 'YY',
+      outlineColor: 'border-[#ff0000]',
+      iLiked: true,
+    },
+    {
+      username: 'Zayn Malik',
+      avatar,
+      time: time - 2000,
+      comment: 'Ah, cool. Thanks for clarifying!!',
+      likes: 1,
+      initials: 'ZM',
+      outlineColor: 'border-[#0000ff]',
+      iLiked: false,
+    },
+  ]);
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <SheetHeader className="bg-[#9493D3] text-left p-[1.5rem]">
         <SheetTitle className="text-white">Comments</SheetTitle>
       </SheetHeader>
-      <div className="flex flex-col p-[1.5rem]">
+      <div className="flex flex-col p-[1.5rem] h-full max-h-full overflow-y-scroll">
         {comments.map((comment) => (
           <div
             key={`${comment.username}-${comment.time}`}
             className="flex flex-row gap-4"
           >
-            <Avatar>
+            <Avatar
+              className={`${
+                comment.outlineColor
+                  ? `border-[0.2rem] ${comment.outlineColor}`
+                  : ''
+              }`}
+            >
               <AvatarImage src={comment.avatar} />
               <AvatarFallback>{comment.initials}</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col">
+            <div className="flex flex-col select-none">
               <p className="text-sm font-semibold text-white pb-[0.25rem]">
                 {comment.username}
               </p>
@@ -121,11 +135,25 @@ const CommentsSheetContent = () => {
                 {comment.comment}
               </p>
               <div className="flex flex-row pb-[2rem] gap-2">
-                {comment.iLiked ? (
-                  <LikeFilledIcon className="cursor-pointer" />
-                ) : (
-                  <LikeOutlineIcon className="cursor-pointer" />
-                )}
+                <div
+                  onClick={() => {
+                    const newComments = [...comments];
+                    const thisComment =
+                      newComments[
+                        newComments.findIndex((c) => c.time === comment.time)
+                      ];
+                    thisComment.iLiked = !thisComment.iLiked;
+                    thisComment.likes += thisComment.iLiked ? 1 : -1;
+                    setComments(newComments);
+                  }}
+                >
+                  {comment.iLiked ? (
+                    <LikeFilledIcon className="cursor-pointer" />
+                  ) : (
+                    <LikeOutlineIcon className="cursor-pointer" />
+                  )}
+                </div>
+
                 <p className="text-sm font-normal text-white pb-[0.5rem]">
                   {comment.likes}
                 </p>
@@ -134,16 +162,37 @@ const CommentsSheetContent = () => {
           </div>
         ))}
       </div>
-      <SheetFooter className="sm:justify-start pt-4">
-        <SheetClose asChild>
+      <SheetFooter className="justify-end bg-[#9493D3] p-4 ">
+        <div className="w-full flex flex-row items-center">
+          <textarea
+            className="w-full h-24 p-2 bg-[#ffffff00] text-white placeholder-gray-100 border-none outline-none focus:none resize-none"
+            placeholder="Write a comment"
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
+          />
           <Button
-            onClick={async () => {
-              console.log('yo');
+            className="bg-white hover:bg-gray-200 text-[#9493D3]"
+            disabled={textInput.length === 0}
+            onClick={() => {
+              setComments([
+                ...comments,
+                {
+                  username: `${userFirstName} ${userLastName}`,
+                  avatar: userPicture ?? avatar,
+                  time: Date.now(),
+                  comment: textInput,
+                  likes: 0,
+                  initials: getInitials(`${userFirstName} ${userLastName}`),
+                  outlineColor: 'border-[#ff0000]',
+                  iLiked: false,
+                },
+              ]);
+              setTextInput('');
             }}
           >
-            Done
+            Send
           </Button>
-        </SheetClose>
+        </div>
       </SheetFooter>
     </div>
   );

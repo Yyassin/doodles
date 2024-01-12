@@ -16,11 +16,17 @@ interface CanvasBoardState {
   board: BoardsType;
   // The current folder
   folder: string;
+  boardMeta: {
+    title: string;
+    lastModified: number;
+    roomID: string;
+  };
 }
 
 interface CanvasBoardActions {
   // Set board and optionally folder
   setBoard: (board: BoardsType, folder: string) => void;
+  setBoardMeta: (meta: Partial<CanvasBoardState['boardMeta']>) => void;
 }
 
 type CanvasBoardStore = CanvasBoardActions & CanvasBoardState;
@@ -29,6 +35,11 @@ type CanvasBoardStore = CanvasBoardActions & CanvasBoardState;
 export const initialCanvasState: CanvasBoardState = {
   board: boards[0],
   folder: 'Recent',
+  boardMeta: {
+    title: '',
+    lastModified: Date.now(),
+    roomID: '',
+  },
 };
 
 /** Actions / Reducers */
@@ -37,9 +48,16 @@ const setBoard =
   (board: BoardsType, folder = 'Recent') =>
     set(() => ({ board, folder }));
 
+const setBoardMeta =
+  (set: SetState<CanvasBoardStore>) =>
+  (meta: Partial<CanvasBoardState['boardMeta']>) => {
+    set((state) => ({ boardMeta: { ...state.boardMeta, ...meta } }));
+  };
+
 /** Store Hook */
 const CanvasBoardStore = create<CanvasBoardStore>()((set) => ({
   ...initialCanvasState,
   setBoard: setBoard(set),
+  setBoardMeta: setBoardMeta(set),
 }));
 export const useCanvasBoardStore = createStoreWithSelectors(CanvasBoardStore);

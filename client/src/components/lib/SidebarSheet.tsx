@@ -1,14 +1,14 @@
 import React from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useAppStore } from '@/stores/AppStore';
-import StableDiffusionSheetContent from './StableDiffusionSheetContent';
-import CommentsSheetContent from '../CommentsSheetContent';
+import StableDiffusionSheetContent from './StableDiffusion/StableDiffusionSheetContent';
+import CommentsSheetContent from './CommentsSheetContent';
 /**
  * Sidebar sheet that allows the user to generate images using Stable Diffusion.
  * @author Yousef Yassin
  */
 
-const StableDiffusionSheet = () => {
+const SidebarSheet = () => {
   const {
     isUsingStableDiffusion,
     setIsUsingStableDiffusion,
@@ -47,4 +47,4 @@ const StableDiffusionSheet = () => {
   );
 };
 
-export default StableDiffusionSheet;
+export default SidebarSheet;

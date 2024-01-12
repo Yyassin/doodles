@@ -118,7 +118,8 @@ export const isDrawingTool = (tool: AppTool): tool is DrawingTool =>
  * @returns The initials.
  */
 export const getInitials = (name: string) => {
-  const words = name.split(' ');
+  console.log(name);
+  const words = name.trim().split(' ');
   if (words.length === 1) {
     return words[0][0].toUpperCase();
   }

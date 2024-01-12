@@ -10,6 +10,6 @@ import { roomTenancy } from './tenancy.controller';
 const router = express.Router();
 
 // Endpoint for adding a consumer to the SFUManager.
-router.get('/room', roomTenancy);
+router.put('/room', roomTenancy);
 
 export default router;

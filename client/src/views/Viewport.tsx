@@ -14,128 +14,12 @@ import ShareScreen from '@/components/lib/ShareScreen';
 import ShareScreenButton from '@/components/lib/ShareScreenButton';
 import TransparencyButton from '@/components/lib/TransparencyButton';
 import { IS_ELECTRON_INSTANCE } from '@/constants';
-import StableDiffusionSheet from '@/components/lib/StableDiffusion/StableDiffusionSheet';
-import { getInitials, isDrawingTool } from '@/lib/misc';
-import { ArrowLeftIcon, ChatBubbleIcon } from '@radix-ui/react-icons';
-import { Button, buttonVariants } from '@/components/ui/button';
+import SidebarSheet from '@/components/lib/SidebarSheet';
+import { isDrawingTool } from '@/lib/misc';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import { Users2Icon } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import CanvasTooltip from '@/components/lib/CanvasTooltip';
+import BoardHeader from '@/components/lib/BoardHeader';
 import ShareBoardDialog from '@/components/lib/ShareBoardDialog';
-
-export interface User {
-  username: string;
-  email: string;
-  initials: string;
-  avatar: string;
-  outlineColor?: string; // Add an optional 'outlineColor' property
-}
-
-const UserList = ({ users }: { users: User[] }) => {
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-
-  const handleAvatarHover = (index: number) => {
-    setFocusedIndex(index);
-  };
-
-  const handleAvatarLeave = () => {
-    setFocusedIndex(null);
-  };
-
-  return (
-    <div className="flex items-center">
-      {users.map((user, index) => (
-        <div
-          key={index}
-          className={`relative transition-transform transform ${
-            focusedIndex !== null && focusedIndex !== index
-              ? index > focusedIndex
-                ? 'translate-x-6 -ml-3'
-                : '-translate-x-6 -ml-3'
-              : '-ml-3'
-          } `}
-        >
-          <CanvasTooltip
-            className="radix-themes-custom-fonts"
-            content={user.username}
-            side="bottom"
-            sideOffset={5}
-          >
-            <Avatar
-              className={`cursor-pointer ${
-                focusedIndex === index ? 'transform scale-125' : ''
-              } ${
-                user.outlineColor ? `border-[0.2rem] ${user.outlineColor}` : ''
-              }`}
-              onMouseEnter={() => handleAvatarHover(index)}
-              onMouseLeave={handleAvatarLeave}
-            >
-              <AvatarImage src={user.avatar} />
-              <AvatarFallback>{user.initials}</AvatarFallback>
-            </Avatar>
-          </CanvasTooltip>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const username = 'Yousef Yassin';
-const email = 'yousefyassin@cmail.carleton.ca';
-const avatar = 'https://github.com/shadcn.png';
-const users = [
-  {
-    username,
-    email,
-    avatar,
-    initials: getInitials(username),
-    outlineColor: 'border-[#0000ff]',
-  },
-  {
-    username,
-    email,
-    avatar,
-    initials: getInitials(username),
-    outlineColor: 'border-[#0f0f00]',
-  },
-  {
-    username,
-    email,
-    avatar,
-    initials: getInitials(username),
-    outlineColor: 'border-[#ff0000]',
-  },
-  {
-    username,
-    email,
-    avatar,
-    initials: getInitials(username),
-    outlineColor: 'border-[#ff0000]',
-  },
-  {
-    username,
-    email,
-    avatar: '',
-    initials: getInitials(username),
-    outlineColor: 'border-[#323232]',
-  },
-  {
-    username,
-    email,
-    avatar,
-    initials: getInitials(username),
-    outlineColor: 'border-[#243c5a]',
-  },
-  {
-    username,
-    email,
-    avatar,
-    initials: getInitials(username),
-    outlineColor: 'border-[#00ff00]',
-  },
-];
+import { users } from '@/stores/WebSocketStore';
 
 /**
  * Primary viewport that houses the canvas
@@ -144,19 +28,7 @@ const users = [
  * @authors Yousef Yassin
  */
 const Viewport = () => {
-  const {
-    setMode,
-    tool,
-    isUsingStableDiffusion,
-    isViewingComments,
-    setIsViewingComments,
-  } = useAppStore([
-    'setMode',
-    'tool',
-    'isUsingStableDiffusion',
-    'isViewingComments',
-    'setIsViewingComments',
-  ]);
+  const { tool } = useAppStore(['tool']);
   const viewportRef = useRef<HTMLDivElement>(null);
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
   const isDrawingSelected = isDrawingTool(tool);
@@ -179,7 +51,7 @@ const Viewport = () => {
           <ShareScreen />
           <Canvas />
           {/* Add the comments here, make the sheet purple */}
-          <StableDiffusionSheet />
+          <SidebarSheet />
           {/* Merge with screenselect */}
           <ShareBoardDialog
             open={isShareDialogOpen}
@@ -195,68 +67,13 @@ const Viewport = () => {
             width: '100%',
           }}
         >
-          <div
-            className="flex flex-row justify-between items-center p-[0.5rem]"
-            style={{
-              backgroundColor: 'white',
-              flexGrow: 1,
-              zIndex: 10,
-            }}
-          >
-            <div className="flex flex-row">
-              <div className="flex flex-row">
-                <div
-                  className="flex items-center pr-[1.5rem] pl-[0.5rem]"
-                  style={{
-                    height: '100%',
-                  }}
-                >
-                  <Button
-                    variant="secondary"
-                    className="border-solid border-2 border-indigo-300 px-3 py-2"
-                    onClick={() => setMode('dashboard')}
-                  >
-                    <span className="sr-only">Show history</span>
-                    <ArrowLeftIcon className="h-4 w-4 stroke-indigo-300" />
-                  </Button>
-                </div>
-                <div className="flex flex-col">
-                  <h2 className="text-xl font-semibold tracking-tight">
-                    Sieve Principle Visuals
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Last Edited: September 23, 2023
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div
-              className={`flex flex-row gap-12 items-center transition-spacing duration-300 ease-in-out ${
-                isUsingStableDiffusion || isViewingComments ? 'mr-[25rem]' : ''
-              }`}
-            >
-              <UserList users={users} />
-              <Button
-                variant="secondary"
-                className="border-solid border-2 border-indigo-300 px-3 py-2"
-                onClick={() => setIsViewingComments(!isViewingComments)}
-              >
-                <ChatBubbleIcon className="h-4 w-4 stroke-indigo-300" />
-              </Button>
-              <Button
-                className={cn(
-                  buttonVariants({ variant: 'ghost', size: 'sm' }),
-                  'h-9 w-90 bg-muted text-muted-foreground hover:bg-muted hover:text-black justify-start items-center',
-                )}
-                onClick={() => setIsShareDialogOpen(!isShareDialogOpen)}
-              >
-                <Users2Icon className="h-4 w-4 mr-2" />
-                <span className="ml-auto  text-black">Share</span>
-              </Button>
-            </div>
-          </div>
+          {/* The header */}
+          <BoardHeader
+            setIsShareDialogOpen={setIsShareDialogOpen}
+            isShareDialogOpen={isShareDialogOpen}
+          />
           <Separator />
-
+          {/* The Canvas */}
           <div
             style={{
               backgroundColor: 'transparent',

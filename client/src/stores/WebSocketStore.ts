@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
 import WebsocketClient from '@/WebsocketClient';
+import { getInitials } from '@/lib/misc';
+import { set } from 'lodash';
 
 /**
  * Define Global WebSocket states and reducers
@@ -18,6 +20,14 @@ export const Actions = [
 ] as const;
 export type ActionsType = typeof Actions;
 
+export interface User {
+  username: string;
+  email: string;
+  initials: string;
+  avatar: string;
+  outlineColor?: string; // Add an optional 'outlineColor' property
+}
+
 /** Definitions */
 interface WebSocketState {
   // Reference for sending non-stateful messages (WebRTC signalling)
@@ -28,6 +38,7 @@ interface WebSocketState {
   action: string;
   // Modifed element ID
   actionElementID: string | string[];
+  activeTenants: Record<string, User>;
 }
 
 interface WebSocketActions {
@@ -37,6 +48,9 @@ interface WebSocketActions {
   setWebsocketAction: (elemID: string | string[], action: string) => void;
   // Set the socket reference
   setSocket: (socket: WebsocketClient) => void;
+  addActiveTenant: (user: User) => void;
+  removeActiveTenant: (email: string) => void;
+  clearTenants: () => void;
 }
 
 type WebSocketStore = WebSocketActions & WebSocketState;
@@ -47,6 +61,7 @@ export const initialWebSocketState: WebSocketState = {
   roomID: null,
   action: '',
   actionElementID: '',
+  activeTenants: {},
 };
 
 /** Actions / Reducers */
@@ -64,11 +79,82 @@ const setWebsocketAction =
       return { actionElementID, action };
     });
 
+const addActiveTenant = (set: SetState<WebSocketStore>) => (user: User) =>
+  set((state) => {
+    return { activeTenants: { ...state.activeTenants, [user.email]: user } };
+  });
+const removeActiveTenant = (set: SetState<WebSocketStore>) => (email: string) =>
+  set((state) => {
+    const activeTenants = { ...state.activeTenants };
+    delete activeTenants[email];
+    return { activeTenants };
+  });
+const clearTenants = (set: SetState<WebSocketStore>) => () =>
+  set(() => ({ activeTenants: {} }));
+
 /** Store Hook */
 const WebSocketStore = create<WebSocketStore>()((set) => ({
   ...initialWebSocketState,
   setSocket: setSocket(set),
   setRoomID: setRoomID(set),
   setWebsocketAction: setWebsocketAction(set),
+  addActiveTenant: addActiveTenant(set),
+  removeActiveTenant: removeActiveTenant(set),
+  clearTenants: clearTenants(set),
 }));
 export const useWebSocketStore = createStoreWithSelectors(WebSocketStore);
+
+const username = 'Yousef Yassin';
+const email = 'yousefyassin@cmail.carleton.ca';
+const avatar = 'https://github.com/shadcn.png';
+export const users = [
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#0000ff]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#0f0f00]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#ff0000]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#ff0000]',
+  },
+  {
+    username,
+    email,
+    avatar: '',
+    initials: getInitials(username),
+    outlineColor: 'border-[#323232]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#243c5a]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#00ff00]',
+  },
+];
