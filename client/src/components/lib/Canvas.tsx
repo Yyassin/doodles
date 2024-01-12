@@ -14,7 +14,12 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { CanvasElementType, TransformHandleDirection, Vector2 } from '@/types';
 import { User, useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES, WS_TOPICS } from '@/constants';
+import {
+  IS_ELECTRON_INSTANCE,
+  PERIPHERAL_CODES,
+  SECONDS_TO_MS,
+  WS_TOPICS,
+} from '@/constants';
 import {
   extractUsername,
   getCanvasContext,
@@ -140,16 +145,26 @@ export default function Canvas() {
   // Text area input for text elements
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
+  /**
+   * Callbacks for active tenants in the room.
+   */
   useEffect(() => {
     socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, initTenants);
     socket?.on(WS_TOPICS.NOTIFY_LEAVE_ROOM, initTenants);
     return clearTenants;
   }, [socket]);
 
+  /**
+   * Called everytime someone joins or leaves the room, and once we initially join, to maintain
+   * the list of active tenants. Note that
+   * we fetch rather than update locally to ensure
+   * consistency.
+   */
   const initTenants = async () => {
     const tenantIds = (await tenancy.get(boardMeta.roomID)) as string[];
     const activeTenants = tenantIds.reduce(
       (acc, id) => {
+        // We don't want to add ourselves to the list of tenants.
         id !== userEmail &&
           (acc[id] = {
             // Temp
@@ -171,8 +186,9 @@ export default function Canvas() {
   // Remove room ID on unmount.
   useEffect(() => {
     setRoomID(boardMeta?.roomID ?? null);
-    // Some time to join the room.
-    setTimeout(initTenants, 1000);
+    // Give some time to join the room before
+    // fetching the tenants.
+    setTimeout(initTenants, 1 * SECONDS_TO_MS);
     return () => setRoomID(null);
   }, [boardMeta, userEmail]);
 
@@ -436,6 +452,7 @@ export default function Canvas() {
         p1: { x: clientX - width / 2, y: clientY - height / 2 },
         p2: { x: clientX + width / 2, y: clientY + height / 2 },
       });
+      // Dispatch the image to all clients
       setWebsocketAction(pendingImageElementId, 'addCanvasShape');
       // Unselect current image and reset cursor
       setPendingImageElement('');

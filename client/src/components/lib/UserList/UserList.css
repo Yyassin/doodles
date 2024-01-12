@@ -1,3 +1,7 @@
+/**
+ * Defines blink animation keyframes for the active producer's border.
+ */
+
 @keyframes blinkAnimation {
   0%,
   100% {

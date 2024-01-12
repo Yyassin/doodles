@@ -4,7 +4,7 @@ import { useAppStore } from '@/stores/AppStore';
 import StableDiffusionSheetContent from './StableDiffusion/StableDiffusionSheetContent';
 import CommentsSheetContent from './CommentsSheetContent';
 /**
- * Sidebar sheet that allows the user to generate images using Stable Diffusion.
+ * Generic sidebar sheet component that houses the stable diffusion and comments sheets.
  * @author Yousef Yassin
  */
 
@@ -25,6 +25,7 @@ const SidebarSheet = () => {
     <Sheet
       modal={false}
       open={isUsingStableDiffusion || isViewingComments}
+      // A close event closes all sheets.
       onOpenChange={(value) => {
         if (!value) {
           setIsUsingStableDiffusion(false);
@@ -32,8 +33,8 @@ const SidebarSheet = () => {
         }
       }}
     >
-      {/* Prevent closing when clicking outside */}
       <SheetContent
+        // Prevent closing when clicking outside
         onInteractOutside={(e) => e.preventDefault()}
         className={isViewingComments ? 'bg-[#7F7DCF] p-0' : 'p-0'}
       >

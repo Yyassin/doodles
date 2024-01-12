@@ -16,6 +16,7 @@ interface CanvasBoardState {
   board: BoardsType;
   // The current folder
   folder: string;
+  // Currently selected board's metadata
   boardMeta: {
     title: string;
     lastModified: number;
@@ -47,7 +48,6 @@ const setBoard =
   (set: SetState<CanvasBoardStore>) =>
   (board: BoardsType, folder = 'Recent') =>
     set(() => ({ board, folder }));
-
 const setBoardMeta =
   (set: SetState<CanvasBoardStore>) =>
   (meta: Partial<CanvasBoardState['boardMeta']>) => {

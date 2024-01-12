@@ -5,6 +5,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { getInitials, unixToFormattedDate } from '@/lib/misc';
 import { useAuthStore } from '@/stores/AuthStore';
 
+/**
+ * Defines a CommentsSheetContent component that displays the comments of a board, and allows the user to add a comment or like existing ones.
+ * @author Yousef Yassin
+ */
+
+/**
+ * A filled thumbs up liking icon, used
+ * if the user has liked a comment.
+ */
 const LikeFilledIcon = ({ className }: { className: string }) => (
   <svg
     width="20"
@@ -28,6 +37,10 @@ const LikeFilledIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
+/**
+ * An outlined thumbs up liking icon, used
+ * if the user has not liked a comment.
+ */
 const LikeOutlineIcon = ({ className }: { className: string }) => (
   <svg
     width="20"
@@ -53,6 +66,7 @@ const LikeOutlineIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
+// Temp: Hardcoded for now.
 const time = 1671880200;
 const avatar = 'https://github.com/shadcn.png';
 
@@ -131,6 +145,7 @@ const CommentsSheetContent = () => {
               <div className="flex flex-row pb-[2rem] gap-2">
                 <div
                   onClick={() => {
+                    // Copy to maintain immutability and add a like.
                     const newComments = [...comments];
                     const thisComment =
                       newComments[

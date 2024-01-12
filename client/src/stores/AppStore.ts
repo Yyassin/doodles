@@ -37,7 +37,9 @@ interface AppState {
   canvasColor: string;
   // Whether app is in transparent canvas mode.
   isTransparent: boolean;
+  // Whether user is using stable diffusion.
   isUsingStableDiffusion: boolean;
+  // Whether user is viewing comments.
   isViewingComments: boolean;
 }
 /** Reducers */

@@ -10,7 +10,7 @@ function App() {
   const { isTransparent } = useAppStore(['isTransparent']);
   const { isWindowActive } = useElectronIPCStore(['isWindowActive']);
 
-  // Set root height to 100% when transparent
+  // Set root height to 100%
   useEffect(() => {
     const root = document.getElementById('root');
     const radixThemes = document.getElementsByClassName(

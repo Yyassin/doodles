@@ -115,6 +115,11 @@ const ShareScreen = () => {
     }
   }, [screenStream, videoRef.current]);
 
+  /**
+   * Update the active producer id when we receive
+   * a new stream (or null if the stream is removed, or
+   * the we exit the room).
+   */
   useEffect(() => {
     if (roomID && screenStream) {
       sfu.poll(roomID, setActiveProducerId);

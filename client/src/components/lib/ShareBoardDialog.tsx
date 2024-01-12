@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,9 +24,8 @@ import {
 import { User } from '@/stores/WebSocketStore';
 
 /**
- * An alert dialog that is controlled by the `open` prop. It displays a list of
- * screen sources and allows the user to select one. When the user clicks
- * continue, the `onContinue` callback is called with the selected source ID.
+ * An alert dialog that is controlled by the `open` prop. It displays a list of users
+ * that have access to the board, along with their permissions, and allows the user to add more users.
  * @author Yousef Yassin
  */
 
@@ -41,6 +40,9 @@ const ShareBoardDialog = ({
   boardLink: string;
   users: User[];
 }) => {
+  /* Controls visibility of the addition input. */
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent>
@@ -63,15 +65,35 @@ const ShareBoardDialog = ({
           </div>
         </AlertDialogHeader>
         <Separator className="bg-gray-200 h-[0.5px]" />
+        {/* The addition input */}
         <div className="flex items-center">
           <h2 className="text-sm font-semibold text-black">
             People with access
           </h2>
           <PlusCircleIcon
-            className="w-4 ml-2 cursor-pointer"
-            onClick={() => console.log('yo')}
+            className="w-4 ml-2 cursor-pointer text-[#818cf8] hover:text-[#6c75c1]"
+            onClick={() => setIsAddUserOpen(!isAddUserOpen)}
           />
         </div>
+        {isAddUserOpen && (
+          <div className="flex flex-row gap-4">
+            <Input
+              placeholder="Enter an email address or username"
+              className="p-[1rem]"
+            />
+            <Select>
+              <SelectTrigger className="w-[6rem]">
+                <SelectValue placeholder="View" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="view">View</SelectItem>
+                <SelectItem value="edit">Edit</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button className="bg-[#818cf8] hover:bg-[#6c75c1]">Confirm</Button>
+          </div>
+        )}
+        {/* The user list */}
         <div className="flex flex-wrap justify-center gap-4 overflow-y-scroll max-h-60 p-[1rem]">
           {users.map((user) => (
             <div key={user.email} className="flex flex-row gap-4 w-[100%]">

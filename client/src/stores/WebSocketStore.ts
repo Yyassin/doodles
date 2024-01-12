@@ -19,11 +19,15 @@ export const Actions = [
 ] as const;
 export type ActionsType = typeof Actions;
 
+/**
+ * The user object stored internally for rendering
+ * user lists and interacting with the backend.
+ */
 export interface User {
-  username: string;
-  email: string;
-  initials: string;
-  avatar: string;
+  username: string; // The user's username (email rn)
+  email: string; // The user's email
+  initials: string; // The user's initials
+  avatar: string; // URL of the user's avatar
   outlineColor?: string; // Add an optional 'outlineColor' property
 }
 
@@ -37,7 +41,9 @@ interface WebSocketState {
   action: string;
   // Modifed element ID
   actionElementID: string | string[];
+  // The current active tenants
   activeTenants: Record<string, User>;
+  // The current active producer ID
   activeProducerID: string | null;
 }
 
@@ -48,8 +54,11 @@ interface WebSocketActions {
   setWebsocketAction: (elemID: string | string[], action: string) => void;
   // Set the socket reference
   setSocket: (socket: WebsocketClient) => void;
+  // Set the active tenants
   setTenants: (tenants: Record<string, User>) => void;
+  // Clear the active tenants
   clearTenants: () => void;
+  // Set the active producer ID
   setActiveProducerId: (producerId: string | null) => void;
 }
 
@@ -69,10 +78,8 @@ export const initialWebSocketState: WebSocketState = {
 const setSocket =
   (set: SetState<WebSocketStore>) => (socket: WebsocketClient) =>
     set(() => ({ socket }));
-
 const setRoomID = (set: SetState<WebSocketStore>) => (roomID: string | null) =>
   set(() => ({ roomID }));
-
 const setWebsocketAction =
   (set: SetState<WebSocketStore>) =>
   (actionElementID: string | string[], action: string) =>

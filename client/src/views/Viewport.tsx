@@ -52,7 +52,7 @@ const Viewport = () => {
           <Canvas />
           {/* Add the comments here, make the sheet purple */}
           <SidebarSheet />
-          {/* Merge with screenselect */}
+          {/* TODO: Merge with screenselect */}
           <ShareBoardDialog
             open={isShareDialogOpen}
             setOpen={setIsShareDialogOpen}

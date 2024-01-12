@@ -37,6 +37,7 @@ export const BoardScroll = () => {
             className="relative w-[500px] h-[200px] rounded-md inline-block mx-3 mt-4 bg-[#ebebeb] cursor-pointer hover:scale-105 ease-in-out duration-300"
             onClick={() => {
               setMode('canvas');
+              // TODO: Should perform and cache concurrent fetches for the board and its comments here
               setBoardMeta({
                 roomID: board.roomID,
                 title: board.board,

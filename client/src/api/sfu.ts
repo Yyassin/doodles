@@ -19,6 +19,8 @@ const pollOngoingStream = async (
     const { data } = await axios.put(REST.sfu.poll, {
       roomId: roomID,
     });
+    // Initialize the consumer, and pass the producer ID to set the active producer id for
+    // styling purposes.
     data.producerId && initConsumer(data.producerId);
   } catch (e) {
     console.error('Failed to poll for ongoing stream');

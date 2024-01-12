@@ -66,6 +66,11 @@ export class SFUManager extends Singleton<SFUManager>() {
     return this.#SFUs[roomId] !== undefined;
   }
 
+  /**
+   * Returns the producer ID of the specified room.
+   * @param roomId The ID of the room.
+   * @returns The producer ID of the room, or undefined if the room doesn't exist.
+   */
   public producerId(roomId: string) {
     return this.#SFUs[roomId]?.producerId;
   }

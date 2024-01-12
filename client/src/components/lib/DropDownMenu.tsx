@@ -13,9 +13,16 @@ import { useAppStore } from '@/stores/AppStore';
 import CanvasColorToolGroup, { canvasColourTypes } from './CanvasBackground';
 import { Button } from '../ui/button';
 
+/**
+ * Creates a DropDownMenu for Canvas
+ * @author Dana El Sherif
+ */
+
+/**
+ * @returns A DropDownMenu icon
+ */
 const DropDownIcon = () => (
   <svg
-    className="stroke-indigo-300"
     width="20"
     height="20"
     viewBox="0 0 20 20"
@@ -32,10 +39,9 @@ const DropDownIcon = () => (
 );
 
 /**
- * Creates a DropDownMenu for Canvas
- * @author Dana El Sherif
+ * Defines a DropDownMenu for the canvas with options to save, open, export, reset, and change the canvas background.
+ * @returns The DropDownMenu component
  */
-
 const DropDownMenu = ({
   viewportRef,
 }: {
@@ -59,7 +65,7 @@ const DropDownMenu = ({
       <DropdownMenu.Trigger asChild>
         <Button
           variant="secondary"
-          className="border-solid border-2 border-indigo-300 px-2 py-2 z-10"
+          className="border-solid border-2 border-indigo-300 hover:border-indigo-400 stroke-indigo-300 hover:stroke-indigo-400 px-2 py-2 z-10"
           style={{
             position: 'absolute',
             right: '1rem',

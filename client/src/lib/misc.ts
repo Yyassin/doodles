@@ -118,7 +118,6 @@ export const isDrawingTool = (tool: AppTool): tool is DrawingTool =>
  * @returns The initials.
  */
 export const getInitials = (name: string) => {
-  console.log(name);
   const words = name.trim().split(' ');
   if (words.length === 1) {
     return words[0][0].toUpperCase();
@@ -126,6 +125,11 @@ export const getInitials = (name: string) => {
   return words.map((word) => word[0].toUpperCase()).join('');
 };
 
+/**
+ * Converts a Unix timestamp to a formatted date string.
+ * @param unix The Unix timestamp to convert.
+ * @returns The formatted date string.
+ */
 const months = [
   'January',
   'February',
@@ -140,7 +144,7 @@ const months = [
   'November',
   'December',
 ];
-// Create a reusable Date object
+// Create a reusable Date object (optimization)
 const dateObject = new Date();
 export const unixToFormattedDate = (unix: number) => {
   // Convert Unix timestamp to milliseconds
@@ -166,6 +170,9 @@ export const unixToFormattedDate = (unix: number) => {
   return `${monthName} ${day}, ${year} ${formattedHours}:${minutes} ${amPm}`;
 };
 
+/**
+ * Extracts the username from an email address (i.e, the part before the @).
+ */
 const emailMatch = /^([^@]+)/;
 export const extractUsername = (email: string): string | null => {
   const match = email.match(emailMatch);
