@@ -1,11 +1,15 @@
 import React from 'react';
 import { useState } from 'react';
-import CanvasTooltip from './CanvasTooltip';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { User, useWebSocketStore } from '@/stores/WebSocketStore';
+import CanvasTooltip from '../CanvasTooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
+import './UserList.css';
 
 const UserList = () => {
-  const { activeTenants } = useWebSocketStore(['activeTenants']);
+  const { activeTenants, activeProducerID } = useWebSocketStore([
+    'activeTenants',
+    'activeProducerID',
+  ]);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
   const handleAvatarHover = (index: number) => {
@@ -31,7 +35,9 @@ const UserList = () => {
         >
           <CanvasTooltip
             className="radix-themes-custom-fonts"
-            content={user.username}
+            content={`${user.username} ${
+              activeProducerID === user.email ? ' (Sharing Screen)' : ''
+            }`}
             side="bottom"
             sideOffset={5}
           >
@@ -40,11 +46,16 @@ const UserList = () => {
                 focusedIndex === index ? 'transform scale-125' : ''
               } ${
                 user.outlineColor ? `border-[0.2rem] ${user.outlineColor}` : ''
+              } ${
+                user.email === activeProducerID ? 'blink-active-producer' : ''
               }`}
               onMouseEnter={() => handleAvatarHover(index)}
               onMouseLeave={handleAvatarLeave}
               style={{
-                border: `0.2rem solid ${user.outlineColor ?? 'white'}`,
+                border:
+                  user.email === activeProducerID
+                    ? '0.2rem solid red'
+                    : `0.2rem solid ${user.outlineColor ?? 'white'}`,
               }}
             >
               <AvatarImage src={user.avatar} />

@@ -66,6 +66,10 @@ export class SFUManager extends Singleton<SFUManager>() {
     return this.#SFUs[roomId] !== undefined;
   }
 
+  public producerId(roomId: string) {
+    return this.#SFUs[roomId]?.producerId;
+  }
+
   /**
    * Adds an ICE candidate to the specified consumer in the given room.
    * @param id The ID of the consumer.

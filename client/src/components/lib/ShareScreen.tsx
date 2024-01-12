@@ -7,6 +7,7 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ScreenSelectDialog from './ScreenSelectDialog';
 import { StreamSource } from '@/types';
+import { sfu } from '@/api';
 
 /**
  * Defines a background video element that renders the shared screen (from the priducer, or incoming stream for a consumer).
@@ -25,7 +26,11 @@ const ShareScreen = () => {
   const [screenSelectDialogOpen, setScreenSelectDialogOpen] = useState(false);
   const [streamSources, setStreamSources] = useState<StreamSource[]>([]);
   /** Reference to the WS client */
-  const { socket } = useWebSocketStore(['socket']);
+  const { socket, setActiveProducerId, roomID } = useWebSocketStore([
+    'socket',
+    'setActiveProducerId',
+    'roomID',
+  ]);
   const {
     setIsInCall,
     appWidth,
@@ -109,6 +114,14 @@ const ShareScreen = () => {
       };
     }
   }, [screenStream, videoRef.current]);
+
+  useEffect(() => {
+    if (roomID && screenStream) {
+      sfu.poll(roomID, setActiveProducerId);
+    } else {
+      setActiveProducerId(null);
+    }
+  }, [roomID, screenStream]);
 
   useEffect(() => {
     // We only want to set the offset when the video is loaded; we also don't

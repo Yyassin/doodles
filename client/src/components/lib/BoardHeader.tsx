@@ -4,8 +4,7 @@ import { ArrowLeftIcon, ChatBubbleIcon } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
 import { Users2Icon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import UserList from './UserList';
-import { users } from '@/stores/WebSocketStore';
+import UserList from './UserList/UserList';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { unixToFormattedDate } from '@/lib/misc';
 

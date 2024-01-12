@@ -38,6 +38,7 @@ interface WebSocketState {
   // Modifed element ID
   actionElementID: string | string[];
   activeTenants: Record<string, User>;
+  activeProducerID: string | null;
 }
 
 interface WebSocketActions {
@@ -49,6 +50,7 @@ interface WebSocketActions {
   setSocket: (socket: WebsocketClient) => void;
   setTenants: (tenants: Record<string, User>) => void;
   clearTenants: () => void;
+  setActiveProducerId: (producerId: string | null) => void;
 }
 
 type WebSocketStore = WebSocketActions & WebSocketState;
@@ -60,6 +62,7 @@ export const initialWebSocketState: WebSocketState = {
   action: '',
   actionElementID: '',
   activeTenants: {},
+  activeProducerID: null,
 };
 
 /** Actions / Reducers */
@@ -76,12 +79,14 @@ const setWebsocketAction =
     set(() => {
       return { actionElementID, action };
     });
-
 const setTenants =
   (set: SetState<WebSocketStore>) => (activeTenants: Record<string, User>) =>
     set(() => ({ activeTenants }));
 const clearTenants = (set: SetState<WebSocketStore>) => () =>
   set(() => ({ activeTenants: {} }));
+const setActiveProducerId =
+  (set: SetState<WebSocketStore>) => (producerId: string | null) =>
+    set(() => ({ activeProducerID: producerId }));
 
 /** Store Hook */
 const WebSocketStore = create<WebSocketStore>()((set) => ({
@@ -91,6 +96,7 @@ const WebSocketStore = create<WebSocketStore>()((set) => ({
   setWebsocketAction: setWebsocketAction(set),
   setTenants: setTenants(set),
   clearTenants: clearTenants(set),
+  setActiveProducerId: setActiveProducerId(set),
 }));
 export const useWebSocketStore = createStoreWithSelectors(WebSocketStore);
 
