@@ -19,7 +19,9 @@ export const Sidebar = ({ folders }: { folders: string[] }) => {
   return (
     <div className="flex flex-col w-1/6 h-full bg-[#eee8f9] text-black boarder-r">
       {/**To be changed to acctual project logo*/}
-      <div className="mb-10 px-8">Logo</div>
+      <div className="flex mb-10 justify-center">
+        <img className="w-24 h-[auto]" src="./doodles-icon.png" alt="logo" />
+      </div>
       <div className="space-y-2">
         <div
           className={`flex flex-row relative gap-7 py-2.5 px-8 cursor-pointer rounded transition duration-200 hover:bg-[#cdc5db] ${
