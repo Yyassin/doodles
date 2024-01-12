@@ -2,6 +2,7 @@ import React from 'react';
 import { CalendarIcon } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { unixToFormattedDate } from '@/lib/misc';
 
 /**
  * Define a react component that all the user's boards in a folder
@@ -46,9 +47,9 @@ export const BoardScroll = () => {
             }}
           >
             {board.board}
-            <div className="flex flex-row gap-2 absolute inset-x-0 bottom-0">
+            <div className="flex flex-row gap-2 absolute inset-x-0 bottom-0 items-center">
               <CalendarIcon className="ml-2" />
-              <div>{board.date} </div>
+              <div>{unixToFormattedDate(board.date)}</div>
             </div>
           </div>
         ))}
