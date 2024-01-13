@@ -19,7 +19,11 @@ const useRTCConsumer = (
   setScreenStream: (stream: MediaStream | null) => void,
 ) => {
   const peerRef = useRef<RTCPeerConnection>();
-  const { socket, roomID } = useWebSocketStore(['socket', 'roomID']);
+  const { socket, roomID, setActiveProducerId } = useWebSocketStore([
+    'socket',
+    'roomID',
+    'setActiveProducerId',
+  ]);
   const { userEmail: userId } = useAuthStore(['userEmail']);
 
   useEffect(() => {
@@ -34,7 +38,14 @@ const useRTCConsumer = (
     // On mount, check if there's a stream in the room. If so, initiate a consumer connection.
     // Give a second for socket to connect
     roomID &&
-      setTimeout(() => sfu.poll(roomID, initConsumer), 1 * SECONDS_TO_MS);
+      setTimeout(
+        () =>
+          sfu.poll(roomID, (producerId) => {
+            initConsumer();
+            setActiveProducerId(producerId);
+          }),
+        1 * SECONDS_TO_MS,
+      );
   }, [roomID]);
 
   // Cleanup on page refresh, close, or tab close

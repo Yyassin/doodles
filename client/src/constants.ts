@@ -24,6 +24,9 @@ export const REST = {
   auth: {
     token: `${REST_ROOT}/auth/token`,
   },
+  tenants: {
+    get: `${REST_ROOT}/tenancy/room`,
+  },
 };
 export const HTTP_STATUS = {
   SUCCESS: 200,
@@ -35,6 +38,8 @@ export const WS_RECONNECT_INTERVAL = (1 * SECONDS_TO_MS) as number;
 export enum WS_TOPICS {
   JOIN_ROOM = 'join-room',
   LEAVE_ROOM = 'leave-room',
+  NOTIFY_JOIN_ROOM = 'notify-join-room',
+  NOTIFY_LEAVE_ROOM = 'notify-leave-room',
   RTC_END_CALL = 'rtc-end-call',
   RTC_NEW_PRODUCER = 'rtc-new-producer',
   RTC_DISCONNECT_PRODUCER = 'rtc-disconnect-producer',

@@ -61,6 +61,6 @@ export const pollProducer = async (req: Request, res: Response) => {
   const {
     body: { roomId },
   } = req;
-  const roomHasProducer = sfuManager.roomHasProducer(roomId);
-  res.status(HTTP_STATUS.SUCCESS).json({ roomHasProducer });
+  const producerId = sfuManager.producerId(roomId);
+  res.status(HTTP_STATUS.SUCCESS).json({ producerId });
 };

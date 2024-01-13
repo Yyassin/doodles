@@ -49,7 +49,9 @@ const setUser =
       return {
         userFirstName,
         userLastName,
-        userEmail: userEmail ?? generateRandId(),
+        // The random id allows the same user to login to different
+        // clients, helpful for tests but not irl.
+        userEmail: `${userEmail}-${generateRandId()}`,
         userPicture,
       };
     });

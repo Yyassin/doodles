@@ -1,0 +1,32 @@
+/**
+ * Defines blink animation keyframes for the active producer's border.
+ */
+
+@keyframes blinkAnimation {
+  0%,
+  100% {
+    border-color: #818cf8;
+    box-shadow: 0 0 10px #818cf8;
+  }
+  50% {
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+
+@-webkit-keyframes blinkAnimation {
+  0%,
+  100% {
+    border-color: #818cf8;
+    box-shadow: 0 0 10px #818cf8;
+  }
+  50% {
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.blink-active-producer {
+  animation: blinkAnimation 2s infinite;
+  -webkit-animation: blinkAnimation 2s infinite; /* For compatibility with certain browsers */
+}

@@ -7,6 +7,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import * as Avatar from '@radix-ui/react-avatar';
 import { ACCESS_TOKEN_TAG } from '../../constants';
 import { useAuthStore } from '@/stores/AuthStore';
+import { extractUsername } from '@/lib/misc';
 
 /**
  * Define a react component that displays a the user infromation with a dropdown menu
@@ -54,7 +55,7 @@ export const IconDropDown = () => {
             <div>
               {userFirstName} {userLastName}
             </div>
-            <div className="text-xs">{userEmail}</div>
+            <div className="text-xs">{extractUsername(userEmail)}</div>
           </div>
           <ChevronDownIcon />
         </button>

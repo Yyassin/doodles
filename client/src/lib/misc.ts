@@ -3,6 +3,7 @@
  * @authors Yousef Yassin
  */
 
+import { SECONDS_TO_MS } from '@/constants';
 import { AppTool, DrawingTool, drawingToolsSet } from '@/types';
 
 /**
@@ -109,3 +110,71 @@ export const debounce = <T extends unknown[]>(
  */
 export const isDrawingTool = (tool: AppTool): tool is DrawingTool =>
   drawingToolsSet.has(tool as DrawingTool);
+
+/**
+ * Retrieves the initials for the provided name. If
+ * the name is only one word, returns the first initial.
+ * @param name The name to retrieve the initials for.
+ * @returns The initials.
+ */
+export const getInitials = (name: string) => {
+  const words = name.trim().split(' ');
+  if (words.length === 1) {
+    return words[0][0].toUpperCase();
+  }
+  return words.map((word) => word[0].toUpperCase()).join('');
+};
+
+/**
+ * Converts a Unix timestamp to a formatted date string.
+ * @param unix The Unix timestamp to convert.
+ * @returns The formatted date string.
+ */
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+// Create a reusable Date object (optimization)
+const dateObject = new Date();
+export const unixToFormattedDate = (unix: number) => {
+  // Convert Unix timestamp to milliseconds
+  const timestampInMilliseconds = unix * SECONDS_TO_MS;
+
+  // Set the date using the timestamp
+  dateObject.setTime(timestampInMilliseconds);
+
+  // Get day, year, hours, and minutes
+  const day = dateObject.getDate();
+  const year = dateObject.getFullYear();
+  const hours = dateObject.getHours();
+  const minutes = dateObject.getMinutes();
+
+  // Convert hours to 12-hour format
+  const amPm = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12;
+
+  // Get the month name using the stored date
+  const monthName = months[dateObject.getMonth()];
+
+  // Construct the formatted date string
+  return `${monthName} ${day}, ${year} ${formattedHours}:${minutes} ${amPm}`;
+};
+
+/**
+ * Extracts the username from an email address (i.e, the part before the @).
+ */
+const emailMatch = /^([^@]+)/;
+export const extractUsername = (email: string): string | null => {
+  const match = email.match(emailMatch);
+  return match ? match[1] : null;
+};

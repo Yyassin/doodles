@@ -172,7 +172,7 @@ const ToolBar = () => {
   const { tool, isTransparent } = useAppStore(['tool', 'isTransparent']);
   return (
     <Toolbar.Root
-      className="flex p-[0.3rem] gap-[0.3rem] w-full min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)]"
+      className="flex p-[0.3rem] gap-[0.3rem] w-full min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] z-10"
       style={{
         position: 'absolute',
         left: 0,

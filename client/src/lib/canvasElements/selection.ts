@@ -281,10 +281,14 @@ export const getElementAtPosition = (
   // be an issue for overlapping elements.
   // One solution is adding some sort of layering (move to front/back)
   // for each element. We have to find all that intersect and select front most.
-  return appState.allIds
-    .map((id) => ({
-      id,
-      position: positionWithinElement(x, y, appState, id),
-    }))
-    .find((element) => element.position);
+
+  return (
+    appState.allIds
+      .map((id) => ({
+        id,
+        position: positionWithinElement(x, y, appState, id),
+      }))
+      // Note: we findLast to ensure last element is selected if overlapping.
+      .findLast((element) => element.position)
+  );
 };

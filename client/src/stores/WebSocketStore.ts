@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
 import WebsocketClient from '@/WebsocketClient';
+import { getInitials } from '@/lib/misc';
 
 /**
  * Define Global WebSocket states and reducers
@@ -18,6 +19,18 @@ export const Actions = [
 ] as const;
 export type ActionsType = typeof Actions;
 
+/**
+ * The user object stored internally for rendering
+ * user lists and interacting with the backend.
+ */
+export interface User {
+  username: string; // The user's username (email rn)
+  email: string; // The user's email
+  initials: string; // The user's initials
+  avatar: string; // URL of the user's avatar
+  outlineColor?: string; // Add an optional 'outlineColor' property
+}
+
 /** Definitions */
 interface WebSocketState {
   // Reference for sending non-stateful messages (WebRTC signalling)
@@ -28,6 +41,10 @@ interface WebSocketState {
   action: string;
   // Modifed element ID
   actionElementID: string | string[];
+  // The current active tenants
+  activeTenants: Record<string, User>;
+  // The current active producer ID
+  activeProducerID: string | null;
 }
 
 interface WebSocketActions {
@@ -37,6 +54,12 @@ interface WebSocketActions {
   setWebsocketAction: (elemID: string | string[], action: string) => void;
   // Set the socket reference
   setSocket: (socket: WebsocketClient) => void;
+  // Set the active tenants
+  setTenants: (tenants: Record<string, User>) => void;
+  // Clear the active tenants
+  clearTenants: () => void;
+  // Set the active producer ID
+  setActiveProducerId: (producerId: string | null) => void;
 }
 
 type WebSocketStore = WebSocketActions & WebSocketState;
@@ -47,22 +70,30 @@ export const initialWebSocketState: WebSocketState = {
   roomID: null,
   action: '',
   actionElementID: '',
+  activeTenants: {},
+  activeProducerID: null,
 };
 
 /** Actions / Reducers */
 const setSocket =
   (set: SetState<WebSocketStore>) => (socket: WebsocketClient) =>
     set(() => ({ socket }));
-
 const setRoomID = (set: SetState<WebSocketStore>) => (roomID: string | null) =>
   set(() => ({ roomID }));
-
 const setWebsocketAction =
   (set: SetState<WebSocketStore>) =>
   (actionElementID: string | string[], action: string) =>
     set(() => {
       return { actionElementID, action };
     });
+const setTenants =
+  (set: SetState<WebSocketStore>) => (activeTenants: Record<string, User>) =>
+    set(() => ({ activeTenants }));
+const clearTenants = (set: SetState<WebSocketStore>) => () =>
+  set(() => ({ activeTenants: {} }));
+const setActiveProducerId =
+  (set: SetState<WebSocketStore>) => (producerId: string | null) =>
+    set(() => ({ activeProducerID: producerId }));
 
 /** Store Hook */
 const WebSocketStore = create<WebSocketStore>()((set) => ({
@@ -70,5 +101,63 @@ const WebSocketStore = create<WebSocketStore>()((set) => ({
   setSocket: setSocket(set),
   setRoomID: setRoomID(set),
   setWebsocketAction: setWebsocketAction(set),
+  setTenants: setTenants(set),
+  clearTenants: clearTenants(set),
+  setActiveProducerId: setActiveProducerId(set),
 }));
 export const useWebSocketStore = createStoreWithSelectors(WebSocketStore);
+
+const username = 'Yousef Yassin';
+const email = 'yousefyassin@cmail.carleton.ca';
+const avatar = 'https://github.com/shadcn.png';
+export const users = [
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#0000ff]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#0f0f00]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#ff0000]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#ff0000]',
+  },
+  {
+    username,
+    email,
+    avatar: '',
+    initials: getInitials(username),
+    outlineColor: 'border-[#323232]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#243c5a]',
+  },
+  {
+    username,
+    email,
+    avatar,
+    initials: getInitials(username),
+    outlineColor: 'border-[#00ff00]',
+  },
+];

@@ -12,13 +12,26 @@ import {
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { CanvasElementType, TransformHandleDirection, Vector2 } from '@/types';
-import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { User, useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
-import { IS_ELECTRON_INSTANCE, PERIPHERAL_CODES } from '@/constants';
-import { getCanvasContext, isDrawingTool, setCursor } from '@/lib/misc';
+import {
+  IS_ELECTRON_INSTANCE,
+  PERIPHERAL_CODES,
+  SECONDS_TO_MS,
+  WS_TOPICS,
+} from '@/constants';
+import {
+  extractUsername,
+  getCanvasContext,
+  isDrawingTool,
+  setCursor,
+} from '@/lib/misc';
 import { imageCache } from '../../lib/cache';
 import { generateRandId } from '@/lib/bytes';
 import { normalizeAngle } from '@/lib/math';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { tenancy } from '@/api';
+import { useAuthStore } from '@/stores/AuthStore';
 
 /**
  * Main Canvas View
@@ -26,7 +39,6 @@ import { normalizeAngle } from '@/lib/math';
  */
 
 export default function Canvas() {
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const {
     action,
     tool,
@@ -110,10 +122,16 @@ export default function Canvas() {
     'toolOptions',
   ]);
 
-  const { setWebsocketAction, setRoomID } = useWebSocketStore([
-    'setWebsocketAction',
-    'setRoomID',
-  ]);
+  const { socket, setWebsocketAction, setRoomID, setTenants, clearTenants } =
+    useWebSocketStore([
+      'socket',
+      'setWebsocketAction',
+      'setRoomID',
+      'setTenants',
+      'clearTenants',
+    ]);
+  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
+  const { userEmail } = useAuthStore(['userEmail']);
 
   // Id of the element currently being drawn.
   const selectOffset = useRef<Vector2 | null>(null);
@@ -124,12 +142,55 @@ export default function Canvas() {
   const selectedHandlePositionRef = useRef<TransformHandleDirection | null>(
     null,
   );
+  // Text area input for text elements
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Initalize roomID upon entering the canvas
+  /**
+   * Callbacks for active tenants in the room.
+   */
   useEffect(() => {
-    setRoomID('1'); // Change later
+    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, initTenants);
+    socket?.on(WS_TOPICS.NOTIFY_LEAVE_ROOM, initTenants);
+    return clearTenants;
+  }, [socket]);
+
+  /**
+   * Called everytime someone joins or leaves the room, and once we initially join, to maintain
+   * the list of active tenants. Note that
+   * we fetch rather than update locally to ensure
+   * consistency.
+   */
+  const initTenants = async () => {
+    const tenantIds = (await tenancy.get(boardMeta.roomID)) as string[];
+    const activeTenants = tenantIds.reduce(
+      (acc, id) => {
+        // We don't want to add ourselves to the list of tenants.
+        id !== userEmail &&
+          (acc[id] = {
+            // Temp
+            username: extractUsername(id) ?? id,
+            email: id,
+            initials: 'A',
+            avatar: 'https://github.com/shadcn.png',
+            outlineColor: `#${Math.floor(Math.random() * 16777215).toString(
+              16,
+            )}`,
+          });
+        return acc;
+      },
+      {} as Record<string, User>,
+    );
+    setTenants(activeTenants);
+  };
+
+  // Remove room ID on unmount.
+  useEffect(() => {
+    setRoomID(boardMeta?.roomID ?? null);
+    // Give some time to join the room before
+    // fetching the tenants.
+    setTimeout(initTenants, 1 * SECONDS_TO_MS);
     return () => setRoomID(null);
-  }, []);
+  }, [boardMeta, userEmail]);
 
   // Initializes text-area on text edit.
   useEffect(() => {
@@ -391,6 +452,7 @@ export default function Canvas() {
         p1: { x: clientX - width / 2, y: clientY - height / 2 },
         p2: { x: clientX + width / 2, y: clientY + height / 2 },
       });
+      // Dispatch the image to all clients
       setWebsocketAction(pendingImageElementId, 'addCanvasShape');
       // Unselect current image and reset cursor
       setPendingImageElement('');
@@ -609,6 +671,8 @@ export default function Canvas() {
         id="canvas"
         style={{
           backgroundColor: 'transparent',
+          position: 'absolute',
+          zIndex: 5,
         }}
         width={appWidth}
         height={appHeight}

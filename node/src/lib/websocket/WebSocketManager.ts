@@ -44,6 +44,10 @@ export type WSCallback = ({
     this.#logger.debug('Instantiated.');
   }
 
+  /**
+   * Sets whether the WebSocketManager should notify other sockets when a socket joins or leaves a room. This is only set to false
+   * for testing as it simplifies counting.
+   */
   public set shouldNotify(shouldNotify: boolean) {
     this.#shouldNotify = shouldNotify;
   }
@@ -67,6 +71,7 @@ export type WSCallback = ({
           room,
           payload: { id },
         });
+      this.#logger.debug(`Socket ${id} joined room ${room}`);
       return sendSuccessResponse(socket, 'Socket joined room!');
     });
     // Remove socket from room
@@ -83,6 +88,7 @@ export type WSCallback = ({
           room,
           payload: { id },
         });
+      this.#logger.debug(`Socket ${id} left room ${room}`);
       return sendSuccessResponse(socket, 'Socket left room!');
     });
     this.initWSS(server);
