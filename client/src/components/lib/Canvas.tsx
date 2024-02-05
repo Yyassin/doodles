@@ -690,7 +690,6 @@ export default function Canvas() {
           ref={textAreaRef}
           style={{
             position: 'fixed',
-            // TODO: using 5 here is not ideal
             top:
               ((p1[selectedElementIds[0]]?.y ??
                 p1[currentDrawingElemId.current]?.y) -
@@ -713,7 +712,8 @@ export default function Canvas() {
                 zoom -
               scaleOffset.x,
             font: `${
-              fontSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
+              fontSizes[selectedElementIds[0] ?? currentDrawingElemId.current] *
+              zoom
             }px ${
               fontFamilies[
                 selectedElementIds[0] ?? currentDrawingElemId.current

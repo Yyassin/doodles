@@ -103,12 +103,13 @@ export const CanvasElementFillStyles = [
 ] as const;
 export type CanvasElementFillStyle = (typeof CanvasElementFillStyles)[number];
 
+/* Used for text offset */
 interface fontOffsets {
   [font: string]: {
     [size: number]: number;
   };
 }
-
+/* Maps text offset to font and size */
 export const fontSizeOffsets: fontOffsets = {
   'brush Script MT, cursive': {
     14: 2,
