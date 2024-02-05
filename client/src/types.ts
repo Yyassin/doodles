@@ -103,6 +103,57 @@ export const CanvasElementFillStyles = [
 ] as const;
 export type CanvasElementFillStyle = (typeof CanvasElementFillStyles)[number];
 
+interface fontOffsets {
+  [font: string]: {
+    [size: number]: number;
+  };
+}
+
+export const fontSizeOffsets: fontOffsets = {
+  'brush Script MT, cursive': {
+    14: 2,
+    24: 4,
+    30: 6,
+    40: 8,
+    60: 10,
+  },
+  'times new roman': {
+    14: 1,
+    24: 3,
+    30: 4,
+    40: 6,
+    60: 8,
+  },
+  'trebuchet MS': {
+    14: 2,
+    24: 4,
+    30: 5,
+    40: 7,
+    60: 9,
+  },
+  garamond: {
+    14: 2,
+    24: 4,
+    30: 5,
+    40: 5,
+    60: 9,
+  },
+  'courier New': {
+    14: 1,
+    24: 2,
+    30: 2,
+    40: 2,
+    60: 4,
+  },
+  'Comic Sans MS': {
+    14: 5,
+    24: 8,
+    30: 11,
+    40: 14,
+    60: 21,
+  },
+};
+
 /** Names of common events subscribed by event listeners */
 export enum EVENT {
   KEYDOWN = 'keydown',

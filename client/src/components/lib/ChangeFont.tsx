@@ -64,7 +64,7 @@ const FontFamily = ({ tools }: { tools: fontType[] }) => {
           <ToolButton
             customizabilityDict={{ fontFamily: mapFonts[toolName] }}
             label={toolName}
-            active={interestValue === fontStyles[toolName]}
+            active={interestValue === mapFonts[toolName]}
           >
             <div
               className="rounded-full"
