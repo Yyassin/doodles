@@ -5,6 +5,7 @@ import {
   FastFireField,
   FastFireDocument,
 } from 'fastfire';
+import { generateRandId } from '../utils/misc';
 
 /**
  * Defines user class.
@@ -14,6 +15,8 @@ import {
 //TODO: add createdAt and updatedAt
 @FastFireCollection('User')
 export class User extends FastFireDocument<User> {
+  @FastFireField({ required: true })
+  uid!: string;
   @FastFireField({ required: true })
   username!: string;
   @FastFireField({ required: true })
@@ -37,14 +40,20 @@ export async function createUser(
   password: string,
   avatar: string,
 ) {
-  return await FastFire.create(User, {
-    username,
-    firstname,
-    lastname,
-    email,
-    password,
-    avatar,
-  });
+  const uid = generateRandId();
+  return await FastFire.create(
+    User,
+    {
+      uid,
+      username,
+      firstname,
+      lastname,
+      email,
+      password,
+      avatar,
+    },
+    uid,
+  );
 }
 
 // Function to find a user by ID

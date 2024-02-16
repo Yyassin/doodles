@@ -3,6 +3,7 @@ import {
   handleCreateBoard,
   handleDeleteBoard,
   handleFindBoardById,
+  handleGetCollaboratorBoards,
   handleUpdateBoard,
 } from './board.controller';
 
@@ -19,6 +20,9 @@ router.post('/createBoard', handleCreateBoard);
 
 // GET board by ID
 router.get('/getBoard', handleFindBoardById);
+
+// GET board by ID
+router.get('/getCollaboratorsBoard', handleGetCollaboratorBoards);
 
 // PUT update a board
 router.put('/updateBoard', handleUpdateBoard);

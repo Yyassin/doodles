@@ -5,6 +5,7 @@ import {
   FastFireField,
   FastFireDocument,
 } from 'fastfire';
+import { generateRandId } from '../utils/misc';
 
 /**
  * Defines image class.
@@ -15,17 +16,22 @@ import {
 @FastFireCollection('Image')
 export class Image extends FastFireDocument<Image> {
   @FastFireField({ required: true })
-  imageID!: string;
+  uid!: string;
   @FastFireField({ required: true })
   imageEncoded!: string;
 }
 
-// Function to create a user
-export async function createImage(imageID: string, imageEncoded: string) {
-  return await FastFire.create(Image, {
-    imageID,
-    imageEncoded,
-  });
+// Function to create an image
+export async function createImage(imageEncoded: string) {
+  const uid = generateRandId();
+  return await FastFire.create(
+    Image,
+    {
+      uid,
+      imageEncoded,
+    },
+    uid,
+  );
 }
 
 // Function to find a image by ID

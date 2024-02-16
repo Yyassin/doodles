@@ -1,11 +1,11 @@
 import { DocumentFields } from 'fastfire/dist/types';
-import { User } from './user';
 import {
   FastFire,
   FastFireCollection,
   FastFireField,
   FastFireDocument,
 } from 'fastfire';
+import { generateRandId } from '../utils/misc';
 
 /**
  * Defines collaborator class.
@@ -17,17 +17,28 @@ import {
 @FastFireCollection('Collaborator')
 export class Collaborator extends FastFireDocument<Collaborator> {
   @FastFireField({ required: true })
+  uid!: string;
+  @FastFireField({ required: true })
   permissionLevel!: string;
   @FastFireField({ required: true })
-  user!: User;
+  user!: string;
 }
 
 // Function to create a collaborator
-export async function createCollaborator(permissionLevel: string, user: User) {
-  return await FastFire.create(Collaborator, {
-    permissionLevel,
-    user,
-  });
+export async function createCollaborator(
+  permissionLevel: string,
+  user: string,
+) {
+  const uid = generateRandId();
+  return await FastFire.create(
+    Collaborator,
+    {
+      uid,
+      permissionLevel,
+      user,
+    },
+    uid,
+  );
 }
 
 // Function to find a collaborator by ID

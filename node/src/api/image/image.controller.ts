@@ -17,8 +17,8 @@ import { HTTP_STATUS } from '../../constants';
 // Create image
 export const handleCreateImage = async (req: Request, res: Response) => {
   try {
-    const { imageID, imageEncoded } = req.body; // The comment parameters are in the body.
-    const image = await createImage(imageID, imageEncoded);
+    const { imageEncoded } = req.body;
+    const image = await createImage(imageEncoded);
 
     res.status(HTTP_STATUS.SUCCESS).json({ image });
   } catch (error) {
