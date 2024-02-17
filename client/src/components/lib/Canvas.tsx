@@ -11,7 +11,12 @@ import {
 } from '@/lib/canvasElements/selection';
 import { useAppStore } from '@/stores/AppStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
-import { CanvasElementType, TransformHandleDirection, Vector2 } from '@/types';
+import {
+  CanvasElementType,
+  TransformHandleDirection,
+  Vector2,
+  fontSizeOffsets,
+} from '@/types';
 import { User, useWebSocketStore } from '@/stores/WebSocketStore';
 import { getScaleOffset } from '@/lib/canvasElements/render';
 import {
@@ -685,11 +690,18 @@ export default function Canvas() {
           ref={textAreaRef}
           style={{
             position: 'fixed',
-            // TODO: using 3 here is not ideal
             top:
               ((p1[selectedElementIds[0]]?.y ??
                 p1[currentDrawingElemId.current]?.y) -
-                5 +
+                (fontSizeOffsets[
+                  fontFamilies[
+                    selectedElementIds[0] ?? currentDrawingElemId.current
+                  ]
+                ]?.[
+                  fontSizes[
+                    selectedElementIds[0] ?? currentDrawingElemId.current
+                  ]
+                ] ?? 0) +
                 panOffset.y) *
                 zoom -
               scaleOffset.y,
@@ -700,7 +712,8 @@ export default function Canvas() {
                 zoom -
               scaleOffset.x,
             font: `${
-              fontSizes[selectedElementIds[0] ?? currentDrawingElemId.current]
+              fontSizes[selectedElementIds[0] ?? currentDrawingElemId.current] *
+              zoom
             }px ${
               fontFamilies[
                 selectedElementIds[0] ?? currentDrawingElemId.current
