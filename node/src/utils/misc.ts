@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 /**
  * Defines miscellaneous helpers used across the application.
  * @authors Yousef Yassin
@@ -18,3 +19,8 @@ export const truncateString = (input: string, n: number): string => {
   }
   return input.length <= n ? input : input.slice(-n);
 };
+/**
+ * Genertates a random id value.
+ * @returns A random UUID.
+ */
+export const generateRandId = () => crypto.randomUUID();

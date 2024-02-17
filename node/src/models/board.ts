@@ -1,11 +1,11 @@
 import { DocumentFields } from 'fastfire/dist/types';
-import { Collaborator } from './collaborator';
 import {
   FastFire,
   FastFireCollection,
   FastFireField,
   FastFireDocument,
 } from 'fastfire';
+import { generateRandId } from '../utils/misc';
 
 /**
  * Defines Board class.
@@ -16,6 +16,8 @@ import {
 @FastFireCollection('Board')
 export class Board extends FastFireDocument<Board> {
   @FastFireField({ required: true })
+  uid!: string;
+  @FastFireField({ required: true })
   serialized!: string;
   @FastFireField({ required: true })
   title!: string;
@@ -24,7 +26,11 @@ export class Board extends FastFireDocument<Board> {
   @FastFireField({ required: true })
   shareUrl!: string;
   @FastFireField({ required: true })
-  collaborators!: Collaborator[];
+  collaborators!: string[]; // Array of collaborator IDs
+  @FastFireField({ required: true })
+  createdAt!: Date;
+  @FastFireField({ required: true })
+  updatedAt!: Date;
 }
 
 // Function to create a board
@@ -33,15 +39,25 @@ export async function createBoard(
   title: string,
   tags: string[],
   shareUrl: string,
-  collaborators: Collaborator[],
+  collaborators: string[],
 ) {
-  return FastFire.create(Board, {
-    serialized,
-    title,
-    tags,
-    shareUrl,
-    collaborators,
-  });
+  const uid = generateRandId();
+  const createdAt = new Date();
+  const updatedAt = new Date();
+  return FastFire.create(
+    Board,
+    {
+      uid,
+      serialized,
+      title,
+      tags,
+      shareUrl,
+      collaborators,
+      createdAt,
+      updatedAt,
+    },
+    uid,
+  );
 }
 
 // Function to find a board by ID
@@ -53,6 +69,7 @@ export const updateBoard = async (
   board: Board,
   updatedFields: Partial<DocumentFields<Board>>,
 ) => {
+  updatedFields.updatedAt = new Date();
   const { fastFireOptions: _fastFireOptions, id: _id, ...boardFields } = board;
   const updatedBoard = { ...boardFields, ...updatedFields };
   await board.update(updatedBoard);
@@ -61,3 +78,12 @@ export const updateBoard = async (
 
 // Function to delete a board
 export const deleteBoard = async (board: Board) => await board.delete();
+
+export const findBoardsByCollaboratorId = async (collaboratorId: string) => {
+  return await FastFire.where(
+    Board,
+    'collaborators',
+    'array-contains',
+    collaboratorId,
+  ).get();
+};

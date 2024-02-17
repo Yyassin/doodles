@@ -5,6 +5,7 @@ import {
   FastFireField,
   FastFireDocument,
 } from 'fastfire';
+import { generateRandId } from '../utils/misc';
 
 /**
  * Defines user class.
@@ -14,6 +15,8 @@ import {
 //TODO: add createdAt and updatedAt
 @FastFireCollection('User')
 export class User extends FastFireDocument<User> {
+  @FastFireField({ required: true })
+  uid!: string;
   @FastFireField({ required: true })
   username!: string;
   @FastFireField({ required: true })
@@ -26,6 +29,10 @@ export class User extends FastFireDocument<User> {
   password!: string;
   @FastFireField()
   avatar!: string;
+  @FastFireField({ required: true })
+  createdAt!: Date;
+  @FastFireField({ required: true })
+  updatedAt!: Date;
 }
 
 // Function to create a user
@@ -37,14 +44,24 @@ export async function createUser(
   password: string,
   avatar: string,
 ) {
-  return await FastFire.create(User, {
-    username,
-    firstname,
-    lastname,
-    email,
-    password,
-    avatar,
-  });
+  const uid = generateRandId();
+  const createdAt = new Date();
+  const updatedAt = new Date();
+  return await FastFire.create(
+    User,
+    {
+      uid,
+      username,
+      firstname,
+      lastname,
+      email,
+      password,
+      avatar,
+      createdAt,
+      updatedAt,
+    },
+    uid,
+  );
 }
 
 // Function to find a user by ID
@@ -56,6 +73,7 @@ export const updateUser = async (
   user: User,
   updatedFields: Partial<DocumentFields<User>>,
 ) => {
+  updatedFields.updatedAt = new Date();
   const { fastFireOptions: _fastFireOptions, id: _id, ...userFields } = user;
   const updatedUser = { ...userFields, ...updatedFields };
   await user.update(updatedUser);

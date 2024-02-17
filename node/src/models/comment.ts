@@ -1,11 +1,11 @@
 import { DocumentFields } from 'fastfire/dist/types';
-import { Collaborator } from './collaborator';
 import {
   FastFire,
   FastFireCollection,
   FastFireField,
   FastFireDocument,
 } from 'fastfire';
+import { generateRandId } from '../utils/misc';
 
 /**
  * Defines comment class.
@@ -16,17 +16,33 @@ import {
 @FastFireCollection('Comment')
 export class Comment extends FastFireDocument<Comment> {
   @FastFireField({ required: true })
+  uid!: string;
+  @FastFireField({ required: true })
   text!: string;
   @FastFireField({ required: true })
-  collaborator!: Collaborator;
+  collaborator!: string; // Collaborator ID
+  @FastFireField({ required: true })
+  createdAt!: Date;
+  @FastFireField({ required: true })
+  updatedAt!: Date;
 }
 
 // Function to create a comment
-export async function createComment(text: string, collaborator: Collaborator) {
-  return await FastFire.create(Comment, {
-    text,
-    collaborator,
-  });
+export async function createComment(text: string, collaborator: string) {
+  const uid = generateRandId();
+  const createdAt = new Date();
+  const updatedAt = new Date();
+  return await FastFire.create(
+    Comment,
+    {
+      uid,
+      text,
+      collaborator,
+      createdAt,
+      updatedAt,
+    },
+    uid,
+  );
 }
 
 // Function to find a comment by ID
@@ -38,6 +54,7 @@ export const updateComment = async (
   comment: Comment,
   updatedFields: Partial<DocumentFields<Comment>>,
 ) => {
+  updatedFields.updatedAt = new Date();
   const {
     fastFireOptions: _fastFireOptions,
     id: _id,
