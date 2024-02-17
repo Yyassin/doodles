@@ -22,6 +22,10 @@ export class Collaborator extends FastFireDocument<Collaborator> {
   permissionLevel!: string;
   @FastFireField({ required: true })
   user!: string;
+  @FastFireField({ required: true })
+  createdAt!: Date;
+  @FastFireField({ required: true })
+  updatedAt!: Date;
 }
 
 // Function to create a collaborator
@@ -30,12 +34,16 @@ export async function createCollaborator(
   user: string,
 ) {
   const uid = generateRandId();
+  const createdAt = new Date();
+  const updatedAt = new Date();
   return await FastFire.create(
     Collaborator,
     {
       uid,
       permissionLevel,
       user,
+      createdAt,
+      updatedAt,
     },
     uid,
   );
@@ -50,6 +58,7 @@ export const updateCollaborator = async (
   collaborator: Collaborator,
   updatedFields: Partial<DocumentFields<Collaborator>>,
 ) => {
+  updatedFields.updatedAt = new Date();
   const {
     fastFireOptions: _fastFireOptions,
     id: _id,

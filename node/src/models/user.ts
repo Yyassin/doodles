@@ -29,6 +29,10 @@ export class User extends FastFireDocument<User> {
   password!: string;
   @FastFireField()
   avatar!: string;
+  @FastFireField({ required: true })
+  createdAt!: Date;
+  @FastFireField({ required: true })
+  updatedAt!: Date;
 }
 
 // Function to create a user
@@ -41,6 +45,8 @@ export async function createUser(
   avatar: string,
 ) {
   const uid = generateRandId();
+  const createdAt = new Date();
+  const updatedAt = new Date();
   return await FastFire.create(
     User,
     {
@@ -51,6 +57,8 @@ export async function createUser(
       email,
       password,
       avatar,
+      createdAt,
+      updatedAt,
     },
     uid,
   );
@@ -65,6 +73,7 @@ export const updateUser = async (
   user: User,
   updatedFields: Partial<DocumentFields<User>>,
 ) => {
+  updatedFields.updatedAt = new Date();
   const { fastFireOptions: _fastFireOptions, id: _id, ...userFields } = user;
   const updatedUser = { ...userFields, ...updatedFields };
   await user.update(updatedUser);

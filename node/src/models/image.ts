@@ -1,4 +1,3 @@
-import { DocumentFields } from 'fastfire/dist/types';
 import {
   FastFire,
   FastFireCollection,
@@ -19,16 +18,20 @@ export class Image extends FastFireDocument<Image> {
   uid!: string;
   @FastFireField({ required: true })
   imageEncoded!: string;
+  @FastFireField({ required: true })
+  createdAt!: Date;
 }
 
 // Function to create an image
 export async function createImage(imageEncoded: string) {
   const uid = generateRandId();
+  const createdAt = new Date();
   return await FastFire.create(
     Image,
     {
       uid,
       imageEncoded,
+      createdAt,
     },
     uid,
   );
@@ -37,17 +40,3 @@ export async function createImage(imageEncoded: string) {
 // Function to find a image by ID
 export const findImageById = async (imageId: string) =>
   FastFire.findById(Image, imageId);
-
-// Function to update a the image
-export const updateImage = async (
-  image: Image,
-  updatedFields: Partial<DocumentFields<Image>>,
-) => {
-  const { fastFireOptions: _fastFireOptions, id: _id, ...imageFields } = image;
-  const updatedImage = { ...imageFields, ...updatedFields };
-  await image.update(updatedImage);
-  return updateImage;
-};
-
-// Function to delete an image
-export const deleteImage = async (image: Image) => await image.delete();

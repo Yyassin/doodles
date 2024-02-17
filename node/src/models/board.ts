@@ -26,7 +26,11 @@ export class Board extends FastFireDocument<Board> {
   @FastFireField({ required: true })
   shareUrl!: string;
   @FastFireField({ required: true })
-  collaborators!: string[]; // Array of user IDs
+  collaborators!: string[]; // Array of collaborator IDs
+  @FastFireField({ required: true })
+  createdAt!: Date;
+  @FastFireField({ required: true })
+  updatedAt!: Date;
 }
 
 // Function to create a board
@@ -38,6 +42,8 @@ export async function createBoard(
   collaborators: string[],
 ) {
   const uid = generateRandId();
+  const createdAt = new Date();
+  const updatedAt = new Date();
   return FastFire.create(
     Board,
     {
@@ -47,6 +53,8 @@ export async function createBoard(
       tags,
       shareUrl,
       collaborators,
+      createdAt,
+      updatedAt,
     },
     uid,
   );
@@ -61,6 +69,7 @@ export const updateBoard = async (
   board: Board,
   updatedFields: Partial<DocumentFields<Board>>,
 ) => {
+  updatedFields.updatedAt = new Date();
   const { fastFireOptions: _fastFireOptions, id: _id, ...boardFields } = board;
   const updatedBoard = { ...boardFields, ...updatedFields };
   await board.update(updatedBoard);

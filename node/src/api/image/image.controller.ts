@@ -1,10 +1,5 @@
 import { Response, Request } from 'express';
-import {
-  createImage,
-  findImageById,
-  updateImage,
-  deleteImage,
-} from '../../models/image';
+import { createImage, findImageById } from '../../models/image';
 import { HTTP_STATUS } from '../../constants';
 
 /**
@@ -58,52 +53,5 @@ export const handleFindImageById = async (req: Request, res: Response) => {
     res
       .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
       .json({ error: 'Failed to find image' });
-  }
-};
-
-// Update image
-export const handleUpdateImage = async (req: Request, res: Response) => {
-  try {
-    // The comment ID and text parameters are in the body.
-    const { id: imageId, fields: updatedFields } = req.body;
-    if (!validateId(imageId, res)) return;
-    const image = await findImageById(imageId);
-
-    if (image) {
-      await updateImage(image, updatedFields);
-      const { fastFireOptions: _fastFireOptions, ...fields } = image;
-      return res.status(HTTP_STATUS.SUCCESS).json(fields);
-    } else {
-      return notFoundError(res);
-    }
-  } catch (error) {
-    console.error('Error updating image: ', error);
-    res
-      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: 'Failed to update image' });
-  }
-};
-
-// Delete image
-export const handleDeleteImage = async (req: Request, res: Response) => {
-  try {
-    const imageId = req.body.id; // The image ID parameter is in the body.
-    if (!validateId(imageId, res)) return;
-
-    const image = await findImageById(imageId as string);
-
-    if (image) {
-      await deleteImage(image);
-      res
-        .status(HTTP_STATUS.SUCCESS)
-        .json({ message: 'image deleted successfully' });
-    } else {
-      return notFoundError(res);
-    }
-  } catch (error) {
-    console.error('Error deleting image:', error);
-    res
-      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: 'Failed to delete image' });
   }
 };
