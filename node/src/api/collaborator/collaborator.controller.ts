@@ -2,6 +2,7 @@ import { Response, Request } from 'express';
 import {
   createCollaborator,
   findCollaboratorById,
+  findCollaboratorsById,
   updateCollaborator,
   deleteCollaborator,
 } from '../../models/collaborator';
@@ -60,6 +61,28 @@ export const handleFindCollaboratorById = async (
     res
       .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
       .json({ error: 'Failed to find collaborator' });
+  }
+};
+
+//Get all of the users collaborators
+export const handleFindCollaboratorsById = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const userID = req.body.id; // The collaborator ID parameter is in the body.
+    if (!validateId(userID, res)) return;
+    const collaborators = await findCollaboratorsById(userID as string);
+    if (collaborators) {
+      res.status(HTTP_STATUS.SUCCESS).json({ collaborators });
+    } else {
+      return notFoundError(res);
+    }
+  } catch (error) {
+    console.error('Error finding collaborators by ID:', error);
+    res
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ error: 'Failed to find collaborators' });
   }
 };
 

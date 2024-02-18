@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { getInitials, unixToFormattedDate } from '@/lib/misc';
+import { getInitials } from '@/lib/misc';
 import { useAuthStore } from '@/stores/AuthStore';
 
 /**
@@ -66,8 +66,6 @@ const LikeOutlineIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
-// Temp: Hardcoded for now.
-const time = 1671880200;
 const avatar = 'https://github.com/shadcn.png';
 
 const CommentsSheetContent = () => {
@@ -81,7 +79,7 @@ const CommentsSheetContent = () => {
     {
       username: 'Zayn Malik',
       avatar,
-      time: time - 1000,
+      time: new Date(),
       comment:
         'I haven’t seen it called the Sieve Principle... is that new? I’m used to calling this Inclusion-Exclusion.',
       likes: 2,
@@ -92,7 +90,7 @@ const CommentsSheetContent = () => {
     {
       username: 'Yousef Yassin',
       avatar,
-      time: time + 1000,
+      time: new Date(),
       comment:
         'Ah, yea Sieve is the more modern term -- you’re right it used to be I.E., I’ll add a note below',
       likes: 1,
@@ -103,7 +101,7 @@ const CommentsSheetContent = () => {
     {
       username: 'Zayn Malik',
       avatar,
-      time: time - 2000,
+      time: new Date(),
       comment: 'Ah, cool. Thanks for clarifying!!',
       likes: 1,
       initials: 'ZM',
@@ -137,7 +135,7 @@ const CommentsSheetContent = () => {
                 {comment.username}
               </p>
               <p className="text-xs text-[#ffffff80] pb-[0.75rem]">
-                {unixToFormattedDate(comment.time)}
+                {comment.time.toUTCString()}
               </p>
               <p className="text-sm font-normal text-white pb-[0.5rem]">
                 {comment.comment}
@@ -188,7 +186,7 @@ const CommentsSheetContent = () => {
                 {
                   username: `${userFirstName} ${userLastName}`,
                   avatar: userPicture ?? avatar,
-                  time: Date.now(),
+                  time: new Date(),
                   comment: textInput,
                   likes: 0,
                   initials: getInitials(`${userFirstName} ${userLastName}`),

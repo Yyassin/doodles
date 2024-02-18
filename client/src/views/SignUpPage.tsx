@@ -22,7 +22,7 @@ import { firebaseApp } from '../firebaseDB/firebase';
 import { useAppStore } from '@/stores/AppStore';
 import { ACCESS_TOKEN_TAG, REST } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 /**
  * It is the sign up page where user either inputs email and password or
@@ -36,7 +36,7 @@ export function signup(
   firstName: string,
   lastName: string,
   profilePicture: File | null,
-): Promise<UserCredential> {
+): Promise<{ cred: UserCredential; userInfo: AxiosResponse }> {
   return new Promise(async (resolve, reject) => {
     const auth = getAuth(firebaseApp);
     console.log(profilePicture);
@@ -60,9 +60,9 @@ export function signup(
         // handle uploading the profile picture to backend
       };
 
-      await axios.post(REST.user.create, userData);
+      const creatUserResp = await axios.post(REST.user.create, userData);
 
-      resolve(userCredential);
+      resolve({ cred: userCredential, userInfo: creatUserResp });
     } catch (error: unknown) {
       reject(error as Error);
     }
@@ -88,7 +88,7 @@ export default function SignUp() {
       //we want to disable sign up button from user so
       //firebase doesnt create many accounts if button click multiple times
       setLoading(true);
-      const signUpToken = await signup(
+      const { cred, userInfo } = await signup(
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
         firstNameRef.current?.value ?? '',
@@ -97,17 +97,17 @@ export default function SignUp() {
           ? profilePictureRef.current?.files[0]
           : null,
       );
+
+      //TODO
       setUser(
         firstNameRef.current?.value ?? '',
         lastNameRef.current?.value ?? '',
         emailRef.current?.value ?? '',
         '', // add image implementation when API is done
+        userInfo.data.user.uid ?? '',
       );
 
-      localStorage.setItem(
-        ACCESS_TOKEN_TAG,
-        await signUpToken.user.getIdToken(),
-      );
+      localStorage.setItem(ACCESS_TOKEN_TAG, await cred.user.getIdToken());
       setMode('dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message); //if error thrown, setState and will display on page
@@ -140,12 +140,14 @@ export default function SignUp() {
           setError('Account is already registered. Go to Sign In Page!');
         })
         .catch(async () => {
-          await axios.post(REST.user.create, userData);
+          const createUserResp = await axios.post(REST.user.create, userData);
+          //TODO
           setUser(
             googleSignInToken.user.displayName ?? '',
             '',
             googleSignInToken.user.email ?? '',
             googleSignInToken.user.photoURL ?? '',
+            createUserResp.data.user.uid ?? '',
           );
           localStorage.setItem(
             ACCESS_TOKEN_TAG,

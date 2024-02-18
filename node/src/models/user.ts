@@ -45,8 +45,8 @@ export async function createUser(
   avatar: string,
 ) {
   const uid = generateRandId();
-  const createdAt = new Date();
-  const updatedAt = new Date();
+  const createdAt = new Date().toUTCString();
+  const updatedAt = new Date().toUTCString();
   return await FastFire.create(
     User,
     {
@@ -73,7 +73,7 @@ export const updateUser = async (
   user: User,
   updatedFields: Partial<DocumentFields<User>>,
 ) => {
-  updatedFields.updatedAt = new Date();
+  updatedFields.updatedAt = new Date().toUTCString();
   const { fastFireOptions: _fastFireOptions, id: _id, ...userFields } = user;
   const updatedUser = { ...userFields, ...updatedFields };
   await user.update(updatedUser);

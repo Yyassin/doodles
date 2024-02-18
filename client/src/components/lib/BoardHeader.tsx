@@ -6,7 +6,6 @@ import { Users2Icon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import UserList from './UserList/UserList';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
-import { unixToFormattedDate } from '@/lib/misc';
 
 /**
  * Defines a header for the board containing the title, last modified date, and buttons for sharing and viewing comments. A list of active
@@ -74,7 +73,7 @@ const BoardHeader = ({
               {boardMeta.title}
             </h2>
             <p className="text-sm text-muted-foreground">
-              Last Edited: {unixToFormattedDate(boardMeta.lastModified)}
+              Last Edited: {boardMeta.lastModified}
             </p>
           </div>
         </div>

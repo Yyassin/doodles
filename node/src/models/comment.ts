@@ -30,8 +30,8 @@ export class Comment extends FastFireDocument<Comment> {
 // Function to create a comment
 export async function createComment(text: string, collaborator: string) {
   const uid = generateRandId();
-  const createdAt = new Date();
-  const updatedAt = new Date();
+  const createdAt = new Date().toUTCString();
+  const updatedAt = new Date().toUTCString();
   return await FastFire.create(
     Comment,
     {
@@ -54,7 +54,7 @@ export const updateComment = async (
   comment: Comment,
   updatedFields: Partial<DocumentFields<Comment>>,
 ) => {
-  updatedFields.updatedAt = new Date();
+  updatedFields.updatedAt = new Date().toUTCString();
   const {
     fastFireOptions: _fastFireOptions,
     id: _id,

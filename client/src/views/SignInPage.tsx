@@ -23,6 +23,7 @@ import axios from 'axios';
 import { REST } from '@/constants';
 import { ACCESS_TOKEN_TAG } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useCanvasBoardStore, Canvas } from '@/stores/CanavasBoardStore';
 
 /**
  * It is the sign in page where user either inputs email and password or
@@ -51,31 +52,38 @@ export async function getUserDetails(
     userLastName: string,
     userEmail: string | null,
     userPicture: string,
+    userID: string,
   ) => void,
+  setCanvases: (canvases: Canvas[]) => void,
 ) {
-  await axios
-    .get(REST.user.get, {
+  try {
+    const user = await axios.get(REST.user.get, {
       params: { email },
-    })
-    .then((response) => {
-      setUser(
-        response.data.user.firstname ?? '',
-        response.data.user.lastname ?? '',
-        response.data.user.email ?? '',
-        response.data.user.avatar ?? '',
-      );
-    })
-    .catch((error) => {
-      console.error(
-        'Error:',
-        error.response ? error.response.data : error.message,
-      );
     });
+
+    const userID = user.data.user.uid;
+    setUser(
+      user.data.user.firstname ?? '',
+      user.data.user.lastname ?? '',
+      user.data.user.email ?? '',
+      user.data.user.avatar ?? '',
+      user.data.user.uid ?? '',
+    );
+
+    const userBoards = await axios.get(REST.board.getBoards, {
+      params: { userID },
+    });
+
+    setCanvases(userBoards.data.boards);
+  } catch (error) {
+    console.error('Error:', error);
+  }
 }
 
 export default function SignInPage() {
   const { setMode } = useAppStore(['setMode']);
   const { setUser } = useAuthStore(['setUser']);
+  const { setCanvases } = useCanvasBoardStore(['setCanvases']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false); // State to disable sign in button while loading
@@ -91,7 +99,7 @@ export default function SignInPage() {
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
       );
-      getUserDetails(emailRef.current?.value ?? '', setUser); //get name, email, avatar of user
+      getUserDetails(emailRef.current?.value ?? '', setUser, setCanvases); //get name, email, avatar of user
 
       localStorage.setItem(
         ACCESS_TOKEN_TAG,
@@ -117,18 +125,26 @@ export default function SignInPage() {
         .get(REST.user.get, {
           params: { email: googleSignInToken.user.email },
         })
-        .then(async () => {
+        .then(async (response) => {
+          const userID = response.data.user.uid;
+
           setUser(
             googleSignInToken.user.displayName ?? '',
             '',
             googleSignInToken.user.email ?? '',
             googleSignInToken.user.photoURL ?? '', // add image implementation when API is done
+            userID,
           );
           localStorage.setItem(
             ACCESS_TOKEN_TAG,
             await googleSignInToken.user.getIdToken(),
           );
 
+          const userBoards = await axios.get(REST.board.getBoards, {
+            params: { userID },
+          });
+
+          setCanvases(userBoards.data.boards);
           setMode('dashboard'); //bring user to dashboard page if sign in complete
         })
         .catch(() => {

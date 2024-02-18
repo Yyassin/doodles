@@ -27,6 +27,10 @@ export const REST = {
   tenants: {
     get: `${REST_ROOT}/tenancy/room`,
   },
+  board: {
+    create: `${REST_ROOT}/board/createBoard`,
+    getBoards: `${REST_ROOT}/board/getCollaboratorsBoard`,
+  },
 };
 export const HTTP_STATUS = {
   SUCCESS: 200,
