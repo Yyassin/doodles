@@ -3,6 +3,7 @@ import {
   handleCreateCollaborator,
   handleDeleteCollaborator,
   handleFindCollaboratorById,
+  handleFindCollaboratorsById,
   handleUpdateCollaborator,
 } from './collaborator.controller';
 
@@ -19,6 +20,9 @@ router.post('/createCollaborator', handleCreateCollaborator);
 
 // GET collaborator by ID
 router.get('/getCollaborator', handleFindCollaboratorById);
+
+// GET collaborators by ID
+router.get('/getCollaborators', handleFindCollaboratorsById);
 
 // PUT update a collaborator
 router.put('/updateCollaborator', handleUpdateCollaborator);

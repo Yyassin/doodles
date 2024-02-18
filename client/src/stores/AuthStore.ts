@@ -14,6 +14,7 @@ interface AuthState {
   userLastName: string;
   userEmail: string;
   userPicture: string;
+  userID: string;
 }
 
 interface AuthActions {
@@ -23,6 +24,7 @@ interface AuthActions {
     userLastName: string,
     userEmail: string | null,
     userPicture: string,
+    userID: string,
   ) => void;
 }
 
@@ -34,6 +36,7 @@ export const initialAuthState: AuthState = {
   userLastName: '',
   userEmail: '',
   userPicture: '',
+  userID: '',
 };
 
 /** Actions / Reducers */
@@ -44,6 +47,7 @@ const setUser =
     userLastName: string,
     userEmail: string | null,
     userPicture: string,
+    userID: string,
   ) =>
     set(() => {
       return {
@@ -53,6 +57,7 @@ const setUser =
         // clients, helpful for tests but not irl.
         userEmail: `${userEmail}-${generateRandId()}`,
         userPicture,
+        userID,
       };
     });
 

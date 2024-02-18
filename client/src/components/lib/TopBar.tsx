@@ -4,6 +4,10 @@ import { PlusIcon } from '@radix-ui/react-icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { IconDropDown } from './IconDropDown';
+import { useAppStore } from '@/stores/AppStore';
+import axios from 'axios';
+import { REST } from '@/constants';
+import { useAuthStore } from '@/stores/AuthStore';
 
 /**
  * Define a react component that the top bar of the main dashboard
@@ -11,7 +15,15 @@ import { IconDropDown } from './IconDropDown';
  */
 
 export const TopBar = () => {
-  const { board, folder } = useCanvasBoardStore(['board', 'folder']);
+  const { board, folder, addCanvas, setBoardMeta } = useCanvasBoardStore([
+    'board',
+    'folder',
+    'addCanvas',
+    'setBoardMeta',
+  ]);
+  const { userID } = useAuthStore(['userID']);
+  const { setMode } = useAppStore(['setMode']);
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-row ml-5 gap-5">
@@ -35,7 +47,32 @@ export const TopBar = () => {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <button className="text-violet11 shadow-blackA4 hover:bg-violet3 inline-flex h-[35px] w-[35px] items-center justify-center rounded-lg bg-white outline outline-offset-0.5 outline-[#7f7dcf] focus:shadow-black hover:bg-[#eee8f9]">
+                <button
+                  onClick={async () => {
+                    setMode('canvas');
+                    // TODO: Should perform and cache concurrent fetches for the board and its comments here
+                    const data = await axios.post(REST.board.create, {
+                      user: userID,
+                      serialized: 'fcvd', //to be changed
+                      title: 'Untitled',
+                      shareUrl: 'Untitled.com',
+                    });
+
+                    const boardData = data.data.board;
+                    delete boardData.fastFireOptions;
+                    delete boardData.serialized;
+                    delete boardData.uid;
+
+                    addCanvas(boardData);
+
+                    setBoardMeta({
+                      roomID: boardData.roomID,
+                      title: boardData.title,
+                      lastModified: boardData.updatedAt,
+                    });
+                  }}
+                  className="text-violet11 shadow-blackA4 hover:bg-violet3 inline-flex h-[35px] w-[35px] items-center justify-center rounded-lg bg-white outline outline-offset-0.5 outline-[#7f7dcf] focus:shadow-black hover:bg-[#eee8f9]"
+                >
                   <PlusIcon color="#7f7dcf" />
                 </button>
               </Tooltip.Trigger>

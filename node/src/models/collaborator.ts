@@ -34,8 +34,8 @@ export async function createCollaborator(
   user: string,
 ) {
   const uid = generateRandId();
-  const createdAt = new Date();
-  const updatedAt = new Date();
+  const createdAt = new Date().toUTCString();
+  const updatedAt = new Date().toUTCString();
   return await FastFire.create(
     Collaborator,
     {
@@ -53,12 +53,17 @@ export async function createCollaborator(
 export const findCollaboratorById = async (collaboratorId: string) =>
   FastFire.findById(Collaborator, collaboratorId);
 
+// Function to find a user's collaborators by ID
+export const findCollaboratorsById = async (userID: string) => {
+  return await FastFire.where(Collaborator, 'user', '==', userID).get();
+};
+
 // Function to update a collaborator
 export const updateCollaborator = async (
   collaborator: Collaborator,
   updatedFields: Partial<DocumentFields<Collaborator>>,
 ) => {
-  updatedFields.updatedAt = new Date();
+  updatedFields.updatedAt = new Date().toUTCString();
   const {
     fastFireOptions: _fastFireOptions,
     id: _id,

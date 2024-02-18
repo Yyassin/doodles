@@ -25,7 +25,7 @@ export class Image extends FastFireDocument<Image> {
 // Function to create an image
 export async function createImage(imageEncoded: string) {
   const uid = generateRandId();
-  const createdAt = new Date();
+  const createdAt = new Date().toUTCString();
   return await FastFire.create(
     Image,
     {

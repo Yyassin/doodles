@@ -8,6 +8,7 @@ import * as Avatar from '@radix-ui/react-avatar';
 import { ACCESS_TOKEN_TAG } from '../../constants';
 import { useAuthStore } from '@/stores/AuthStore';
 import { extractUsername } from '@/lib/misc';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 
 /**
  * Define a react component that displays a the user infromation with a dropdown menu
@@ -16,6 +17,7 @@ import { extractUsername } from '@/lib/misc';
 
 export const IconDropDown = () => {
   const { setMode } = useAppStore(['setMode']);
+  const { setCanvases } = useCanvasBoardStore(['setCanvases']);
   const { userFirstName, userLastName, userEmail, userPicture } = useAuthStore([
     'userFirstName',
     'userLastName',
@@ -26,6 +28,7 @@ export const IconDropDown = () => {
     try {
       await signOut(getAuth(firebaseApp));
       localStorage.removeItem(ACCESS_TOKEN_TAG);
+      setCanvases([]);
       setMode('signin'); // if logout works, bring back to sign in page
     } catch (error: unknown) {
       console.error(error);

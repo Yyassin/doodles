@@ -24,6 +24,8 @@ export class Board extends FastFireDocument<Board> {
   @FastFireField({ required: true })
   tags!: string[];
   @FastFireField({ required: true })
+  folder!: string[];
+  @FastFireField({ required: true })
   shareUrl!: string;
   @FastFireField({ required: true })
   collaborators!: string[]; // Array of collaborator IDs
@@ -31,30 +33,33 @@ export class Board extends FastFireDocument<Board> {
   createdAt!: Date;
   @FastFireField({ required: true })
   updatedAt!: Date;
+  @FastFireField({ required: true })
+  roomID!: string;
 }
 
 // Function to create a board
 export async function createBoard(
   serialized: string,
   title: string,
-  tags: string[],
   shareUrl: string,
   collaborators: string[],
 ) {
   const uid = generateRandId();
-  const createdAt = new Date();
-  const updatedAt = new Date();
+  const createdAt = new Date().toUTCString();
+  const updatedAt = new Date().toUTCString();
   return FastFire.create(
     Board,
     {
       uid,
       serialized,
       title,
-      tags,
+      tags: [],
+      folder: 'none',
       shareUrl,
       collaborators,
       createdAt,
       updatedAt,
+      roomID: generateRandId(),
     },
     uid,
   );
@@ -69,7 +74,7 @@ export const updateBoard = async (
   board: Board,
   updatedFields: Partial<DocumentFields<Board>>,
 ) => {
-  updatedFields.updatedAt = new Date();
+  updatedFields.updatedAt = new Date().toUTCString();
   const { fastFireOptions: _fastFireOptions, id: _id, ...boardFields } = board;
   const updatedBoard = { ...boardFields, ...updatedFields };
   await board.update(updatedBoard);
@@ -79,11 +84,11 @@ export const updateBoard = async (
 // Function to delete a board
 export const deleteBoard = async (board: Board) => await board.delete();
 
-export const findBoardsByCollaboratorId = async (collaboratorId: string) => {
+export const findBoardsByCollaboratorsId = async (collaboratorId: string[]) => {
   return await FastFire.where(
     Board,
     'collaborators',
-    'array-contains',
+    'array-contains-any',
     collaboratorId,
   ).get();
 };

@@ -4,9 +4,13 @@ import {
   findBoardById,
   updateBoard,
   deleteBoard,
-  findBoardsByCollaboratorId,
+  findBoardsByCollaboratorsId,
 } from '../../models/board';
 import { HTTP_STATUS } from '../../constants';
+import {
+  createCollaborator,
+  findCollaboratorsById,
+} from '../../models/collaborator';
 
 /**
  * Firebase API controllers, logic for endpoint routes.
@@ -18,14 +22,13 @@ import { HTTP_STATUS } from '../../constants';
 // Create board
 export const handleCreateBoard = async (req: Request, res: Response) => {
   try {
-    const { serialized, title, tags, shareUrl, collaborators } = req.body; // The board parameters are in the body.
-    const board = await createBoard(
-      serialized,
-      title,
-      tags,
-      shareUrl,
-      collaborators,
-    );
+    const { user, serialized, title, shareUrl } = req.body; // The board parameters are in the body.
+
+    const collaborator = await createCollaborator('edit', user);
+
+    const board = await createBoard(serialized, title, shareUrl, [
+      collaborator.uid,
+    ]);
 
     res.status(HTTP_STATUS.SUCCESS).json({ board });
   } catch (error) {
@@ -71,14 +74,34 @@ export const handleGetCollaboratorBoards = async (
   res: Response,
 ) => {
   try {
-    const collaboratorId = req.body.collaboratorId;
-    if (!collaboratorId) {
+    const userID = req.query.userID as string;
+    if (!userID) {
       return res
         .status(HTTP_STATUS.ERROR)
-        .json({ error: 'No collaborator ID provided' });
+        .json({ error: 'No user ID provided' });
     }
 
-    const boards = await findBoardsByCollaboratorId(collaboratorId);
+    const collaborators = (await findCollaboratorsById(userID)).map(
+      (collab) => collab.uid,
+    );
+
+    if (collaborators.length == 0) {
+      return res.status(HTTP_STATUS.SUCCESS).json({ boards: [] });
+    }
+
+    const boards = (await findBoardsByCollaboratorsId(collaborators)).map(
+      (board) => ({
+        collaborators: board.collaborators,
+        createdAt: board.createdAt,
+        updatedAt: board.updatedAt,
+        id: board.id,
+        title: board.title,
+        tags: board.tags,
+        folder: board.folder,
+        shareUrl: board.shareUrl,
+        roomID: board.roomID,
+      }),
+    );
 
     return res.status(HTTP_STATUS.SUCCESS).json({ boards });
   } catch (error) {
