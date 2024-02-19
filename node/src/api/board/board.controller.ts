@@ -14,7 +14,7 @@ import {
 
 /**
  * Firebase API controllers, logic for endpoint routes.
- * @author Ibrahim Almalki
+ * @author Ibrahim Almalki, Abdalla Abdelhadi
  */
 
 // TODO: JSDOC
@@ -53,7 +53,7 @@ const notFoundError = (res: Response) =>
 // Get board
 export const handleFindBoardById = async (req: Request, res: Response) => {
   try {
-    const boardId = req.body.id; // The board ID parameter is in the body.
+    const boardId = req.query.id as string; // The board ID parameter is in the body.
     if (!validateId(boardId, res)) return;
     const board = await findBoardById(boardId as string);
 
@@ -121,9 +121,9 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
     const board = await findBoardById(boardId);
 
     if (board) {
-      await updateBoard(board, updatedFields);
-      const { fastFireOptions: _fastFireOptions, ...fields } = board; // TODO(yousef): Should make a helper method to extract the options
-      return res.status(HTTP_STATUS.SUCCESS).json(fields);
+      const update = await updateBoard(board, updatedFields);
+      // const { fastFireOptions: _fastFireOptions, ...fields } = board; // TODO(yousef): Should make a helper method to extract the options
+      return res.status(HTTP_STATUS.SUCCESS).json(update.updatedAt);
     } else {
       return notFoundError(res);
     }
@@ -138,7 +138,7 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
 // Delete board
 export const handleDeleteBoard = async (req: Request, res: Response) => {
   try {
-    const boardId = req.body.id; // The board ID parameter is in the body.
+    const boardId = req.query.id as string; // The board ID parameter is in the body.
     if (!validateId(boardId, res)) return;
     const board = await findBoardById(boardId);
 

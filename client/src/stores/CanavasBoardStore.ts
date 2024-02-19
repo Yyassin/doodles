@@ -33,6 +33,7 @@ interface CanvasBoardState {
   // Currently selected board's metadata
   boardMeta: {
     title: string;
+    id: string;
     lastModified: string;
     roomID: string;
   };
@@ -43,6 +44,8 @@ interface CanvasBoardActions {
   setBoard: (board: BoardsType, folder: string) => void;
   setCanvases: (canvases: Canvas[]) => void;
   addCanvas: (canvas: Canvas) => void;
+  removeCanvas: (id: string) => void;
+  updateCanvas: (id: string, meta: string) => void;
   setBoardMeta: (meta: Partial<CanvasBoardState['boardMeta']>) => void;
 }
 
@@ -55,6 +58,7 @@ export const initialCanvasState: CanvasBoardState = {
   folder: 'Recent',
   boardMeta: {
     title: '',
+    id: '',
     lastModified: '',
     roomID: '',
   },
@@ -77,6 +81,23 @@ const addCanvas = (set: SetState<CanvasBoardStore>) => (canvas: Canvas) =>
     return { ...state, canvases };
   });
 
+const removeCanvas = (set: SetState<CanvasBoardStore>) => (id: string) =>
+  set((state) => {
+    const canvases = state.canvases.filter((canvas) => canvas.id !== id);
+
+    return { ...state, canvases };
+  });
+
+const updateCanvas =
+  (set: SetState<CanvasBoardStore>) => (id: string, updatedAt: string) =>
+    set((state) => {
+      const canvases = state.canvases.map((canvas) =>
+        canvas.id === id ? { ...canvas, updatedAt } : canvas,
+      );
+
+      return { ...state, canvases };
+    });
+
 const setBoardMeta =
   (set: SetState<CanvasBoardStore>) =>
   (meta: Partial<CanvasBoardState['boardMeta']>) => {
@@ -89,6 +110,8 @@ const CanvasBoardStore = create<CanvasBoardStore>()((set) => ({
   setBoard: setBoard(set),
   setCanvases: setCanvases(set),
   addCanvas: addCanvas(set),
+  removeCanvas: removeCanvas(set),
+  updateCanvas: updateCanvas(set),
   setBoardMeta: setBoardMeta(set),
 }));
 export const useCanvasBoardStore = createStoreWithSelectors(CanvasBoardStore);
