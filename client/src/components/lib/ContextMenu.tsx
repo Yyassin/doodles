@@ -6,6 +6,7 @@ import ExportSelectedPNGContextItem from './ExportSelectedPNGContextItem';
 import ContextMenuItem from './ContextMenuItem';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import StableDiffusionContextItem from './StableDiffusion/StableDiffusionContextItem';
+import FileUpload from './UploadFiles';
 
 /**
  * Defines a context menu, with options, that is revealed
@@ -57,6 +58,7 @@ const ContextMenu = () => {
             </ContextMenuItem>
             <ExportSelectedPNGContextItem />
             <StableDiffusionContextItem />
+            <FileUpload />
           </>
         ) : null}
       </RadixContextMenu.Content>
