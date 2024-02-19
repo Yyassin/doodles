@@ -20,11 +20,13 @@ const ContextMenu = () => {
     setSelectedElements,
     selectedElementIds,
     pushCanvasHistory,
+    removeAttachedFileUrl,
   } = useCanvasElementStore([
     'removeCanvasElements',
     'setSelectedElements',
     'selectedElementIds',
     'pushCanvasHistory',
+    'removeAttachedFileUrl',
   ]);
 
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
@@ -59,6 +61,23 @@ const ContextMenu = () => {
             <ExportSelectedPNGContextItem />
             <StableDiffusionContextItem />
             <FileUpload />
+
+            <ContextMenuItem
+              onClick={() => {
+                const ids = selectedElementIds;
+                setSelectedElements([]);
+                removeAttachedFileUrl(ids);
+                pushCanvasHistory();
+
+                setWebsocketAction(ids, 'removeAttachedFileUrl');
+              }}
+              className="text-red-700"
+            >
+              Delete File{' '}
+              <div className="ml-auto pl-5 text-red-700 group-data-[highlighted]:text-white group-data-[disabled]:text-mauve8">
+                <TrashIcon />
+              </div>
+            </ContextMenuItem>
           </>
         ) : null}
       </RadixContextMenu.Content>

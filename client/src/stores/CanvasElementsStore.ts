@@ -96,6 +96,7 @@ interface CanvasElementActions {
   pushCanvasHistory: () => void;
   resetCanvas: () => void;
   updateAttachedFileUrl: (id: string, url: string) => void;
+  removeAttachedFileUrl: (ids: string[]) => void;
   redoCanvasHistory: () => void;
   setCanvasElementState: (element: CanvasElementState) => void;
   setSelectionFrame: (
@@ -473,11 +474,27 @@ const setToolOptions =
       toolOptions: { ...state.toolOptions, ...toolOptions },
     }));
 
+//Uploads file to firebase and attatches link to canvas element
 const updateAttachedFileUrl =
   (set: SetState<CanvasElementState>) => (id: string, url: string) =>
     set((state) => {
       const updatedAttachedFileUrls = { ...state.attachedFileUrls, [id]: url };
       return { ...state, attachedFileUrls: updatedAttachedFileUrls };
+    });
+
+//Deletes attatched link (file) from canvas element
+const removeAttachedFileUrl =
+  (set: SetState<CanvasElementState>) => (ids: string[]) =>
+    set((state) => {
+      const attachedFileUrls = { ...state.attachedFileUrls };
+      ids.forEach((id) => {
+        delete attachedFileUrls[id];
+      });
+
+      return {
+        ...state,
+        attachedFileUrls,
+      };
     });
 
 /**
@@ -662,6 +679,7 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   resetCanvas: resetCanvas(set),
   setToolOptions: setToolOptions(set),
   updateAttachedFileUrl: updateAttachedFileUrl(set),
+  removeAttachedFileUrl: removeAttachedFileUrl(set),
 }));
 export const useCanvasElementStore =
   createStoreWithSelectors(canvasElementStore);
