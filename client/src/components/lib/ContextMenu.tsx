@@ -6,7 +6,7 @@ import ExportSelectedPNGContextItem from './ExportSelectedPNGContextItem';
 import ContextMenuItem from './ContextMenuItem';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import StableDiffusionContextItem from './StableDiffusion/StableDiffusionContextItem';
-import FileUpload from './UploadFiles';
+import FileUpload from './UploadFilesToFirebase';
 
 /**
  * Defines a context menu, with options, that is revealed
