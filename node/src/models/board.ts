@@ -9,7 +9,7 @@ import { generateRandId } from '../utils/misc';
 
 /**
  * Defines Board class.
- * @authors Ibrahim Almalki
+ * @authors Ibrahim Almalki, Abdalla Abdelhadi
  */
 
 //TODO: add createdAt and updatedAt
@@ -18,7 +18,7 @@ export class Board extends FastFireDocument<Board> {
   @FastFireField({ required: true })
   uid!: string;
   @FastFireField({ required: true })
-  serialized!: string;
+  serialized!: object;
   @FastFireField({ required: true })
   title!: string;
   @FastFireField({ required: true })
@@ -39,7 +39,7 @@ export class Board extends FastFireDocument<Board> {
 
 // Function to create a board
 export async function createBoard(
-  serialized: string,
+  serialized: object,
   title: string,
   shareUrl: string,
   collaborators: string[],
