@@ -7,11 +7,12 @@ import ContextMenuItem from './ContextMenuItem';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import StableDiffusionContextItem from './StableDiffusion/StableDiffusionContextItem';
 import FileUpload from './UploadFilesToFirebase';
+import deleteFilefromFirebase from './DeleteFileFromFirebase';
 
 /**
  * Defines a context menu, with options, that is revealed
  * on canvas right click.
- * @author Yousef Yassin
+ * @author Yousef Yassin, Dana El Sherif
  */
 
 const ContextMenu = () => {
@@ -21,12 +22,14 @@ const ContextMenu = () => {
     selectedElementIds,
     pushCanvasHistory,
     removeAttachedFileUrl,
+    attachedFileUrls,
   } = useCanvasElementStore([
     'removeCanvasElements',
     'setSelectedElements',
     'selectedElementIds',
     'pushCanvasHistory',
     'removeAttachedFileUrl',
+    'attachedFileUrls',
   ]);
 
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
@@ -48,7 +51,6 @@ const ContextMenu = () => {
                 setSelectedElements([]);
                 removeCanvasElements(ids);
                 pushCanvasHistory();
-
                 setWebsocketAction(ids, 'removeCanvasElements');
               }}
               className="text-red-700"
@@ -66,9 +68,11 @@ const ContextMenu = () => {
               onClick={() => {
                 const ids = selectedElementIds;
                 setSelectedElements([]);
-                removeAttachedFileUrl(ids);
-                pushCanvasHistory();
-
+                const link = attachedFileUrls[selectedElementIds[0]];
+                if (link !== undefined) {
+                  deleteFilefromFirebase(link);
+                }
+                removeAttachedFileUrl(ids); //Don't want users to be able to undo deletion
                 setWebsocketAction(ids, 'removeAttachedFileUrl');
               }}
               className="text-red-700"

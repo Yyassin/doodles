@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { firebaseApp } from '../../firebaseDB/firebase';
-import { Link2Icon } from '@radix-ui/react-icons';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 
 /**
@@ -9,7 +8,7 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
  * canvas element by uploading it to firebase
  * @author Dana El Sherif
  */
-const FileUpload: React.FC = () => {
+const FileUpload = () => {
   const [, setFile] = useState<File | null>(null);
   const { selectedElementIds, updateAttachedFileUrl } = useCanvasElementStore([
     'selectedElementIds',
@@ -21,7 +20,7 @@ const FileUpload: React.FC = () => {
     const fileToUpload = files ? files[0] : null;
     setFile(fileToUpload);
 
-    if (fileToUpload && selectedElementIds.length > 0) {
+    if (fileToUpload !== null && selectedElementIds.length > 0) {
       const storage = getStorage(firebaseApp);
       const storageRef = ref(storage, `uploads/${fileToUpload.name}`);
       uploadBytes(storageRef, fileToUpload)
@@ -41,7 +40,6 @@ const FileUpload: React.FC = () => {
   return (
     <div className="ml-auto pl-5 text-violet-500 group-data-[highlighted]:text-white group-data-[disabled]:text-mauve8">
       <input type="file" onChange={onFileChange} />
-      <Link2Icon />
     </div>
   );
 };
