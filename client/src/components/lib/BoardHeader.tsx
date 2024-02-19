@@ -6,11 +6,14 @@ import { Users2Icon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import UserList from './UserList/UserList';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import axios from 'axios';
+import { REST } from '@/constants';
 
 /**
  * Defines a header for the board containing the title, last modified date, and buttons for sharing and viewing comments. A list of active
  * users in the room is also displayed.
- * @author Yousef Yassin
+ * @author Yousef Yassin, Abdalla Abdelhadi
  */
 
 /**
@@ -25,7 +28,11 @@ const BoardHeader = ({
   isShareDialogOpen: boolean;
   setIsShareDialogOpen: (value: boolean) => void;
 }) => {
-  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
+  const { boardMeta, setBoardMeta, updateCanvas } = useCanvasBoardStore([
+    'boardMeta',
+    'setBoardMeta',
+    'updateCanvas',
+  ]);
   const {
     setMode,
     isUsingStableDiffusion,
@@ -38,6 +45,51 @@ const BoardHeader = ({
     'isViewingComments',
     'setIsViewingComments',
     'setIsUsingStableDiffusion',
+  ]);
+  const {
+    allIds,
+    types,
+    strokeColors,
+    fillColors,
+    fontFamilies,
+    fontSizes,
+    bowings,
+    roughnesses,
+    strokeWidths,
+    fillStyles,
+    strokeLineDashes,
+    opacities,
+    freehandPoints,
+    p1,
+    p2,
+    textStrings,
+    isImagePlaceds,
+    freehandBounds,
+    angles,
+    fileIds,
+    resetCanvas,
+  } = useCanvasElementStore([
+    'allIds',
+    'types',
+    'strokeColors',
+    'fillColors',
+    'fontFamilies',
+    'fontSizes',
+    'bowings',
+    'roughnesses',
+    'strokeWidths',
+    'fillStyles',
+    'strokeLineDashes',
+    'opacities',
+    'freehandPoints',
+    'p1',
+    'p2',
+    'textStrings',
+    'isImagePlaceds',
+    'freehandBounds',
+    'angles',
+    'fileIds',
+    'resetCanvas',
   ]);
 
   return (
@@ -61,7 +113,16 @@ const BoardHeader = ({
             <Button
               variant="secondary"
               className="border-solid border-2 border-indigo-300 hover:border-indigo-400 stroke-indigo-300 hover:stroke-indigo-400 px-3 py-2"
-              onClick={() => setMode('dashboard')}
+              onClick={() => {
+                setMode('dashboard');
+                resetCanvas();
+                setBoardMeta({
+                  title: '',
+                  id: '',
+                  lastModified: '',
+                  roomID: '',
+                });
+              }}
             >
               <span className="sr-only">Back to dashboard</span>
               <ArrowLeftIcon className="h-4 w-4" />
@@ -98,16 +159,62 @@ const BoardHeader = ({
           <ChatBubbleIcon className="h-4 w-4" />
         </Button>
         {/* Share Dialog */}
-        <Button
-          className={cn(
-            buttonVariants({ variant: 'ghost', size: 'sm' }),
-            'h-full bg-muted text-gray-200 bg-indigo-300 hover:bg-indigo-400 hover:text-white justify-start items-center border-2 border-indigo-300 hover:border-indigo-400',
-          )}
-          onClick={() => setIsShareDialogOpen(!isShareDialogOpen)}
+        <div
+          className={`flex flex-row gap-2 items-center transition-spacing duration-300 ease-in-out ${
+            isUsingStableDiffusion || isViewingComments ? 'mr-[25rem]' : ''
+          }`}
         >
-          <Users2Icon className="h-4 w-4 mr-2" />
-          <span className="ml-auto">Share</span>
-        </Button>
+          <Button
+            className={cn(
+              buttonVariants({ variant: 'ghost', size: 'sm' }),
+              'h-full bg-muted text-gray-200 bg-indigo-300 hover:bg-indigo-400 hover:text-white justify-start items-center border-2 border-indigo-300 hover:border-indigo-400',
+            )}
+            onClick={() => setIsShareDialogOpen(!isShareDialogOpen)}
+          >
+            <Users2Icon className="h-4 w-4 mr-2" />
+            <span className="ml-auto">Share</span>
+          </Button>
+
+          <Button
+            className={cn(
+              buttonVariants({ variant: 'ghost', size: 'sm' }),
+              'h-full bg-muted text-gray-200 bg-indigo-300 hover:bg-indigo-400 hover:text-white justify-start items-center border-2 border-indigo-300 hover:border-indigo-400',
+            )}
+            onClick={async () => {
+              const state = {
+                allIds,
+                types,
+                strokeColors,
+                fillColors,
+                fontFamilies,
+                fontSizes,
+                bowings,
+                roughnesses,
+                strokeWidths,
+                fillStyles,
+                strokeLineDashes,
+                opacities,
+                freehandPoints,
+                p1,
+                p2,
+                textStrings,
+                isImagePlaceds,
+                freehandBounds,
+                angles,
+                fileIds,
+              };
+
+              const updated = await axios.put(REST.board.updateBoard, {
+                id: boardMeta.id,
+                fields: { serialized: state },
+              });
+              setBoardMeta({ lastModified: updated.data });
+              updateCanvas(boardMeta.id, updated.data);
+            }}
+          >
+            <span className="ml-auto">Save</span>
+          </Button>
+        </div>
       </div>
     </div>
   );
