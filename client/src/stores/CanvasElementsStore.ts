@@ -34,6 +34,7 @@ export interface CanvasElement {
   p2: Vector2; // Bottom right coordinate
   angle: number; // Element orientation, in radians
   id: string; // Element id
+  attachedFileUrl?: string; //Attatched file link
 }
 
 //Default customizability options
@@ -77,6 +78,7 @@ export interface CanvasElementState {
   isImagePlaceds: Record<string, CanvasElement['isImagePlaced']>;
   angles: Record<string, CanvasElement['angle']>;
   toolOptions: ToolOptions;
+  attachedFileUrls: Record<string, CanvasElement['attachedFileUrl']>;
 }
 
 interface CanvasElementActions {
@@ -93,6 +95,8 @@ interface CanvasElementActions {
   undoCanvasHistory: () => void;
   pushCanvasHistory: () => void;
   resetCanvas: () => void;
+  updateAttachedFileUrl: (id: string, url: string) => void;
+  removeAttachedFileUrl: (ids: string[]) => void;
   redoCanvasHistory: () => void;
   setCanvasElementState: (element: CanvasElementState) => void;
   setSelectionFrame: (
@@ -112,6 +116,7 @@ export const initialCanvasElementState: CanvasElementState = {
   types: {},
   strokeColors: {},
   fillColors: {},
+  attachedFileUrls: {},
   fontFamilies: {},
   fontSizes: {},
   bowings: {},
@@ -176,12 +181,14 @@ const addCanvasShape =
       const fileIds = { ...state.fileIds };
       const isImagePlaceds = { ...state.isImagePlaceds };
       const angles = { ...state.angles };
+      const attachedFileUrls = { ...state.attachedFileUrls };
 
       const {
         id,
         type,
         strokeColor,
         fillColor,
+        attachedFileUrl,
         fontFamily,
         fontSize,
         bowing,
@@ -202,6 +209,7 @@ const addCanvasShape =
       types[id] = type;
       strokeColors[id] = strokeColor;
       fillColors[id] = fillColor;
+      attachedFileUrls[id] = attachedFileUrl;
       fontFamilies[id] = fontFamily;
       fontSizes[id] = fontSize;
       bowings[id] = bowing;
@@ -223,6 +231,7 @@ const addCanvasShape =
         types,
         strokeColors,
         fillColors,
+        attachedFileUrls,
         fontFamilies,
         fontSizes,
         bowings,
@@ -347,6 +356,12 @@ const editCanvasElement =
             [id]: partialElement.fontSize,
           }
         : state.fontSizes;
+      const attachedFileUrls = partialElement.attachedFileUrl
+        ? {
+            ...state.attachedFileUrls,
+            [id]: partialElement.attachedFileUrl,
+          }
+        : state.attachedFileUrls;
       const bowings = partialElement.bowing
         ? { ...state.bowings, [id]: partialElement.bowing }
         : state.bowings;
@@ -432,6 +447,7 @@ const editCanvasElement =
         types,
         strokeColors,
         fillColors,
+        attachedFileUrls,
         fontFamilies,
         fontSizes,
         bowings,
@@ -458,6 +474,29 @@ const setToolOptions =
       toolOptions: { ...state.toolOptions, ...toolOptions },
     }));
 
+//Uploads file to firebase and attatches link to canvas element
+const updateAttachedFileUrl =
+  (set: SetState<CanvasElementState>) => (id: string, url: string) =>
+    set((state) => {
+      const updatedAttachedFileUrls = { ...state.attachedFileUrls, [id]: url };
+      return { ...state, attachedFileUrls: updatedAttachedFileUrls };
+    });
+
+//Deletes attatched link (file) from canvas element
+const removeAttachedFileUrl =
+  (set: SetState<CanvasElementState>) => (ids: string[]) =>
+    set((state) => {
+      const attachedFileUrls = { ...state.attachedFileUrls };
+      ids.forEach((id) => {
+        delete attachedFileUrls[id];
+      });
+
+      return {
+        ...state,
+        attachedFileUrls,
+      };
+    });
+
 /**
  * Removes the canvas element with the specfied state
  * from the store.
@@ -471,6 +510,7 @@ const removeCanvasElements =
       const types = { ...state.types };
       const strokeColors = { ...state.strokeColors };
       const fillColors = { ...state.fillColors };
+      const attachedFileUrls = { ...state.attachedFileUrls };
       const fontFamilies = { ...state.fontFamilies };
       const fontSizes = { ...state.fontSizes };
       const bowings = { ...state.bowings };
@@ -490,6 +530,7 @@ const removeCanvasElements =
         delete types[id];
         delete strokeColors[id];
         delete fillColors[id];
+        delete attachedFileUrls[id];
         delete fontFamilies[id];
         delete fontSizes[id];
         delete bowings[id];
@@ -511,6 +552,7 @@ const removeCanvasElements =
         types,
         strokeColors,
         fillColors,
+        attachedFileUrls,
         fontFamilies,
         fontSizes,
         bowings,
@@ -636,6 +678,8 @@ const canvasElementStore = create<CanvasElementStore>()((set) => ({
   redoCanvasHistory: redoCanvasHistory(set),
   resetCanvas: resetCanvas(set),
   setToolOptions: setToolOptions(set),
+  updateAttachedFileUrl: updateAttachedFileUrl(set),
+  removeAttachedFileUrl: removeAttachedFileUrl(set),
 }));
 export const useCanvasElementStore =
   createStoreWithSelectors(canvasElementStore);
