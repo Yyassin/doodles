@@ -11,12 +11,10 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
  */
 const FileUpload: React.FC = () => {
   const [, setFile] = useState<File | null>(null);
-  const { selectedElementIds, attachedFileUrls, updateAttachedFileUrl } =
-    useCanvasElementStore([
-      'selectedElementIds',
-      'attachedFileUrls',
-      'updateAttachedFileUrl',
-    ]);
+  const { selectedElementIds, updateAttachedFileUrl } = useCanvasElementStore([
+    'selectedElementIds',
+    'updateAttachedFileUrl',
+  ]);
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
