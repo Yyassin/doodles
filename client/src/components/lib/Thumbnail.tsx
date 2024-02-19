@@ -59,7 +59,7 @@ export const Thumbnail = ({
           <img
             src={thumbnail}
             alt="No Thumbnail"
-            className="max-w-[500px] max-h-[500px] w-auto h-auto object-cover"
+            className="max-w-[400px] max-h-[400px] w-auto h-auto"
           />
         )}
       </div>
