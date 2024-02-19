@@ -51,9 +51,32 @@ export const TopBar = () => {
                   onClick={async () => {
                     setMode('canvas');
                     // TODO: Should perform and cache concurrent fetches for the board and its comments here
+                    const state = {
+                      allIds: [],
+                      types: {},
+                      strokeColors: {},
+                      fillColors: {},
+                      fontFamilies: {},
+                      fontSizes: {},
+                      bowings: {},
+                      roughnesses: {},
+                      strokeWidths: {},
+                      fillStyles: {},
+                      strokeLineDashes: {},
+                      opacities: {},
+                      freehandPoints: {},
+                      p1: {},
+                      p2: {},
+                      textStrings: {},
+                      isImagePlaceds: {},
+                      freehandBounds: {},
+                      angles: {},
+                      fileIds: {},
+                    };
+
                     const data = await axios.post(REST.board.create, {
                       user: userID,
-                      serialized: 'fcvd', //to be changed
+                      serialized: state,
                       title: 'Untitled',
                       shareUrl: 'Untitled.com',
                     });
@@ -68,6 +91,7 @@ export const TopBar = () => {
                     setBoardMeta({
                       roomID: boardData.roomID,
                       title: boardData.title,
+                      id: boardData.id,
                       lastModified: boardData.updatedAt,
                     });
                   }}

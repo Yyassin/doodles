@@ -30,6 +30,9 @@ export const REST = {
   board: {
     create: `${REST_ROOT}/board/createBoard`,
     getBoards: `${REST_ROOT}/board/getCollaboratorsBoard`,
+    getBoard: `${REST_ROOT}/board/getBoard`,
+    deleteBoard: `${REST_ROOT}/board/deleteBoard`,
+    updateBoard: `${REST_ROOT}/board/updateBoard`,
   },
 };
 export const HTTP_STATUS = {

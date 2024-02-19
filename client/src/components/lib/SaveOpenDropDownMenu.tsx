@@ -207,7 +207,7 @@ export const SaveOpenDropDownMenu = () => {
         className="group text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 hover:bg-indigo-200"
         onClick={handleSave}
       >
-        <DownloadIcon /> Save
+        <DownloadIcon /> Save Localy
       </DropdownMenu.Item>
     </>
   );
