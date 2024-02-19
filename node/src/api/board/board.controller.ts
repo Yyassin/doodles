@@ -122,7 +122,7 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
 
     if (board) {
       const update = await updateBoard(board, updatedFields);
-      const { fastFireOptions: _fastFireOptions, ...fields } = board; // TODO(yousef): Should make a helper method to extract the options
+      // const { fastFireOptions: _fastFireOptions, ...fields } = board; // TODO(yousef): Should make a helper method to extract the options
       return res.status(HTTP_STATUS.SUCCESS).json(update.updatedAt);
     } else {
       return notFoundError(res);

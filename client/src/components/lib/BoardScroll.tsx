@@ -32,8 +32,7 @@ export const BoardScroll = () => {
   ]);
 
   const setCanvasState = () => {
-    if (!state) return;
-    setCanvasElementState(state);
+    state && setCanvasElementState(state);
   };
 
   return (
@@ -47,9 +46,9 @@ export const BoardScroll = () => {
               (boardMeta.id === board.id ? 'bg-[#7f7dcf]' : 'bg-[#ebebeb]')
             }
             onClick={async () => {
-              const selected = boardMeta.id === board.id;
+              const isSelected = boardMeta.id === board.id;
 
-              if (!selected) {
+              if (!isSelected) {
                 const boardState = await axios.get(REST.board.getBoard, {
                   params: { id: board.id },
                 });
@@ -120,10 +119,10 @@ export const BoardScroll = () => {
               }
               // TODO: Should perform and cache concurrent fetches for the board and its comments here
               setBoardMeta({
-                roomID: selected ? '' : board.roomID,
-                title: selected ? '' : board.title,
-                id: selected ? '' : board.id,
-                lastModified: selected ? '' : board.updatedAt,
+                roomID: isSelected ? '' : board.roomID,
+                title: isSelected ? '' : board.title,
+                id: isSelected ? '' : board.id,
+                lastModified: isSelected ? '' : board.updatedAt,
               });
             }}
           >

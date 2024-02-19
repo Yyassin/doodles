@@ -18,7 +18,7 @@ export class Board extends FastFireDocument<Board> {
   @FastFireField({ required: true })
   uid!: string;
   @FastFireField({ required: true })
-  serialized!: object;
+  serialized!: Record<string, unknown>;
   @FastFireField({ required: true })
   title!: string;
   @FastFireField({ required: true })
@@ -39,7 +39,7 @@ export class Board extends FastFireDocument<Board> {
 
 // Function to create a board
 export async function createBoard(
-  serialized: object,
+  serialized: Record<string, unknown>,
   title: string,
   shareUrl: string,
   collaborators: string[],

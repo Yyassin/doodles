@@ -83,8 +83,7 @@ const addCanvas = (set: SetState<CanvasBoardStore>) => (canvas: Canvas) =>
 
 const removeCanvas = (set: SetState<CanvasBoardStore>) => (id: string) =>
   set((state) => {
-    let canvases = state.canvases;
-    canvases = canvases.filter((canvas) => canvas.id !== id);
+    const canvases = state.canvases.filter((canvas) => canvas.id !== id);
 
     return { ...state, canvases };
   });
@@ -92,8 +91,7 @@ const removeCanvas = (set: SetState<CanvasBoardStore>) => (id: string) =>
 const updateCanvas =
   (set: SetState<CanvasBoardStore>) => (id: string, updatedAt: string) =>
     set((state) => {
-      let canvases = state.canvases;
-      canvases = canvases.map((canvas) =>
+      const canvases = state.canvases.map((canvas) =>
         canvas.id === id ? { ...canvas, updatedAt } : canvas,
       );
 
