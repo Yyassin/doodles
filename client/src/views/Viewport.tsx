@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import BoardHeader from '@/components/lib/BoardHeader';
 import ShareBoardDialog from '@/components/lib/ShareBoardDialog';
 import { users } from '@/stores/WebSocketStore';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 
 /**
  * Primary viewport that houses the canvas
@@ -33,6 +34,7 @@ const Viewport = () => {
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
   const isDrawingSelected = isDrawingTool(tool);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
 
   return (
     <RadixContextMenu.Root>
@@ -56,7 +58,7 @@ const Viewport = () => {
           <ShareBoardDialog
             open={isShareDialogOpen}
             setOpen={setIsShareDialogOpen}
-            boardLink="https://doodles.com/SYSC4907"
+            boardLink={boardMeta.shareUrl}
             users={users}
           />
         </RadixContextMenu.Trigger>

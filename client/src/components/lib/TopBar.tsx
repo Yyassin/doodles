@@ -49,7 +49,6 @@ export const TopBar = () => {
               <Tooltip.Trigger asChild>
                 <button
                   onClick={async () => {
-                    setMode('canvas');
                     // TODO: Should perform and cache concurrent fetches for the board and its comments here
                     const state = {
                       allIds: [],
@@ -78,7 +77,7 @@ export const TopBar = () => {
                       user: userID,
                       serialized: state,
                       title: 'Untitled',
-                      shareUrl: 'Untitled.com',
+                      shareUrl: window.location.href,
                     });
 
                     const boardData = data.data.board;
@@ -93,7 +92,10 @@ export const TopBar = () => {
                       title: boardData.title,
                       id: boardData.id,
                       lastModified: boardData.updatedAt,
+                      shareUrl: boardData.shareUrl,
                     });
+
+                    setMode('canvas');
                   }}
                   className="text-violet11 shadow-blackA4 hover:bg-violet3 inline-flex h-[35px] w-[35px] items-center justify-center rounded-lg bg-white outline outline-offset-0.5 outline-[#7f7dcf] focus:shadow-black hover:bg-[#eee8f9]"
                 >

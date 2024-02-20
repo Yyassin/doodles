@@ -1,5 +1,5 @@
 import WebsocketClient from '@/WebsocketClient';
-import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { UpdatedTimeMessage, useWebSocketStore } from '@/stores/WebSocketStore';
 import {
   CanvasElement,
   useCanvasElementStore,
@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { fileCache } from '@/lib/cache';
 import { dataURLToFile } from '@/lib/bytes';
 import { commitImageToCache, isSupportedImageFile } from '@/lib/image';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -79,6 +80,11 @@ export const useSocket = () => {
     'p2',
     'textStrings',
     'fileIds',
+  ]);
+
+  const { setBoardMeta, updateCanvas } = useCanvasBoardStore([
+    'setBoardMeta',
+    'updateCanvas',
   ]);
 
   const socket = useRef<WebsocketClient>();
@@ -202,6 +208,10 @@ export const useSocket = () => {
     },
     redoCanvasHistory: () => {
       redoCanvasHistory();
+    },
+    updateUpdatedTime: (fields: UpdatedTimeMessage) => {
+      setBoardMeta({ lastModified: fields.lastModified });
+      updateCanvas(fields.boardID, fields.lastModified);
     },
   };
 

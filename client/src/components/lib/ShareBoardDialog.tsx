@@ -59,7 +59,12 @@ const ShareBoardDialog = ({
               value={boardLink}
               disabled
             />
-            <Button className="bg-[#818cf8] hover:bg-[#6c75c1]">
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText(boardLink);
+              }}
+              className="bg-[#818cf8] hover:bg-[#6c75c1]"
+            >
               <CopyIcon className="w-4" />
             </Button>
           </div>

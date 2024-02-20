@@ -205,7 +205,7 @@ export default class WebsocketClient {
    */
   async sendMsgRoom(
     topic: string,
-    msg: CanvasElement | string | string[] | null,
+    msg: CanvasElement | string | string[] | object | null,
   ) {
     // Msg to be changed to proper type once everything finalized
     if (this.room === null) throw 'No room assigned!';

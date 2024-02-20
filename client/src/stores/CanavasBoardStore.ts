@@ -36,6 +36,7 @@ interface CanvasBoardState {
     id: string;
     lastModified: string;
     roomID: string;
+    shareUrl: string;
   };
 }
 
@@ -61,6 +62,7 @@ export const initialCanvasState: CanvasBoardState = {
     id: '',
     lastModified: '',
     roomID: '',
+    shareUrl: '',
   },
 };
 

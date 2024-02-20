@@ -9,6 +9,8 @@ import { ACCESS_TOKEN_TAG } from '../../constants';
 import { useAuthStore } from '@/stores/AuthStore';
 import { extractUsername } from '@/lib/misc';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { ToastAction } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/use-toast';
 
 /**
  * Define a react component that displays a the user infromation with a dropdown menu
@@ -34,6 +36,7 @@ export const IconDropDown = () => {
       console.error(error);
     }
   };
+  const { toast } = useToast();
 
   return (
     <DropdownMenu.Root>
@@ -72,7 +75,24 @@ export const IconDropDown = () => {
           align="center"
           alignOffset={0}
         >
-          <DropdownMenu.Item className="group text-[13px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[25px] relative px-[25px] select-none outline-none  data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-[#7f7dcf]">
+          <DropdownMenu.Item
+            onClick={() => {
+              toast({
+                variant: 'destructive',
+                title: 'Something went wrong.',
+                description: 'There was a problem with your request.',
+                action: (
+                  <ToastAction
+                    onClick={() => window.location.reload()}
+                    altText="Refresh"
+                  >
+                    Refresh
+                  </ToastAction>
+                ),
+              });
+            }}
+            className="group text-[13px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[25px] relative px-[25px] select-none outline-none  data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-[#7f7dcf]"
+          >
             Test
           </DropdownMenu.Item>
           <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
