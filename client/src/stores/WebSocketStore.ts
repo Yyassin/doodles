@@ -16,6 +16,7 @@ export const Actions = [
   'undoCanvasHistory',
   'redoCanvasHistory',
   'removeCanvasElements',
+  'updateUpdatedTime',
 ] as const;
 export type ActionsType = typeof Actions;
 
@@ -31,6 +32,11 @@ export interface User {
   outlineColor?: string; // Add an optional 'outlineColor' property
 }
 
+export interface UpdatedTimeMessage {
+  boardID: string;
+  lastModified: string;
+}
+
 /** Definitions */
 interface WebSocketState {
   // Reference for sending non-stateful messages (WebRTC signalling)
@@ -40,7 +46,7 @@ interface WebSocketState {
   // The current action
   action: string;
   // Modifed element ID
-  actionElementID: string | string[];
+  actionElementID: string | string[] | UpdatedTimeMessage;
   // The current active tenants
   activeTenants: Record<string, User>;
   // The current active producer ID
@@ -51,7 +57,10 @@ interface WebSocketActions {
   // Reducer to set the roomID
   setRoomID: (roomID: string | null) => void;
   // Set action and elemID
-  setWebsocketAction: (elemID: string | string[], action: string) => void;
+  setWebsocketAction: (
+    elemID: string | string[] | UpdatedTimeMessage,
+    action: string,
+  ) => void;
   // Set the socket reference
   setSocket: (socket: WebsocketClient) => void;
   // Set the active tenants
@@ -82,7 +91,7 @@ const setRoomID = (set: SetState<WebSocketStore>) => (roomID: string | null) =>
   set(() => ({ roomID }));
 const setWebsocketAction =
   (set: SetState<WebSocketStore>) =>
-  (actionElementID: string | string[], action: string) =>
+  (actionElementID: string | string[] | UpdatedTimeMessage, action: string) =>
     set(() => {
       return { actionElementID, action };
     });

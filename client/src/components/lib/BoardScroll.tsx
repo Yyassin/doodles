@@ -12,6 +12,45 @@ import {
 } from '@/stores/CanvasElementsStore';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { renderElementsOnOffscreenCanvas } from '@/lib/export';
+import { useToast } from '@/components/ui/use-toast';
+import { ToastAction } from '@/components/ui/toast';
+
+export const createStateWithRoughElement = (state: CanvasElementState) => {
+  const roughElements: Record<string, CanvasElement['roughElement']> = {};
+
+  //create the roughElements
+  for (const [key, type] of Object.entries(state.types)) {
+    const options = {
+      stroke: state.strokeColors[key],
+      fill: state.fillColors[key],
+      font: state.fontFamilies[key],
+      size: state.fontSizes[key],
+      bowing: state.bowings[key],
+      roughness: state.roughnesses[key],
+      strokeWidth: state.strokeWidths[key],
+      fillStyle: state.fillStyles[key],
+      strokeLineDash: state.strokeLineDashes[key],
+      opacity: state.opacities[key],
+      text: state.textStrings[key],
+      angle: state.angles[key],
+    };
+
+    roughElements[key] = createElement(
+      key,
+      state.p1[key].x,
+      state.p1[key].y,
+      state.p2[key].x,
+      state.p2[key].y,
+      type,
+      undefined,
+      options,
+    ).roughElement;
+  }
+  state.roughElements = roughElements;
+  state.fileIds = {};
+
+  return state;
+};
 
 /**
  * Define a react component that all the user's boards in a folder
@@ -35,6 +74,8 @@ export const BoardScroll = () => {
     state && setCanvasElementState(state);
   };
 
+  const { toast } = useToast();
+
   return (
     <div className="relative flex flex-col mx-2 h-full">
       <div className="w-full h-[250px] overflow-x-scroll scroll whitespace-nowrap scroll-smooth">
@@ -48,82 +89,62 @@ export const BoardScroll = () => {
             onClick={async () => {
               const isSelected = boardMeta.id === board.id;
 
-              if (!isSelected) {
-                const boardState = await axios.get(REST.board.getBoard, {
-                  params: { id: board.id },
-                });
+              try {
+                if (!isSelected) {
+                  const boardState = await axios.get(REST.board.getBoard, {
+                    params: { id: board.id },
+                  });
 
-                const state: CanvasElementState =
-                  boardState.data.board.serialized;
+                  const state = createStateWithRoughElement(
+                    boardState.data.board.serialized,
+                  );
 
-                const roughElements: Record<
-                  string,
-                  CanvasElement['roughElement']
-                > = {};
+                  setState(state);
 
-                //create the roughElements
-                for (const [key, type] of Object.entries(state.types)) {
-                  const options = {
-                    stroke: state.strokeColors[key],
-                    fill: state.fillColors[key],
-                    font: state.fontFamilies[key],
-                    size: state.fontSizes[key],
-                    bowing: state.bowings[key],
-                    roughness: state.roughnesses[key],
-                    strokeWidth: state.strokeWidths[key],
-                    fillStyle: state.fillStyles[key],
-                    strokeLineDash: state.strokeLineDashes[key],
-                    opacity: state.opacities[key],
-                    text: state.textStrings[key],
-                    angle: state.angles[key],
-                  };
+                  const canvas = renderElementsOnOffscreenCanvas(state.allIds, {
+                    p1: state.p1,
+                    p2: state.p2,
+                    angles: state.angles,
+                    types: state.types,
+                    freehandPoints: state.freehandPoints,
+                    freehandBounds: state.freehandBounds,
+                    textStrings: state.textStrings,
+                    fontFamilies: state.fontFamilies,
+                    fontSizes: state.fontSizes,
+                    fillColors: state.fillColors,
+                    isImagePlaceds: state.isImagePlaceds,
+                    fileIds: state.fileIds,
+                    roughElements: state.roughElements,
+                    opacities: state.opacities,
+                    strokeColors: state.strokeColors,
+                    strokeWidths: state.strokeWidths,
+                  });
 
-                  roughElements[key] = createElement(
-                    key,
-                    state.p1[key].x,
-                    state.p1[key].y,
-                    state.p2[key].x,
-                    state.p2[key].y,
-                    type,
-                    undefined,
-                    options,
-                  ).roughElement;
+                  setThumbnailUrl(canvas?.toDataURL('image/png') ?? '');
                 }
-                state.roughElements = roughElements;
-                state.fileIds = {};
-
-                setState(state);
-
-                const canvas = renderElementsOnOffscreenCanvas(state.allIds, {
-                  p1: state.p1,
-                  p2: state.p2,
-                  angles: state.angles,
-                  types: state.types,
-                  freehandPoints: state.freehandPoints,
-                  freehandBounds: state.freehandBounds,
-                  textStrings: state.textStrings,
-                  fontFamilies: state.fontFamilies,
-                  fontSizes: state.fontSizes,
-                  fillColors: state.fillColors,
-                  isImagePlaceds: state.isImagePlaceds,
-                  fileIds: state.fileIds,
-                  roughElements: state.roughElements,
-                  opacities: state.opacities,
-                  strokeColors: state.strokeColors,
-                  strokeWidths: state.strokeWidths,
+                // TODO: Should perform and cache concurrent fetches for the board and its comments here
+                setBoardMeta({
+                  roomID: isSelected ? '' : board.roomID,
+                  title: isSelected ? '' : board.title,
+                  id: isSelected ? '' : board.id,
+                  lastModified: isSelected ? '' : board.updatedAt,
+                  shareUrl: isSelected ? '' : board.shareUrl,
                 });
-
-                setThumbnailUrl(
-                  canvas === undefined ? '' : canvas.toDataURL('image/png'),
-                );
+              } catch (error) {
+                toast({
+                  variant: 'destructive',
+                  title: 'Something went wrong.',
+                  description: 'There was a problem with your request.',
+                  action: (
+                    <ToastAction
+                      onClick={() => window.location.reload()}
+                      altText="Refresh"
+                    >
+                      Refresh
+                    </ToastAction>
+                  ),
+                });
               }
-              // TODO: Should perform and cache concurrent fetches for the board and its comments here
-              setBoardMeta({
-                roomID: isSelected ? '' : board.roomID,
-                title: isSelected ? '' : board.title,
-                id: isSelected ? '' : board.id,
-                lastModified: isSelected ? '' : board.updatedAt,
-              });
             }}
           >
             {board.title}

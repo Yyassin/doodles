@@ -47,6 +47,7 @@ export async function createBoard(
   const uid = generateRandId();
   const createdAt = new Date().toUTCString();
   const updatedAt = new Date().toUTCString();
+  shareUrl = shareUrl + `?boardID=${uid}`;
   return FastFire.create(
     Board,
     {
@@ -76,6 +77,10 @@ export const updateBoard = async (
 ) => {
   updatedFields.updatedAt = new Date().toUTCString();
   const { fastFireOptions: _fastFireOptions, id: _id, ...boardFields } = board;
+  if (updatedFields.collaborators !== undefined) {
+    boardFields.collaborators.push(updatedFields.collaborators as string);
+    delete updatedFields.collaborators;
+  }
   const updatedBoard = { ...boardFields, ...updatedFields };
   await board.update(updatedBoard);
   return updatedBoard;

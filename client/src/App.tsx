@@ -5,6 +5,7 @@ import Titlebar from './components/lib/Titlebar/Titlebar';
 import { IS_ELECTRON_INSTANCE } from './constants';
 import { useAppStore } from './stores/AppStore';
 import { useElectronIPCStore } from './stores/ElectronIPCStore';
+import { Toaster } from '@/components/ui/toaster';
 
 function App() {
   const { isTransparent } = useAppStore(['isTransparent']);
@@ -35,6 +36,7 @@ function App() {
     >
       {IS_ELECTRON_INSTANCE && <Titlebar fg={'#000'} title={'Doodles'} />}
       <Bootstrap />
+      <Toaster />
     </div>
   );
 }

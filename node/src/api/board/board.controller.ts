@@ -9,6 +9,8 @@ import {
 import { HTTP_STATUS } from '../../constants';
 import {
   createCollaborator,
+  deleteCollaborator,
+  findCollaboratorById,
   findCollaboratorsById,
 } from '../../models/collaborator';
 
@@ -85,7 +87,7 @@ export const handleGetCollaboratorBoards = async (
       (collab) => collab.uid,
     );
 
-    if (collaborators.length == 0) {
+    if (collaborators.length === 0) {
       return res.status(HTTP_STATUS.SUCCESS).json({ boards: [] });
     }
 
@@ -120,10 +122,31 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
     if (!validateId(boardId, res)) return;
     const board = await findBoardById(boardId);
 
-    if (board) {
+    if (board !== null) {
+      if (updatedFields.collaborators !== undefined) {
+        const collaborators = (
+          await findCollaboratorsById(updatedFields.collaborators)
+        ).map((collab) => collab.uid);
+
+        if (collaborators.length !== 0) {
+          const sharedBoard = (
+            await findBoardsByCollaboratorsId(collaborators)
+          ).find((board) => board.id === boardId);
+
+          if (sharedBoard !== undefined)
+            return res.status(HTTP_STATUS.SUCCESS).json(sharedBoard);
+        }
+        const collaborator = await createCollaborator(
+          'edit',
+          updatedFields.collaborators,
+        );
+
+        updatedFields.collaborators = collaborator.uid;
+      }
+
       const update = await updateBoard(board, updatedFields);
-      // const { fastFireOptions: _fastFireOptions, ...fields } = board; // TODO(yousef): Should make a helper method to extract the options
-      return res.status(HTTP_STATUS.SUCCESS).json(update.updatedAt);
+      const { fastFireOptions: _fastFireOptions, ...fields } = update; // TODO(yousef): Should make a helper method to extract the options
+      return res.status(HTTP_STATUS.SUCCESS).json(fields);
     } else {
       return notFoundError(res);
     }
@@ -142,7 +165,12 @@ export const handleDeleteBoard = async (req: Request, res: Response) => {
     if (!validateId(boardId, res)) return;
     const board = await findBoardById(boardId);
 
-    if (board) {
+    if (board !== null) {
+      board.collaborators.forEach(async (collabId) => {
+        const collaborator = await findCollaboratorById(collabId);
+        collaborator && (await deleteCollaborator(collaborator));
+      });
+
       await deleteBoard(board);
       return res
         .status(HTTP_STATUS.SUCCESS)
