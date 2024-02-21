@@ -120,9 +120,7 @@ export const BoardScroll = () => {
                     strokeWidths: state.strokeWidths,
                   });
 
-                  setThumbnailUrl(
-                    canvas === undefined ? '' : canvas.toDataURL('image/png'),
-                  );
+                  setThumbnailUrl(canvas?.toDataURL('image/png') ?? '');
                 }
                 // TODO: Should perform and cache concurrent fetches for the board and its comments here
                 setBoardMeta({

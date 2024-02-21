@@ -136,8 +136,6 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
           if (sharedBoard !== undefined)
             return res.status(HTTP_STATUS.SUCCESS).json(sharedBoard);
         }
-
-        console.log(updatedFields.collaborators);
         const collaborator = await createCollaborator(
           'edit',
           updatedFields.collaborators,
