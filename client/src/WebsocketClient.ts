@@ -14,6 +14,7 @@ import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { EVENT } from './types';
 import { ValueOf } from './lib/misc';
 import { UpdatedTimeMessage } from './stores/WebSocketStore';
+import { Comment } from './stores/CommentsStore';
 
 interface CallBacksType {
   addCanvasShape: (element: CanvasElement) => void;
@@ -162,7 +163,8 @@ export default class WebsocketClient {
       if (injectableCallbacks !== undefined) {
         injectableCallbacks(jsonMsg);
       } else {
-        this.callBacks[jsonMsg.topic](jsonMsg.payload);
+        const callback = this.callBacks[jsonMsg.topic];
+        callback && callback(jsonMsg.payload);
       }
     });
   }
@@ -206,7 +208,13 @@ export default class WebsocketClient {
    */
   async sendMsgRoom(
     topic: string,
-    msg: CanvasElement | string | string[] | UpdatedTimeMessage | null,
+    msg:
+      | CanvasElement
+      | string
+      | string[]
+      | UpdatedTimeMessage
+      | null
+      | { elemID: string; comment: Partial<Comment> },
   ) {
     // Msg to be changed to proper type once everything finalized
     if (this.room === null) throw 'No room assigned!';

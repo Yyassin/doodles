@@ -294,7 +294,7 @@ export const useSocket = () => {
     }
 
     //Check if the actionElementID is string[] (collection of ids)
-    if (typeof actionElementID === 'object') {
+    if (typeof actionElementID === 'object' || action === 'addCollab') {
       socket.current?.sendMsgRoom(action, actionElementID);
       setWebsocketAction('', '');
       return;

@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { getInitials } from '@/lib/misc';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useCommentsStore, Comment } from '@/stores/CommentsStore';
+import axios from 'axios';
+import { REST } from '@/constants';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { useAppStore } from '@/stores/AppStore';
 
 /**
  * Defines a CommentsSheetContent component that displays the comments of a board, and allows the user to add a comment or like existing ones.
@@ -66,49 +73,130 @@ const LikeOutlineIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
-const avatar = 'https://github.com/shadcn.png';
-
 const CommentsSheetContent = () => {
-  const { userFirstName, userLastName, userPicture } = useAuthStore([
+  const { userFirstName, userLastName, userPicture, userID } = useAuthStore([
     'userFirstName',
     'userLastName',
     'userPicture',
+    'userID',
+  ]);
+  const { socket, setWebsocketAction } = useWebSocketStore([
+    'socket',
+    'setWebsocketAction',
+  ]);
+  const { boardMeta, setBoardMeta, updateCanvas } = useCanvasBoardStore([
+    'boardMeta',
+    'setBoardMeta',
+    'updateCanvas',
   ]);
   const [textInput, setTextInput] = useState('');
-  const [comments, setComments] = useState([
-    {
-      username: 'Zayn Malik',
-      avatar,
-      time: new Date(),
-      comment:
-        'I haven’t seen it called the Sieve Principle... is that new? I’m used to calling this Inclusion-Exclusion.',
-      likes: 2,
-      initials: 'ZM',
-      outlineColor: 'border-[#0000ff]',
-      iLiked: true,
-    },
-    {
-      username: 'Yousef Yassin',
-      avatar,
-      time: new Date(),
-      comment:
-        'Ah, yea Sieve is the more modern term -- you’re right it used to be I.E., I’ll add a note below',
-      likes: 1,
-      initials: 'YY',
-      outlineColor: 'border-[#ff0000]',
-      iLiked: true,
-    },
-    {
-      username: 'Zayn Malik',
-      avatar,
-      time: new Date(),
-      comment: 'Ah, cool. Thanks for clarifying!!',
-      likes: 1,
-      initials: 'ZM',
-      outlineColor: 'border-[#0000ff]',
-      iLiked: false,
-    },
+  const {
+    selectedElementIds,
+    allIds,
+    types,
+    strokeColors,
+    fillColors,
+    fontFamilies,
+    fontSizes,
+    bowings,
+    roughnesses,
+    strokeWidths,
+    fillStyles,
+    strokeLineDashes,
+    opacities,
+    freehandPoints,
+    p1,
+    p2,
+    textStrings,
+    isImagePlaceds,
+    freehandBounds,
+    angles,
+    fileIds,
+  } = useCanvasElementStore([
+    'selectedElementIds',
+    'allIds',
+    'types',
+    'strokeColors',
+    'fillColors',
+    'fontFamilies',
+    'fontSizes',
+    'bowings',
+    'roughnesses',
+    'strokeWidths',
+    'fillStyles',
+    'strokeLineDashes',
+    'opacities',
+    'freehandPoints',
+    'p1',
+    'p2',
+    'textStrings',
+    'isImagePlaceds',
+    'freehandBounds',
+    'angles',
+    'fileIds',
   ]);
+  const {
+    comments,
+    colorMaping,
+    updateComment,
+    addComment,
+    removeComment,
+    setComments,
+  } = useCommentsStore([
+    'comments',
+    'colorMaping',
+    'updateComment',
+    'addComment',
+    'removeComment',
+    'setComments',
+  ]);
+
+  const { isViewingComments } = useAppStore(['isViewingComments']);
+
+  useEffect(() => {
+    socket?.on('addComment', (msg) => {
+      const { elemID, comment } = (
+        msg as { payload: { elemID: string; comment: Comment } }
+      ).payload;
+      selectedElementIds[0] === elemID &&
+        isViewingComments &&
+        addComment(comment);
+    });
+
+    socket?.on('removeComment', (msg) => {
+      const { elemID, comment } = (
+        msg as { payload: { elemID: string; comment: Comment } }
+      ).payload;
+      selectedElementIds[0] === elemID &&
+        isViewingComments &&
+        removeComment(comment.uid);
+    });
+
+    socket?.on('updateComment', (msg) => {
+      const { elemID, comment } = (
+        msg as { payload: { elemID: string; comment: Comment } }
+      ).payload;
+      selectedElementIds[0] === elemID &&
+        isViewingComments &&
+        updateComment(comment);
+    });
+  }, [socket, isViewingComments, selectedElementIds]);
+
+  useEffect(() => {
+    const getComments = async () => {
+      const comments = await axios.get(REST.comment.getComments, {
+        params: { elemID: selectedElementIds[0], collabID: boardMeta.collabID },
+      });
+      setComments(
+        comments.data.comments.map((comment: Comment) => ({
+          ...comment,
+          outlineColor: `${colorMaping[comment.outlineColor]}`,
+        })),
+      );
+    };
+
+    isViewingComments && selectedElementIds.length === 1 && getComments();
+  }, [selectedElementIds, isViewingComments]);
   return (
     <div className="flex flex-col h-full">
       <SheetHeader className="bg-[#9493D3] text-left p-[1.5rem]">
@@ -121,11 +209,9 @@ const CommentsSheetContent = () => {
             className="flex flex-row gap-4"
           >
             <Avatar
-              className={`${
-                comment.outlineColor
-                  ? `border-[0.2rem] ${comment.outlineColor}`
-                  : ''
-              }`}
+              style={{
+                border: `0.2rem solid ${comment.outlineColor ?? 'white'}`,
+              }}
             >
               <AvatarImage src={comment.avatar} />
               <AvatarFallback>{comment.initials}</AvatarFallback>
@@ -135,7 +221,7 @@ const CommentsSheetContent = () => {
                 {comment.username}
               </p>
               <p className="text-xs text-[#ffffff80] pb-[0.75rem]">
-                {comment.time.toUTCString()}
+                {comment.time}
               </p>
               <p className="text-sm font-normal text-white pb-[0.5rem]">
                 {comment.comment}
@@ -144,17 +230,34 @@ const CommentsSheetContent = () => {
                 <div
                   onClick={() => {
                     // Copy to maintain immutability and add a like.
-                    const newComments = [...comments];
-                    const thisComment =
-                      newComments[
-                        newComments.findIndex((c) => c.time === comment.time)
-                      ];
-                    thisComment.iLiked = !thisComment.iLiked;
-                    thisComment.likes += thisComment.iLiked ? 1 : -1;
-                    setComments(newComments);
+                    const newLike = (comment.likes += !comment.isLiked
+                      ? 1
+                      : -1);
+                    updateComment({
+                      uid: comment.uid,
+                      likes: newLike,
+                      isLiked: !comment.isLiked,
+                    });
+                    axios.put(REST.comment.update, {
+                      commentID: comment.uid,
+                      userID: userID,
+                      boardID: boardMeta.id,
+                      action: !comment.isLiked ? 'add' : 'remove',
+                    });
+
+                    setWebsocketAction(
+                      {
+                        comment: {
+                          uid: comment.uid,
+                          likes: newLike,
+                        },
+                        elemID: selectedElementIds[0],
+                      },
+                      'updateComment',
+                    );
                   }}
                 >
-                  {comment.iLiked ? (
+                  {comment.isLiked ? (
                     <LikeFilledIcon className="cursor-pointer" />
                   ) : (
                     <LikeOutlineIcon className="cursor-pointer" />
@@ -166,6 +269,25 @@ const CommentsSheetContent = () => {
                 </p>
               </div>
             </div>
+            <Button
+              className="bg-white hover:bg-gray-200 text-[#9493D3]"
+              onClick={() => {
+                removeComment(comment.uid);
+                axios.delete(REST.comment.delete, {
+                  params: { id: comment.uid },
+                });
+
+                setWebsocketAction(
+                  {
+                    comment: { uid: comment.uid },
+                    elemID: selectedElementIds[0],
+                  },
+                  'removeComment',
+                );
+              }}
+            >
+              hi
+            </Button>
           </div>
         ))}
       </div>
@@ -180,21 +302,69 @@ const CommentsSheetContent = () => {
           <Button
             className="bg-white hover:bg-gray-200 text-[#9493D3]"
             disabled={textInput.length === 0}
-            onClick={() => {
-              setComments([
-                ...comments,
+            onClick={async () => {
+              const state = {
+                allIds,
+                types,
+                strokeColors,
+                fillColors,
+                fontFamilies,
+                fontSizes,
+                bowings,
+                roughnesses,
+                strokeWidths,
+                fillStyles,
+                strokeLineDashes,
+                opacities,
+                freehandPoints,
+                p1,
+                p2,
+                textStrings,
+                isImagePlaceds,
+                freehandBounds,
+                angles,
+                fileIds,
+              };
+
+              const updated = await axios.put(REST.board.updateBoard, {
+                id: boardMeta.id,
+                fields: { serialized: state },
+              });
+              setBoardMeta({ lastModified: updated.data.updatedAt });
+              updateCanvas(boardMeta.id, updated.data.updatedAt);
+              setWebsocketAction(
                 {
-                  username: `${userFirstName} ${userLastName}`,
-                  avatar: userPicture ?? avatar,
-                  time: new Date(),
-                  comment: textInput,
-                  likes: 0,
-                  initials: getInitials(`${userFirstName} ${userLastName}`),
-                  outlineColor: 'border-[#ff0000]',
-                  iLiked: false,
+                  boardID: boardMeta.id,
+                  lastModified: updated.data.updatedAt,
                 },
-              ]);
+                'updateUpdatedTime',
+              );
+
+              const comment = await axios.post(REST.comment.create, {
+                elemID: selectedElementIds[0],
+                commentText: textInput,
+                userID: userID,
+                boardID: boardMeta.id,
+              });
+
+              const newComment: Comment = {
+                uid: comment.data.comment.uid,
+                username: `${userFirstName} ${userLastName}`,
+                avatar: userPicture,
+                time: comment.data.comment.createdAt,
+                comment: comment.data.comment.comment,
+                likes: 0,
+                initials: getInitials(`${userFirstName} ${userLastName}`),
+                outlineColor: `${colorMaping[boardMeta.collabID]}`,
+                isLiked: false,
+              };
+
+              addComment(newComment);
               setTextInput('');
+              setWebsocketAction(
+                { comment: newComment, elemID: selectedElementIds[0] },
+                'addComment',
+              );
             }}
           >
             Send

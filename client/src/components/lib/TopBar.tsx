@@ -73,6 +73,7 @@ export const TopBar = () => {
                       fileIds: {},
                     };
 
+                    //todo
                     const data = await axios.post(REST.board.create, {
                       user: userID,
                       serialized: state,
@@ -93,6 +94,7 @@ export const TopBar = () => {
                       id: boardData.id,
                       lastModified: boardData.updatedAt,
                       shareUrl: boardData.shareUrl,
+                      collabID: data.data.collabID,
                     });
 
                     setMode('canvas');

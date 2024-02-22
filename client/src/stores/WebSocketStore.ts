@@ -3,6 +3,7 @@ import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
 import WebsocketClient from '@/WebsocketClient';
 import { getInitials } from '@/lib/misc';
+import { Comment } from './CommentsStore';
 
 /**
  * Define Global WebSocket states and reducers
@@ -17,6 +18,9 @@ export const Actions = [
   'redoCanvasHistory',
   'removeCanvasElements',
   'updateUpdatedTime',
+  'updateComment',
+  'addComment',
+  'removeComment',
 ] as const;
 export type ActionsType = typeof Actions;
 
@@ -46,7 +50,11 @@ interface WebSocketState {
   // The current action
   action: string;
   // Modifed element ID
-  actionElementID: string | string[] | UpdatedTimeMessage;
+  actionElementID:
+    | string
+    | string[]
+    | UpdatedTimeMessage
+    | { elemID: string; comment: Partial<Comment> };
   // The current active tenants
   activeTenants: Record<string, User>;
   // The current active producer ID
@@ -58,7 +66,11 @@ interface WebSocketActions {
   setRoomID: (roomID: string | null) => void;
   // Set action and elemID
   setWebsocketAction: (
-    elemID: string | string[] | UpdatedTimeMessage,
+    elemID:
+      | string
+      | string[]
+      | UpdatedTimeMessage
+      | { elemID: string; comment: Partial<Comment> },
     action: string,
   ) => void;
   // Set the socket reference
@@ -91,7 +103,14 @@ const setRoomID = (set: SetState<WebSocketStore>) => (roomID: string | null) =>
   set(() => ({ roomID }));
 const setWebsocketAction =
   (set: SetState<WebSocketStore>) =>
-  (actionElementID: string | string[] | UpdatedTimeMessage, action: string) =>
+  (
+    actionElementID:
+      | string
+      | string[]
+      | UpdatedTimeMessage
+      | { elemID: string; comment: Partial<Comment> },
+    action: string,
+  ) =>
     set(() => {
       return { actionElementID, action };
     });

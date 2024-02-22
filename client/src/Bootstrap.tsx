@@ -6,6 +6,7 @@ import { ACCESS_TOKEN_TAG, HTTP_STATUS } from './constants';
 import { useAuthStore } from './stores/AuthStore';
 import { useCanvasBoardStore } from './stores/CanavasBoardStore';
 import { useCanvasElementStore } from './stores/CanvasElementsStore';
+import { useCommentsStore } from './stores/CommentsStore';
 
 /**
  * @author Zakariyya Almalki
@@ -22,6 +23,7 @@ const Bootstrap = () => {
   const { setCanvasElementState } = useCanvasElementStore([
     'setCanvasElementState',
   ]);
+  const { setColorMaping } = useCommentsStore(['setColorMaping']);
   const [isLoaded, setIsLoaded] = useState(false);
   const auth = async () => {
     const token = localStorage.getItem(ACCESS_TOKEN_TAG);
@@ -36,6 +38,7 @@ const Bootstrap = () => {
             setCanvases,
             setBoardMeta,
             setCanvasElementState,
+            setColorMaping,
           )
         )?.valueOf();
         if (response.status === HTTP_STATUS.SUCCESS) {

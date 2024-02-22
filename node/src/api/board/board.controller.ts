@@ -11,8 +11,10 @@ import {
   createCollaborator,
   deleteCollaborator,
   findCollaboratorById,
+  findCollaboratorByIdAndBoard,
   findCollaboratorsById,
 } from '../../models/collaborator';
+import { generateRandId } from '../../utils/misc';
 
 /**
  * Firebase API controllers, logic for endpoint routes.
@@ -24,15 +26,16 @@ import {
 // Create board
 export const handleCreateBoard = async (req: Request, res: Response) => {
   try {
+    const boardID = generateRandId();
     const { user, serialized, title, shareUrl } = req.body; // The board parameters are in the body.
 
-    const collaborator = await createCollaborator('edit', user);
+    const collaborator = await createCollaborator('edit', user, boardID);
 
-    const board = await createBoard(serialized, title, shareUrl, [
+    const board = await createBoard(boardID, serialized, title, shareUrl, [
       collaborator.uid,
     ]);
 
-    res.status(HTTP_STATUS.SUCCESS).json({ board });
+    res.status(HTTP_STATUS.SUCCESS).json({ board, collabID: collaborator.id });
   } catch (error) {
     console.error('Error creating board:', error);
     res
@@ -56,11 +59,15 @@ const notFoundError = (res: Response) =>
 export const handleFindBoardById = async (req: Request, res: Response) => {
   try {
     const boardId = req.query.id as string; // The board ID parameter is in the body.
+    const userID = req.query.userID as string;
+
     if (!validateId(boardId, res)) return;
     const board = await findBoardById(boardId as string);
+    const collabID = (await findCollaboratorByIdAndBoard(userID, boardId)).pop()
+      ?.id;
 
     return board
-      ? res.status(HTTP_STATUS.SUCCESS).json({ board })
+      ? res.status(HTTP_STATUS.SUCCESS).json({ board, collabID })
       : notFoundError(res);
   } catch (error) {
     console.error('Error finding board by ID:', error);
@@ -121,32 +128,35 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
     const { id: boardId, fields: updatedFields } = req.body;
     if (!validateId(boardId, res)) return;
     const board = await findBoardById(boardId);
+    let collabID;
 
     if (board !== null) {
       if (updatedFields.collaborators !== undefined) {
-        const collaborators = (
-          await findCollaboratorsById(updatedFields.collaborators)
-        ).map((collab) => collab.uid);
-
-        if (collaborators.length !== 0) {
-          const sharedBoard = (
-            await findBoardsByCollaboratorsId(collaborators)
-          ).find((board) => board.id === boardId);
-
-          if (sharedBoard !== undefined)
-            return res.status(HTTP_STATUS.SUCCESS).json(sharedBoard);
-        }
-        const collaborator = await createCollaborator(
-          'edit',
+        const collab = await findCollaboratorByIdAndBoard(
           updatedFields.collaborators,
+          boardId,
         );
 
-        updatedFields.collaborators = collaborator.uid;
+        if (collab.length !== 0) {
+          collabID = collab.pop()?.uid;
+          const board = await findBoardById(boardId);
+          return res.status(HTTP_STATUS.SUCCESS).json({ ...board, collabID });
+        }
+
+        collabID = (
+          await createCollaborator(
+            'edit',
+            updatedFields.collaborators,
+            board.id,
+          )
+        ).uid;
+
+        updatedFields.collaborators = collabID;
       }
 
       const update = await updateBoard(board, updatedFields);
       const { fastFireOptions: _fastFireOptions, ...fields } = update; // TODO(yousef): Should make a helper method to extract the options
-      return res.status(HTTP_STATUS.SUCCESS).json(fields);
+      return res.status(HTTP_STATUS.SUCCESS).json({ ...fields, collabID });
     } else {
       return notFoundError(res);
     }

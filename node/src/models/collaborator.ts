@@ -23,6 +23,8 @@ export class Collaborator extends FastFireDocument<Collaborator> {
   @FastFireField({ required: true })
   user!: string;
   @FastFireField({ required: true })
+  board!: string;
+  @FastFireField({ required: true })
   createdAt!: Date;
   @FastFireField({ required: true })
   updatedAt!: Date;
@@ -32,6 +34,7 @@ export class Collaborator extends FastFireDocument<Collaborator> {
 export async function createCollaborator(
   permissionLevel: string,
   user: string,
+  board: string,
 ) {
   const uid = generateRandId();
   const createdAt = new Date().toUTCString();
@@ -42,6 +45,7 @@ export async function createCollaborator(
       uid,
       permissionLevel,
       user,
+      board,
       createdAt,
       updatedAt,
     },
@@ -56,6 +60,15 @@ export const findCollaboratorById = async (collaboratorId: string) =>
 // Function to find a user's collaborators by ID
 export const findCollaboratorsById = async (userID: string) => {
   return await FastFire.where(Collaborator, 'user', '==', userID).get();
+};
+
+export const findCollaboratorByIdAndBoard = async (
+  userID: string,
+  boardID: string,
+) => {
+  return await FastFire.where(Collaborator, 'user', '==', userID)
+    .where('board', '==', boardID)
+    .get();
 };
 
 // Function to update a collaborator

@@ -38,6 +38,7 @@ import { normalizeAngle } from '@/lib/math';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { tenancy } from '@/api';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useCommentsStore } from '@/stores/CommentsStore';
 
 /**
  * Main Canvas View
@@ -130,6 +131,8 @@ export default function Canvas() {
     'attachedFileUrls',
   ]);
 
+  const { addColor } = useCommentsStore(['addColor']);
+
   const { socket, setWebsocketAction, setRoomID, setTenants, clearTenants } =
     useWebSocketStore([
       'socket',
@@ -157,7 +160,10 @@ export default function Canvas() {
    * Callbacks for active tenants in the room.
    */
   useEffect(() => {
-    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, initTenants);
+    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, () => {
+      initTenants();
+      addColor(boardMeta.collabID);
+    });
     socket?.on(WS_TOPICS.NOTIFY_LEAVE_ROOM, initTenants);
     return clearTenants;
   }, [socket]);
