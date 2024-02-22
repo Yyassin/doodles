@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { TrashIcon } from '@radix-ui/react-icons';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { getInitials } from '@/lib/misc';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -270,7 +271,7 @@ const CommentsSheetContent = () => {
               </div>
             </div>
             <Button
-              className="bg-white hover:bg-gray-200 text-[#9493D3]"
+              className="p-0 h-7 w-15 bg-[#7f7dcf] hover:text-red-600 hover:bg-[#7f7dcf]"
               onClick={() => {
                 removeComment(comment.uid);
                 axios.delete(REST.comment.delete, {
@@ -286,7 +287,7 @@ const CommentsSheetContent = () => {
                 );
               }}
             >
-              hi
+              <TrashIcon className="h-5 w-5" />
             </Button>
           </div>
         ))}

@@ -68,6 +68,8 @@ const setComments = (set: SetState<CommentsStore>) => (comments: Comment[]) =>
 
 const addColor = (set: SetState<CommentsStore>) => (collabID: string) =>
   set((state) => {
+    if (state.colorMaping[collabID]) return state;
+
     const colorMaping = {
       ...state.colorMaping,
       [collabID]: `#${Math.floor(Math.random() * 16777215).toString(16)}`,

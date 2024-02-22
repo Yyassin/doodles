@@ -82,7 +82,8 @@ export const useSocket = () => {
     'fileIds',
   ]);
 
-  const { setBoardMeta, updateCanvas } = useCanvasBoardStore([
+  const { boardMeta, setBoardMeta, updateCanvas } = useCanvasBoardStore([
+    'boardMeta',
     'setBoardMeta',
     'updateCanvas',
   ]);
@@ -237,7 +238,7 @@ export const useSocket = () => {
         socket.current?.leaveRoom();
       }
     } else {
-      socket.current?.joinRoom(roomID);
+      socket.current?.joinRoom(roomID, boardMeta.collabID);
     }
   }, [roomID]);
 

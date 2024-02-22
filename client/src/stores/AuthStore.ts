@@ -55,7 +55,7 @@ const setUser =
         userLastName,
         // The random id allows the same user to login to different
         // clients, helpful for tests but not irl.
-        userEmail: `${userEmail}-${generateRandId()}`,
+        userEmail: userEmail ?? ' ',
         userPicture,
         userID,
       };

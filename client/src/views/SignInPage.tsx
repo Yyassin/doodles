@@ -122,31 +122,34 @@ export const checkURL = async (
   let board;
 
   if (queryParams.get('boardID')) {
-    board = await axios.put(REST.board.updateBoard, {
-      id: queryParams.get('boardID'),
-      fields: { collaborators: userID },
-    });
+    try {
+      board = await axios.put(REST.board.updateBoard, {
+        id: queryParams.get('boardID'),
+        fields: { collaborators: userID },
+      });
 
-    setColorMaping(board.data.collaborators);
+      setColorMaping(board.data.collaborators);
 
-    setBoardMeta({
-      roomID: board.data.roomID,
-      title: board.data.title,
-      id: board.data.uid,
-      lastModified: board.data.updatedAt,
-      shareUrl: board.data.shareUrl,
-      collabID: board.data.collabID,
-    });
+      setBoardMeta({
+        roomID: board.data.roomID,
+        title: board.data.title,
+        id: board.data.uid,
+        lastModified: board.data.updatedAt,
+        shareUrl: board.data.shareUrl,
+        collabID: board.data.collabID,
+      });
 
-    setCanvasElementState(createStateWithRoughElement(board.data.serialized));
+      setCanvasElementState(createStateWithRoughElement(board.data.serialized));
+      isSharedCanvas = true;
+    } catch {
+      console.log('error');
+    }
 
     //remove variable from url
     const currentUrl = window.location.href;
     const queryStringIndex = currentUrl.indexOf('?');
     const updatedUrl = currentUrl.slice(0, queryStringIndex);
     window.history.replaceState({}, document.title, updatedUrl);
-
-    isSharedCanvas = true;
   }
 
   if (!signUp) {

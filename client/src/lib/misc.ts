@@ -131,3 +131,11 @@ export const extractUsername = (email: string): string | null => {
   const match = email.match(emailMatch);
   return match ? match[1] : null;
 };
+
+export function extractCollabID(username: string): string | null {
+  const index = username.indexOf('-');
+  if (index !== -1) {
+    return username.substring(index + 1);
+  }
+  return null;
+}

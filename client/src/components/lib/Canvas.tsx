@@ -27,6 +27,7 @@ import {
   WS_TOPICS,
 } from '@/constants';
 import {
+  extractCollabID,
   extractUsername,
   getCanvasContext,
   isDrawingTool,
@@ -131,7 +132,10 @@ export default function Canvas() {
     'attachedFileUrls',
   ]);
 
-  const { addColor } = useCommentsStore(['addColor']);
+  const { colorMaping, addColor } = useCommentsStore([
+    'colorMaping',
+    'addColor',
+  ]);
 
   const { socket, setWebsocketAction, setRoomID, setTenants, clearTenants } =
     useWebSocketStore([
@@ -160,9 +164,12 @@ export default function Canvas() {
    * Callbacks for active tenants in the room.
    */
   useEffect(() => {
-    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, () => {
+    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, (payload) => {
       initTenants();
-      addColor(boardMeta.collabID);
+      const collabID = extractCollabID(
+        (payload as { payload: { id: string } }).payload.id,
+      );
+      collabID && addColor(collabID);
     });
     socket?.on(WS_TOPICS.NOTIFY_LEAVE_ROOM, initTenants);
     return clearTenants;
