@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
-import { generateRandId } from '@/lib/bytes';
 
 /**
  * Define Global Auth states and reducers

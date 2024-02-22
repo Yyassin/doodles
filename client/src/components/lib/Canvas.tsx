@@ -132,10 +132,7 @@ export default function Canvas() {
     'attachedFileUrls',
   ]);
 
-  const { colorMaping, addColor } = useCommentsStore([
-    'colorMaping',
-    'addColor',
-  ]);
+  const { addColor } = useCommentsStore(['addColor']);
 
   const { socket, setWebsocketAction, setRoomID, setTenants, clearTenants } =
     useWebSocketStore([
