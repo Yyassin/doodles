@@ -30,6 +30,7 @@ import {
   CanvasElementState,
   useCanvasElementStore,
 } from '@/stores/CanvasElementsStore';
+import { useCommentsStore } from '@/stores/CommentsStore';
 
 /**
  * It is the sign in page where user either inputs email and password or
@@ -82,9 +83,11 @@ export async function getUserDetails(
       lastModified: string;
       roomID: string;
       shareUrl: string;
+      collabID: string;
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
+  setColorMaping: (collabs: string[]) => void,
 ) {
   try {
     const user = await axios.get(REST.user.get, {
@@ -108,6 +111,7 @@ export async function getUserDetails(
       setCanvases,
       setBoardMeta,
       setCanvasElementState,
+      setColorMaping,
     );
   } catch (error) {
     console.error('Error:', error);
@@ -124,9 +128,11 @@ export const checkURL = async (
       lastModified: string;
       roomID: string;
       shareUrl: string;
+      collabID: string;
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
+  setColorMaping: (collabs: string[]) => void,
   signUp = false,
 ) => {
   const queryParams = new URLSearchParams(window.location.search);
@@ -134,28 +140,34 @@ export const checkURL = async (
   let board;
 
   if (queryParams.get('boardID')) {
-    board = await axios.put(REST.board.updateBoard, {
-      id: queryParams.get('boardID'),
-      fields: { collaborators: userID },
-    });
+    try {
+      board = await axios.put(REST.board.updateBoard, {
+        id: queryParams.get('boardID'),
+        fields: { collaborators: userID },
+      });
 
-    setBoardMeta({
-      roomID: board.data.roomID,
-      title: board.data.title,
-      id: board.data.uid,
-      lastModified: board.data.updatedAt,
-      shareUrl: board.data.shareUrl,
-    });
+      setColorMaping(board.data.collaborators);
 
-    setCanvasElementState(createStateWithRoughElement(board.data.serialized));
+      setBoardMeta({
+        roomID: board.data.roomID,
+        title: board.data.title,
+        id: board.data.uid,
+        lastModified: board.data.updatedAt,
+        shareUrl: board.data.shareUrl,
+        collabID: board.data.collabID,
+      });
+
+      setCanvasElementState(createStateWithRoughElement(board.data.serialized));
+      isSharedCanvas = true;
+    } catch {
+      console.log('error');
+    }
 
     //remove variable from url
     const currentUrl = window.location.href;
     const queryStringIndex = currentUrl.indexOf('?');
     const updatedUrl = currentUrl.slice(0, queryStringIndex);
     window.history.replaceState({}, document.title, updatedUrl);
-
-    isSharedCanvas = true;
   }
 
   if (!signUp) {
@@ -186,6 +198,7 @@ export default function SignInPage() {
   const { setCanvasElementState } = useCanvasElementStore([
     'setCanvasElementState',
   ]);
+  const { setColorMaping } = useCommentsStore(['setColorMaping']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false); // State to disable sign in button while loading
@@ -208,6 +221,7 @@ export default function SignInPage() {
           setCanvases,
           setBoardMeta,
           setCanvasElementState,
+          setColorMaping,
         )
       )?.valueOf(); //get name, email, avatar of user
 
@@ -256,6 +270,7 @@ export default function SignInPage() {
               setCanvases,
               setBoardMeta,
               setCanvasElementState,
+              setColorMaping,
             )
           ).valueOf();
 

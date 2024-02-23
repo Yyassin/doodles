@@ -18,8 +18,8 @@ import { HTTP_STATUS } from '../../constants';
 //Create collaborator
 export const handleCreateCollaborator = async (req: Request, res: Response) => {
   try {
-    const { permissionLevel, user } = req.body; // The permission level and user parameters are in the body.
-    const collaborator = await createCollaborator(permissionLevel, user);
+    const { permissionLevel, user, board } = req.body; // The permission level and user parameters are in the body.
+    const collaborator = await createCollaborator(permissionLevel, user, board);
 
     res.status(HTTP_STATUS.SUCCESS).json({ collaborator });
   } catch (error) {

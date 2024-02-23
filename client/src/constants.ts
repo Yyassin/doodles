@@ -34,6 +34,12 @@ export const REST = {
     deleteBoard: `${REST_ROOT}/board/deleteBoard`,
     updateBoard: `${REST_ROOT}/board/updateBoard`,
   },
+  comment: {
+    getComments: `${REST_ROOT}/comment/getComments`,
+    create: `${REST_ROOT}/comment/createComment`,
+    update: `${REST_ROOT}/comment/handleLike`,
+    delete: `${REST_ROOT}/comment/deleteComment`,
+  },
 };
 export const HTTP_STATUS = {
   SUCCESS: 200,

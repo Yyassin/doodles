@@ -50,6 +50,7 @@ const BoardHeader = ({
     'setIsUsingStableDiffusion',
   ]);
   const {
+    selectedElementIds,
     allIds,
     types,
     strokeColors,
@@ -72,6 +73,7 @@ const BoardHeader = ({
     fileIds,
     resetCanvas,
   } = useCanvasElementStore([
+    'selectedElementIds',
     'allIds',
     'types',
     'strokeColors',
@@ -127,6 +129,7 @@ const BoardHeader = ({
                   lastModified: '',
                   roomID: '',
                   shareUrl: '',
+                  collabID: '',
                 });
               }}
             >
@@ -161,14 +164,15 @@ const BoardHeader = ({
             setIsViewingComments(!isViewingComments);
             !isViewingComments && setIsUsingStableDiffusion(false);
           }}
+          disabled={selectedElementIds.length !== 1}
         >
           <ChatBubbleIcon className="h-4 w-4" />
         </Button>
         {/* Share Dialog */}
         <div
-          className={`flex flex-row gap-2 items-center transition-spacing duration-300 ease-in-out ${
-            isUsingStableDiffusion || isViewingComments ? 'mr-[25rem]' : ''
-          }`}
+          className={
+            'flex flex-row gap-2 items-center transition-spacing duration-300 ease-in-out'
+          }
         >
           <Button
             className={cn(

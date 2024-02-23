@@ -37,6 +37,7 @@ interface CanvasBoardState {
     lastModified: string;
     roomID: string;
     shareUrl: string;
+    collabID: string;
   };
 }
 
@@ -63,6 +64,7 @@ export const initialCanvasState: CanvasBoardState = {
     lastModified: '',
     roomID: '',
     shareUrl: '',
+    collabID: '',
   },
 };
 
@@ -77,8 +79,7 @@ const setCanvases = (set: SetState<CanvasBoardStore>) => (canvases: Canvas[]) =>
 
 const addCanvas = (set: SetState<CanvasBoardStore>) => (canvas: Canvas) =>
   set((state) => {
-    const canvases = state.canvases;
-    canvases.push(canvas);
+    const canvases = [...state.canvases, canvas];
 
     return { ...state, canvases };
   });

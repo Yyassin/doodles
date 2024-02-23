@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
-import { generateRandId } from '@/lib/bytes';
 
 /**
  * Define Global Auth states and reducers
@@ -55,7 +54,7 @@ const setUser =
         userLastName,
         // The random id allows the same user to login to different
         // clients, helpful for tests but not irl.
-        userEmail: `${userEmail}-${generateRandId()}`,
+        userEmail: userEmail ?? ' ',
         userPicture,
         userID,
       };

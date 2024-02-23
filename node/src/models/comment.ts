@@ -18,28 +18,34 @@ export class Comment extends FastFireDocument<Comment> {
   @FastFireField({ required: true })
   uid!: string;
   @FastFireField({ required: true })
-  text!: string;
+  elemID!: string;
+  @FastFireField({ required: true })
+  comment!: string;
   @FastFireField({ required: true })
   collaborator!: string; // Collaborator ID
   @FastFireField({ required: true })
   createdAt!: Date;
   @FastFireField({ required: true })
-  updatedAt!: Date;
+  likes!: string[];
 }
 
 // Function to create a comment
-export async function createComment(text: string, collaborator: string) {
+export async function createComment(
+  elemID: string,
+  comment: string,
+  collaborator: string,
+) {
   const uid = generateRandId();
   const createdAt = new Date().toUTCString();
-  const updatedAt = new Date().toUTCString();
   return await FastFire.create(
     Comment,
     {
       uid,
-      text,
+      elemID,
+      comment,
       collaborator,
       createdAt,
-      updatedAt,
+      likes: [],
     },
     uid,
   );
@@ -49,12 +55,14 @@ export async function createComment(text: string, collaborator: string) {
 export const findCommentById = async (commentId: string) =>
   FastFire.findById(Comment, commentId);
 
+export const findCommentsByElemID = async (elemID: string) =>
+  await FastFire.where(Comment, 'elemID', '==', elemID).get();
+
 // Function to update a comment
 export const updateComment = async (
   comment: Comment,
   updatedFields: Partial<DocumentFields<Comment>>,
 ) => {
-  updatedFields.updatedAt = new Date().toUTCString();
   const {
     fastFireOptions: _fastFireOptions,
     id: _id,
