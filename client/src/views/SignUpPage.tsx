@@ -23,6 +23,8 @@ import { useAppStore } from '@/stores/AppStore';
 import { ACCESS_TOKEN_TAG, REST } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
 import axios, { AxiosResponse } from 'axios';
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { generateRandId } from '@/lib/bytes';
 import { checkURL } from './SignInPage';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
@@ -39,11 +41,10 @@ export function signup(
   password: string,
   firstName: string,
   lastName: string,
-  profilePicture: File | null,
+  profilePicture: string,
 ): Promise<{ cred: UserCredential; userInfo: AxiosResponse }> {
   return new Promise(async (resolve, reject) => {
     const auth = getAuth(firebaseApp);
-    console.log(profilePicture);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -60,7 +61,7 @@ export function signup(
         password,
         firstname: firstName,
         lastname: lastName,
-        avatar: 'profilePicture',
+        avatar: profilePicture,
         // handle uploading the profile picture to backend
       };
 
@@ -100,22 +101,51 @@ export default function SignUp() {
       //we want to disable sign up button from user so
       //firebase doesnt create many accounts if button click multiple times
       setLoading(true);
+      const pictureId = generateRandId();
       const { cred, userInfo } = await signup(
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
         firstNameRef.current?.value ?? '',
         lastNameRef.current?.value ?? '',
-        profilePictureRef.current?.files
-          ? profilePictureRef.current?.files[0]
-          : null,
+        pictureId,
       );
 
-      //TODO
+      const generateImageUrl = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            if (e.target && e.target.result) {
+              const generatedUrl = e.target.result as string;
+              resolve(generatedUrl);
+            } else {
+              reject(new Error('Failed to generate image URL'));
+            }
+          };
+          // Read the file as a data URL
+          reader.readAsDataURL(file);
+        });
+      };
+
+      const profilePic = profilePictureRef.current?.files
+        ? generateImageUrl(profilePictureRef.current?.files[0])
+        : '';
+
+      const storage = getStorage(firebaseApp);
+      const storageRef = ref(storage, `profilePictures/${pictureId}.jpg`); // give the image a random id
+      profilePictureRef.current?.files?.[0] &&
+        uploadBytes(storageRef, profilePictureRef.current?.files[0])
+          .then((snapshot) => {
+            return getDownloadURL(snapshot.ref);
+          })
+          .catch(() => {
+            alert('Error uploading');
+          });
+
       setUser(
         firstNameRef.current?.value ?? '',
         lastNameRef.current?.value ?? '',
         emailRef.current?.value ?? '',
-        '', // add image implementation when API is done
+        (await profilePic) ?? '',
         userInfo.data.user.uid ?? '',
       );
 
