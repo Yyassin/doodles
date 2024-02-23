@@ -31,7 +31,6 @@ import {
   useCanvasElementStore,
 } from '@/stores/CanvasElementsStore';
 
-
 /**
  * It is the sign in page where user either inputs email and password or
  * sign in through google. We use firebase auth for both
