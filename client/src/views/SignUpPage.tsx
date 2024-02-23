@@ -25,6 +25,9 @@ import { useAuthStore } from '@/stores/AuthStore';
 import axios, { AxiosResponse } from 'axios';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { generateRandId } from '@/lib/bytes';
+import { checkURL } from './SignInPage';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 
 /**
  * It is the sign up page where user either inputs email and password or
@@ -73,6 +76,13 @@ export function signup(
 export default function SignUp() {
   const { setMode } = useAppStore(['setMode']);
   const { setUser } = useAuthStore(['setUser']);
+  const { setCanvases, setBoardMeta } = useCanvasBoardStore([
+    'setCanvases',
+    'setBoardMeta',
+  ]);
+  const { setCanvasElementState } = useCanvasElementStore([
+    'setCanvasElementState',
+  ]);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const firstNameRef = useRef<HTMLInputElement | null>(null);
@@ -138,7 +148,18 @@ export default function SignUp() {
       );
 
       localStorage.setItem(ACCESS_TOKEN_TAG, await cred.user.getIdToken());
-      setMode('dashboard'); //bring user to dashboard page if sign in complete
+
+      const isSharedCanvas = (
+        await checkURL(
+          userInfo.data.user.uid,
+          setCanvases,
+          setBoardMeta,
+          setCanvasElementState,
+          true,
+        )
+      ).valueOf();
+
+      setMode(isSharedCanvas ? 'canvas' : 'dashboard');
     } catch (error: unknown) {
       setError((error as Error).message); //if error thrown, setState and will display on page
     }
@@ -184,7 +205,17 @@ export default function SignUp() {
             await googleSignInToken.user.getIdToken(),
           );
 
-          setMode('dashboard'); //bring user to dashboard page if sign in complete
+          const isSharedCanvas = (
+            await checkURL(
+              createUserResp.data.user.uid,
+              setCanvases,
+              setBoardMeta,
+              setCanvasElementState,
+              true,
+            )
+          ).valueOf();
+
+          setMode(isSharedCanvas ? 'canvas' : 'dashboard');
         });
     } catch (error: unknown) {
       setError((error as Error).message);

@@ -13,6 +13,7 @@ import {
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { EVENT } from './types';
 import { ValueOf } from './lib/misc';
+import { UpdatedTimeMessage } from './stores/WebSocketStore';
 
 interface CallBacksType {
   addCanvasShape: (element: CanvasElement) => void;
@@ -205,7 +206,7 @@ export default class WebsocketClient {
    */
   async sendMsgRoom(
     topic: string,
-    msg: CanvasElement | string | string[] | null,
+    msg: CanvasElement | string | string[] | UpdatedTimeMessage | null,
   ) {
     // Msg to be changed to proper type once everything finalized
     if (this.room === null) throw 'No room assigned!';

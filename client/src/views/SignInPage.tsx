@@ -25,6 +25,12 @@ import { ACCESS_TOKEN_TAG } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useCanvasBoardStore, Canvas } from '@/stores/CanavasBoardStore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import { createStateWithRoughElement } from '@/components/lib/BoardScroll';
+import {
+  CanvasElementState,
+  useCanvasElementStore,
+} from '@/stores/CanvasElementsStore';
+
 
 /**
  * It is the sign in page where user either inputs email and password or
@@ -70,6 +76,16 @@ export async function getUserDetails(
     userID: string,
   ) => void,
   setCanvases: (canvases: Canvas[]) => void,
+  setBoardMeta: (
+    meta: Partial<{
+      title: string;
+      id: string;
+      lastModified: string;
+      roomID: string;
+      shareUrl: string;
+    }>,
+  ) => void,
+  setCanvasElementState: (element: CanvasElementState) => void,
 ) {
   try {
     const user = await axios.get(REST.user.get, {
@@ -88,20 +104,89 @@ export async function getUserDetails(
       user.data.user.uid ?? '',
     );
 
-    const userBoards = await axios.get(REST.board.getBoards, {
-      params: { userID },
-    });
-
-    setCanvases(userBoards.data.boards);
+    return await checkURL(
+      userID,
+      setCanvases,
+      setBoardMeta,
+      setCanvasElementState,
+    );
   } catch (error) {
     console.error('Error:', error);
   }
 }
 
+export const checkURL = async (
+  userID: string,
+  setCanvases: (canvases: Canvas[]) => void,
+  setBoardMeta: (
+    meta: Partial<{
+      title: string;
+      id: string;
+      lastModified: string;
+      roomID: string;
+      shareUrl: string;
+    }>,
+  ) => void,
+  setCanvasElementState: (element: CanvasElementState) => void,
+  signUp = false,
+) => {
+  const queryParams = new URLSearchParams(window.location.search);
+  let isSharedCanvas = false;
+  let board;
+
+  if (queryParams.get('boardID')) {
+    board = await axios.put(REST.board.updateBoard, {
+      id: queryParams.get('boardID'),
+      fields: { collaborators: userID },
+    });
+
+    setBoardMeta({
+      roomID: board.data.roomID,
+      title: board.data.title,
+      id: board.data.uid,
+      lastModified: board.data.updatedAt,
+      shareUrl: board.data.shareUrl,
+    });
+
+    setCanvasElementState(createStateWithRoughElement(board.data.serialized));
+
+    //remove variable from url
+    const currentUrl = window.location.href;
+    const queryStringIndex = currentUrl.indexOf('?');
+    const updatedUrl = currentUrl.slice(0, queryStringIndex);
+    window.history.replaceState({}, document.title, updatedUrl);
+
+    isSharedCanvas = true;
+  }
+
+  if (!signUp) {
+    const response = await axios.get(REST.board.getBoards, {
+      params: { userID },
+    });
+
+    const userBoards: Canvas[] = response.data.boards;
+    setCanvases(userBoards);
+  } else if (signUp && isSharedCanvas) {
+    const canvas = { ...board?.data };
+    canvas.id = canvas.uid;
+
+    delete canvas.uid;
+    delete canvas.serialized;
+    setCanvases([canvas]);
+  }
+  return isSharedCanvas;
+};
+
 export default function SignInPage() {
   const { setMode } = useAppStore(['setMode']);
   const { setUser } = useAuthStore(['setUser']);
-  const { setCanvases } = useCanvasBoardStore(['setCanvases']);
+  const { setCanvases, setBoardMeta } = useCanvasBoardStore([
+    'setCanvases',
+    'setBoardMeta',
+  ]);
+  const { setCanvasElementState } = useCanvasElementStore([
+    'setCanvasElementState',
+  ]);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false); // State to disable sign in button while loading
@@ -117,14 +202,22 @@ export default function SignInPage() {
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
       );
-      getUserDetails(emailRef.current?.value ?? '', setUser, setCanvases); //get name, email, avatar of user
+      const isSharedCanvas = (
+        await getUserDetails(
+          emailRef.current?.value ?? '',
+          setUser,
+          setCanvases,
+          setBoardMeta,
+          setCanvasElementState,
+        )
+      )?.valueOf(); //get name, email, avatar of user
 
       localStorage.setItem(
         ACCESS_TOKEN_TAG,
         await signInToken.user.getIdToken(),
       );
 
-      setMode('dashboard'); //bring user to dashboard page if sign in complete
+      setMode(isSharedCanvas ? 'canvas' : 'dashboard'); //bring user to dashboard page if sign in complete
     } catch (error: unknown) {
       setError((error as Error).message); //if error thrown, setState and will display on page
     }
@@ -158,12 +251,16 @@ export default function SignInPage() {
             await googleSignInToken.user.getIdToken(),
           );
 
-          const userBoards = await axios.get(REST.board.getBoards, {
-            params: { userID },
-          });
+          const isSharedCanvas = (
+            await checkURL(
+              userID,
+              setCanvases,
+              setBoardMeta,
+              setCanvasElementState,
+            )
+          ).valueOf();
 
-          setCanvases(userBoards.data.boards);
-          setMode('dashboard'); //bring user to dashboard page if sign in complete
+          setMode(isSharedCanvas ? 'canvas' : 'dashboard'); //bring user to dashboard page if sign in complete
         })
         .catch(() => {
           setError('Email is not associated with an Account. Sign Up First!');
