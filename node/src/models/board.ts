@@ -39,12 +39,12 @@ export class Board extends FastFireDocument<Board> {
 
 // Function to create a board
 export async function createBoard(
+  uid: string,
   serialized: Record<string, unknown>,
   title: string,
   shareUrl: string,
   collaborators: string[],
 ) {
-  const uid = generateRandId();
   const createdAt = new Date().toUTCString();
   const updatedAt = new Date().toUTCString();
   shareUrl = shareUrl + `?boardID=${uid}`;

@@ -59,6 +59,7 @@ export const DeleteCanavasDialog = ({
                 shareUrl: '',
                 folder: '',
                 tags: [],
+                collabID: '',
               });
               axios.delete(REST.board.deleteBoard, {
                 params: { id: boardMeta.id },

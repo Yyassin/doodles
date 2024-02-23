@@ -24,3 +24,17 @@ export const truncateString = (input: string, n: number): string => {
  * @returns A random UUID.
  */
 export const generateRandId = () => crypto.randomUUID();
+
+/**
+ * Retrieves the initials for the provided name. If
+ * the name is only one word, returns the first initial.
+ * @param name The name to retrieve the initials for.
+ * @returns The initials.
+ */
+export const getInitials = (name: string) => {
+  const words = name.trim().split(' ');
+  if (words.length === 1) {
+    return words[0][0].toUpperCase();
+  }
+  return words.map((word) => word[0].toUpperCase()).join('');
+};

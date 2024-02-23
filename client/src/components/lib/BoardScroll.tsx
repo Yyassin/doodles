@@ -14,6 +14,8 @@ import { createElement } from '@/lib/canvasElements/canvasElementUtils';
 import { renderElementsOnOffscreenCanvas } from '@/lib/export';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
+import { useAuthStore } from '@/stores/AuthStore';
+import { useCommentsStore } from '@/stores/CommentsStore';
 
 export const createStateWithRoughElement = (state: CanvasElementState) => {
   const roughElements: Record<string, CanvasElement['roughElement']> = {};
@@ -69,6 +71,8 @@ export const BoardScroll = () => {
   const { setCanvasElementState } = useCanvasElementStore([
     'setCanvasElementState',
   ]);
+  const { userID } = useAuthStore(['userID']);
+  const { setColorMaping } = useCommentsStore(['setColorMaping']);
 
   const setCanvasState = () => {
     state && setCanvasElementState(state);
@@ -90,10 +94,16 @@ export const BoardScroll = () => {
               const isSelected = boardMeta.id === board.id;
 
               try {
+                let collabID = ' ';
                 if (!isSelected) {
+                  //todo
                   const boardState = await axios.get(REST.board.getBoard, {
-                    params: { id: board.id },
+                    params: { id: board.id, userID },
                   });
+
+                  setColorMaping(boardState.data.board.collaborators);
+
+                  collabID = boardState.data.collabID;
 
                   const state = createStateWithRoughElement(
                     boardState.data.board.serialized,
@@ -131,6 +141,7 @@ export const BoardScroll = () => {
                   shareUrl: isSelected ? '' : board.shareUrl,
                   folder: isSelected ? '' : board.folder,
                   tags: isSelected ? [] : board.tags,
+                  collabID: isSelected ? '' : collabID,
                 });
               } catch (error) {
                 toast({

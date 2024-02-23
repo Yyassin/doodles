@@ -14,6 +14,7 @@ import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { EVENT } from './types';
 import { ValueOf } from './lib/misc';
 import { UpdatedTimeMessage } from './stores/WebSocketStore';
+import { Comment } from './stores/CommentsStore';
 
 interface CallBacksType {
   addCanvasShape: (element: CanvasElement) => void;
@@ -33,6 +34,7 @@ interface WSMessageType {
 // Encapsualtes functionality to interact with websockets
 export default class WebsocketClient {
   userId: string;
+  _userId: string;
   reconnectInterval: number;
   socket: WebSocket | null;
   room: string | null; //the current room the socket is in
@@ -57,6 +59,7 @@ export default class WebsocketClient {
     this.callBacks = callBacks;
     this.injectableCallbacks = {};
     this.userId = userId;
+    this._userId = userId;
     this.reconnectInterval = reconnectInterval;
     this.connect(); // Create a socket
   }
@@ -162,7 +165,8 @@ export default class WebsocketClient {
       if (injectableCallbacks !== undefined) {
         injectableCallbacks(jsonMsg);
       } else {
-        this.callBacks[jsonMsg.topic](jsonMsg.payload);
+        const callback = this.callBacks[jsonMsg.topic];
+        callback && callback(jsonMsg.payload);
       }
     });
   }
@@ -206,7 +210,13 @@ export default class WebsocketClient {
    */
   async sendMsgRoom(
     topic: string,
-    msg: CanvasElement | string | string[] | UpdatedTimeMessage | null,
+    msg:
+      | CanvasElement
+      | string
+      | string[]
+      | UpdatedTimeMessage
+      | null
+      | { elemID: string; comment: Partial<Comment> },
   ) {
     // Msg to be changed to proper type once everything finalized
     if (this.room === null) throw 'No room assigned!';
@@ -224,8 +234,9 @@ export default class WebsocketClient {
    *
    * @param room String, the room id
    */
-  async joinRoom(room: string) {
+  async joinRoom(room: string, collabID: string) {
     this.room = room;
+    this.userId = `${this._userId}-${collabID}`;
     return this.send({
       topic: WS_TOPICS.JOIN_ROOM,
       room: this.room,
