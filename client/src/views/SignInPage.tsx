@@ -83,6 +83,8 @@ export async function getUserDetails(
       lastModified: string;
       roomID: string;
       shareUrl: string;
+      folder: string;
+      tags: string[];
       collabID: string;
     }>,
   ) => void,
@@ -128,6 +130,8 @@ export const checkURL = async (
       lastModified: string;
       roomID: string;
       shareUrl: string;
+      folder: string;
+      tags: string[];
       collabID: string;
     }>,
   ) => void,
@@ -145,7 +149,6 @@ export const checkURL = async (
         id: queryParams.get('boardID'),
         fields: { collaborators: userID },
       });
-
       setColorMaping(board.data.collaborators);
 
       setBoardMeta({
@@ -154,6 +157,8 @@ export const checkURL = async (
         id: board.data.uid,
         lastModified: board.data.updatedAt,
         shareUrl: board.data.shareUrl,
+        folder: board.data.folder,
+        tags: board.data.tags,
         collabID: board.data.collabID,
       });
 
