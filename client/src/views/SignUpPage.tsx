@@ -28,7 +28,6 @@ import { generateRandId } from '@/lib/bytes';
 import { checkURL } from './SignInPage';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
-import { useCommentsStore } from '@/stores/CommentsStore';
 
 /**
  * It is the sign up page where user either inputs email and password or

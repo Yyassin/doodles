@@ -30,7 +30,6 @@ import {
   CanvasElementState,
   useCanvasElementStore,
 } from '@/stores/CanvasElementsStore';
-import { useCommentsStore } from '@/stores/CommentsStore';
 
 /**
  * It is the sign in page where user either inputs email and password or

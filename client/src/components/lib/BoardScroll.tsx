@@ -15,7 +15,6 @@ import { renderElementsOnOffscreenCanvas } from '@/lib/export';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useCommentsStore } from '@/stores/CommentsStore';
 
 export const createStateWithRoughElement = (state: CanvasElementState) => {
   const roughElements: Record<string, CanvasElement['roughElement']> = {};
