@@ -132,10 +132,13 @@ export const extractUsername = (email: string): string | null => {
   return match ? match[1] : null;
 };
 
-export function extractCollabID(username: string): string | null {
+/**
+ * Extracts the collabID from the user sockeetID.
+ */
+export const extractCollabID = (username: string) => {
   const index = username.indexOf('-');
   if (index !== -1) {
     return username.substring(index + 1);
   }
   return null;
-}
+};
