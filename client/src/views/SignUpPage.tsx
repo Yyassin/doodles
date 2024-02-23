@@ -114,7 +114,7 @@ export default function SignUp() {
         });
       };
 
-      const newpic = profilePictureRef.current?.files
+      const profilePic = profilePictureRef.current?.files
         ? generateImageUrl(profilePictureRef.current?.files[0])
         : '';
 
@@ -133,7 +133,7 @@ export default function SignUp() {
         firstNameRef.current?.value ?? '',
         lastNameRef.current?.value ?? '',
         emailRef.current?.value ?? '',
-        (await newpic) ?? '',
+        (await profilePic) ?? '',
         userInfo.data.user.uid ?? '',
       );
 
