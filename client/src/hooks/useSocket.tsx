@@ -82,7 +82,8 @@ export const useSocket = () => {
     'fileIds',
   ]);
 
-  const { setBoardMeta, updateCanvas } = useCanvasBoardStore([
+  const { boardMeta, setBoardMeta, updateCanvas } = useCanvasBoardStore([
+    'boardMeta',
     'setBoardMeta',
     'updateCanvas',
   ]);
@@ -237,7 +238,7 @@ export const useSocket = () => {
         socket.current?.leaveRoom();
       }
     } else {
-      socket.current?.joinRoom(roomID);
+      socket.current?.joinRoom(roomID, boardMeta.collabID);
     }
   }, [roomID]);
 
@@ -294,7 +295,7 @@ export const useSocket = () => {
     }
 
     //Check if the actionElementID is string[] (collection of ids)
-    if (typeof actionElementID === 'object') {
+    if (typeof actionElementID === 'object' || action === 'addCollab') {
       socket.current?.sendMsgRoom(action, actionElementID);
       setWebsocketAction('', '');
       return;
