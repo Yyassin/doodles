@@ -93,6 +93,8 @@ export const TopBar = () => {
                       id: boardData.id,
                       lastModified: boardData.updatedAt,
                       shareUrl: boardData.shareUrl,
+                      folder: boardData.folder,
+                      tags: boardData.tags,
                     });
 
                     setMode('canvas');

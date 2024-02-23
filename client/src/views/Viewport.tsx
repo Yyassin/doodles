@@ -21,12 +21,13 @@ import BoardHeader from '@/components/lib/BoardHeader';
 import ShareBoardDialog from '@/components/lib/ShareBoardDialog';
 import { users } from '@/stores/WebSocketStore';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import EditBoardDataDialog from '@/components/lib/EditBoardDataDialog';
 
 /**
  * Primary viewport that houses the canvas
  * and accompanying widgets/buttons that lie
  * on top of it (absolutely positioned).
- * @authors Yousef Yassin
+ * @authors Yousef Yassin, Abdalla Abdelhadi, Zakariyya Almalki
  */
 const Viewport = () => {
   const { tool } = useAppStore(['tool']);
@@ -35,6 +36,7 @@ const Viewport = () => {
   const isDrawingSelected = isDrawingTool(tool);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const { boardMeta } = useCanvasBoardStore(['boardMeta']);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   return (
     <RadixContextMenu.Root>
@@ -60,6 +62,10 @@ const Viewport = () => {
             setOpen={setIsShareDialogOpen}
             boardLink={boardMeta.shareUrl}
             users={users}
+          />
+          <EditBoardDataDialog
+            open={isEditDialogOpen}
+            setOpen={setIsEditDialogOpen}
           />
         </RadixContextMenu.Trigger>
         <div
@@ -99,7 +105,11 @@ const Viewport = () => {
                 {(selectedElementIds.length === 1 || isDrawingSelected) && (
                   <CustomToolbar />
                 )}
-                <DropDownMenu viewportRef={viewportRef} />
+                <DropDownMenu
+                  viewportRef={viewportRef}
+                  isEditDialogOpen={isEditDialogOpen}
+                  setIsEditDialogOpen={setIsEditDialogOpen}
+                />
 
                 <div
                   className="flex gap-[0.5rem] z-10"

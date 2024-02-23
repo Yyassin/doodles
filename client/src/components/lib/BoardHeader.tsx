@@ -127,6 +127,8 @@ const BoardHeader = ({
                   lastModified: '',
                   roomID: '',
                   shareUrl: '',
+                  folder: '',
+                  tags: [],
                 });
               }}
             >

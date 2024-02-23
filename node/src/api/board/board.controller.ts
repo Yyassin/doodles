@@ -16,7 +16,7 @@ import {
 
 /**
  * Firebase API controllers, logic for endpoint routes.
- * @author Ibrahim Almalki, Abdalla Abdelhadi
+ * @author Ibrahim Almalki, Abdalla Abdelhadi, Zakariyya Almalki
  */
 
 // TODO: JSDOC
@@ -121,7 +121,7 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
     const { id: boardId, fields: updatedFields } = req.body;
     if (!validateId(boardId, res)) return;
     const board = await findBoardById(boardId);
-
+    console.log(updatedFields);
     if (board !== null) {
       if (updatedFields.collaborators !== undefined) {
         const collaborators = (

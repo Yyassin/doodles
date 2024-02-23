@@ -9,7 +9,7 @@ import { generateRandId } from '../utils/misc';
 
 /**
  * Defines Board class.
- * @authors Ibrahim Almalki, Abdalla Abdelhadi
+ * @authors Ibrahim Almalki, Abdalla Abdelhadi, Zakariyya Almalki
  */
 
 //TODO: add createdAt and updatedAt
@@ -24,7 +24,7 @@ export class Board extends FastFireDocument<Board> {
   @FastFireField({ required: true })
   tags!: string[];
   @FastFireField({ required: true })
-  folder!: string[];
+  folder!: string;
   @FastFireField({ required: true })
   shareUrl!: string;
   @FastFireField({ required: true })
@@ -76,6 +76,7 @@ export const updateBoard = async (
   updatedFields: Partial<DocumentFields<Board>>,
 ) => {
   updatedFields.updatedAt = new Date().toUTCString();
+  console.log(updatedFields);
   const { fastFireOptions: _fastFireOptions, id: _id, ...boardFields } = board;
   if (updatedFields.collaborators !== undefined) {
     boardFields.collaborators.push(updatedFields.collaborators as string);

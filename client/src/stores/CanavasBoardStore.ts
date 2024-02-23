@@ -4,7 +4,7 @@ import { createStoreWithSelectors } from './utils';
 
 /**
  * Define Global CanvasBoard states and reducers
- * @author Abdalla Abdelhadi
+ * @author Abdalla Abdelhadi, Zakariyya Almalki
  */
 
 export const boards = ['Folder', 'Templates', 'Settings'] as const;
@@ -37,6 +37,8 @@ interface CanvasBoardState {
     lastModified: string;
     roomID: string;
     shareUrl: string;
+    folder: string;
+    tags: string[];
   };
 }
 
@@ -47,7 +49,14 @@ interface CanvasBoardActions {
   addCanvas: (canvas: Canvas) => void;
   removeCanvas: (id: string) => void;
   updateCanvas: (id: string, meta: string) => void;
+  updateCanvasINFO: (
+    id: string,
+    title: string,
+    folder: string,
+    tags: string[],
+  ) => void;
   setBoardMeta: (meta: Partial<CanvasBoardState['boardMeta']>) => void;
+  setTag: (tags: Array<string>) => void;
 }
 
 type CanvasBoardStore = CanvasBoardActions & CanvasBoardState;
@@ -63,6 +72,8 @@ export const initialCanvasState: CanvasBoardState = {
     lastModified: '',
     roomID: '',
     shareUrl: '',
+    folder: '',
+    tags: [],
   },
 };
 
@@ -100,11 +111,25 @@ const updateCanvas =
       return { ...state, canvases };
     });
 
+const updateCanvasINFO =
+  (set: SetState<CanvasBoardStore>) =>
+  (id: string, title: string, folder: string, tags: string[]) =>
+    set((state) => {
+      const canvases = state.canvases.map((canvas) =>
+        canvas.id === id ? { ...canvas, title, folder, tags } : canvas,
+      );
+
+      return { ...state, canvases };
+    });
+
 const setBoardMeta =
   (set: SetState<CanvasBoardStore>) =>
   (meta: Partial<CanvasBoardState['boardMeta']>) => {
     set((state) => ({ boardMeta: { ...state.boardMeta, ...meta } }));
   };
+
+const setTag = (set: SetState<CanvasBoardStore>) => (tags: Array<string>) =>
+  set((state) => ({ boardMeta: { ...state.boardMeta, tags } }));
 
 /** Store Hook */
 const CanvasBoardStore = create<CanvasBoardStore>()((set) => ({
@@ -114,6 +139,8 @@ const CanvasBoardStore = create<CanvasBoardStore>()((set) => ({
   addCanvas: addCanvas(set),
   removeCanvas: removeCanvas(set),
   updateCanvas: updateCanvas(set),
+  updateCanvasINFO: updateCanvasINFO(set),
   setBoardMeta: setBoardMeta(set),
+  setTag: setTag(set),
 }));
 export const useCanvasBoardStore = createStoreWithSelectors(CanvasBoardStore);

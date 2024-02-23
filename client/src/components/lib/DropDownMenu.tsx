@@ -15,7 +15,7 @@ import { Button } from '../ui/button';
 
 /**
  * Creates a DropDownMenu for Canvas
- * @author Dana El Sherif
+ * @author Dana El Sherif, Abdalla Abdelhadi, Zakariyya Almalki
  */
 
 /**
@@ -44,8 +44,12 @@ const DropDownIcon = () => (
  */
 const DropDownMenu = ({
   viewportRef,
+  isEditDialogOpen,
+  setIsEditDialogOpen,
 }: {
   viewportRef: React.RefObject<HTMLDivElement>;
+  isEditDialogOpen: boolean;
+  setIsEditDialogOpen: (value: boolean) => void;
 }) => {
   const { isFullscreen } = useAppStore(['isFullscreen']);
   //Handle button functionailities
@@ -57,7 +61,8 @@ const DropDownMenu = ({
     console.log('Live Collab');
   };
   const handleEditCanvas = () => {
-    console.log('Editing Canvas');
+    console.log('Edit canvas');
+    setIsEditDialogOpen(!isEditDialogOpen);
   };
 
   return (

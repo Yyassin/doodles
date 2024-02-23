@@ -67,6 +67,8 @@ export async function getUserDetails(
       lastModified: string;
       roomID: string;
       shareUrl: string;
+      folder: string;
+      tags: string[];
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
@@ -106,6 +108,8 @@ export const checkURL = async (
       lastModified: string;
       roomID: string;
       shareUrl: string;
+      folder: string;
+      tags: string[];
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
@@ -127,6 +131,8 @@ export const checkURL = async (
       id: board.data.uid,
       lastModified: board.data.updatedAt,
       shareUrl: board.data.shareUrl,
+      folder: board.data.folder,
+      tags: board.data.tags,
     });
 
     setCanvasElementState(createStateWithRoughElement(board.data.serialized));

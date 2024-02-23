@@ -57,6 +57,8 @@ export const DeleteCanavasDialog = ({
                 lastModified: '',
                 roomID: '',
                 shareUrl: '',
+                folder: '',
+                tags: [],
               });
               axios.delete(REST.board.deleteBoard, {
                 params: { id: boardMeta.id },
