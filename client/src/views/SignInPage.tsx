@@ -24,6 +24,7 @@ import { REST } from '@/constants';
 import { ACCESS_TOKEN_TAG } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useCanvasBoardStore, Canvas } from '@/stores/CanavasBoardStore';
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 
 /**
  * It is the sign in page where user either inputs email and password or
@@ -45,6 +46,20 @@ export function checkToken(token: string) {
   });
 }
 
+async function fetchImageFromFirebaseStorage(
+  storageUrl: string,
+): Promise<string | null> {
+  try {
+    // Create a reference to the Firebase Storage URL
+    const storage = getStorage(firebaseApp);
+    const storageRef = ref(storage, storageUrl);
+
+    return await getDownloadURL(storageRef);
+  } catch (error) {
+    console.error('Error fetching image from Firebase Storage:', error);
+    return null;
+  }
+}
 export async function getUserDetails(
   email: string,
   setUser: (
@@ -62,11 +77,14 @@ export async function getUserDetails(
     });
 
     const userID = user.data.user.uid;
+    const profilePic = await fetchImageFromFirebaseStorage(
+      `profilePictures/${user.data.user.avatar}.jpg`, //use the id generated when signing up
+    );
     setUser(
       user.data.user.firstname ?? '',
       user.data.user.lastname ?? '',
       user.data.user.email ?? '',
-      user.data.user.avatar ?? '',
+      profilePic ?? '',
       user.data.user.uid ?? '',
     );
 
