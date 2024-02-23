@@ -9,6 +9,9 @@ import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import axios from 'axios';
 import { REST } from '@/constants';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { ToastAction } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/use-toast';
 
 /**
  * Defines a header for the board containing the title, last modified date, and buttons for sharing and viewing comments. A list of active
@@ -91,6 +94,8 @@ const BoardHeader = ({
     'fileIds',
     'resetCanvas',
   ]);
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
+  const { toast } = useToast();
 
   return (
     <div
@@ -121,6 +126,7 @@ const BoardHeader = ({
                   id: '',
                   lastModified: '',
                   roomID: '',
+                  shareUrl: '',
                 });
               }}
             >
@@ -181,35 +187,58 @@ const BoardHeader = ({
               'h-full bg-muted text-gray-200 bg-indigo-300 hover:bg-indigo-400 hover:text-white justify-start items-center border-2 border-indigo-300 hover:border-indigo-400',
             )}
             onClick={async () => {
-              const state = {
-                allIds,
-                types,
-                strokeColors,
-                fillColors,
-                fontFamilies,
-                fontSizes,
-                bowings,
-                roughnesses,
-                strokeWidths,
-                fillStyles,
-                strokeLineDashes,
-                opacities,
-                freehandPoints,
-                p1,
-                p2,
-                textStrings,
-                isImagePlaceds,
-                freehandBounds,
-                angles,
-                fileIds,
-              };
+              try {
+                const state = {
+                  allIds,
+                  types,
+                  strokeColors,
+                  fillColors,
+                  fontFamilies,
+                  fontSizes,
+                  bowings,
+                  roughnesses,
+                  strokeWidths,
+                  fillStyles,
+                  strokeLineDashes,
+                  opacities,
+                  freehandPoints,
+                  p1,
+                  p2,
+                  textStrings,
+                  isImagePlaceds,
+                  freehandBounds,
+                  angles,
+                  fileIds,
+                };
 
-              const updated = await axios.put(REST.board.updateBoard, {
-                id: boardMeta.id,
-                fields: { serialized: state },
-              });
-              setBoardMeta({ lastModified: updated.data });
-              updateCanvas(boardMeta.id, updated.data);
+                const updated = await axios.put(REST.board.updateBoard, {
+                  id: boardMeta.id,
+                  fields: { serialized: state },
+                });
+                setBoardMeta({ lastModified: updated.data.updatedAt });
+                updateCanvas(boardMeta.id, updated.data.updatedAt);
+                setWebsocketAction(
+                  {
+                    boardID: boardMeta.id,
+                    lastModified: updated.data.updatedAt,
+                  },
+                  'updateUpdatedTime',
+                );
+              } catch (error) {
+                toast({
+                  variant: 'destructive',
+                  title: 'Something went wrong.',
+                  description: 'There was a problem with your request.',
+                  action: (
+                    <ToastAction
+                      onClick={() => window.location.reload()}
+                      altText="Refresh"
+                    >
+                      Refresh
+                    </ToastAction>
+                  ),
+                });
+              }
             }}
           >
             <span className="ml-auto">Save</span>
