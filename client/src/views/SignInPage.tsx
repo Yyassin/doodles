@@ -59,7 +59,7 @@ async function fetchImageFromFirebaseStorage(
     const storage = getStorage(firebaseApp);
     const storageRef = ref(storage, storageUrl);
 
-    return await getDownloadURL(storageRef);
+    return getDownloadURL(storageRef);
   } catch (error) {
     console.error('Error fetching image from Firebase Storage:', error);
     return null;

@@ -99,13 +99,13 @@ export default function SignUp() {
       //we want to disable sign up button from user so
       //firebase doesnt create many accounts if button click multiple times
       setLoading(true);
-      const picid = generateRandId();
+      const pictureId = generateRandId();
       const { cred, userInfo } = await signup(
         emailRef.current?.value ?? '',
         passwordRef.current?.value ?? '',
         firstNameRef.current?.value ?? '',
         lastNameRef.current?.value ?? '',
-        picid,
+        pictureId,
       );
 
       const generateImageUrl = (file: File): Promise<string> => {
@@ -129,7 +129,7 @@ export default function SignUp() {
         : '';
 
       const storage = getStorage(firebaseApp);
-      const storageRef = ref(storage, `profilePictures/${picid}.jpg`); // give the image a random id
+      const storageRef = ref(storage, `profilePictures/${pictureId}.jpg`); // give the image a random id
       profilePictureRef.current?.files?.[0] &&
         uploadBytes(storageRef, profilePictureRef.current?.files[0])
           .then((snapshot) => {
