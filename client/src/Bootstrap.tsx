@@ -23,7 +23,6 @@ const Bootstrap = () => {
   const { setCanvasElementState } = useCanvasElementStore([
     'setCanvasElementState',
   ]);
-  const { setColorMaping } = useCommentsStore(['setColorMaping']);
   const [isLoaded, setIsLoaded] = useState(false);
   const auth = async () => {
     const token = localStorage.getItem(ACCESS_TOKEN_TAG);
@@ -38,7 +37,6 @@ const Bootstrap = () => {
             setCanvases,
             setBoardMeta,
             setCanvasElementState,
-            setColorMaping,
           )
         )?.valueOf();
         if (response.status === HTTP_STATUS.SUCCESS) {

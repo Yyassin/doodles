@@ -39,7 +39,9 @@ import { normalizeAngle } from '@/lib/math';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { tenancy } from '@/api';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useCommentsStore } from '@/stores/CommentsStore';
+import CursorPresence from './CursorPresence';
+import { throttle } from 'lodash';
+import { idToColour } from '@/lib/userColours';
 
 /**
  * Main Canvas View
@@ -132,8 +134,6 @@ export default function Canvas() {
     'attachedFileUrls',
   ]);
 
-  const { addColor } = useCommentsStore(['addColor']);
-
   const { socket, setWebsocketAction, setRoomID, setTenants, clearTenants } =
     useWebSocketStore([
       'socket',
@@ -161,13 +161,7 @@ export default function Canvas() {
    * Callbacks for active tenants in the room.
    */
   useEffect(() => {
-    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, (payload) => {
-      initTenants();
-      const collabID = extractCollabID(
-        (payload as { payload: { id: string } }).payload.id,
-      );
-      collabID && addColor(collabID);
-    });
+    socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, initTenants);
     socket?.on(WS_TOPICS.NOTIFY_LEAVE_ROOM, initTenants);
     return clearTenants;
   }, [socket]);
@@ -180,19 +174,22 @@ export default function Canvas() {
    */
   const initTenants = async () => {
     const tenantIds = (await tenancy.get(boardMeta.roomID)) as string[];
+    console.log(tenantIds);
     const activeTenants = tenantIds.reduce(
       (acc, id) => {
+        const collabId = extractCollabID(id);
+        if (collabId === null) return acc;
+
+        const isMe = collabId === boardMeta.collabID;
         // We don't want to add ourselves to the list of tenants.
-        id !== userEmail &&
+        !isMe &&
           (acc[id] = {
             // Temp
             username: extractUsername(id) ?? id,
             email: id,
             initials: 'A',
             avatar: 'https://github.com/shadcn.png',
-            outlineColor: `#${Math.floor(Math.random() * 16777215).toString(
-              16,
-            )}`,
+            outlineColor: idToColour(collabId),
           });
         return acc;
       },
@@ -517,12 +514,28 @@ export default function Canvas() {
     action !== 'writing' && setAction('none');
   };
 
+  const sendCursorPositions = React.useCallback(
+    throttle((x: number | null, y: number | null) => {
+      socket?.sendMsgRoom(
+        'updateCursorPosition',
+        // make collab id
+        {
+          x,
+          y,
+          userId: userEmail,
+        },
+      );
+    }, 16),
+    [userEmail, socket],
+  );
+
   // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
+    const { clientX, clientY } = getMouseCoordinates(e);
+    sendCursorPositions(clientX, clientY);
     if (e.button === PERIPHERAL_CODES.RIGHT_MOUSE) {
       return;
     }
-    const { clientX, clientY } = getMouseCoordinates(e);
 
     if (action === 'panning') {
       const deltaX = clientX - panMouseStartPosition.current.x;
@@ -684,6 +697,7 @@ export default function Canvas() {
 
   return (
     <>
+      <CursorPresence />
       <canvas
         id="canvas"
         style={{
@@ -696,6 +710,9 @@ export default function Canvas() {
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
+        onPointerLeave={() => {
+          sendCursorPositions(null, null);
+        }}
       />
       {tool === 'select' &&
         attachedFileUrls[selectedElementIds[0]] !== undefined && (

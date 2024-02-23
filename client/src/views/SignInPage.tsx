@@ -89,7 +89,6 @@ export async function getUserDetails(
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
-  setColorMaping: (collabs: string[]) => void,
 ) {
   try {
     const user = await axios.get(REST.user.get, {
@@ -113,7 +112,6 @@ export async function getUserDetails(
       setCanvases,
       setBoardMeta,
       setCanvasElementState,
-      setColorMaping,
     );
   } catch (error) {
     console.error('Error:', error);
@@ -136,7 +134,6 @@ export const checkURL = async (
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
-  setColorMaping: (collabs: string[]) => void,
   signUp = false,
 ) => {
   const queryParams = new URLSearchParams(window.location.search);
@@ -149,9 +146,6 @@ export const checkURL = async (
         id: queryParams.get('boardID'),
         fields: { collaborators: userID },
       });
-      setColorMaping(board.data.collaborators);
-
-      setColorMaping(board.data.collaborators);
 
       setBoardMeta({
         roomID: board.data.roomID,
@@ -205,7 +199,6 @@ export default function SignInPage() {
   const { setCanvasElementState } = useCanvasElementStore([
     'setCanvasElementState',
   ]);
-  const { setColorMaping } = useCommentsStore(['setColorMaping']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false); // State to disable sign in button while loading
@@ -228,7 +221,6 @@ export default function SignInPage() {
           setCanvases,
           setBoardMeta,
           setCanvasElementState,
-          setColorMaping,
         )
       )?.valueOf(); //get name, email, avatar of user
 
@@ -277,7 +269,6 @@ export default function SignInPage() {
               setCanvases,
               setBoardMeta,
               setCanvasElementState,
-              setColorMaping,
             )
           ).valueOf();
 

@@ -4,6 +4,7 @@ import { createStoreWithSelectors } from './utils';
 import WebsocketClient from '@/WebsocketClient';
 import { getInitials } from '@/lib/misc';
 import { Comment } from './CommentsStore';
+import { Vector2 } from '@/types';
 
 /**
  * Define Global WebSocket states and reducers
@@ -57,6 +58,8 @@ interface WebSocketState {
     | { elemID: string; comment: Partial<Comment> };
   // The current active tenants
   activeTenants: Record<string, User>;
+  // The current cursor positions keyed by user ID
+  cursorPositions: Record<string, { x: number | null; y: number | null }>;
   // The current active producer ID
   activeProducerID: string | null;
 }
@@ -77,6 +80,8 @@ interface WebSocketActions {
   setSocket: (socket: WebsocketClient) => void;
   // Set the active tenants
   setTenants: (tenants: Record<string, User>) => void;
+  // Set the cursor positions
+  setCursorPosition: (userId: string, position: Vector2) => void;
   // Clear the active tenants
   clearTenants: () => void;
   // Set the active producer ID
@@ -92,6 +97,7 @@ export const initialWebSocketState: WebSocketState = {
   action: '',
   actionElementID: '',
   activeTenants: {},
+  cursorPositions: {},
   activeProducerID: null,
 };
 
@@ -122,6 +128,13 @@ const clearTenants = (set: SetState<WebSocketStore>) => () =>
 const setActiveProducerId =
   (set: SetState<WebSocketStore>) => (producerId: string | null) =>
     set(() => ({ activeProducerID: producerId }));
+const setCursorPosition =
+  (set: SetState<WebSocketStore>) => (userId: string, position: Vector2) =>
+    set((state) => {
+      const cursorPositions = { ...state.cursorPositions };
+      cursorPositions[userId] = position;
+      return { cursorPositions };
+    });
 
 /** Store Hook */
 const WebSocketStore = create<WebSocketStore>()((set) => ({
@@ -132,6 +145,7 @@ const WebSocketStore = create<WebSocketStore>()((set) => ({
   setTenants: setTenants(set),
   clearTenants: clearTenants(set),
   setActiveProducerId: setActiveProducerId(set),
+  setCursorPosition: setCursorPosition(set),
 }));
 export const useWebSocketStore = createStoreWithSelectors(WebSocketStore);
 

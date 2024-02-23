@@ -84,7 +84,6 @@ export default function SignUp() {
   const { setCanvasElementState } = useCanvasElementStore([
     'setCanvasElementState',
   ]);
-  const { setColorMaping } = useCommentsStore(['setColorMaping']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const firstNameRef = useRef<HTMLInputElement | null>(null);
@@ -157,7 +156,6 @@ export default function SignUp() {
           setCanvases,
           setBoardMeta,
           setCanvasElementState,
-          setColorMaping,
           true,
         )
       ).valueOf();
@@ -214,7 +212,6 @@ export default function SignUp() {
               setCanvases,
               setBoardMeta,
               setCanvasElementState,
-              setColorMaping,
               true,
             )
           ).valueOf();

@@ -175,7 +175,7 @@ export default class WebsocketClient {
    * Method that sends a message over the WebSocket connection.
    * @param msg Object, the message object to be sent.
    */
-  async send(msg: object) {
+  async send(msg: Record<string, unknown>) {
     if (!this.checkSocket()) return;
     try {
       await this.waitForOpenConnection();
@@ -216,13 +216,14 @@ export default class WebsocketClient {
       | string[]
       | UpdatedTimeMessage
       | null
-      | { elemID: string; comment: Partial<Comment> },
+      | { elemID: string; comment: Partial<Comment> }
+      | Record<string, unknown>,
   ) {
     // Msg to be changed to proper type once everything finalized
     if (this.room === null) throw 'No room assigned!';
     return this.send({
       ...this.msgTemplate,
-      topic: topic,
+      topic,
       payload: msg,
       room: this.room,
       id: this.userId,
