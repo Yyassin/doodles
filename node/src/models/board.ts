@@ -76,7 +76,6 @@ export const updateBoard = async (
   updatedFields: Partial<DocumentFields<Board>>,
 ) => {
   updatedFields.updatedAt = new Date().toUTCString();
-  console.log(updatedFields);
   const { fastFireOptions: _fastFireOptions, id: _id, ...boardFields } = board;
   if (updatedFields.collaborators !== undefined) {
     boardFields.collaborators.push(updatedFields.collaborators as string);

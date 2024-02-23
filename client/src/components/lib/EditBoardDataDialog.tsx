@@ -35,14 +35,19 @@ export default function EditBoardDataDialog({
   const titleRef = useRef<HTMLInputElement | null>(null);
   const folderRef = useRef<HTMLInputElement | null>(null);
 
-  const { boardMeta, setTag, setBoardMeta, updateCanvas, updateCanvasINFO } =
-    useCanvasBoardStore([
-      'boardMeta',
-      'setTag',
-      'setBoardMeta',
-      'updateCanvas',
-      'updateCanvasINFO',
-    ]);
+  const {
+    boardMeta,
+    setTag,
+    setBoardMeta,
+    updateCanvas,
+    updateCanvasInfo: updateCanvasInfo,
+  } = useCanvasBoardStore([
+    'boardMeta',
+    'setTag',
+    'setBoardMeta',
+    'updateCanvas',
+    'updateCanvasInfo',
+  ]);
 
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
@@ -139,7 +144,7 @@ export default function EditBoardDataDialog({
                 lastModified: updatedAt.data.updatedAt,
               });
               updateCanvas(boardMeta.id, updatedAt.data.updatedAt);
-              updateCanvasINFO(
+              updateCanvasInfo(
                 boardMeta.id,
                 newTitle ?? '',
                 newFolder ?? '',

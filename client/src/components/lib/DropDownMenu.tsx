@@ -61,7 +61,6 @@ const DropDownMenu = ({
     console.log('Live Collab');
   };
   const handleEditCanvas = () => {
-    console.log('Edit canvas');
     setIsEditDialogOpen(!isEditDialogOpen);
   };
 
