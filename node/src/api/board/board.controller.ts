@@ -18,7 +18,7 @@ import { generateRandId } from '../../utils/misc';
 
 /**
  * Firebase API controllers, logic for endpoint routes.
- * @author Ibrahim Almalki, Abdalla Abdelhadi
+ * @author Ibrahim Almalki, Abdalla Abdelhadi, Zakariyya Almalki
  */
 
 // TODO: JSDOC

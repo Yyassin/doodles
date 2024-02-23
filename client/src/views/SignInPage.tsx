@@ -24,6 +24,7 @@ import { REST } from '@/constants';
 import { ACCESS_TOKEN_TAG } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useCanvasBoardStore, Canvas } from '@/stores/CanavasBoardStore';
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { createStateWithRoughElement } from '@/components/lib/BoardScroll';
 import {
   CanvasElementState,
@@ -51,6 +52,20 @@ export function checkToken(token: string) {
   });
 }
 
+async function fetchImageFromFirebaseStorage(
+  storageUrl: string,
+): Promise<string | null> {
+  try {
+    // Create a reference to the Firebase Storage URL
+    const storage = getStorage(firebaseApp);
+    const storageRef = ref(storage, storageUrl);
+
+    return getDownloadURL(storageRef);
+  } catch (error) {
+    console.error('Error fetching image from Firebase Storage:', error);
+    return null;
+  }
+}
 export async function getUserDetails(
   email: string,
   setUser: (
@@ -68,6 +83,8 @@ export async function getUserDetails(
       lastModified: string;
       roomID: string;
       shareUrl: string;
+      folder: string;
+      tags: string[];
       collabID: string;
     }>,
   ) => void,
@@ -80,11 +97,14 @@ export async function getUserDetails(
     });
 
     const userID = user.data.user.uid;
+    const profilePic = await fetchImageFromFirebaseStorage(
+      `profilePictures/${user.data.user.avatar}.jpg`, //use the id generated when signing up
+    );
     setUser(
       user.data.user.firstname ?? '',
       user.data.user.lastname ?? '',
       user.data.user.email ?? '',
-      user.data.user.avatar ?? '',
+      profilePic ?? '',
       user.data.user.uid ?? '',
     );
 
@@ -110,6 +130,8 @@ export const checkURL = async (
       lastModified: string;
       roomID: string;
       shareUrl: string;
+      folder: string;
+      tags: string[];
       collabID: string;
     }>,
   ) => void,
@@ -122,31 +144,37 @@ export const checkURL = async (
   let board;
 
   if (queryParams.get('boardID')) {
-    board = await axios.put(REST.board.updateBoard, {
-      id: queryParams.get('boardID'),
-      fields: { collaborators: userID },
-    });
+    try {
+      board = await axios.put(REST.board.updateBoard, {
+        id: queryParams.get('boardID'),
+        fields: { collaborators: userID },
+      });
+      setColorMaping(board.data.collaborators);
 
-    setColorMaping(board.data.collaborators);
+      setColorMaping(board.data.collaborators);
 
-    setBoardMeta({
-      roomID: board.data.roomID,
-      title: board.data.title,
-      id: board.data.uid,
-      lastModified: board.data.updatedAt,
-      shareUrl: board.data.shareUrl,
-      collabID: board.data.collabID,
-    });
+      setBoardMeta({
+        roomID: board.data.roomID,
+        title: board.data.title,
+        id: board.data.uid,
+        lastModified: board.data.updatedAt,
+        shareUrl: board.data.shareUrl,
+        folder: board.data.folder,
+        tags: board.data.tags,
+        collabID: board.data.collabID,
+      });
 
-    setCanvasElementState(createStateWithRoughElement(board.data.serialized));
+      setCanvasElementState(createStateWithRoughElement(board.data.serialized));
+      isSharedCanvas = true;
+    } catch {
+      console.log('error');
+    }
 
     //remove variable from url
     const currentUrl = window.location.href;
     const queryStringIndex = currentUrl.indexOf('?');
     const updatedUrl = currentUrl.slice(0, queryStringIndex);
     window.history.replaceState({}, document.title, updatedUrl);
-
-    isSharedCanvas = true;
   }
 
   if (!signUp) {

@@ -139,6 +139,8 @@ export const BoardScroll = () => {
                   id: isSelected ? '' : board.id,
                   lastModified: isSelected ? '' : board.updatedAt,
                   shareUrl: isSelected ? '' : board.shareUrl,
+                  folder: isSelected ? '' : board.folder,
+                  tags: isSelected ? [] : board.tags,
                   collabID: isSelected ? '' : collabID,
                 });
               } catch (error) {

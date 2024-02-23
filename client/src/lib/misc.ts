@@ -131,3 +131,14 @@ export const extractUsername = (email: string): string | null => {
   const match = email.match(emailMatch);
   return match ? match[1] : null;
 };
+
+/**
+ * Extracts the collabID from the user sockeetID.
+ */
+export const extractCollabID = (username: string) => {
+  const index = username.indexOf('-');
+  if (index !== -1) {
+    return username.substring(index + 1);
+  }
+  return null;
+};
