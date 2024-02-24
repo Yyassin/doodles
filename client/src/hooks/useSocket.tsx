@@ -11,6 +11,7 @@ import { fileCache } from '@/lib/cache';
 import { dataURLToFile } from '@/lib/bytes';
 import { commitImageToCache, isSupportedImageFile } from '@/lib/image';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { Vector2 } from '@/types';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -19,14 +20,21 @@ import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 
 export const useSocket = () => {
   const { userEmail: userId } = useAuthStore(['userEmail']);
-  const { roomID, actionElementID, action, setSocket, setWebsocketAction } =
-    useWebSocketStore([
-      'roomID',
-      'actionElementID',
-      'action',
-      'setSocket',
-      'setWebsocketAction',
-    ]);
+  const {
+    roomID,
+    actionElementID,
+    action,
+    setSocket,
+    setWebsocketAction,
+    setCursorPosition,
+  } = useWebSocketStore([
+    'roomID',
+    'actionElementID',
+    'action',
+    'setSocket',
+    'setWebsocketAction',
+    'setCursorPosition',
+  ]);
 
   const {
     addCanvasShape,
@@ -214,6 +222,11 @@ export const useSocket = () => {
       setBoardMeta({ lastModified: fields.lastModified });
       updateCanvas(fields.boardID, fields.lastModified);
     },
+    updateCursorPosition: (cursorPosition: Vector2 & { userId: string }) =>
+      setCursorPosition(cursorPosition.userId, {
+        x: cursorPosition.x,
+        y: cursorPosition.y,
+      }),
   };
 
   // Intialize socket

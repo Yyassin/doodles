@@ -12,6 +12,7 @@ import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { useAppStore } from '@/stores/AppStore';
+import { idToColour } from '@/lib/userColours';
 
 /**
  * Defines a CommentsSheetContent component that displays the comments of a board, and allows the user to add a comment or like existing ones.
@@ -136,21 +137,14 @@ const CommentsSheetContent = () => {
     'angles',
     'fileIds',
   ]);
-  const {
-    comments,
-    colorMaping,
-    updateComment,
-    addComment,
-    removeComment,
-    setComments,
-  } = useCommentsStore([
-    'comments',
-    'colorMaping',
-    'updateComment',
-    'addComment',
-    'removeComment',
-    'setComments',
-  ]);
+  const { comments, updateComment, addComment, removeComment, setComments } =
+    useCommentsStore([
+      'comments',
+      'updateComment',
+      'addComment',
+      'removeComment',
+      'setComments',
+    ]);
 
   const { isViewingComments } = useAppStore(['isViewingComments']);
 
@@ -191,7 +185,9 @@ const CommentsSheetContent = () => {
       setComments(
         comments.data.comments.map((comment: Comment) => ({
           ...comment,
-          outlineColor: `${colorMaping[comment.outlineColor]}`,
+          collabId: comment.outlineColor,
+          // Outline colour is the collaborator id
+          outlineColor: `${idToColour(comment.outlineColor)}`,
         })),
       );
     };
@@ -270,25 +266,27 @@ const CommentsSheetContent = () => {
                 </p>
               </div>
             </div>
-            <Button
-              className="p-0 h-7 w-15 bg-[#7f7dcf] hover:text-red-600 hover:bg-[#7f7dcf]"
-              onClick={() => {
-                removeComment(comment.uid);
-                axios.delete(REST.comment.delete, {
-                  params: { id: comment.uid },
-                });
+            {boardMeta.collabID === comment.collabId && (
+              <Button
+                className="p-0 h-7 w-15 bg-[#7f7dcf] hover:text-red-600 hover:bg-[#7f7dcf]"
+                onClick={() => {
+                  removeComment(comment.uid);
+                  axios.delete(REST.comment.delete, {
+                    params: { id: comment.uid },
+                  });
 
-                setWebsocketAction(
-                  {
-                    comment: { uid: comment.uid },
-                    elemID: selectedElementIds[0],
-                  },
-                  'removeComment',
-                );
-              }}
-            >
-              <TrashIcon className="h-5 w-5" />
-            </Button>
+                  setWebsocketAction(
+                    {
+                      comment: { uid: comment.uid },
+                      elemID: selectedElementIds[0],
+                    },
+                    'removeComment',
+                  );
+                }}
+              >
+                <TrashIcon className="h-5 w-5" />
+              </Button>
+            )}
           </div>
         ))}
       </div>
@@ -356,7 +354,8 @@ const CommentsSheetContent = () => {
                 comment: comment.data.comment.comment,
                 likes: 0,
                 initials: getInitials(`${userFirstName} ${userLastName}`),
-                outlineColor: `${colorMaping[boardMeta.collabID]}`,
+                outlineColor: `${idToColour(boardMeta.collabID)}`,
+                collabId: boardMeta.collabID,
                 isLiked: false,
               };
 

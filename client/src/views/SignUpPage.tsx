@@ -28,7 +28,6 @@ import { generateRandId } from '@/lib/bytes';
 import { checkURL } from './SignInPage';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
-import { useCommentsStore } from '@/stores/CommentsStore';
 
 /**
  * It is the sign up page where user either inputs email and password or
@@ -84,7 +83,6 @@ export default function SignUp() {
   const { setCanvasElementState } = useCanvasElementStore([
     'setCanvasElementState',
   ]);
-  const { setColorMaping } = useCommentsStore(['setColorMaping']);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const firstNameRef = useRef<HTMLInputElement | null>(null);
@@ -157,7 +155,6 @@ export default function SignUp() {
           setCanvases,
           setBoardMeta,
           setCanvasElementState,
-          setColorMaping,
           true,
         )
       ).valueOf();
@@ -214,7 +211,6 @@ export default function SignUp() {
               setCanvases,
               setBoardMeta,
               setCanvasElementState,
-              setColorMaping,
               true,
             )
           ).valueOf();

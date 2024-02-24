@@ -8,7 +8,6 @@ import { useAppStore } from '@/stores/AppStore';
 import axios from 'axios';
 import { REST } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useCommentsStore } from '@/stores/CommentsStore';
 
 /**
  * Define a react component that the top bar of the main dashboard
@@ -24,7 +23,6 @@ export const TopBar = () => {
   ]);
   const { userID } = useAuthStore(['userID']);
   const { setMode } = useAppStore(['setMode']);
-  const { setColorMaping } = useCommentsStore(['setColorMaping']);
 
   return (
     <div className="flex flex-col">
@@ -89,8 +87,6 @@ export const TopBar = () => {
                     delete boardData.uid;
 
                     addCanvas(boardData);
-
-                    setColorMaping(boardData.collaborators);
 
                     setBoardMeta({
                       roomID: boardData.roomID,

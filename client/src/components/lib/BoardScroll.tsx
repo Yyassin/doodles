@@ -15,7 +15,6 @@ import { renderElementsOnOffscreenCanvas } from '@/lib/export';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useCommentsStore } from '@/stores/CommentsStore';
 
 export const createStateWithRoughElement = (state: CanvasElementState) => {
   const roughElements: Record<string, CanvasElement['roughElement']> = {};
@@ -72,7 +71,6 @@ export const BoardScroll = () => {
     'setCanvasElementState',
   ]);
   const { userID } = useAuthStore(['userID']);
-  const { setColorMaping } = useCommentsStore(['setColorMaping']);
 
   const setCanvasState = () => {
     state && setCanvasElementState(state);
@@ -100,8 +98,6 @@ export const BoardScroll = () => {
                   const boardState = await axios.get(REST.board.getBoard, {
                     params: { id: board.id, userID },
                   });
-
-                  setColorMaping(boardState.data.board.collaborators);
 
                   collabID = boardState.data.collabID;
 
