@@ -2,6 +2,14 @@ import React from 'react';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import ToolButton from './ToolButtonSelector';
 import { CanvasElementFillStyle } from '@/types';
+import HachureSVG from '@/assets/Hachure';
+import CrossHatchedSVG from '@/assets/CrossHatched';
+import DashedSVG from '@/assets/Dashed';
+import ZigzagLineSVG from '@/assets/ZigzagLine';
+import DotsSVG from '@/assets/Dots';
+import ZigzagSVG from '@/assets/Zigzag';
+import NoneSVG from '@/assets/None';
+import SolidSVG from '@/assets/Solid';
 
 /**
  * This file defines the ChangeFillStyle component, which allows the user to select
@@ -11,15 +19,15 @@ import { CanvasElementFillStyle } from '@/types';
  * @author Eebro
  */
 
-const fillStyleMap: Record<string, string> = {
-  none: 'bg-red-500',
-  hachure: 'bg-red-500',
-  solid: 'bg-green-300',
-  zigzag: 'bg-blue-300',
-  ['cross-hatch']: 'bg-orange-500',
-  dots: 'bg-black',
-  dashed: 'bg-blue-500',
-  ['zigzag-line']: 'bg-blue-500',
+const fillStyleMap: Record<string, JSX.Element> = {
+  none: <NoneSVG />,
+  hachure: <HachureSVG />,
+  solid: <SolidSVG />,
+  zigzag: <ZigzagSVG />,
+  ['cross-hatch']: <CrossHatchedSVG />,
+  dots: <DotsSVG />,
+  dashed: <DashedSVG />,
+  ['zigzag-line']: <ZigzagLineSVG />,
 };
 
 const mapFillStyle = {
@@ -56,9 +64,7 @@ const FillStyleToolGroup = ({ tools }: { tools: CanvasElementFillStyle[] }) => {
             label={toolName}
             active={interestValue === mapFillStyle[toolName]}
           >
-            <div
-              className={'w-5 h-5 rounded-full ' + fillStyleMap[toolName]}
-            ></div>
+            {fillStyleMap[toolName]}
           </ToolButton>
         </div>
       ))}
