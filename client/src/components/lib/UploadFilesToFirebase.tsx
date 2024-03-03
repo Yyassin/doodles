@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { firebaseApp } from '../../firebaseDB/firebase';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
 
 /**
  * Defines a context menu option that allows users to attatch a file to a
@@ -9,16 +10,15 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
  * @author Dana El Sherif
  */
 const FileUpload = () => {
-  const [, setFile] = useState<File | null>(null);
   const { selectedElementIds, updateAttachedFileUrl } = useCanvasElementStore([
     'selectedElementIds',
     'updateAttachedFileUrl',
   ]);
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     const fileToUpload = files ? files[0] : null;
-    setFile(fileToUpload);
 
     if (fileToUpload !== null && selectedElementIds.length > 0) {
       const storage = getStorage(firebaseApp);
@@ -30,6 +30,10 @@ const FileUpload = () => {
         })
         .then((downloadURL) => {
           updateAttachedFileUrl(selectedElementIds[0], downloadURL);
+          setWebsocketAction(
+            { selectedElementIds, downloadURL },
+            'addAttachedFileUrl',
+          );
         })
         .catch(() => {
           alert('Error uploading');
