@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CalendarIcon } from '@radix-ui/react-icons';
-import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { Canvas, useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { Thumbnail } from './Thumbnail';
 import { DeleteCanavasDialog } from './DeleteCanvasDialog';
 import axios from 'axios';
@@ -59,13 +59,18 @@ export const createStateWithRoughElement = (state: CanvasElementState) => {
  * @author Abdalla Abdelhadi
  */
 
-export const BoardScroll = () => {
+export const BoardScroll = ({
+  searchCanvases,
+}: {
+  searchCanvases: Canvas[];
+}) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [state, setState] = useState<CanvasElementState>();
   const [thumbnailUrl, setThumbnailUrl] = useState('');
-  const { canvases, boardMeta, setBoardMeta } = useCanvasBoardStore([
+  const { canvases, boardMeta, folder, setBoardMeta } = useCanvasBoardStore([
     'canvases',
     'boardMeta',
+    'folder',
     'setBoardMeta',
   ]);
   const { setCanvasElementState } = useCanvasElementStore([
@@ -79,11 +84,22 @@ export const BoardScroll = () => {
 
   const { toast } = useToast();
 
+  const sortedCavases = (
+    searchCanvases.length === 0 ? canvases : searchCanvases
+  )
+    .filter((board) => (folder === 'Recent' ? true : folder === board.folder))
+    .sort((a, b) => {
+      const dateA = new Date(a.updatedAt);
+      const dateB = new Date(b.updatedAt);
+
+      return dateB.getTime() - dateA.getTime();
+    });
+
   return (
     <div className="relative flex flex-col mx-2 h-full">
       <div className="w-full h-[250px] overflow-x-scroll scroll whitespace-nowrap scroll-smooth">
         {/* eslint-disable-next-line sonarjs/cognitive-complexity */}
-        {canvases.map((board) => (
+        {sortedCavases.map((board) => (
           <div
             key={board.id}
             className={
