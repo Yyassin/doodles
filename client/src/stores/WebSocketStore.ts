@@ -24,6 +24,8 @@ export const Actions = [
   'removeComment',
   'changePermission',
   'addNewCollab',
+  'addAttachedFileUrl',
+  'removeAttachedFileUrl',
 ] as const;
 export type ActionsType = typeof Actions;
 
@@ -58,7 +60,8 @@ interface WebSocketState {
     | string[]
     | UpdatedTimeMessage
     | { elemID: string; comment: Partial<Comment> }
-    | { collabID: string; permission: string };
+    | { collabID: string; permission: string }
+    | { selectedElementIds: string[]; downloadURL: string };
   // The current active tenants
   activeTenants: Record<string, User>;
   // The current cursor positions keyed by user ID
@@ -77,7 +80,8 @@ interface WebSocketActions {
       | string[]
       | UpdatedTimeMessage
       | { elemID: string; comment: Partial<Comment> }
-      | { collabID: string; permission: string },
+      | { collabID: string; permission: string }
+      | { selectedElementIds: string[]; downloadURL: string },
     action: string,
   ) => void;
   // Set the socket reference
@@ -119,7 +123,8 @@ const setWebsocketAction =
       | string[]
       | UpdatedTimeMessage
       | { elemID: string; comment: Partial<Comment> }
-      | { collabID: string; permission: string },
+      | { collabID: string; permission: string }
+      | { selectedElementIds: string[]; downloadURL: string },
     action: string,
   ) =>
     set(() => {

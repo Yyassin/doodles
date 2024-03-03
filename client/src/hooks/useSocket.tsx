@@ -40,6 +40,8 @@ export const useSocket = () => {
   ]);
 
   const {
+    removeAttachedFileUrl,
+    updateAttachedFileUrl,
     setCanvasElementState,
     addCanvasShape,
     addCanvasFreehand,
@@ -67,6 +69,8 @@ export const useSocket = () => {
     textStrings,
     fileIds,
   } = useCanvasElementStore([
+    'removeAttachedFileUrl',
+    'updateAttachedFileUrl',
     'setCanvasElementState',
     'addCanvasShape',
     'addCanvasFreehand',
@@ -245,6 +249,15 @@ export const useSocket = () => {
       }),
     addNewCollab: (newUser: SharedUser) => {
       addUser(newUser);
+    },
+    addAttachedFileUrl: (params: {
+      selectedElementIds: string;
+      downloadURL: string;
+    }) => {
+      updateAttachedFileUrl(params.selectedElementIds[0], params.downloadURL);
+    },
+    removeAttachedFileUrl: (ids: string[]) => {
+      removeAttachedFileUrl(ids);
     },
   };
 
