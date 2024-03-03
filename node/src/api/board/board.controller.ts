@@ -19,7 +19,6 @@ import {
 import { generateRandId, getInitials } from '../../utils/misc';
 import { findUserById } from '../../models/user';
 import { findUserByEmail } from '../user/user.controller';
-import { use } from 'chai';
 
 /**
  * Firebase API controllers, logic for endpoint routes.
@@ -277,7 +276,7 @@ export const handleAddUserbyEmail = async (req: Request, res: Response) => {
     if (user === null) return res.status(HTTP_STATUS.ERROR).json();
 
     const collab = await createCollaborator(perm, user.uid, boardId);
-    const update = await updateBoard(board as Board, {
+    await updateBoard(board as Board, {
       collaborators: collab.id,
     });
 
