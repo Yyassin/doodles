@@ -4,6 +4,8 @@ import CanvasTooltip from '../CanvasTooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import './UserList.css';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { extractCollabID } from '@/lib/misc';
 
 /**
  * Renders a list of users in the room, with their avatars,
@@ -12,6 +14,7 @@ import './UserList.css';
  */
 
 const UserList = () => {
+  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
   const { activeTenants, activeProducerID } = useWebSocketStore([
     'activeTenants',
     'activeProducerID',
@@ -67,7 +70,13 @@ const UserList = () => {
                     : `0.2rem solid ${user.outlineColor ?? 'white'}`,
               }}
             >
-              <AvatarImage src={user.avatar} />
+              <AvatarImage
+                src={
+                  boardMeta.collaboratorAvatars[
+                    extractCollabID(user.email) ?? ''
+                  ] ?? ''
+                }
+              />
               <AvatarFallback>{user.initials}</AvatarFallback>
             </Avatar>
           </CanvasTooltip>

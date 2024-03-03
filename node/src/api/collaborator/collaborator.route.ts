@@ -4,6 +4,7 @@ import {
   handleDeleteCollaborator,
   handleFindCollaboratorById,
   handleFindCollaboratorsById,
+  handleGetCollaboratorAvatars,
   handleUpdateCollaborator,
 } from './collaborator.controller';
 
@@ -20,6 +21,9 @@ router.post('/createCollaborator', handleCreateCollaborator);
 
 // GET collaborator by ID
 router.get('/getCollaborator', handleFindCollaboratorById);
+
+// GET all collaborator avatars
+router.put('/getCollaboratorAvatars', handleGetCollaboratorAvatars);
 
 // GET collaborators by ID
 router.get('/getCollaborators', handleFindCollaboratorsById);

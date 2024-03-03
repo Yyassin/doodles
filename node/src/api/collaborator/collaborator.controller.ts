@@ -7,13 +7,39 @@ import {
   deleteCollaborator,
 } from '../../models/collaborator';
 import { HTTP_STATUS } from '../../constants';
+import { findUserById } from '../../models/user';
 
 /**
  * Firebase API controllers, logic for endpoint routes.
  * @author Ibrahim Almalki
  */
 
-// TODO: JSDOC
+const memo = {} as Record<string, string>;
+export const handleGetCollaboratorAvatars = async (
+  req: Request,
+  res: Response,
+) => {
+  const { collaboratorIds } = req.body as { collaboratorIds: string[] };
+  const collaboratorAvatarMap = await Promise.all(
+    collaboratorIds.map(async (id) => {
+      if (memo[id]) return { id, avatar: memo[id] };
+
+      const collaborator = await findCollaboratorById(id);
+      const userId = collaborator?.user ?? id;
+      const user = await findUserById(userId);
+      memo[id] = user?.avatar ?? '';
+      return { id: collaborator?.id, avatar: user?.avatar };
+    }),
+  );
+  const collaborators = collaboratorAvatarMap.reduce(
+    (acc, { id, avatar }) => {
+      id && avatar && (acc[id] = avatar);
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+  res.status(HTTP_STATUS.SUCCESS).json({ collaborators });
+};
 
 //Create collaborator
 export const handleCreateCollaborator = async (req: Request, res: Response) => {

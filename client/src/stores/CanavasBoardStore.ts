@@ -40,6 +40,7 @@ interface CanvasBoardState {
     folder: string;
     tags: string[];
     collabID: string;
+    collaboratorAvatars: Record<string, string>;
   };
 }
 
@@ -76,6 +77,7 @@ export const initialCanvasState: CanvasBoardState = {
     folder: '',
     tags: [],
     collabID: '',
+    collaboratorAvatars: {},
   },
 };
 
