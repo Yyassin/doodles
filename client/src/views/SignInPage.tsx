@@ -51,7 +51,7 @@ export function checkToken(token: string) {
   });
 }
 
-async function fetchImageFromFirebaseStorage(
+export async function fetchImageFromFirebaseStorage(
   storageUrl: string,
 ): Promise<string | null> {
   try {
@@ -95,9 +95,12 @@ export async function getUserDetails(
     });
 
     const userID = user.data.user.uid;
-    const profilePic = await fetchImageFromFirebaseStorage(
-      `profilePictures/${user.data.user.avatar}.jpg`, //use the id generated when signing up
-    );
+    // If it's a google image, don't fetch anything.
+    const profilePic = (user.data.user.avatar ?? '').includes('https')
+      ? user.data.user.avatar
+      : await fetchImageFromFirebaseStorage(
+          `profilePictures/${user.data.user.avatar}.jpg`, //use the id generated when signing up
+        );
     setUser(
       user.data.user.firstname ?? '',
       user.data.user.lastname ?? '',

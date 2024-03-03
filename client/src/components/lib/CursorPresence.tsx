@@ -46,7 +46,7 @@ const CursorPresence = memo(() => {
     <svg
       className="h-[100vh] w-[100vw]"
       style={{
-        backgroundColor: 'red',
+        backgroundColor: 'transparent',
         position: 'absolute',
         zIndex: 4,
         pointerEvents: 'none',
