@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TopBar } from '@/components/lib/TopBar';
 import { BoardScroll } from './BoardScroll';
 import { Settings } from './Settings';
-import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { Canvas, useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 
 /**
  * Define a react component that displays
@@ -13,10 +13,11 @@ import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 
 export const Board = () => {
   const { board } = useCanvasBoardStore(['board']);
+  const [searchCanvases, setSearchCanvases] = useState<Canvas[]>([]);
   return (
     <div className="flex flex-col w-5/6 h-full bg-[#FEFDFF]">
-      <TopBar />
-      {board === 'Folder' && <BoardScroll />}
+      <TopBar setSearchCanvases={setSearchCanvases} />
+      {board === 'Folder' && <BoardScroll searchCanvases={searchCanvases} />}
       {board == 'Settings' && <Settings />}
       {/** To be added template and setting page */}
     </div>
