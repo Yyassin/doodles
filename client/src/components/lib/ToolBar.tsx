@@ -22,6 +22,7 @@ import { fileOpen } from '@/lib/fs';
 import { injectImageElement } from '@/lib/image';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { IS_ELECTRON_INSTANCE } from '@/constants';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 
 /**
  * This is the toolbar that is displayed on the canvas.
@@ -170,6 +171,8 @@ const ToolGroup = ({
  */
 const ToolBar = () => {
   const { tool, isTransparent } = useAppStore(['tool', 'isTransparent']);
+  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
+  const allowEdit = boardMeta.permission !== 'view';
   return (
     <Toolbar.Root
       className="flex p-[0.3rem] gap-[0.3rem] w-full min-w-max rounded-lg bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] z-10"
@@ -185,22 +188,29 @@ const ToolBar = () => {
         width: 'fit-content',
       }}
     >
-      <ToolGroup tools={['select', 'pan'] as AppTool[]} selectedTool={tool} />
-      <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
       <ToolGroup
-        tools={
-          [
-            'text',
-            'freehand',
-            'rectangle',
-            'circle',
-            'line',
-            'image',
-            'erase',
-          ] as AppTool[]
-        }
+        tools={(allowEdit ? ['select', 'pan'] : ['pan']) as AppTool[]}
         selectedTool={tool}
       />
+      {allowEdit && (
+        <React.Fragment>
+          <Toolbar.Separator className="w-[1px] bg-neutral-200 mx-[0.2rem]" />
+          <ToolGroup
+            tools={
+              [
+                'text',
+                'freehand',
+                'rectangle',
+                'circle',
+                'line',
+                'image',
+                'erase',
+              ] as AppTool[]
+            }
+            selectedTool={tool}
+          />
+        </React.Fragment>
+      )}
     </Toolbar.Root>
   );
 };

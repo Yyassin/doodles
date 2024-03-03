@@ -97,6 +97,8 @@ export const TopBar = () => {
                       folder: boardData.folder,
                       tags: boardData.tags,
                       collabID: data.data.collabID,
+                      users: data.data.users,
+                      permission: data.data.permissionLevel,
                     });
 
                     setMode('canvas');

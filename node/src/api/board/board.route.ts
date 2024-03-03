@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  handleAddUserbyEmail,
   handleCreateBoard,
   handleDeleteBoard,
   handleFindBoardById,
@@ -26,6 +27,9 @@ router.get('/getCollaboratorsBoard', handleGetCollaboratorBoards);
 
 // PUT update a board
 router.put('/updateBoard', handleUpdateBoard);
+
+// PUT add user by email
+router.put('/addUser', handleAddUserbyEmail);
 
 // DELETE board by ID
 router.delete('/deleteBoard', handleDeleteBoard);

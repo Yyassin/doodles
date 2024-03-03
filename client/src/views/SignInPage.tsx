@@ -23,7 +23,11 @@ import axios from 'axios';
 import { REST } from '@/constants';
 import { ACCESS_TOKEN_TAG } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useCanvasBoardStore, Canvas } from '@/stores/CanavasBoardStore';
+import {
+  useCanvasBoardStore,
+  Canvas,
+  SharedUser,
+} from '@/stores/CanavasBoardStore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { createStateWithRoughElement } from '@/components/lib/BoardScroll';
 import {
@@ -85,6 +89,8 @@ export async function getUserDetails(
       folder: string;
       tags: string[];
       collabID: string;
+      users: SharedUser[];
+      permission: string;
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
@@ -133,6 +139,8 @@ export const checkURL = async (
       folder: string;
       tags: string[];
       collabID: string;
+      users: SharedUser[];
+      permission: string;
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
@@ -149,6 +157,9 @@ export const checkURL = async (
         fields: { collaborators: userID },
       });
 
+      console.log('users ', board.data.users);
+      console.log('permissions', board.data.permission);
+      console.log(board);
       setBoardMeta({
         roomID: board.data.roomID,
         title: board.data.title,
@@ -158,6 +169,8 @@ export const checkURL = async (
         folder: board.data.folder,
         tags: board.data.tags,
         collabID: board.data.collabID,
+        users: board.data.users,
+        permission: board.data.permission,
       });
 
       setCanvasElementState(createStateWithRoughElement(board.data.serialized));

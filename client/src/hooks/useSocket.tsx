@@ -10,8 +10,11 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { fileCache } from '@/lib/cache';
 import { dataURLToFile } from '@/lib/bytes';
 import { commitImageToCache, isSupportedImageFile } from '@/lib/image';
-import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { SharedUser, useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { Vector2 } from '@/types';
+import axios from 'axios';
+import { REST } from '@/constants';
+import { createStateWithRoughElement } from '@/components/lib/BoardScroll';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -37,6 +40,7 @@ export const useSocket = () => {
   ]);
 
   const {
+    setCanvasElementState,
     addCanvasShape,
     addCanvasFreehand,
     editCanvasElement,
@@ -63,6 +67,7 @@ export const useSocket = () => {
     textStrings,
     fileIds,
   } = useCanvasElementStore([
+    'setCanvasElementState',
     'addCanvasShape',
     'addCanvasFreehand',
     'editCanvasElement',
@@ -90,11 +95,13 @@ export const useSocket = () => {
     'fileIds',
   ]);
 
-  const { boardMeta, setBoardMeta, updateCanvas } = useCanvasBoardStore([
-    'boardMeta',
-    'setBoardMeta',
-    'updateCanvas',
-  ]);
+  const { boardMeta, setBoardMeta, updateCanvas, addUser } =
+    useCanvasBoardStore([
+      'boardMeta',
+      'setBoardMeta',
+      'updateCanvas',
+      'addUser',
+    ]);
 
   const socket = useRef<WebsocketClient>();
 
@@ -218,15 +225,27 @@ export const useSocket = () => {
     redoCanvasHistory: () => {
       redoCanvasHistory();
     },
-    updateUpdatedTime: (fields: UpdatedTimeMessage) => {
+    updateUpdatedTime: async (fields: UpdatedTimeMessage) => {
       setBoardMeta({ lastModified: fields.lastModified });
       updateCanvas(fields.boardID, fields.lastModified);
+
+      const boardState = await axios.get(REST.board.getBoard, {
+        params: { id: fields.boardID },
+      });
+
+      const state = createStateWithRoughElement(
+        boardState.data.board.serialized,
+      );
+      setCanvasElementState(state);
     },
     updateCursorPosition: (cursorPosition: Vector2 & { userId: string }) =>
       setCursorPosition(cursorPosition.userId, {
         x: cursorPosition.x,
         y: cursorPosition.y,
       }),
+    addNewCollab: (newUser: SharedUser) => {
+      addUser(newUser);
+    },
   };
 
   // Intialize socket

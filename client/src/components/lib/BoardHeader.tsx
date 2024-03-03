@@ -132,6 +132,8 @@ const BoardHeader = ({
                   folder: '',
                   tags: [],
                   collabID: '',
+                  users: [],
+                  permission: '',
                 });
               }}
             >
@@ -159,96 +161,101 @@ const BoardHeader = ({
         {/* Avatars of active tenants */}
         <UserList />
         {/* Comment section button */}
-        <Button
-          variant="secondary"
-          className="border-solid border-2 border-indigo-300 hover:border-indigo-400 stroke-indigo-300 hover:stroke-indigo-400 px-3 py-2 "
-          onClick={() => {
-            setIsViewingComments(!isViewingComments);
-            !isViewingComments && setIsUsingStableDiffusion(false);
-          }}
-          disabled={selectedElementIds.length !== 1}
-        >
-          <ChatBubbleIcon className="h-4 w-4" />
-        </Button>
+        {boardMeta.permission !== 'view' && (
+          <Button
+            variant="secondary"
+            className="border-solid border-2 border-indigo-300 hover:border-indigo-400 stroke-indigo-300 hover:stroke-indigo-400 px-3 py-2 "
+            onClick={() => {
+              setIsViewingComments(!isViewingComments);
+              !isViewingComments && setIsUsingStableDiffusion(false);
+            }}
+            disabled={selectedElementIds.length !== 1}
+          >
+            <ChatBubbleIcon className="h-4 w-4" />
+          </Button>
+        )}
         {/* Share Dialog */}
         <div
           className={
             'flex flex-row gap-2 items-center transition-spacing duration-300 ease-in-out'
           }
         >
-          <Button
-            className={cn(
-              buttonVariants({ variant: 'ghost', size: 'sm' }),
-              'h-full bg-muted text-gray-200 bg-indigo-300 hover:bg-indigo-400 hover:text-white justify-start items-center border-2 border-indigo-300 hover:border-indigo-400',
-            )}
-            onClick={() => setIsShareDialogOpen(!isShareDialogOpen)}
-          >
-            <Users2Icon className="h-4 w-4 mr-2" />
-            <span className="ml-auto">Share</span>
-          </Button>
+          {boardMeta.permission !== 'view' && (
+            <React.Fragment>
+              <Button
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'h-full bg-muted text-gray-200 bg-indigo-300 hover:bg-indigo-400 hover:text-white justify-start items-center border-2 border-indigo-300 hover:border-indigo-400',
+                )}
+                onClick={() => setIsShareDialogOpen(!isShareDialogOpen)}
+              >
+                <Users2Icon className="h-4 w-4 mr-2" />
+                <span className="ml-auto">Share</span>
+              </Button>
+              <Button
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'h-full bg-muted text-gray-200 bg-indigo-300 hover:bg-indigo-400 hover:text-white justify-start items-center border-2 border-indigo-300 hover:border-indigo-400',
+                )}
+                onClick={async () => {
+                  try {
+                    const state = {
+                      allIds,
+                      types,
+                      strokeColors,
+                      fillColors,
+                      fontFamilies,
+                      fontSizes,
+                      bowings,
+                      roughnesses,
+                      strokeWidths,
+                      fillStyles,
+                      strokeLineDashes,
+                      opacities,
+                      freehandPoints,
+                      p1,
+                      p2,
+                      textStrings,
+                      isImagePlaceds,
+                      freehandBounds,
+                      angles,
+                      fileIds,
+                    };
 
-          <Button
-            className={cn(
-              buttonVariants({ variant: 'ghost', size: 'sm' }),
-              'h-full bg-muted text-gray-200 bg-indigo-300 hover:bg-indigo-400 hover:text-white justify-start items-center border-2 border-indigo-300 hover:border-indigo-400',
-            )}
-            onClick={async () => {
-              try {
-                const state = {
-                  allIds,
-                  types,
-                  strokeColors,
-                  fillColors,
-                  fontFamilies,
-                  fontSizes,
-                  bowings,
-                  roughnesses,
-                  strokeWidths,
-                  fillStyles,
-                  strokeLineDashes,
-                  opacities,
-                  freehandPoints,
-                  p1,
-                  p2,
-                  textStrings,
-                  isImagePlaceds,
-                  freehandBounds,
-                  angles,
-                  fileIds,
-                };
-
-                const updated = await axios.put(REST.board.updateBoard, {
-                  id: boardMeta.id,
-                  fields: { serialized: state },
-                });
-                setBoardMeta({ lastModified: updated.data.updatedAt });
-                updateCanvas(boardMeta.id, updated.data.updatedAt);
-                setWebsocketAction(
-                  {
-                    boardID: boardMeta.id,
-                    lastModified: updated.data.updatedAt,
-                  },
-                  'updateUpdatedTime',
-                );
-              } catch (error) {
-                toast({
-                  variant: 'destructive',
-                  title: 'Something went wrong.',
-                  description: 'There was a problem with your request.',
-                  action: (
-                    <ToastAction
-                      onClick={() => window.location.reload()}
-                      altText="Refresh"
-                    >
-                      Refresh
-                    </ToastAction>
-                  ),
-                });
-              }
-            }}
-          >
-            <span className="ml-auto">Save</span>
-          </Button>
+                    const updated = await axios.put(REST.board.updateBoard, {
+                      id: boardMeta.id,
+                      fields: { serialized: state },
+                    });
+                    setBoardMeta({ lastModified: updated.data.updatedAt });
+                    updateCanvas(boardMeta.id, updated.data.updatedAt);
+                    setWebsocketAction(
+                      {
+                        boardID: boardMeta.id,
+                        lastModified: updated.data.updatedAt,
+                      },
+                      'updateUpdatedTime',
+                    );
+                  } catch (error) {
+                    toast({
+                      variant: 'destructive',
+                      title: 'Something went wrong.',
+                      description: 'There was a problem with your request.',
+                      action: (
+                        <ToastAction
+                          onClick={() => window.location.reload()}
+                          altText="Refresh"
+                        >
+                          Refresh
+                        </ToastAction>
+                      ),
+                    });
+                  }
+                }}
+              >
+                <span className="ml-auto">Save</span>
+              </Button>{' '}
+            </React.Fragment>
+          )}
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import {
   findUserById,
   deleteUser,
   updateUser,
+  User,
 } from '../../models/user';
 import { HTTP_STATUS } from '../../constants';
 import { firebaseApp } from '../../firebase/firebaseApp';
@@ -14,12 +15,6 @@ import { firebaseApp } from '../../firebase/firebaseApp';
  */
 
 // TODO: JSDOC
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
 
 //Create user
 export const handleCreateUser = async (req: Request, res: Response) => {
@@ -63,6 +58,7 @@ export const handleFindUserById = async (req: Request, res: Response) => {
     }
 
     const user = await findUserByEmail(email);
+    //todo
     if (user) {
       res.status(HTTP_STATUS.SUCCESS).json({ user });
     } else {
@@ -78,7 +74,7 @@ export const handleFindUserById = async (req: Request, res: Response) => {
   }
 };
 
-async function findUserByEmail(email: string): Promise<User | null> {
+export async function findUserByEmail(email: string): Promise<User | null> {
   const usersCollection = firebaseApp.firestore().collection('User');
 
   const querySnapshot = await usersCollection.where('email', '==', email).get();
