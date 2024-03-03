@@ -174,7 +174,6 @@ export default function Canvas() {
    */
   const initTenants = async () => {
     const tenantIds = (await tenancy.get(boardMeta.roomID)) as string[];
-    console.log(tenantIds);
     const activeTenants = tenantIds.reduce(
       (acc, id) => {
         const collabId = extractCollabID(id);

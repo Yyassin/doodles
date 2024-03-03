@@ -210,7 +210,9 @@ const CommentsSheetContent = () => {
                 border: `0.2rem solid ${comment.outlineColor ?? 'white'}`,
               }}
             >
-              <AvatarImage src={comment.avatar} />
+              <AvatarImage
+                src={boardMeta.collaboratorAvatars[comment.collabId] ?? ''}
+              />
               <AvatarFallback>{comment.initials}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col select-none">

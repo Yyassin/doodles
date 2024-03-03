@@ -15,6 +15,7 @@ import { renderElementsOnOffscreenCanvas } from '@/lib/export';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { useAuthStore } from '@/stores/AuthStore';
+import { fetchImageFromFirebaseStorage } from '@/views/SignInPage';
 
 export const createStateWithRoughElement = (state: CanvasElementState) => {
   const roughElements: Record<string, CanvasElement['roughElement']> = {};
@@ -128,6 +129,30 @@ export const BoardScroll = () => {
 
                   setThumbnailUrl(canvas?.toDataURL('image/png') ?? '');
                 }
+                const collaboratorAvatarMeta = (
+                  await axios.put(REST.collaborators.getAvatar, {
+                    collaboratorIds: board.collaborators,
+                  })
+                ).data.collaborators;
+                const collaboratorAvatarUrls = await Promise.all(
+                  Object.entries(
+                    collaboratorAvatarMeta as { id: string; avatar: string },
+                  ).map(async ([id, avatar]) => ({
+                    id,
+                    avatar: (avatar ?? '').includes('https')
+                      ? avatar
+                      : await fetchImageFromFirebaseStorage(
+                          `profilePictures/${avatar}.jpg`,
+                        ),
+                  })),
+                );
+                const collaboratorAvatarUrlsMap = collaboratorAvatarUrls.reduce(
+                  (acc, { id, avatar }) => {
+                    id && avatar && (acc[id] = avatar);
+                    return acc;
+                  },
+                  {} as Record<string, string>,
+                ) as Record<string, string>;
                 // TODO: Should perform and cache concurrent fetches for the board and its comments here
                 setBoardMeta({
                   roomID: isSelected ? '' : board.roomID,
@@ -138,6 +163,7 @@ export const BoardScroll = () => {
                   folder: isSelected ? '' : board.folder,
                   tags: isSelected ? [] : board.tags,
                   collabID: isSelected ? '' : collabID,
+                  collaboratorAvatars: collaboratorAvatarUrlsMap,
                 });
               } catch (error) {
                 toast({
