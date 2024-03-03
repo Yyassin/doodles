@@ -8,6 +8,7 @@ import {
 } from '../../models/collaborator';
 import { HTTP_STATUS } from '../../constants';
 import { findUserById } from '../../models/user';
+import { getInitials } from '../../utils/misc';
 
 /**
  * Firebase API controllers, logic for endpoint routes.
@@ -73,12 +74,22 @@ export const handleFindCollaboratorById = async (
   res: Response,
 ) => {
   try {
-    const collabId = req.body.id; // The collaborator ID parameter is in the body.
+    const collabId = req.query.id as string; // The collaborator ID parameter is in the body.
     if (!validateId(collabId, res)) return;
     const collaborator = await findCollaboratorById(collabId as string);
+    const user = await findUserById(collaborator?.user as string);
 
     if (collaborator) {
-      res.status(HTTP_STATUS.SUCCESS).json({ collaborator });
+      res.status(HTTP_STATUS.SUCCESS).json({
+        userInfo: {
+          email: user?.email,
+          avatar: user?.avatar,
+          initials: getInitials(user?.firstname + ' ' + user?.lastname),
+          username: user?.firstname + ' ' + user?.lastname,
+          permission: collaborator.permissionLevel,
+          collabID: collaborator.id,
+        },
+      });
     } else {
       return notFoundError(res);
     }

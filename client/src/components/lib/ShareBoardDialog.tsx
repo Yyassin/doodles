@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,7 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { User } from '@/stores/WebSocketStore';
+import { SharedUser, useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import axios from 'axios';
+import { useAppStore } from '@/stores/AppStore';
+import { setCursor } from '@/lib/misc';
+import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { REST } from '@/constants';
+import { useToast } from '../ui/use-toast';
 
 /**
  * An alert dialog that is controlled by the `open` prop. It displays a list of users
@@ -38,10 +45,38 @@ const ShareBoardDialog = ({
   open: boolean;
   setOpen: (value: boolean) => void;
   boardLink: string;
-  users: User[];
+  users: SharedUser[];
 }) => {
   /* Controls visibility of the addition input. */
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const { boardMeta, updatePermission, addUser } = useCanvasBoardStore([
+    'boardMeta',
+    'updatePermission',
+    'addUser',
+  ]);
+  const { setSelectedElements, selectedElementIds } = useCanvasElementStore([
+    'setSelectedElements',
+    'selectedElementIds',
+  ]);
+  const { setTool } = useAppStore(['setTool']);
+  const { socket, setWebsocketAction } = useWebSocketStore([
+    'socket',
+    'setWebsocketAction',
+  ]);
+  const newUserEmail = useRef<HTMLInputElement | null>(null);
+  const newUserPerm = useRef<HTMLSelectElement | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    socket?.on('changePermission', (msg) => {
+      const { collabID, permission } = (
+        msg as { payload: { collabID: string; permission: string } }
+      ).payload;
+      const isOwnPerm = boardMeta.collabID === collabID;
+      if (isOwnPerm) setSelectedElements([]);
+      updatePermission(collabID, permission, isOwnPerm);
+    });
+  }, [socket, boardMeta.collabID, updatePermission]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -85,17 +120,62 @@ const ShareBoardDialog = ({
             <Input
               placeholder="Enter an email address or username"
               className="p-[1rem]"
+              ref={newUserEmail}
             />
             <Select>
               <SelectTrigger className="w-[6rem]">
-                <SelectValue placeholder="View" />
+                <SelectValue placeholder="View" ref={newUserPerm} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="view">View</SelectItem>
                 <SelectItem value="edit">Edit</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-[#818cf8] hover:bg-[#6c75c1]">Confirm</Button>
+            <Button
+              className="bg-[#818cf8] hover:bg-[#6c75c1]"
+              onClick={async () => {
+                const email = newUserEmail.current?.value;
+                let isAlreadyShared = false;
+                for (const user of boardMeta.users) {
+                  if (user.email === email) {
+                    isAlreadyShared = true;
+                  }
+                }
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(newUserEmail.current?.value as string)) {
+                  toast({
+                    title: 'Oops! The email you entered is not valid.',
+                    description: 'Please check and try again.',
+                  });
+                } else if (isAlreadyShared) {
+                  toast({
+                    title:
+                      'Oops! This user seems to already be a Collaborator.',
+                    description: 'Please try again.',
+                  });
+                  (newUserEmail.current as HTMLInputElement).value = '';
+                } else {
+                  try {
+                    const response = await axios.put(REST.board.addUser, {
+                      boardId: boardMeta.id,
+                      email: email,
+                      perm: newUserPerm.current?.textContent?.toLocaleLowerCase(),
+                    });
+                    (newUserEmail.current as HTMLInputElement).value = '';
+                    addUser(response.data.user);
+                    setWebsocketAction(response.data.user, 'addNewCollab');
+                  } catch {
+                    toast({
+                      title: "Oops! We couldn't find a user with that email.",
+                      description: 'Please try again.',
+                    });
+                  }
+                }
+              }}
+            >
+              Confirm
+            </Button>
           </div>
         )}
         {/* The user list */}
@@ -103,7 +183,9 @@ const ShareBoardDialog = ({
           {users.map((user) => (
             <div key={user.email} className="flex flex-row gap-4 w-[100%]">
               <Avatar>
-                <AvatarImage src={user.avatar} />
+                <AvatarImage
+                  src={boardMeta.collaboratorAvatars[user.collabID]}
+                />
                 <AvatarFallback>{user.initials}</AvatarFallback>
               </Avatar>
               <div className="flex flex-row w-[100%] justify-between">
@@ -113,13 +195,44 @@ const ShareBoardDialog = ({
                   </p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
-                <Select>
+                <Select
+                  value={user.permission}
+                  disabled={
+                    user.permission === 'owner' ||
+                    boardMeta.permission === 'view'
+                  }
+                  onValueChange={(value) => {
+                    if (boardMeta.collabID === user.collabID) {
+                      updatePermission(user.collabID, value, true);
+                      setTool('pan');
+                      setSelectedElements([]);
+                      setCursor('');
+                    } else {
+                      updatePermission(user.collabID, value, false);
+                    }
+                    console.log(selectedElementIds);
+                    setWebsocketAction(
+                      { collabID: user.collabID, permission: value },
+                      'changePermission',
+                    );
+                    axios.put(REST.collaborator.update, {
+                      id: user.collabID,
+                      fields: {
+                        permissionLevel: value,
+                      },
+                    });
+                  }}
+                >
                   <SelectTrigger className="w-[6rem]">
-                    <SelectValue placeholder="View" />
+                    <SelectValue placeholder={user.permission} />
                   </SelectTrigger>
+
                   <SelectContent>
                     <SelectItem value="view">View</SelectItem>
                     <SelectItem value="edit">Edit</SelectItem>
+                    {user.permission === 'owner' && (
+                      <SelectItem value="owner">Owner</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

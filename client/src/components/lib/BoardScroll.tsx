@@ -82,6 +82,7 @@ export const BoardScroll = () => {
   return (
     <div className="relative flex flex-col mx-2 h-full">
       <div className="w-full h-[250px] overflow-x-scroll scroll whitespace-nowrap scroll-smooth">
+        {/* eslint-disable-next-line sonarjs/cognitive-complexity */}
         {canvases.map((board) => (
           <div
             key={board.id}
@@ -94,6 +95,8 @@ export const BoardScroll = () => {
 
               try {
                 let collabID = ' ';
+                let users = [];
+                let permission = '';
                 if (!isSelected) {
                   //todo
                   const boardState = await axios.get(REST.board.getBoard, {
@@ -101,6 +104,8 @@ export const BoardScroll = () => {
                   });
 
                   collabID = boardState.data.collabID;
+                  users = boardState.data.users;
+                  permission = boardState.data.permissionLevel;
 
                   const state = createStateWithRoughElement(
                     boardState.data.board.serialized,
@@ -164,6 +169,8 @@ export const BoardScroll = () => {
                   tags: isSelected ? [] : board.tags,
                   collabID: isSelected ? '' : collabID,
                   collaboratorAvatars: collaboratorAvatarUrlsMap,
+                  users: isSelected ? '' : users,
+                  permission: isSelected ? '' : permission,
                 });
               } catch (error) {
                 toast({
