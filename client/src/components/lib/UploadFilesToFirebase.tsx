@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { firebaseApp } from '../../firebaseDB/firebase';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
