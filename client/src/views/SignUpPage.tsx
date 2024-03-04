@@ -35,6 +35,22 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
  * @author Zakariyya Almalki
  */
 
+export const generateImageUrl = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target && e.target.result) {
+        const generatedUrl = e.target.result as string;
+        resolve(generatedUrl);
+      } else {
+        reject(new Error('Failed to generate image URL'));
+      }
+    };
+    // Read the file as a data URL
+    reader.readAsDataURL(file);
+  });
+};
+
 export function signup(
   email: string,
   password: string,
@@ -107,22 +123,6 @@ export default function SignUp() {
         lastNameRef.current?.value ?? '',
         pictureId,
       );
-
-      const generateImageUrl = (file: File): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            if (e.target && e.target.result) {
-              const generatedUrl = e.target.result as string;
-              resolve(generatedUrl);
-            } else {
-              reject(new Error('Failed to generate image URL'));
-            }
-          };
-          // Read the file as a data URL
-          reader.readAsDataURL(file);
-        });
-      };
 
       const profilePic = profilePictureRef.current?.files
         ? generateImageUrl(profilePictureRef.current?.files[0])

@@ -17,6 +17,7 @@ export const REST = {
   user: {
     get: `${REST_ROOT}/user/getUser`,
     create: `${REST_ROOT}/user/createUser`,
+    update: `${REST_ROOT}/user/updateUser`,
   },
   sfu: {
     poll: `${REST_ROOT}/sfu/poll`,
@@ -33,6 +34,7 @@ export const REST = {
     getBoard: `${REST_ROOT}/board/getBoard`,
     deleteBoard: `${REST_ROOT}/board/deleteBoard`,
     updateBoard: `${REST_ROOT}/board/updateBoard`,
+    addUser: `${REST_ROOT}/board/addUser`,
   },
   collaborators: {
     getAvatar: `${REST_ROOT}/collaborator/getCollaboratorAvatars`,
@@ -42,6 +44,10 @@ export const REST = {
     create: `${REST_ROOT}/comment/createComment`,
     update: `${REST_ROOT}/comment/handleLike`,
     delete: `${REST_ROOT}/comment/deleteComment`,
+  },
+  collaborator: {
+    update: `${REST_ROOT}/collaborator/updateCollaborator`,
+    getUserInfo: `${REST_ROOT}/collaborator/getCollaborator`,
   },
 };
 export const HTTP_STATUS = {

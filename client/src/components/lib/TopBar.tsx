@@ -2,27 +2,37 @@ import React from 'react';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { PlusIcon } from '@radix-ui/react-icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
+import { Canvas, useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { IconDropDown } from './IconDropDown';
 import { useAppStore } from '@/stores/AppStore';
 import axios from 'axios';
 import { REST } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
+import Fuse from 'fuse.js';
 
 /**
  * Define a react component that the top bar of the main dashboard
  * @author Abdalla Abdelhadi
  */
 
-export const TopBar = () => {
-  const { board, folder, addCanvas, setBoardMeta } = useCanvasBoardStore([
-    'board',
-    'folder',
-    'addCanvas',
-    'setBoardMeta',
-  ]);
+export const TopBar = ({
+  setSearchCanvases,
+}: {
+  setSearchCanvases: (canvases: Canvas[]) => void;
+}) => {
+  const { canvases, board, folder, addCanvas, setBoardMeta } =
+    useCanvasBoardStore([
+      'canvases',
+      'board',
+      'folder',
+      'addCanvas',
+      'setBoardMeta',
+    ]);
   const { userID } = useAuthStore(['userID']);
   const { setMode } = useAppStore(['setMode']);
+  const fuseOptions = { keys: ['title', 'tags'] };
+
+  const fuse = new Fuse(canvases, fuseOptions);
 
   return (
     <div className="flex flex-col">
@@ -30,6 +40,11 @@ export const TopBar = () => {
         <MagnifyingGlassIcon className="h-[25px] w-[25px] mt-2 inline-flex items-center justify-center" />
         <div className="flex h-[50px] flex-1">
           <input
+            onChange={(e) =>
+              setSearchCanvases(
+                fuse.search(e.target.value).map((target) => target.item),
+              )
+            }
             type="text"
             className="h-[25px] mt-2 basis-3/4"
             placeholder="Search Boards"
@@ -97,6 +112,8 @@ export const TopBar = () => {
                       folder: boardData.folder,
                       tags: boardData.tags,
                       collabID: data.data.collabID,
+                      users: data.data.users,
+                      permission: data.data.permissionLevel,
                     });
 
                     setMode('canvas');

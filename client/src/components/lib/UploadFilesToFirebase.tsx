@@ -5,18 +5,17 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useToast } from '@/components/ui/use-toast';
 
 const FileUpload = () => {
-  const [, setFile] = useState<File | null>(null);
   const { selectedElementIds, updateAttachedFileUrl } = useCanvasElementStore([
     'selectedElementIds',
     'updateAttachedFileUrl',
   ]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     const fileToUpload = files ? files[0] : null;
-    setFile(fileToUpload);
 
     if (fileToUpload !== null && selectedElementIds.length > 0) {
       const storage = getStorage(firebaseApp);
@@ -31,6 +30,10 @@ const FileUpload = () => {
         })
         .then((downloadURL) => {
           updateAttachedFileUrl(selectedElementIds[0], downloadURL);
+          setWebsocketAction(
+            { selectedElementIds, downloadURL },
+            'addAttachedFileUrl',
+          );
         })
         .catch(() => {
           toast({

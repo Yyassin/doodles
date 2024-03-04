@@ -25,6 +25,7 @@ interface AuthActions {
     userPicture: string,
     userID: string,
   ) => void;
+  updateUser: (meta: Partial<AuthState>) => void;
 }
 
 type AuthStore = AuthActions & AuthState;
@@ -60,9 +61,16 @@ const setUser =
       };
     });
 
+const updateUser = (set: SetState<AuthStore>) => (meta: Partial<AuthState>) => {
+  set((state) => {
+    return { ...state, ...meta };
+  });
+};
+
 /** Store Hook */
 const AuthStore = create<AuthStore>()((set) => ({
   ...initialAuthState,
   setUser: setUser(set),
+  updateUser: updateUser(set),
 }));
 export const useAuthStore = createStoreWithSelectors(AuthStore);
