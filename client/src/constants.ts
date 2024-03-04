@@ -17,6 +17,7 @@ export const REST = {
   user: {
     get: `${REST_ROOT}/user/getUser`,
     create: `${REST_ROOT}/user/createUser`,
+    update: `${REST_ROOT}/user/updateUser`,
   },
   sfu: {
     poll: `${REST_ROOT}/sfu/poll`,

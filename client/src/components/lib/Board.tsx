@@ -1,6 +1,7 @@
 import React from 'react';
 import { TopBar } from '@/components/lib/TopBar';
 import { BoardScroll } from './BoardScroll';
+import { Settings } from './Settings';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 
 /**
@@ -16,6 +17,7 @@ export const Board = () => {
     <div className="flex flex-col w-5/6 h-full bg-[#FEFDFF]">
       <TopBar />
       {board === 'Folder' && <BoardScroll />}
+      {board == 'Settings' && <Settings />}
       {/** To be added template and setting page */}
     </div>
   );
