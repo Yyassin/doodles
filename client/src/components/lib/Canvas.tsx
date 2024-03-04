@@ -1,6 +1,6 @@
 import React, { MouseEvent, useEffect, useRef, FocusEvent } from 'react';
 import { createElement } from '@/lib/canvasElements/canvasElementUtils';
-import { FileIcon } from '@radix-ui/react-icons';
+import { FileIcon, Link2Icon } from '@radix-ui/react-icons';
 import {
   adjustElementCoordinatesById,
   rescalePointsInElem,
@@ -102,6 +102,7 @@ export default function Canvas() {
     isSelectionFrameSet,
     toolOptions,
     attachedFileUrls,
+    attachedUrls,
   } = useCanvasElementStore([
     'addCanvasShape',
     'addCanvasFreehand',
@@ -134,6 +135,7 @@ export default function Canvas() {
     'isSelectionFrameSet',
     'toolOptions',
     'attachedFileUrls',
+    'attachedUrls',
   ]);
 
   const { socket, setWebsocketAction, setRoomID, setTenants, clearTenants } =
@@ -746,6 +748,24 @@ export default function Canvas() {
             }}
           >
             <FileIcon />
+          </a>
+        )}
+
+      {tool === 'select' &&
+        attachedUrls[selectedElementIds[0]] !== undefined && (
+          <a
+            href={attachedUrls[selectedElementIds[0]]}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 10,
+            }}
+          >
+            <Link2Icon />
           </a>
         )}
 
