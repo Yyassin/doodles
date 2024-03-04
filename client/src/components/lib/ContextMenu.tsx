@@ -85,7 +85,7 @@ const ContextMenu = () => {
                 }}
                 className="text-red-700"
               >
-                Delete Attatched File{' '}
+                Delete Attached File{' '}
                 <div className="ml-auto pl-5 text-red-700 group-data-[highlighted]:text-white group-data-[disabled]:text-mauve8">
                   <TrashIcon />
                 </div>
