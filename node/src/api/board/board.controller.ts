@@ -5,16 +5,20 @@ import {
   updateBoard,
   deleteBoard,
   findBoardsByCollaboratorsId,
+  Board,
 } from '../../models/board';
 import { HTTP_STATUS } from '../../constants';
 import {
+  Collaborator,
   createCollaborator,
   deleteCollaborator,
   findCollaboratorById,
   findCollaboratorByIdAndBoard,
   findCollaboratorsById,
 } from '../../models/collaborator';
-import { generateRandId } from '../../utils/misc';
+import { generateRandId, getInitials } from '../../utils/misc';
+import { findUserById } from '../../models/user';
+import { findUserByEmail } from '../user/user.controller';
 
 /**
  * Firebase API controllers, logic for endpoint routes.
@@ -29,13 +33,31 @@ export const handleCreateBoard = async (req: Request, res: Response) => {
     const boardID = generateRandId();
     const { user, serialized, title, shareUrl } = req.body; // The board parameters are in the body.
 
-    const collaborator = await createCollaborator('edit', user, boardID);
+    const {
+      id: collabID,
+      permissionLevel,
+      uid,
+    } = await createCollaborator('owner', user, boardID);
 
     const board = await createBoard(boardID, serialized, title, shareUrl, [
-      collaborator.uid,
+      uid,
     ]);
 
-    res.status(HTTP_STATUS.SUCCESS).json({ board, collabID: collaborator.id });
+    const userInfo = await findUserById(user);
+    const users = [
+      {
+        email: userInfo?.email,
+        avatar: userInfo?.avatar,
+        initials: getInitials(userInfo?.firstname + ' ' + userInfo?.lastname),
+        username: userInfo?.firstname + ' ' + userInfo?.lastname,
+        permission: permissionLevel,
+        collabID,
+      },
+    ];
+
+    res
+      .status(HTTP_STATUS.SUCCESS)
+      .json({ board, collabID, users, permissionLevel });
   } catch (error) {
     console.error('Error creating board:', error);
     res
@@ -63,11 +85,42 @@ export const handleFindBoardById = async (req: Request, res: Response) => {
 
     if (!validateId(boardId, res)) return;
     const board = await findBoardById(boardId as string);
-    const collabID = (await findCollaboratorByIdAndBoard(userID, boardId)).pop()
-      ?.id;
+
+    let collabID;
+    let permissionLevel;
+    if (userID) {
+      const { id, permissionLevel: perm } = (
+        await findCollaboratorByIdAndBoard(userID, boardId)
+      ).pop() as Collaborator;
+
+      collabID = id;
+      permissionLevel = perm;
+    } else {
+      collabID = undefined;
+      permissionLevel = undefined;
+    }
+
+    const users =
+      board &&
+      (await Promise.all(
+        board.collaborators.map(async (collabID) => {
+          const collab = await findCollaboratorById(collabID);
+          const user = await findUserById(collab?.user as string);
+          return {
+            email: user?.email,
+            avatar: user?.avatar,
+            initials: getInitials(user?.firstname + ' ' + user?.lastname),
+            username: user?.firstname + ' ' + user?.lastname,
+            permission: collab?.permissionLevel,
+            collabID: collab?.id,
+          };
+        }),
+      ));
 
     return board
-      ? res.status(HTTP_STATUS.SUCCESS).json({ board, collabID })
+      ? res
+          .status(HTTP_STATUS.SUCCESS)
+          .json({ board, collabID, users, permissionLevel })
       : notFoundError(res);
   } catch (error) {
     console.error('Error finding board by ID:', error);
@@ -140,7 +193,32 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
         if (collab.length !== 0) {
           collabID = collab.pop()?.uid;
           const board = await findBoardById(boardId);
-          return res.status(HTTP_STATUS.SUCCESS).json({ ...board, collabID });
+          const users =
+            board &&
+            (await Promise.all(
+              board.collaborators.map(async (collabID) => {
+                const collab = await findCollaboratorById(collabID);
+                const user = await findUserById(collab?.user as string);
+                return {
+                  email: user?.email,
+                  avatar: user?.avatar,
+                  initials: getInitials(user?.firstname + ' ' + user?.lastname),
+                  username: user?.firstname + ' ' + user?.lastname,
+                  permission: collab?.permissionLevel,
+                  collabID: collab?.id,
+                };
+              }),
+            ));
+
+          const { permissionLevel: permission } = (await findCollaboratorById(
+            collabID as string,
+          )) as Collaborator;
+          return res.status(HTTP_STATUS.SUCCESS).json({
+            ...board,
+            collabID,
+            users,
+            permission: permission,
+          });
         }
 
         collabID = (
@@ -155,13 +233,65 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
       }
 
       const update = await updateBoard(board, updatedFields);
+      const users =
+        board &&
+        (await Promise.all(
+          (update.collaborators as string[]).map(async (collabID) => {
+            const collab = await findCollaboratorById(collabID);
+            const user = await findUserById(collab?.user as string);
+            return {
+              email: user?.email,
+              avatar: user?.avatar,
+              initials: getInitials(user?.firstname + ' ' + user?.lastname),
+              username: user?.firstname + ' ' + user?.lastname,
+              permission: collab?.permissionLevel,
+              collabID: collab?.id,
+            };
+          }),
+        ));
+
       const { fastFireOptions: _fastFireOptions, ...fields } = update; // TODO(yousef): Should make a helper method to extract the options
-      return res.status(HTTP_STATUS.SUCCESS).json({ ...fields, collabID });
+      return res
+        .status(HTTP_STATUS.SUCCESS)
+        .json({ ...fields, collabID, users, permission: 'edit' });
     } else {
       return notFoundError(res);
     }
   } catch (error) {
     console.error('Error updating board: ', error);
+    res
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ error: 'Failed to update board' });
+  }
+};
+
+// Update board
+export const handleAddUserbyEmail = async (req: Request, res: Response) => {
+  try {
+    // The board ID and new parameters are in the body.
+    const { boardId, email, perm } = req.body;
+    if (!validateId(boardId, res)) return;
+    const board = await findBoardById(boardId);
+    const user = await findUserByEmail(email);
+    if (user === null) return res.status(HTTP_STATUS.ERROR).json();
+
+    const collab = await createCollaborator(perm, user.uid, boardId);
+    await updateBoard(board as Board, {
+      collaborators: collab.id,
+    });
+
+    return res.status(HTTP_STATUS.SUCCESS).json({
+      user: {
+        email: user.email,
+        avatar: user.avatar,
+        initials: getInitials(user.firstname + ' ' + user.lastname),
+        username: user.firstname + ' ' + user.lastname,
+        permission: perm,
+        collabID: collab.id,
+      },
+    });
+  } catch (error) {
+    console.error('Error adding user: ', error);
     res
       .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
       .json({ error: 'Failed to update board' });

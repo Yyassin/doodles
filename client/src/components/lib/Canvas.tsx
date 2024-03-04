@@ -23,6 +23,7 @@ import { getScaleOffset } from '@/lib/canvasElements/render';
 import {
   IS_ELECTRON_INSTANCE,
   PERIPHERAL_CODES,
+  REST,
   SECONDS_TO_MS,
   WS_TOPICS,
 } from '@/constants';
@@ -42,6 +43,7 @@ import { useAuthStore } from '@/stores/AuthStore';
 import CursorPresence from './CursorPresence';
 import { throttle } from 'lodash';
 import { idToColour } from '@/lib/userColours';
+import axios from 'axios';
 
 /**
  * Main Canvas View
@@ -144,7 +146,7 @@ export default function Canvas() {
       'setTenants',
       'clearTenants',
     ]);
-  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
+  const { boardMeta, addUser } = useCanvasBoardStore(['boardMeta', 'addUser']);
   const { userEmail } = useAuthStore(['userEmail']);
 
   // Id of the element currently being drawn.
@@ -166,7 +168,7 @@ export default function Canvas() {
     socket?.on(WS_TOPICS.NOTIFY_JOIN_ROOM, initTenants);
     socket?.on(WS_TOPICS.NOTIFY_LEAVE_ROOM, initTenants);
     return clearTenants;
-  }, [socket]);
+  }, [socket, boardMeta.users]);
 
   /**
    * Called everytime someone joins or leaves the room, and once we initially join, to maintain
@@ -176,6 +178,22 @@ export default function Canvas() {
    */
   const initTenants = async () => {
     const tenantIds = (await tenancy.get(boardMeta.roomID)) as string[];
+
+    tenantIds
+      .map((id) => extractCollabID(id) as string)
+      .filter(
+        (id) => !new Set(boardMeta.users.map((user) => user.collabID)).has(id),
+      )
+      .forEach(async (collabID) => {
+        if (!collabID) return;
+        const userInfo = await axios.get(REST.collaborator.getUserInfo, {
+          params: {
+            id: collabID,
+          },
+        });
+        addUser(userInfo.data.userInfo);
+      });
+
     const activeTenants = tenantIds.reduce(
       (acc, id) => {
         const collabId = extractCollabID(id);

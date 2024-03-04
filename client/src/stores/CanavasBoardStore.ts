@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { SetState } from './types';
 import { createStoreWithSelectors } from './utils';
+// import { User } from 'firebase/auth';
 
 /**
  * Define Global CanvasBoard states and reducers
@@ -23,6 +24,15 @@ export interface Canvas {
   roomID: string;
 }
 
+export interface SharedUser {
+  email: string;
+  avatar: string;
+  initials: string;
+  username: string;
+  permission: string;
+  collabID: string;
+}
+
 /** Definitions */
 interface CanvasBoardState {
   canvases: Canvas[];
@@ -41,6 +51,8 @@ interface CanvasBoardState {
     tags: string[];
     collabID: string;
     collaboratorAvatars: Record<string, string>;
+    users: SharedUser[];
+    permission: string;
   };
 }
 
@@ -57,6 +69,12 @@ interface CanvasBoardActions {
     folder: string,
     tags: string[],
   ) => void;
+  updatePermission: (
+    collabID: string,
+    permission: string,
+    isOwnPerm: boolean,
+  ) => void;
+  addUser: (user: SharedUser) => void;
   setBoardMeta: (meta: Partial<CanvasBoardState['boardMeta']>) => void;
   setTag: (tags: Array<string>) => void;
 }
@@ -78,6 +96,8 @@ export const initialCanvasState: CanvasBoardState = {
     tags: [],
     collabID: '',
     collaboratorAvatars: {},
+    users: [],
+    permission: '',
   },
 };
 
@@ -125,6 +145,26 @@ const updateCanvasInfo =
       return { ...state, canvases };
     });
 
+const updatePermission =
+  (set: SetState<CanvasBoardStore>) =>
+  (collabID: string, permission: string, isOwnPerm: boolean) =>
+    set((state) => {
+      const users = state.boardMeta.users.map((user) =>
+        user.collabID === collabID ? { ...user, permission } : user,
+      );
+
+      if (isOwnPerm)
+        return { boardMeta: { ...state.boardMeta, users, permission } };
+      return { boardMeta: { ...state.boardMeta, users } };
+    });
+
+const addUser = (set: SetState<CanvasBoardStore>) => (user: SharedUser) =>
+  set((state) => {
+    const users = [...state.boardMeta.users, user];
+
+    return { boardMeta: { ...state.boardMeta, users } };
+  });
+
 const setBoardMeta =
   (set: SetState<CanvasBoardStore>) =>
   (meta: Partial<CanvasBoardState['boardMeta']>) => {
@@ -143,6 +183,8 @@ const CanvasBoardStore = create<CanvasBoardStore>()((set) => ({
   removeCanvas: removeCanvas(set),
   updateCanvas: updateCanvas(set),
   updateCanvasInfo: updateCanvasInfo(set),
+  updatePermission: updatePermission(set),
+  addUser: addUser(set),
   setBoardMeta: setBoardMeta(set),
   setTag: setTag(set),
 }));

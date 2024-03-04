@@ -19,7 +19,6 @@ import { isDrawingTool } from '@/lib/misc';
 import { Separator } from '@/components/ui/separator';
 import BoardHeader from '@/components/lib/BoardHeader';
 import ShareBoardDialog from '@/components/lib/ShareBoardDialog';
-import { users } from '@/stores/WebSocketStore';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import EditBoardDataDialog from '@/components/lib/EditBoardDataDialog';
 
@@ -61,7 +60,7 @@ const Viewport = () => {
             open={isShareDialogOpen}
             setOpen={setIsShareDialogOpen}
             boardLink={boardMeta.shareUrl}
-            users={users}
+            users={boardMeta.users}
           />
           <EditBoardDataDialog
             open={isEditDialogOpen}
@@ -120,9 +119,9 @@ const Viewport = () => {
                   }}
                 >
                   <ZoomButtons />
-                  <UndoRedoButtons />
+                  {boardMeta.permission !== 'view' && <UndoRedoButtons />}
                   <FullScreenButton viewportRef={viewportRef} />
-                  <ShareScreenButton />
+                  {boardMeta.permission !== 'view' && <ShareScreenButton />}
                   {IS_ELECTRON_INSTANCE && <TransparencyButton />}
                 </div>
               </div>

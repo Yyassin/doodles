@@ -11,6 +11,7 @@ const FileUpload = () => {
   ]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -29,6 +30,10 @@ const FileUpload = () => {
         })
         .then((downloadURL) => {
           updateAttachedFileUrl(selectedElementIds[0], downloadURL);
+          setWebsocketAction(
+            { selectedElementIds, downloadURL },
+            'addAttachedFileUrl',
+          );
         })
         .catch(() => {
           toast({
