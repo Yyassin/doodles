@@ -100,7 +100,6 @@ const ContextMenu = () => {
                 onClick={() => {
                   const ids = selectedElementIds;
                   setSelectedElements([]);
-                  const link = attachedUrls[selectedElementIds[0]];
                   removeAttachedUrl(ids);
                   setWebsocketAction(ids, 'removeAttachedUrl');
                 }}
