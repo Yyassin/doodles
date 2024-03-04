@@ -7,6 +7,7 @@ import ContextMenuItem from './ContextMenuItem';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import StableDiffusionContextItem from './StableDiffusion/StableDiffusionContextItem';
 import FileUpload from './UploadFilesToFirebase';
+import LinkAttach from './UploadLink';
 import deleteFilefromFirebase from './DeleteFileFromFirebase';
 
 /**
@@ -22,14 +23,18 @@ const ContextMenu = () => {
     selectedElementIds,
     pushCanvasHistory,
     removeAttachedFileUrl,
+    removeAttachedUrl,
     attachedFileUrls,
+    attachedUrls,
   } = useCanvasElementStore([
     'removeCanvasElements',
     'setSelectedElements',
     'selectedElementIds',
     'pushCanvasHistory',
     'removeAttachedFileUrl',
+    'removeAttachedUrl',
     'attachedFileUrls',
+    'attachedUrls',
   ]);
 
   const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
@@ -62,26 +67,51 @@ const ContextMenu = () => {
             </ContextMenuItem>
             <ExportSelectedPNGContextItem />
             <StableDiffusionContextItem />
-            <FileUpload />
 
-            <ContextMenuItem
-              onClick={() => {
-                const ids = selectedElementIds;
-                setSelectedElements([]);
-                const link = attachedFileUrls[selectedElementIds[0]];
-                if (link !== undefined) {
-                  deleteFilefromFirebase(link);
-                }
-                removeAttachedFileUrl(ids); //Don't want users to be able to undo deletion
-                setWebsocketAction(ids, 'removeAttachedFileUrl');
-              }}
-              className="text-red-700"
-            >
-              Delete File{' '}
-              <div className="ml-auto pl-5 text-red-700 group-data-[highlighted]:text-white group-data-[disabled]:text-mauve8">
-                <TrashIcon />
-              </div>
-            </ContextMenuItem>
+            {attachedUrls[selectedElementIds[0]] === undefined && (
+              <FileUpload />
+            )}
+            {attachedUrls[selectedElementIds[0]] === undefined && (
+              <ContextMenuItem
+                onClick={() => {
+                  const ids = selectedElementIds;
+                  setSelectedElements([]);
+                  const link = attachedFileUrls[selectedElementIds[0]];
+                  if (link !== undefined) {
+                    deleteFilefromFirebase(link);
+                  }
+                  removeAttachedFileUrl(ids); //Don't want users to be able to undo deletion
+                  setWebsocketAction(ids, 'removeAttachedFileUrl');
+                }}
+                className="text-red-700"
+              >
+                Delete Attatched File{' '}
+                <div className="ml-auto pl-5 text-red-700 group-data-[highlighted]:text-white group-data-[disabled]:text-mauve8">
+                  <TrashIcon />
+                </div>
+              </ContextMenuItem>
+            )}
+
+            {attachedFileUrls[selectedElementIds[0]] === undefined && (
+              <LinkAttach />
+            )}
+            {attachedFileUrls[selectedElementIds[0]] === undefined && (
+              <ContextMenuItem
+                onClick={() => {
+                  const ids = selectedElementIds;
+                  setSelectedElements([]);
+                  const link = attachedUrls[selectedElementIds[0]];
+                  removeAttachedUrl(ids);
+                  setWebsocketAction(ids, 'removeAttachedUrl');
+                }}
+                className="text-red-700"
+              >
+                Delete Attatched Link{' '}
+                <div className="ml-auto pl-5 text-red-700 group-data-[highlighted]:text-white group-data-[disabled]:text-mauve8">
+                  <TrashIcon />
+                </div>
+              </ContextMenuItem>
+            )}
           </>
         ) : null}
       </RadixContextMenu.Content>

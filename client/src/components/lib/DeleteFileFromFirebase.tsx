@@ -22,10 +22,10 @@ function deleteFilefromFirebase(downloadURL: string) {
   const fileRef = ref(storage, filePath);
   deleteObject(fileRef)
     .then(() => {
-      console.log('File deleted successfully'); //Will replace with toast next sprint
+      console.log('File deleted successfully');
     })
     .catch((error) => {
-      console.error('Error deleting file: ', error); //Will replace with toast next sprint
+      console.error('Error deleting file: ', error);
     });
 }
 
