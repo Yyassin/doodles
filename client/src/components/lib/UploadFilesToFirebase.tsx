@@ -1,11 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { firebaseApp } from '../../firebaseDB/firebase';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useToast } from '@/components/ui/use-toast';
 
 const FileUpload = () => {
-  const [, setFile] = useState<File | null>(null);
   const { selectedElementIds, updateAttachedFileUrl } = useCanvasElementStore([
     'selectedElementIds',
     'updateAttachedFileUrl',
@@ -16,7 +15,6 @@ const FileUpload = () => {
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     const fileToUpload = files ? files[0] : null;
-    setFile(fileToUpload);
 
     if (fileToUpload !== null && selectedElementIds.length > 0) {
       const storage = getStorage(firebaseApp);
