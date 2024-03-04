@@ -17,6 +17,7 @@ import boardRoutes from './api/board/board.route';
 import authRoutes from './api/auth/auth.route';
 import sfuRoutes from './api/sfu/sfu.route';
 import tenancyRoutes from './api/tenancy/tenancy.route';
+import templateRoutes from './api/template/template.route';
 
 const mainLogger = new Logger('MainModule', LOG_LEVEL);
 const port = 3005;
@@ -40,6 +41,7 @@ app.use('/board', boardRoutes);
 app.use('/auth', authRoutes);
 app.use('/sfu', sfuRoutes);
 app.use('/tenancy', tenancyRoutes);
+app.use('/template', templateRoutes);
 
 server.listen(port, () => {
   mainLogger.info(`Example app listening on port ${port}.`);
