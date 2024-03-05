@@ -49,6 +49,12 @@ export const REST = {
     update: `${REST_ROOT}/collaborator/updateCollaborator`,
     getUserInfo: `${REST_ROOT}/collaborator/getCollaborator`,
   },
+  template: {
+    create: `${REST_ROOT}/template/createTemplate`,
+    get: `${REST_ROOT}/template/getTemplate`,
+    getAll: `${REST_ROOT}/template/getAllTemplates`,
+    delete: `${REST_ROOT}/template/deleteTemplate`,
+  },
 };
 export const HTTP_STATUS = {
   SUCCESS: 200,
