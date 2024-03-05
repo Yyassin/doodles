@@ -1,27 +1,23 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Input } from '../ui/input';
-import { PlusCircleIcon } from 'lucide-react';
-import { Button } from '../ui/button';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import axios from 'axios';
 import { REST } from '@/constants';
-import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useToast } from '../ui/use-toast';
 
 /**
  * An alert dialog where user can edit board data
- * @author Zakariyya Almalki
+ * @author Ibrahim Almalki
  */
 
 export default function PublishTemplateDialog({
@@ -32,29 +28,12 @@ export default function PublishTemplateDialog({
   setOpen: (value: boolean) => void;
 }) {
   /* Controls visibility of the addition input. */
-  const [isAddTagOpen, setIsTagUserOpen] = useState(false);
-  const tagRef = useRef<HTMLInputElement | null>(null);
   const titleRef = useRef<HTMLInputElement | null>(null);
-  const folderRef = useRef<HTMLInputElement | null>(null);
 
-  const {
-    boardMeta,
-    setTag,
-    setBoardMeta,
-    updateCanvas,
-    updateCanvasInfo: updateCanvasInfo,
-  } = useCanvasBoardStore([
-    'boardMeta',
-    'setTag',
-    'setBoardMeta',
-    'updateCanvas',
-    'updateCanvasInfo',
-  ]);
+  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
   const { toast } = useToast();
 
-  const { setWebsocketAction } = useWebSocketStore(['setWebsocketAction']);
   const {
-    selectedElementIds,
     allIds,
     types,
     strokeColors,
@@ -75,9 +54,7 @@ export default function PublishTemplateDialog({
     freehandBounds,
     angles,
     fileIds,
-    resetCanvas,
   } = useCanvasElementStore([
-    'selectedElementIds',
     'allIds',
     'types',
     'strokeColors',
@@ -98,7 +75,6 @@ export default function PublishTemplateDialog({
     'freehandBounds',
     'angles',
     'fileIds',
-    'resetCanvas',
   ]);
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>

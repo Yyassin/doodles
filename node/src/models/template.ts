@@ -4,7 +4,6 @@ import {
   FastFireField,
   FastFireDocument,
 } from 'fastfire';
-//import firebase from 'firebase/compat';
 
 /**
  * Defines template class.
