@@ -12,7 +12,6 @@ import { ToastAction } from '@/components/ui/toast';
 import { useAuthStore } from '@/stores/AuthStore';
 import { createStateWithRoughElement } from './BoardScroll';
 import { TemplateThumbnail } from './TemplateThumbnail';
-import { set } from 'lodash';
 
 /**
  * Define a react component that all the user's boards in a folder
