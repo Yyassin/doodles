@@ -8,7 +8,7 @@ export default function Dashboard() {
 
   const userFolders = [
     ...new Set(['Recent', ...canvases.map((board) => board.folder)]),
-  ];
+  ].filter((folder) => folder !== 'none');
 
   return (
     <div className="flex flex-row h-screen overflow-hidden">

@@ -44,7 +44,7 @@ const notFoundError = (res: Response) =>
 // Get tempalte by ID
 export const handleFindTemplateById = async (req: Request, res: Response) => {
   try {
-    const templateId = req.body.id as string;
+    const templateId = req.query.id as string;
     if (!validateId(templateId, res)) return;
     const template = await findTemplateById(templateId as string);
 
