@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CalendarIcon } from '@radix-ui/react-icons';
 import { Canvas, useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { Thumbnail } from './Thumbnail';
@@ -67,12 +67,14 @@ export const BoardScroll = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [state, setState] = useState<CanvasElementState>();
   const [thumbnailUrl, setThumbnailUrl] = useState('');
-  const { canvases, boardMeta, folder, setBoardMeta } = useCanvasBoardStore([
-    'canvases',
-    'boardMeta',
-    'folder',
-    'setBoardMeta',
-  ]);
+  const { canvases, boardMeta, board, folder, setBoardMeta } =
+    useCanvasBoardStore([
+      'canvases',
+      'boardMeta',
+      'board',
+      'folder',
+      'setBoardMeta',
+    ]);
   const { setCanvasElementState } = useCanvasElementStore([
     'setCanvasElementState',
   ]);
@@ -83,7 +85,9 @@ export const BoardScroll = ({
   };
 
   const { toast } = useToast();
-
+  useEffect(() => {
+    setBoardMeta({ title: '', id: '' });
+  }, [folder]);
   const sortedCavases = (
     searchCanvases.length === 0 ? canvases : searchCanvases
   )
@@ -213,7 +217,7 @@ export const BoardScroll = ({
           </div>
         ))}
       </div>
-      {boardMeta.id && (
+      {boardMeta.id && board === 'Folder' && (
         <Thumbnail
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           setState={setCanvasState}

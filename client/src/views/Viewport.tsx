@@ -21,6 +21,7 @@ import BoardHeader from '@/components/lib/BoardHeader';
 import ShareBoardDialog from '@/components/lib/ShareBoardDialog';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import EditBoardDataDialog from '@/components/lib/EditBoardDataDialog';
+import PublishTemplateDialog from '@/components/lib/PublishTemplateDialog';
 
 /**
  * Primary viewport that houses the canvas
@@ -36,6 +37,7 @@ const Viewport = () => {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const { boardMeta } = useCanvasBoardStore(['boardMeta']);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isPubDialogOpen, setIsPubDialogOpen] = useState(false);
 
   return (
     <RadixContextMenu.Root>
@@ -65,6 +67,10 @@ const Viewport = () => {
           <EditBoardDataDialog
             open={isEditDialogOpen}
             setOpen={setIsEditDialogOpen}
+          />
+          <PublishTemplateDialog
+            open={isPubDialogOpen}
+            setOpen={setIsPubDialogOpen}
           />
         </RadixContextMenu.Trigger>
         <div
@@ -108,6 +114,8 @@ const Viewport = () => {
                   viewportRef={viewportRef}
                   isEditDialogOpen={isEditDialogOpen}
                   setIsEditDialogOpen={setIsEditDialogOpen}
+                  isPubDialogOpen={isPubDialogOpen}
+                  setIsPubDialogOpen={setIsPubDialogOpen}
                 />
 
                 <div

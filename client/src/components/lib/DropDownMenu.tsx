@@ -8,6 +8,7 @@ import {
   InfoCircledIcon,
   Share1Icon,
   BlendingModeIcon,
+  RocketIcon,
 } from '@radix-ui/react-icons';
 import { useAppStore } from '@/stores/AppStore';
 import CanvasColorToolGroup, { canvasColourTypes } from './CanvasBackground';
@@ -46,10 +47,14 @@ const DropDownMenu = ({
   viewportRef,
   isEditDialogOpen,
   setIsEditDialogOpen,
+  isPubDialogOpen,
+  setIsPubDialogOpen,
 }: {
   viewportRef: React.RefObject<HTMLDivElement>;
   isEditDialogOpen: boolean;
   setIsEditDialogOpen: (value: boolean) => void;
+  isPubDialogOpen: boolean;
+  setIsPubDialogOpen: (value: boolean) => void;
 }) => {
   const { isFullscreen } = useAppStore(['isFullscreen']);
   //Handle button functionailities
@@ -118,6 +123,16 @@ const DropDownMenu = ({
           <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
 
           <ResetCanvasDropDownMenu />
+          <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
+
+          <DropdownMenu.Item
+            className="group text-[13px] indent-[10px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 hover:bg-indigo-200"
+            onClick={async () => {
+              setIsPubDialogOpen(!isPubDialogOpen);
+            }}
+          >
+            <RocketIcon /> Publish as Template
+          </DropdownMenu.Item>
           <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
 
           <DropdownMenu.Item
