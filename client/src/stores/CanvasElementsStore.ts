@@ -548,6 +548,8 @@ const removeCanvasElements =
       const types = { ...state.types };
       const strokeColors = { ...state.strokeColors };
       const fillColors = { ...state.fillColors };
+      const fileIds = { ...state.fileIds };
+      const isImagePlaceds = { ...state.isImagePlaceds };
       const attachedFileUrls = { ...state.attachedFileUrls };
       const attachedUrls = { ...state.attachedUrls };
       const fontFamilies = { ...state.fontFamilies };
@@ -565,6 +567,16 @@ const removeCanvasElements =
       const textStrings = { ...state.textStrings };
 
       ids.forEach((id) => {
+        // Delete images from storage, if applicable
+        // const fileId = fileIds[id];
+        // if (fileId !== undefined) {
+        //   const storage = getStorage(firebaseApp);
+        //   const storageRef = ref(storage, `boardImages/${fileId}.jpg`);
+        //   deleteObject(storageRef)
+        //     .then(() => console.log('Deleted image', fileId))
+        //     .catch((error) => console.error('Error deleting image', error));
+        // }
+
         allIds.splice(allIds.indexOf(id), 1);
         delete types[id];
         delete strokeColors[id];
@@ -584,6 +596,8 @@ const removeCanvasElements =
         delete p2s[id];
         delete angles[id];
         delete textStrings[id];
+        delete fileIds[id];
+        delete isImagePlaceds[id];
       });
 
       return {
@@ -607,6 +621,8 @@ const removeCanvasElements =
         p2: p2s,
         textStrings,
         angles,
+        fileIds,
+        isImagePlaceds,
       };
     });
 
