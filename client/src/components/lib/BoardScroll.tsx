@@ -16,6 +16,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { useAuthStore } from '@/stores/AuthStore';
 import { fetchImageFromFirebaseStorage } from '@/views/SignInPage';
+import { commitImageToCache, getImageDataUrl } from '@/lib/image';
+import { BinaryFileData } from '@/types';
 
 export const createStateWithRoughElement = (state: CanvasElementState) => {
   const roughElements: Record<string, CanvasElement['roughElement']> = {};
@@ -49,7 +51,6 @@ export const createStateWithRoughElement = (state: CanvasElementState) => {
     ).roughElement;
   }
   state.roughElements = roughElements;
-  state.fileIds = {};
 
   return state;
 };
@@ -75,9 +76,12 @@ export const BoardScroll = ({
       'folder',
       'setBoardMeta',
     ]);
-  const { setCanvasElementState } = useCanvasElementStore([
-    'setCanvasElementState',
-  ]);
+  const { setCanvasElementState, editCanvasElement, fileIds } =
+    useCanvasElementStore([
+      'setCanvasElementState',
+      'editCanvasElement',
+      'fileIds',
+    ]);
   const { userID } = useAuthStore(['userID']);
 
   const setCanvasState = () => {
@@ -98,6 +102,32 @@ export const BoardScroll = ({
 
       return dateB.getTime() - dateA.getTime();
     });
+
+  useEffect(() => {
+    if (state === undefined) return;
+
+    const canvas = renderElementsOnOffscreenCanvas(state.allIds, {
+      p1: state.p1,
+      p2: state.p2,
+      angles: state.angles,
+      types: state.types,
+      freehandPoints: state.freehandPoints,
+      freehandBounds: state.freehandBounds,
+      textStrings: state.textStrings,
+      fontFamilies: state.fontFamilies,
+      fontSizes: state.fontSizes,
+      fillColors: state.fillColors,
+      isImagePlaceds: state.isImagePlaceds,
+      fileIds: fileIds,
+      roughElements: state.roughElements,
+      opacities: state.opacities,
+      strokeColors: state.strokeColors,
+      strokeWidths: state.strokeWidths,
+    });
+
+    setThumbnailUrl(canvas?.toDataURL('image/png') ?? '');
+    // Rerender on isImagePlaceds change to update the thumbnail
+  }, [state, fileIds]);
 
   return (
     <div className="relative flex flex-col mx-2 h-full">
@@ -123,6 +153,37 @@ export const BoardScroll = ({
                     params: { id: board.id, userID },
                   });
 
+                  // Fetch images from firebase storage
+                  Object.entries(
+                    boardState.data.board.serialized.fileIds,
+                  ).forEach(async ([elemId, fileId]) => {
+                    const imageUrl = await fetchImageFromFirebaseStorage(
+                      `boardImages/${fileId}.jpg`,
+                    );
+                    const dataUrl =
+                      imageUrl && (await getImageDataUrl(imageUrl));
+                    if (!dataUrl)
+                      throw new Error('Failed to resolve saved image dataurls');
+
+                    const binary = {
+                      dataURL: dataUrl,
+                      id: fileId,
+                      mimeType: 'image/jpeg',
+                    } as BinaryFileData;
+
+                    const imageElement = { id: elemId };
+                    commitImageToCache(
+                      {
+                        ...binary,
+                        lastRetrieved: Date.now(),
+                      },
+                      imageElement,
+                      // Will set fileIds, triggering a rerender. A placeholder
+                      // will be shown in the mean time.
+                      editCanvasElement,
+                    );
+                  });
+
                   collabID = boardState.data.collabID;
                   users = boardState.data.users;
                   permission = boardState.data.permissionLevel;
@@ -130,29 +191,7 @@ export const BoardScroll = ({
                   const state = createStateWithRoughElement(
                     boardState.data.board.serialized,
                   );
-
                   setState(state);
-
-                  const canvas = renderElementsOnOffscreenCanvas(state.allIds, {
-                    p1: state.p1,
-                    p2: state.p2,
-                    angles: state.angles,
-                    types: state.types,
-                    freehandPoints: state.freehandPoints,
-                    freehandBounds: state.freehandBounds,
-                    textStrings: state.textStrings,
-                    fontFamilies: state.fontFamilies,
-                    fontSizes: state.fontSizes,
-                    fillColors: state.fillColors,
-                    isImagePlaceds: state.isImagePlaceds,
-                    fileIds: state.fileIds,
-                    roughElements: state.roughElements,
-                    opacities: state.opacities,
-                    strokeColors: state.strokeColors,
-                    strokeWidths: state.strokeWidths,
-                  });
-
-                  setThumbnailUrl(canvas?.toDataURL('image/png') ?? '');
                 }
                 const collaboratorAvatarMeta = (
                   await axios.put(REST.collaborators.getAvatar, {

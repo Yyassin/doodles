@@ -13,6 +13,8 @@ import {
   DRAGGING_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
 } from '@/constants';
+import { firebaseApp } from '@/firebaseDB/firebase';
+import { getStorage, ref, uploadBytes } from 'firebase/storage';
 
 /**
  * Defines helpers for interacting with images in state, and rendering them on the canvas.
@@ -303,7 +305,7 @@ export const commitImageToCache = <T extends Pick<CanvasElement, 'id'>>(
 
       // Update the image element in the application state with the file ID
       // once loaded, this will trigger a rerender to show the image, provided
-      // the element has been placed.
+      // the element has been placed.d
       editImageInState(imageElement.id, { fileId: file.id });
       // Resolve the Promise with the inserted image element
       resolve(imageElement);
@@ -359,6 +361,13 @@ export const injectImageElement = async (
       throw new Error('Failed to insert image');
     }
 
+    // Try to upload the image to firebase, in case it doesn't already exist.
+    const storage = getStorage(firebaseApp);
+    const storageRef = ref(storage, `boardImages/${fileId}.jpg`); // give the image a random id
+    uploadBytes(storageRef, imageFile).catch(() => {
+      alert('Error uploading');
+    });
+
     // Check if file data already exists in the cache
     const existingFileData = fileCache.cache[fileId];
     // If an image doesn't exist in cache, create it and add it.
@@ -410,4 +419,41 @@ export const injectImageElement = async (
     // TODO: Should handle deleting the image from state here
     console.error('Failed to insert image');
   }
+};
+
+/**
+ * Given an image URL, returns a data URL for the image.
+ * @param url The URL of the image.
+ * @returns The data URL for the image.
+ */
+export const getImageDataUrl = async (url: string) => {
+  return new Promise((resolve, reject) => {
+    // Create an image element and load the image from the URL
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+
+    // Set up event listeners to resolve or reject the promise
+    img.onload = function () {
+      // Create a canvas and draw the image on it
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+
+      if (ctx === null) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+
+      // Draw the image on the canvas and resolve the promise with the data URL
+      ctx.drawImage(img, 0, 0);
+      const dataURL = canvas.toDataURL('image/jpeg');
+      resolve(dataURL);
+    };
+    img.onerror = function (error) {
+      reject(new Error('Failed to load image: ' + error));
+    };
+    // Set the image source to the URL, this will trigger the load event
+    img.src = url;
+  });
 };
