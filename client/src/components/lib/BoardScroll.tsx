@@ -129,6 +129,10 @@ export const BoardScroll = ({
     // Rerender on isImagePlaceds change to update the thumbnail
   }, [state, fileIds]);
 
+  const isOwner =
+    boardMeta.users.find((user) => user.collabID === boardMeta.collabID)
+      ?.permission === 'owner';
+
   return (
     <div className="relative flex flex-col mx-2 h-full">
       <div className="w-full h-[250px] overflow-x-scroll scroll whitespace-nowrap scroll-smooth">
@@ -258,6 +262,7 @@ export const BoardScroll = ({
       </div>
       {boardMeta.id && board === 'Folder' && (
         <Thumbnail
+          disabled={!isOwner}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           setState={setCanvasState}
           thumbnail={thumbnailUrl}

@@ -71,7 +71,7 @@ const ContextMenu = () => {
             {attachedUrls[selectedElementIds[0]] === undefined && (
               <FileUpload />
             )}
-            {attachedUrls[selectedElementIds[0]] === undefined && (
+            {attachedUrls[selectedElementIds[0]] !== undefined && (
               <ContextMenuItem
                 onClick={() => {
                   const ids = selectedElementIds;
@@ -95,7 +95,7 @@ const ContextMenu = () => {
             {attachedFileUrls[selectedElementIds[0]] === undefined && (
               <LinkAttach />
             )}
-            {attachedFileUrls[selectedElementIds[0]] === undefined && (
+            {attachedFileUrls[selectedElementIds[0]] !== undefined && (
               <ContextMenuItem
                 onClick={() => {
                   const ids = selectedElementIds;

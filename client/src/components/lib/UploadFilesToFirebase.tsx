@@ -55,7 +55,7 @@ const FileUpload = () => {
         onClick={triggerFileInput}
         className="cursor-pointer text-[13px] leading-none text-violet-500"
       >
-        Choose File
+        Attach a File
       </span>
     </div>
   );

@@ -32,7 +32,7 @@ const LinkAttach = () => {
         onClick={attachLink}
         className="cursor-pointer text-[13px] leading-none text-violet-500"
       >
-        Attach Link
+        Attach a Link
       </button>
     </div>
   );

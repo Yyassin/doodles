@@ -48,7 +48,7 @@ const CursorPresence = memo(() => {
       style={{
         backgroundColor: 'transparent',
         position: 'absolute',
-        zIndex: 4,
+        zIndex: 9,
         pointerEvents: 'none',
       }}
     >

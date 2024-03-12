@@ -29,6 +29,7 @@ import { useCanvasElementStore } from '@/stores/CanvasElementsStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { REST } from '@/constants';
 import { useToast } from '../ui/use-toast';
+import { fetchImageFromFirebaseStorage } from '@/views/SignInPage';
 
 /**
  * An alert dialog that is controlled by the `open` prop. It displays a list of users
@@ -49,11 +50,13 @@ const ShareBoardDialog = ({
 }) => {
   /* Controls visibility of the addition input. */
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const { boardMeta, updatePermission, addUser } = useCanvasBoardStore([
-    'boardMeta',
-    'updatePermission',
-    'addUser',
-  ]);
+  const { boardMeta, updatePermission, addUser, updateAvatars } =
+    useCanvasBoardStore([
+      'boardMeta',
+      'updatePermission',
+      'addUser',
+      'updateAvatars',
+    ]);
   const { setSelectedElements, selectedElementIds } = useCanvasElementStore([
     'setSelectedElements',
     'selectedElementIds',
@@ -164,6 +167,14 @@ const ShareBoardDialog = ({
                     });
                     (newUserEmail.current as HTMLInputElement).value = '';
                     addUser(response.data.user);
+                    const avatar = (response.data.user.avatar ?? '').includes(
+                      'https',
+                    )
+                      ? response.data.user.avatar
+                      : await fetchImageFromFirebaseStorage(
+                          `profilePictures/${response.data.user.avatar}.jpg`,
+                        );
+                    updateAvatars(response.data.user.collabID, avatar);
                     setWebsocketAction(response.data.user, 'addNewCollab');
                   } catch {
                     toast({

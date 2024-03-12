@@ -194,6 +194,11 @@ const CommentsSheetContent = () => {
 
     isViewingComments && selectedElementIds.length === 1 && getComments();
   }, [selectedElementIds, isViewingComments]);
+
+  const isOwner =
+    boardMeta.users.find((user) => user.collabID === boardMeta.collabID)
+      ?.permission === 'owner';
+
   return (
     <div className="flex flex-col h-full">
       <SheetHeader className="bg-[#9493D3] text-left p-[1.5rem]">
@@ -268,7 +273,7 @@ const CommentsSheetContent = () => {
                 </p>
               </div>
             </div>
-            {boardMeta.collabID === comment.collabId && (
+            {(isOwner || boardMeta.collabID === comment.collabId) && (
               <Button
                 className="p-0 h-7 w-15 bg-[#7f7dcf] hover:text-red-600 hover:bg-[#7f7dcf]"
                 onClick={() => {

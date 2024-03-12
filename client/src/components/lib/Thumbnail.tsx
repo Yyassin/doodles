@@ -14,10 +14,12 @@ export const Thumbnail = ({
   thumbnail,
   setState,
   setIsDeleteDialogOpen,
+  disabled,
 }: {
   thumbnail: string;
   setState: () => void;
   setIsDeleteDialogOpen: (value: boolean) => void;
+  disabled: boolean;
 }) => {
   const { setMode } = useAppStore(['setMode']);
   const { boardMeta } = useCanvasBoardStore(['boardMeta']);
@@ -31,6 +33,7 @@ export const Thumbnail = ({
 
         <div className="flex flex-row gap-3">
           <Button
+            disabled={disabled}
             className={cn(
               buttonVariants({ variant: 'ghost', size: 'sm' }),
               'h-full bg-muted text-gray-200 bg-red-600 hover:bg-red-700 hover:text-white justify-start items-center border-2 border-red-600 hover:border-red-700',

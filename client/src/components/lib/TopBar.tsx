@@ -9,6 +9,7 @@ import axios from 'axios';
 import { REST } from '@/constants';
 import { useAuthStore } from '@/stores/AuthStore';
 import Fuse from 'fuse.js';
+import { fetchImageFromFirebaseStorage } from '@/views/SignInPage';
 
 /**
  * Define a react component that the top bar of the main dashboard
@@ -88,7 +89,6 @@ export const TopBar = ({
                       fileIds: {},
                     };
 
-                    //todo
                     const data = await axios.post(REST.board.create, {
                       user: userID,
                       serialized: state,
@@ -100,6 +100,35 @@ export const TopBar = ({
                     delete boardData.fastFireOptions;
                     delete boardData.serialized;
                     delete boardData.uid;
+
+                    const collaboratorAvatarMeta = (
+                      await axios.put(REST.collaborators.getAvatar, {
+                        collaboratorIds: boardData.collaborators,
+                      })
+                    ).data.collaborators;
+                    const collaboratorAvatarUrls = await Promise.all(
+                      Object.entries(
+                        collaboratorAvatarMeta as {
+                          id: string;
+                          avatar: string;
+                        },
+                      ).map(async ([id, avatar]) => ({
+                        id,
+                        avatar: (avatar ?? '').includes('https')
+                          ? avatar
+                          : await fetchImageFromFirebaseStorage(
+                              `profilePictures/${avatar}.jpg`,
+                            ),
+                      })),
+                    );
+                    const collaboratorAvatarUrlsMap =
+                      collaboratorAvatarUrls.reduce(
+                        (acc, { id, avatar }) => {
+                          id && avatar && (acc[id] = avatar);
+                          return acc;
+                        },
+                        {} as Record<string, string>,
+                      ) as Record<string, string>;
 
                     addCanvas(boardData);
 
@@ -114,6 +143,7 @@ export const TopBar = ({
                       collabID: data.data.collabID,
                       users: data.data.users,
                       permission: data.data.permissionLevel,
+                      collaboratorAvatars: collaboratorAvatarUrlsMap,
                     });
 
                     setMode('canvas');
