@@ -17,7 +17,6 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { firebaseApp } from '@/firebaseDB/firebase';
 import { REST } from '@/constants';
 import axios from 'axios';
-import { DialogDescription } from '@radix-ui/react-dialog';
 import { IconDropDown } from './IconDropDown';
 
 /**

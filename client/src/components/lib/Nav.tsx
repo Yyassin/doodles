@@ -1,5 +1,5 @@
-import { ArchiveIcon, FileTextIcon, Inbox, LucideIcon } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { ArchiveIcon, FileTextIcon } from 'lucide-react';
+import React, { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '../ui/button';

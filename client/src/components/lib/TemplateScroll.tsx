@@ -156,7 +156,6 @@ export const TemplateScroll = () => {
       </div>
       <ScrollArea className="w-full whitespace-nowrap rounded-md">
         <div className="flex flex-row gap-2 h-[10rem] mb-6">
-          {/* eslint-disable-next-line sonarjs/cognitive-complexity */}
           {(searchTemplates.length ? searchTemplates : templates).map(
             (template) => (
               <button
