@@ -12,8 +12,8 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-row h-screen overflow-hidden">
-      <Sidebar folders={userFolders} />
-      <Board />
+      {/* <Sidebar folders={userFolders} /> */}
+      <Board folders={userFolders} />
     </div>
   );
 }

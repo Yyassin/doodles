@@ -298,9 +298,16 @@ export default function SignInPage() {
   };
 
   return (
-    <Card className="rounded-none">
+    <Card className="rounded-none border-none shadow-none">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl">Log In</CardTitle>
+        <div className="flex">
+          <img
+            className="w-[12rem] h-[auto]"
+            src="./doodles-icon.png"
+            alt="logo"
+          />
+        </div>
+        <CardTitle className="text-2xl text-[#98a2e3]">Log In</CardTitle>
         <CardDescription>
           Enter your email and password below to Log In
         </CardDescription>
@@ -327,7 +334,11 @@ export default function SignInPage() {
             ref={passwordRef}
           />
         </div>
-        <Button disabled={loading} onClick={handleSignUp} className="w-full">
+        <Button
+          disabled={loading}
+          onClick={handleSignUp}
+          className="w-full mt-6 bg-[#98a2e3] hover:bg-[#7f8cd9]"
+        >
           Log In
         </Button>
         <div />
@@ -348,10 +359,14 @@ export default function SignInPage() {
         </div>
       </CardContent>
       <CardFooter>
-        <div className="w-100 text-center mt-2">
-          <button onClick={() => setMode('signup')}>
-            Need an Account? Sign Up Here!
-          </button>
+        <div className="w-100 text-center mt-2 select-none text-[#98a2e3]">
+          Need an Account?{' '}
+          <span
+            className="hover:underline hover:cursor-pointer"
+            onClick={() => setMode('signup')}
+          >
+            Sign Up Here!
+          </span>
         </div>
       </CardFooter>
     </Card>

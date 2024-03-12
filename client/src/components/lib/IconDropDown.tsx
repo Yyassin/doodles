@@ -72,10 +72,6 @@ export const IconDropDown = () => {
           align="center"
           alignOffset={0}
         >
-          <DropdownMenu.Item className="group text-[13px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[25px] relative px-[25px] select-none outline-none  data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-[#7f7dcf]">
-            Test
-          </DropdownMenu.Item>
-          <DropdownMenu.Separator className="h-[1px] bg-neutral-200 m-[5px]" />
           <DropdownMenu.Item
             onClick={handleLogOut}
             className="group text-[13px] leading-none text-violet11 rounded-[3px] flex items-center h-[25px] px-[25px] relative px-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-violet9 data-[highlighted]:text-white hover:bg-red-600"
