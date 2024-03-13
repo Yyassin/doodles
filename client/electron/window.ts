@@ -14,7 +14,7 @@ import isDev from 'electron-is-dev';
  * @param devServer The development server URL (empty string if not in development mode).
  */
 export const setupWindow = (win: BrowserWindow, devServer: string) => {
-  win.setSize(1000, 800);
+  win.setSize(800, 800);
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString());
@@ -84,13 +84,13 @@ export const setupTray = (win: BrowserWindow, tray: Tray, appName: string) => {
     {
       label: 'Show App',
       click: () => {
-        win && win.show();
+        win.show();
       },
     },
     {
       label: 'Exit',
       click: () => {
-        win && win.close();
+        win.close();
       },
     },
   ]);

@@ -34,21 +34,22 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
 
   const closeHandler = useCallback(() => {
     // Need to wait for the message to send.
-    socket?.leaveRoom().then(() => {
-      ipcAPI.close('close');
-    });
+    socket
+      ? socket?.leaveRoom().finally(() => {
+          ipcAPI.close('close');
+        })
+      : ipcAPI.close('close');
     // HACK: We need to listen to these to get the updated socket since
     // the socket is mutable, it won't trigger rerenders on change.
   }, [socket, userId, roomID]);
 
   return (
-    <div className="TitlebarWin">
+    <div className="TitlebarWin" style={{ zIndex: 9999 }}>
       <div
         className={isWindowActive ? 'Title-Bar' : 'Title-Bar-inactive'}
         style={{
-          backgroundColor: `rgba(129, 140, 248, ${isWindowActive ? 0.8 : 0.6})`,
+          backgroundColor: `rgba(129, 140, 248, ${isWindowActive ? 1 : 0.9})`,
           ...(isTransparent && { position: 'absolute' }),
-          zIndex: 10,
         }}
       >
         <div className="TitlebarWin-drag-region"></div>

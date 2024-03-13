@@ -2,6 +2,7 @@ import { startScreenShare } from '@/lib/screenshare';
 import { createPeer, handleNegotiationNeededEvent } from '@/lib/webrtc';
 import { useAppStore } from '@/stores/AppStore';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { StreamSource } from '@/types';
 import { useEffect, useRef, useState } from 'react';
@@ -30,6 +31,7 @@ const useRTCProducer = (
   ]);
   const { socket, roomID } = useWebSocketStore(['socket', 'roomID']);
   const { userEmail: userId } = useAuthStore(['userEmail']);
+  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
   useEffect(() => {
     // Cleanup on component unmount
@@ -126,7 +128,7 @@ const useRTCProducer = (
           peer,
           'broadcast',
           roomID,
-          userId,
+          `${userId}-${boardMeta.collabID}`,
           cleanup,
         ),
     );

@@ -56,6 +56,8 @@ const createWindow = () => {
     transparent: true,
     frame: false,
     title: APP_NAME,
+    minWidth: 600,
+    minHeight: 400,
   });
   setupWindow(win, VITE_DEV_SERVER_URL ?? '');
   win.on('closed', () => (win = null));

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Canvas from '@/components/lib/Canvas';
 import DropDownMenu from '@/components/lib/DropDownMenu';
 import ToolBar from '@/components/lib/ToolBar';
@@ -22,6 +22,9 @@ import ShareBoardDialog from '@/components/lib/ShareBoardDialog';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 import EditBoardDataDialog from '@/components/lib/EditBoardDataDialog';
 import PublishTemplateDialog from '@/components/lib/PublishTemplateDialog';
+import { useWebSocketStore } from '@/stores/WebSocketStore';
+import { Comment, useCommentsStore } from '@/stores/CommentsStore';
+import { ipcAPI } from '@/data/ipc/ipcMessages';
 
 /**
  * Primary viewport that houses the canvas
@@ -30,7 +33,18 @@ import PublishTemplateDialog from '@/components/lib/PublishTemplateDialog';
  * @authors Yousef Yassin, Abdalla Abdelhadi, Zakariyya Almalki
  */
 const Viewport = () => {
-  const { tool } = useAppStore(['tool']);
+  const { tool, isTransparent, isViewingComments } = useAppStore([
+    'tool',
+    'isTransparent',
+    'isViewingComments',
+  ]);
+  const { updateComment, addComment, removeComment } = useCommentsStore([
+    'updateComment',
+    'addComment',
+    'removeComment',
+  ]);
+  const { socket } = useWebSocketStore(['socket']);
+
   const viewportRef = useRef<HTMLDivElement>(null);
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
   const isDrawingSelected = isDrawingTool(tool);
@@ -38,6 +52,41 @@ const Viewport = () => {
   const { boardMeta } = useCanvasBoardStore(['boardMeta']);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isPubDialogOpen, setIsPubDialogOpen] = useState(false);
+
+  useEffect(() => {
+    socket?.on('addComment', (msg) => {
+      const { elemID, comment } = (
+        msg as { payload: { elemID: string; comment: Comment } }
+      ).payload;
+      selectedElementIds[0] === elemID &&
+        isViewingComments &&
+        addComment(comment);
+      ipcAPI &&
+        ipcAPI.notification({
+          title: comment.username,
+          body: comment.comment,
+          avatar: comment.avatar,
+        });
+    });
+
+    socket?.on('removeComment', (msg) => {
+      const { elemID, comment } = (
+        msg as { payload: { elemID: string; comment: Comment } }
+      ).payload;
+      selectedElementIds[0] === elemID &&
+        isViewingComments &&
+        removeComment(comment.uid);
+    });
+
+    socket?.on('updateComment', (msg) => {
+      const { elemID, comment } = (
+        msg as { payload: { elemID: string; comment: Comment } }
+      ).payload;
+      selectedElementIds[0] === elemID &&
+        isViewingComments &&
+        updateComment(comment);
+    });
+  }, [socket, isViewingComments, selectedElementIds]);
 
   return (
     <RadixContextMenu.Root>
@@ -81,11 +130,15 @@ const Viewport = () => {
           }}
         >
           {/* The header */}
-          <BoardHeader
-            setIsShareDialogOpen={setIsShareDialogOpen}
-            isShareDialogOpen={isShareDialogOpen}
-          />
-          <Separator />
+          {!isTransparent && (
+            <div className="z-10">
+              <BoardHeader
+                setIsShareDialogOpen={setIsShareDialogOpen}
+                isShareDialogOpen={isShareDialogOpen}
+              />
+              <Separator />
+            </div>
+          )}
           {/* The Canvas */}
           <div
             style={{
@@ -122,7 +175,7 @@ const Viewport = () => {
                   className="flex gap-[0.5rem] z-10"
                   style={{
                     position: 'absolute',
-                    bottom: '1rem',
+                    bottom: `calc(1rem + ${!isTransparent ? 30 : 0}px)`,
                     left: '1rem',
                   }}
                 >

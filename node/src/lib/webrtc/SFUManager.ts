@@ -52,7 +52,10 @@ export class SFUManager extends Singleton<SFUManager>() {
         };
         const success = await sfuManager.addIceCandidate(id, room, candidate);
         const response = success ? sendSuccessResponse : sendErrorResponse;
-        response(socket, 'Received Ice Candidate');
+        response(
+          socket,
+          `Received Ice Candidate ${success ? 'Success' : 'Fail'}`,
+        );
       },
     );
   }

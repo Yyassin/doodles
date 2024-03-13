@@ -12,14 +12,17 @@ const IconButton = ({
   label,
   active,
   onClick,
+  disabled,
 }: {
   children?: React.ReactNode;
   active?: boolean;
   label: string;
   onClick: (label: string) => void;
+  disabled?: boolean;
 }) => {
   return (
     <CanvasFlatButton
+      disabled={disabled}
       className={`rounded-md ${
         active ? 'bg-indigo-200 hover:bg-indigo-200' : ''
       }`}

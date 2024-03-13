@@ -59,9 +59,16 @@ const handleNotification = (
   _event: IpcMainEvent,
   { title, body }: { title: string; body: string },
 ) => {
+  const window = getWindow(_event);
+  if (!window?.isMinimized()) {
+    return;
+  }
   notification.title = title;
   notification.body = body;
   notification.show();
+  notification.on('click', () => {
+    window?.show();
+  });
 };
 
 /**

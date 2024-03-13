@@ -1,5 +1,7 @@
+import { getScaleOffset } from '@/lib/canvasElements/render';
 import { extractCollabID, extractUsername } from '@/lib/misc';
 import { idToColour } from '@/lib/userColours';
+import { useAppStore } from '@/stores/AppStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { Vector2 } from '@/types';
 import { MousePointer2 } from 'lucide-react';
@@ -42,6 +44,12 @@ Cursor.displayName = 'CursorPresence';
 
 const CursorPresence = memo(() => {
   const { cursorPositions } = useWebSocketStore(['cursorPositions']);
+  const { panOffset, zoom, appHeight, appWidth } = useAppStore([
+    'panOffset',
+    'zoom',
+    'appHeight',
+    'appWidth',
+  ]);
   return (
     <svg
       className="h-[100vh] w-[100vw]"
@@ -53,18 +61,17 @@ const CursorPresence = memo(() => {
       }}
     >
       <g>
-        {Object.entries(cursorPositions).map(
-          ([userId, position]) =>
-            position.x !== null &&
-            position.y !== null && (
-              <Cursor
-                key={userId}
-                userId={userId}
-                x={position.x}
-                y={position.y}
-              />
-            ),
-        )}
+        {Object.entries(cursorPositions).map(([userId, position]) => {
+          if (position.x === null || position.y === null) return;
+          // Cursor Positions are in the absolute frame, but we send everything
+          // in the canvas relative frame (since the other clients may have
+          // a different zoom, and offset. So inverse the transformation
+          // according to the current zoom and panOffset for *our* client)
+          const scaleOffset = getScaleOffset(appHeight, appWidth, zoom);
+          const posX = position.x * zoom - scaleOffset.x + panOffset.x * zoom;
+          const posY = position.y * zoom - scaleOffset.y + panOffset.y * zoom;
+          return <Cursor key={userId} userId={userId} x={posX} y={posY} />;
+        })}
       </g>
     </svg>
   );

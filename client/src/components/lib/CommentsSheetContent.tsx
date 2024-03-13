@@ -82,7 +82,7 @@ const CommentsSheetContent = () => {
     'userPicture',
     'userID',
   ]);
-  const { socket, setWebsocketAction } = useWebSocketStore([
+  const { setWebsocketAction } = useWebSocketStore([
     'socket',
     'setWebsocketAction',
   ]);
@@ -147,35 +147,6 @@ const CommentsSheetContent = () => {
     ]);
 
   const { isViewingComments } = useAppStore(['isViewingComments']);
-
-  useEffect(() => {
-    socket?.on('addComment', (msg) => {
-      const { elemID, comment } = (
-        msg as { payload: { elemID: string; comment: Comment } }
-      ).payload;
-      selectedElementIds[0] === elemID &&
-        isViewingComments &&
-        addComment(comment);
-    });
-
-    socket?.on('removeComment', (msg) => {
-      const { elemID, comment } = (
-        msg as { payload: { elemID: string; comment: Comment } }
-      ).payload;
-      selectedElementIds[0] === elemID &&
-        isViewingComments &&
-        removeComment(comment.uid);
-    });
-
-    socket?.on('updateComment', (msg) => {
-      const { elemID, comment } = (
-        msg as { payload: { elemID: string; comment: Comment } }
-      ).payload;
-      selectedElementIds[0] === elemID &&
-        isViewingComments &&
-        updateComment(comment);
-    });
-  }, [socket, isViewingComments, selectedElementIds]);
 
   useEffect(() => {
     const getComments = async () => {
@@ -368,6 +339,7 @@ const CommentsSheetContent = () => {
 
               addComment(newComment);
               setTextInput('');
+              console.log('comment');
               setWebsocketAction(
                 { comment: newComment, elemID: selectedElementIds[0] },
                 'addComment',

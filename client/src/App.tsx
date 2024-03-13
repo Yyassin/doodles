@@ -24,6 +24,7 @@ function App() {
   return (
     <div
       style={{
+        overflow: 'hidden',
         backgroundColor: 'transparent',
         height: '100%',
         // Add border when transparent
@@ -35,7 +36,9 @@ function App() {
       }}
     >
       {IS_ELECTRON_INSTANCE && <Titlebar fg={'#000'} title={'Doodles'} />}
-      <Bootstrap />
+      <div className={`overflow-auto h-full ${!isTransparent && 'bg-white'}`}>
+        <Bootstrap />
+      </div>
       <Toaster />
     </div>
   );

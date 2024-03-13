@@ -149,7 +149,7 @@ export const BoardScroll = () => {
       ?.permission === 'owner';
 
   return (
-    <div className="w-full h-full bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="w-full h-full p-4 backdrop-blur overflow-auto">
       <div className="flex flex-row justify-between items-center">
         <form className="flex-grow pr-6">
           <div className="relative">
