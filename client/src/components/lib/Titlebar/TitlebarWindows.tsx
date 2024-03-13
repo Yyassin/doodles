@@ -34,9 +34,11 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
 
   const closeHandler = useCallback(() => {
     // Need to wait for the message to send.
-    socket?.leaveRoom().then(() => {
-      ipcAPI.close('close');
-    });
+    socket
+      ? socket?.leaveRoom().finally(() => {
+          ipcAPI.close('close');
+        })
+      : ipcAPI.close('close');
     // HACK: We need to listen to these to get the updated socket since
     // the socket is mutable, it won't trigger rerenders on change.
   }, [socket, userId, roomID]);

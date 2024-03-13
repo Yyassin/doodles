@@ -84,13 +84,13 @@ export const setupTray = (win: BrowserWindow, tray: Tray, appName: string) => {
     {
       label: 'Show App',
       click: () => {
-        win && win.show();
+        win.show();
       },
     },
     {
       label: 'Exit',
       click: () => {
-        win && win.close();
+        win.close();
       },
     },
   ]);
