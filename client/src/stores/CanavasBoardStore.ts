@@ -74,6 +74,7 @@ interface CanvasBoardActions {
     permission: string,
     isOwnPerm: boolean,
   ) => void;
+  updateAvatars: (collabID: string, avatar: string) => void;
   addUser: (user: SharedUser) => void;
   setBoardMeta: (meta: Partial<CanvasBoardState['boardMeta']>) => void;
   setTag: (tags: Array<string>) => void;
@@ -145,6 +146,20 @@ const updateCanvasInfo =
       return { ...state, canvases };
     });
 
+const updateAvatars =
+  (set: SetState<CanvasBoardStore>) => (collabID: string, avatar: string) =>
+    set((state) => {
+      const avatars = {
+        ...state.boardMeta.collaboratorAvatars,
+        [collabID]: avatar,
+      };
+
+      return {
+        ...state,
+        boardMeta: { ...state.boardMeta, collaboratorAvatars: avatars },
+      };
+    });
+
 const updatePermission =
   (set: SetState<CanvasBoardStore>) =>
   (collabID: string, permission: string, isOwnPerm: boolean) =>
@@ -187,5 +202,6 @@ const CanvasBoardStore = create<CanvasBoardStore>()((set) => ({
   addUser: addUser(set),
   setBoardMeta: setBoardMeta(set),
   setTag: setTag(set),
+  updateAvatars: updateAvatars(set),
 }));
 export const useCanvasBoardStore = createStoreWithSelectors(CanvasBoardStore);

@@ -245,9 +245,18 @@ export default function SignUp() {
   >(null);
 
   return (
-    <Card className="rounded-none">
+    <Card className="rounded-none border-none shadow-none">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl">Create an account</CardTitle>
+        <div className="flex">
+          <img
+            className="w-[12rem] h-[auto]"
+            src="./doodles-icon.png"
+            alt="logo"
+          />
+        </div>
+        <CardTitle className="text-2xl text-[#98a2e3]">
+          Create an account
+        </CardTitle>
         <CardDescription>
           Enter your information below to create your account
         </CardDescription>
@@ -256,8 +265,10 @@ export default function SignUp() {
         )}
       </CardHeader>
       <CardContent className="grid gap-1">
-        <div className="grid grid-cols-1 gap-1">
-          <Label htmlFor="firstName">First Name</Label>
+        <div className="grid grid-cols-1 gap-1 pt-4">
+          <Label className="text-[#98a2e3]" htmlFor="firstName">
+            First Name
+          </Label>
           <Input
             ref={firstNameRef}
             id="firstName"
@@ -266,8 +277,10 @@ export default function SignUp() {
             required
           />
         </div>
-        <div className="grid grid-cols-1 gap-1">
-          <Label htmlFor="lastName">Last Name</Label>
+        <div className="grid grid-cols-1 gap-1 pt-4">
+          <Label className="text-[#98a2e3]" htmlFor="lastName">
+            Last Name
+          </Label>
           <Input
             ref={lastNameRef}
             id="lastName"
@@ -276,8 +289,10 @@ export default function SignUp() {
             required
           />
         </div>
-        <div className="grid grid-cols-1 gap-1">
-          <Label htmlFor="profilePicture">Profile Picture</Label>
+        <div className="grid grid-cols-1 gap-1 pt-4">
+          <Label className="text-[#98a2e3]" htmlFor="profilePicture">
+            Profile Picture
+          </Label>
           <Input
             ref={profilePictureRef}
             id="profilePicture"
@@ -289,7 +304,7 @@ export default function SignUp() {
         </div>
         {profilePictureThumbnail && (
           <div>
-            <Label>Profile Picture Thumbnail</Label>
+            <Label className="text-[#98a2e3]">Profile Picture Thumbnail</Label>
             <img
               src={profilePictureThumbnail}
               alt="Profile Thumbnail"
@@ -301,7 +316,9 @@ export default function SignUp() {
         <div className="h-4" />
 
         <div className="grid grid-cols-1 gap-1">
-          <Label htmlFor="email">Email</Label>
+          <Label className="text-[#98a2e3]" htmlFor="email">
+            Email
+          </Label>
           <Input
             ref={emailRef}
             id="email"
@@ -309,8 +326,10 @@ export default function SignUp() {
             placeholder="name@example.com"
           />
         </div>
-        <div className="grid gap-2">
-          <Label htmlFor="password">Password</Label>
+        <div className="grid gap-2 pt-4">
+          <Label className="text-[#98a2e3]" htmlFor="password">
+            Password
+          </Label>
           <Input
             id="password"
             type="password"
@@ -318,7 +337,11 @@ export default function SignUp() {
             ref={passwordRef}
           />
         </div>
-        <Button disabled={loading} onClick={handleSignUp} className="w-full">
+        <Button
+          disabled={loading}
+          onClick={handleSignUp}
+          className="w-full mt-6 bg-[#98a2e3] hover:bg-[#7f8cd9]"
+        >
           Sign Up with Email
         </Button>
         <div />
@@ -339,10 +362,14 @@ export default function SignUp() {
         </div>
       </CardContent>
       <CardFooter>
-        <div className="w-100 text-center mt-2">
-          <a onClick={() => setMode('signin')}>
-            Already Have an Account? Log In!
-          </a>
+        <div className="w-100 text-center mt-2 select-none text-[#98a2e3]">
+          Already Have an Account?{' '}
+          <span
+            className="hover:underline hover:cursor-pointer"
+            onClick={() => setMode('signin')}
+          >
+            Log In!
+          </span>
         </div>
       </CardFooter>
     </Card>

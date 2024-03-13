@@ -149,7 +149,7 @@ export default class WebsocketClient {
       this.socket?.close();
     });
 
-    this.socket.addEventListener(EVENT.MESSAGE, (msg) => {
+    this.socket.addEventListener(EVENT.MESSAGE, async (msg) => {
       const jsonMsg = JSON.parse(msg.data) as WSMessageType;
 
       if (jsonMsg.status !== undefined) {
@@ -163,10 +163,10 @@ export default class WebsocketClient {
 
       const injectableCallbacks = this.injectableCallbacks[jsonMsg.topic];
       if (injectableCallbacks !== undefined) {
-        injectableCallbacks(jsonMsg);
+        await injectableCallbacks(jsonMsg);
       } else {
         const callback = this.callBacks[jsonMsg.topic];
-        callback && callback(jsonMsg.payload);
+        callback && (await callback(jsonMsg.payload));
       }
     });
   }

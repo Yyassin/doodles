@@ -15,6 +15,7 @@ import { Vector2 } from '@/types';
 import axios from 'axios';
 import { REST } from '@/constants';
 import { createStateWithRoughElement } from '@/components/lib/BoardScroll';
+import { fetchImageFromFirebaseStorage } from '@/views/SignInPage';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -99,12 +100,13 @@ export const useSocket = () => {
     'fileIds',
   ]);
 
-  const { boardMeta, setBoardMeta, updateCanvas, addUser } =
+  const { boardMeta, setBoardMeta, updateCanvas, addUser, updateAvatars } =
     useCanvasBoardStore([
       'boardMeta',
       'setBoardMeta',
       'updateCanvas',
       'addUser',
+      'updateAvatars',
     ]);
 
   const socket = useRef<WebsocketClient>();
@@ -247,7 +249,13 @@ export const useSocket = () => {
         x: cursorPosition.x,
         y: cursorPosition.y,
       }),
-    addNewCollab: (newUser: SharedUser) => {
+    addNewCollab: async (newUser: SharedUser) => {
+      const avatar = (newUser.avatar ?? '').includes('https')
+        ? newUser.avatar
+        : await fetchImageFromFirebaseStorage(
+            `profilePictures/${newUser.avatar}.jpg`,
+          );
+      avatar && updateAvatars(newUser.collabID, avatar);
       addUser(newUser);
     },
     addAttachedFileUrl: (params: {
