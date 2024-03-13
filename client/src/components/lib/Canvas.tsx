@@ -741,13 +741,13 @@ export default function Canvas() {
             rel="noopener noreferrer"
             style={{
               position: 'absolute',
-              bottom: 0,
-              left: '50%',
+              bottom: '1.5rem',
+              left: '47.5%',
               transform: 'translateX(-50%)',
               zIndex: 10,
             }}
           >
-            <FileIcon />
+            <FileIcon className="w-[20px] h-auto text-[#818cf8]" />
           </a>
         )}
 
@@ -759,13 +759,13 @@ export default function Canvas() {
             rel="noopener noreferrer"
             style={{
               position: 'absolute',
-              bottom: 0,
-              left: '50%',
+              bottom: '1.5rem',
+              left: '52.5%',
               transform: 'translateX(-50%)',
               zIndex: 10,
             }}
           >
-            <Link2Icon />
+            <Link2Icon className="w-[20px] h-auto text-[#818cf8]" />
           </a>
         )}
 
