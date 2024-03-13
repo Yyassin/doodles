@@ -42,13 +42,12 @@ const TitlebarWin = ({ title, fg }: { title: string; fg: string }) => {
   }, [socket, userId, roomID]);
 
   return (
-    <div className="TitlebarWin">
+    <div className="TitlebarWin" style={{ zIndex: 9999 }}>
       <div
         className={isWindowActive ? 'Title-Bar' : 'Title-Bar-inactive'}
         style={{
-          backgroundColor: `rgba(129, 140, 248, ${isWindowActive ? 0.8 : 0.6})`,
+          backgroundColor: `rgba(129, 140, 248, ${isWindowActive ? 1 : 0.9})`,
           ...(isTransparent && { position: 'absolute' }),
-          zIndex: 10,
         }}
       >
         <div className="TitlebarWin-drag-region"></div>

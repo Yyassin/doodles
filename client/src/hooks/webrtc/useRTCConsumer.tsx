@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { useEffect, useRef } from 'react';
 import { sfu } from '@/api';
+import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
 
 /**
  * Hook that handles creating a consumer if a stream is initiated inside a room.
@@ -25,6 +26,7 @@ const useRTCConsumer = (
     'setActiveProducerId',
   ]);
   const { userEmail: userId } = useAuthStore(['userEmail']);
+  const { boardMeta } = useCanvasBoardStore(['boardMeta']);
 
   useEffect(() => {
     // Cleanup on component unmount
@@ -112,7 +114,7 @@ const useRTCConsumer = (
           peer,
           'subscribe',
           roomID,
-          userId,
+          `${userId}-${boardMeta.collabID}`,
           cleanup,
         ),
     );

@@ -56,7 +56,10 @@ const DropDownMenu = ({
   isPubDialogOpen: boolean;
   setIsPubDialogOpen: (value: boolean) => void;
 }) => {
-  const { isFullscreen } = useAppStore(['isFullscreen']);
+  const { isFullscreen, isTransparent } = useAppStore([
+    'isFullscreen',
+    'isTransparent',
+  ]);
   //Handle button functionailities
 
   const handleInfo = () => {
@@ -78,7 +81,7 @@ const DropDownMenu = ({
           style={{
             position: 'absolute',
             right: '1rem',
-            bottom: '1rem',
+            bottom: `calc(1rem + ${!isTransparent ? 30 : 0}px)`,
           }}
         >
           <DropDownIcon />

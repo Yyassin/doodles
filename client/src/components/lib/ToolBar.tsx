@@ -62,7 +62,7 @@ const ToolButton = ({
   active: boolean;
   children?: React.ReactNode;
 }) => {
-  const { setTool } = useAppStore(['setTool']);
+  const { setTool, isTransparent } = useAppStore(['setTool', 'isTransparent']);
   const {
     removeCanvasElements,
     setSelectedElements,
@@ -130,7 +130,12 @@ const ToolButton = ({
       };
 
   return (
-    <IconButton label={capitalize(tool)} active={active} onClick={onClick}>
+    <IconButton
+      label={capitalize(tool)}
+      active={active}
+      onClick={onClick}
+      disabled={tool === 'pan' && isTransparent}
+    >
       {children}
     </IconButton>
   );

@@ -278,6 +278,7 @@ export default class WebsocketClient {
    */
   async iceCandidate(candidate: RTCIceCandidate) {
     this.checkSocket();
+    console.log(this.userId);
     return this.send({
       topic: WS_TOPICS.ICE_CANDIDATE,
       payload: { candidate },

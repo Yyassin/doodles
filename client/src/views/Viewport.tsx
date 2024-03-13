@@ -30,7 +30,7 @@ import PublishTemplateDialog from '@/components/lib/PublishTemplateDialog';
  * @authors Yousef Yassin, Abdalla Abdelhadi, Zakariyya Almalki
  */
 const Viewport = () => {
-  const { tool } = useAppStore(['tool']);
+  const { tool, isTransparent } = useAppStore(['tool', 'isTransparent']);
   const viewportRef = useRef<HTMLDivElement>(null);
   const { selectedElementIds } = useCanvasElementStore(['selectedElementIds']);
   const isDrawingSelected = isDrawingTool(tool);
@@ -81,11 +81,15 @@ const Viewport = () => {
           }}
         >
           {/* The header */}
-          <BoardHeader
-            setIsShareDialogOpen={setIsShareDialogOpen}
-            isShareDialogOpen={isShareDialogOpen}
-          />
-          <Separator />
+          {!isTransparent && (
+            <div className="z-10">
+              <BoardHeader
+                setIsShareDialogOpen={setIsShareDialogOpen}
+                isShareDialogOpen={isShareDialogOpen}
+              />
+              <Separator />
+            </div>
+          )}
           {/* The Canvas */}
           <div
             style={{
@@ -122,7 +126,7 @@ const Viewport = () => {
                   className="flex gap-[0.5rem] z-10"
                   style={{
                     position: 'absolute',
-                    bottom: '1rem',
+                    bottom: `calc(1rem + ${!isTransparent ? 30 : 0}px)`,
                     left: '1rem',
                   }}
                 >

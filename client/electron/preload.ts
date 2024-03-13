@@ -84,7 +84,7 @@ function useLoading() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #282c34;
+  background: #818cf8;
   z-index: 9;
 }
     `;

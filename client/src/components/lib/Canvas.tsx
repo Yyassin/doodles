@@ -60,6 +60,7 @@ export default function Canvas() {
     panOffset,
     setPanOffset,
     setAction,
+    isTransparent,
   } = useAppStore([
     'action',
     'tool',
@@ -251,7 +252,7 @@ export default function Canvas() {
    * @param e The mouse event containing the raw mouse coordinates.
    * @returns The normalized mouse coordinates.
    */
-  const titlebarHeight = IS_ELECTRON_INSTANCE ? 30 : 0;
+  const titlebarHeight = !isTransparent && IS_ELECTRON_INSTANCE ? 30 : 0;
   const getMouseCoordinates = (e: MouseEvent<HTMLCanvasElement>) => {
     const clientX = (e.clientX - panOffset.x * zoom + scaleOffset.x) / zoom;
     const clientY =
@@ -535,15 +536,11 @@ export default function Canvas() {
 
   const sendCursorPositions = React.useCallback(
     throttle((x: number | null, y: number | null) => {
-      socket?.sendMsgRoom(
-        'updateCursorPosition',
-        // make collab id
-        {
-          x,
-          y,
-          userId: userEmail,
-        },
-      );
+      socket?.sendMsgRoom('updateCursorPosition', {
+        x,
+        y,
+        userId: `${userEmail}-${boardMeta.collabID}`,
+      });
     }, 16),
     [userEmail, socket],
   );

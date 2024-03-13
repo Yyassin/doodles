@@ -105,7 +105,6 @@ const BoardHeader = ({
       style={{
         backgroundColor: 'white',
         flexGrow: 1,
-        zIndex: 10,
       }}
     >
       <div className="flex flex-row">
