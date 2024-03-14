@@ -9,7 +9,7 @@
 > **Doodles** is a virtual, collraborative, real-time whiteboard application that aims to boost productivity. The application features an intuitive interface that serves as a flexible canvas for drawing shapes, attaching images, generating them with Stable Diffusion, documenting with text-based notes, and annotating files— all of which are supported by rich customization options. The application also supports screen-sharing, and all this functionality is extended in a native desktop application, that doubles as a transparent whiteboard widget.
 
 ## Contributors
-Floralyfe was developed throughout Fall 2023 - Winter 2024 by \
+*Doodles* was developed throughout Fall 2023 - Winter 2024 by \
 [Abdalla Abdelhadi](https://github.com/AbdallaAbdelhadi) \
 [Dana El Sherif](https://github.com/TheDana1) \
 [Ibrahim Almalki](https://github.com/Eebro) \
