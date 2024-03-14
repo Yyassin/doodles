@@ -62,7 +62,7 @@ interface CanvasBoardActions {
   setCanvases: (canvases: Canvas[]) => void;
   addCanvas: (canvas: Canvas) => void;
   removeCanvas: (id: string) => void;
-  updateCanvas: (id: string, meta: string) => void;
+  updateCanvas: (id: string, meta: Partial<Canvas>) => void;
   updateCanvasInfo: (
     id: string,
     title: string,
@@ -126,10 +126,10 @@ const removeCanvas = (set: SetState<CanvasBoardStore>) => (id: string) =>
   });
 
 const updateCanvas =
-  (set: SetState<CanvasBoardStore>) => (id: string, updatedAt: string) =>
+  (set: SetState<CanvasBoardStore>) => (id: string, meta: Partial<Canvas>) =>
     set((state) => {
       const canvases = state.canvases.map((canvas) =>
-        canvas.id === id ? { ...canvas, updatedAt } : canvas,
+        canvas.id === id ? { ...canvas, ...meta } : canvas,
       );
 
       return { ...state, canvases };

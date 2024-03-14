@@ -5,6 +5,7 @@ import {
   handleDeleteBoard,
   handleFindBoardById,
   handleGetCollaboratorBoards,
+  handleRemoveCollaborator,
   handleUpdateBoard,
 } from './board.controller';
 
@@ -33,5 +34,8 @@ router.put('/addUser', handleAddUserbyEmail);
 
 // DELETE board by ID
 router.delete('/deleteBoard', handleDeleteBoard);
+
+// PUT new collaborators a board
+router.put('/updateCollabs', handleRemoveCollaborator);
 
 export default router;

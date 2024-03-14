@@ -26,6 +26,8 @@ export const Actions = [
   'addNewCollab',
   'addAttachedFileUrl',
   'removeAttachedFileUrl',
+  'removeCollab',
+  'changeBoardMeta',
 ] as const;
 export type ActionsType = typeof Actions;
 
@@ -46,6 +48,14 @@ export interface UpdatedTimeMessage {
   lastModified: string;
 }
 
+export interface BoardMetaData {
+  boardID: string;
+  title: string;
+  tags: string[];
+  folder: string;
+  lastModified: string;
+}
+
 /** Definitions */
 interface WebSocketState {
   // Reference for sending non-stateful messages (WebRTC signalling)
@@ -59,6 +69,7 @@ interface WebSocketState {
     | string
     | string[]
     | UpdatedTimeMessage
+    | BoardMetaData
     | { elemID: string; comment: Partial<Comment> }
     | { collabID: string; permission: string }
     | { selectedElementIds: string[]; downloadURL: string };
@@ -79,6 +90,7 @@ interface WebSocketActions {
       | string
       | string[]
       | UpdatedTimeMessage
+      | BoardMetaData
       | { elemID: string; comment: Partial<Comment> }
       | { collabID: string; permission: string }
       | { selectedElementIds: string[]; downloadURL: string },
@@ -122,6 +134,7 @@ const setWebsocketAction =
       | string
       | string[]
       | UpdatedTimeMessage
+      | BoardMetaData
       | { elemID: string; comment: Partial<Comment> }
       | { collabID: string; permission: string }
       | { selectedElementIds: string[]; downloadURL: string },

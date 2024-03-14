@@ -13,7 +13,7 @@ import {
 import { CanvasElement } from '@/stores/CanvasElementsStore';
 import { EVENT } from './types';
 import { ValueOf } from './lib/misc';
-import { UpdatedTimeMessage } from './stores/WebSocketStore';
+import { BoardMetaData, UpdatedTimeMessage } from './stores/WebSocketStore';
 import { Comment } from './stores/CommentsStore';
 
 interface CallBacksType {
@@ -215,6 +215,7 @@ export default class WebsocketClient {
       | string
       | string[]
       | UpdatedTimeMessage
+      | BoardMetaData
       | null
       | { elemID: string; comment: Partial<Comment> }
       | Record<string, unknown>,

@@ -30,6 +30,7 @@ import { useWebSocketStore } from '@/stores/WebSocketStore';
 import { REST } from '@/constants';
 import { useToast } from '../ui/use-toast';
 import { fetchImageFromFirebaseStorage } from '@/views/SignInPage';
+import { TrashIcon } from '@radix-ui/react-icons';
 
 /**
  * An alert dialog that is controlled by the `open` prop. It displays a list of users
@@ -50,18 +51,26 @@ const ShareBoardDialog = ({
 }) => {
   /* Controls visibility of the addition input. */
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const { boardMeta, updatePermission, addUser, updateAvatars } =
-    useCanvasBoardStore([
-      'boardMeta',
-      'updatePermission',
-      'addUser',
-      'updateAvatars',
-    ]);
+  const {
+    boardMeta,
+    updatePermission,
+    addUser,
+    updateAvatars,
+    setBoardMeta,
+    removeCanvas,
+  } = useCanvasBoardStore([
+    'boardMeta',
+    'updatePermission',
+    'addUser',
+    'updateAvatars',
+    'setBoardMeta',
+    'removeCanvas',
+  ]);
   const { setSelectedElements, selectedElementIds } = useCanvasElementStore([
     'setSelectedElements',
     'selectedElementIds',
   ]);
-  const { setTool } = useAppStore(['setTool']);
+  const { setTool, setMode } = useAppStore(['setTool', 'setMode']);
   const { socket, setWebsocketAction } = useWebSocketStore([
     'socket',
     'setWebsocketAction',
@@ -78,6 +87,38 @@ const ShareBoardDialog = ({
       const isOwnPerm = boardMeta.collabID === collabID;
       if (isOwnPerm) setSelectedElements([]);
       updatePermission(collabID, permission, isOwnPerm);
+    });
+
+    socket?.on('removeCollab', async (msg) => {
+      const collabID = (msg as { payload: string }).payload;
+
+      if (collabID === boardMeta.collabID) {
+        setMode('dashboard');
+        toast({
+          variant: 'destructive',
+          title: `You have been removed from: ${boardMeta.title}`,
+          description: 'Ask another collaborator to add you again',
+        });
+        removeCanvas(boardMeta.id);
+        setBoardMeta({
+          title: '',
+          id: '',
+          lastModified: '',
+          roomID: '',
+          shareUrl: '',
+          folder: '',
+          tags: [],
+          collabID: '',
+          users: [],
+          permission: '',
+        });
+        return;
+      }
+      setBoardMeta({
+        users: boardMeta.users.filter(
+          (metaUser) => collabID !== metaUser.collabID,
+        ),
+      });
     });
   }, [socket, boardMeta.collabID, updatePermission]);
 
@@ -206,46 +247,73 @@ const ShareBoardDialog = ({
                   </p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
-                <Select
-                  value={user.permission}
-                  disabled={
-                    user.permission === 'owner' ||
-                    boardMeta.permission === 'view'
-                  }
-                  onValueChange={(value) => {
-                    if (boardMeta.collabID === user.collabID) {
-                      updatePermission(user.collabID, value, true);
-                      setTool('pan');
-                      setSelectedElements([]);
-                      setCursor('');
-                    } else {
-                      updatePermission(user.collabID, value, false);
+                <div className="flex flex-row">
+                  <Select
+                    value={user.permission}
+                    disabled={
+                      user.permission === 'owner' ||
+                      boardMeta.permission === 'view'
                     }
-                    console.log(selectedElementIds);
-                    setWebsocketAction(
-                      { collabID: user.collabID, permission: value },
-                      'changePermission',
-                    );
-                    axios.put(REST.collaborator.update, {
-                      id: user.collabID,
-                      fields: {
-                        permissionLevel: value,
-                      },
-                    });
-                  }}
-                >
-                  <SelectTrigger className="w-[6rem]">
-                    <SelectValue placeholder={user.permission} />
-                  </SelectTrigger>
+                    onValueChange={(value) => {
+                      if (boardMeta.collabID === user.collabID) {
+                        updatePermission(user.collabID, value, true);
+                        setTool('pan');
+                        setSelectedElements([]);
+                        setCursor('');
+                      } else {
+                        updatePermission(user.collabID, value, false);
+                      }
+                      console.log(selectedElementIds);
+                      setWebsocketAction(
+                        { collabID: user.collabID, permission: value },
+                        'changePermission',
+                      );
+                      axios.put(REST.collaborator.update, {
+                        id: user.collabID,
+                        fields: {
+                          permissionLevel: value,
+                        },
+                      });
+                    }}
+                  >
+                    <SelectTrigger className="w-[6rem]">
+                      <SelectValue placeholder={user.permission} />
+                    </SelectTrigger>
 
-                  <SelectContent>
-                    <SelectItem value="view">View</SelectItem>
-                    <SelectItem value="edit">Edit</SelectItem>
-                    {user.permission === 'owner' && (
-                      <SelectItem value="owner">Owner</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
+                    <SelectContent>
+                      <SelectItem value="view">View</SelectItem>
+                      <SelectItem value="edit">Edit</SelectItem>
+                      {user.permission === 'owner' && (
+                        <SelectItem value="owner">Owner</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    className="ml-2 p-0 bg-[#ffffff] text-black hover:text-red-600 hover:bg-[#ffffff]"
+                    disabled={
+                      user.permission === 'owner' ||
+                      user.collabID === boardMeta.collabID
+                    }
+                    onClick={() => {
+                      const newCollabs = boardMeta.users.filter(
+                        (shareUser) => user.collabID !== shareUser.collabID,
+                      );
+                      setBoardMeta({
+                        users: newCollabs,
+                      });
+                      setWebsocketAction(user.collabID, 'removeCollab');
+
+                      axios.put(REST.board.removeCollab, {
+                        boardId: boardMeta.id,
+                        newCollabs: newCollabs.map(
+                          (shareUser) => shareUser.collabID,
+                        ),
+                      });
+                    }}
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
