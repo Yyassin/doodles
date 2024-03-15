@@ -143,7 +143,9 @@ export default function EditBoardDataDialog({
                 folder: newFolder,
                 lastModified: updatedAt.data.updatedAt,
               });
-              updateCanvas(boardMeta.id, updatedAt.data.updatedAt);
+              updateCanvas(boardMeta.id, {
+                updatedAt: updatedAt.data.updatedAt,
+              });
               updateCanvasInfo(
                 boardMeta.id,
                 newTitle ?? '',
@@ -153,9 +155,12 @@ export default function EditBoardDataDialog({
               setWebsocketAction(
                 {
                   boardID: boardMeta.id,
+                  title: newTitle,
+                  tags: boardMeta.tags,
+                  folder: newFolder,
                   lastModified: updatedAt.data.updatedAt,
                 },
-                'updateUpdatedTime',
+                'changeBoardMeta',
               );
             }}
           >

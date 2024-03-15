@@ -35,6 +35,7 @@ export const REST = {
     deleteBoard: `${REST_ROOT}/board/deleteBoard`,
     updateBoard: `${REST_ROOT}/board/updateBoard`,
     addUser: `${REST_ROOT}/board/addUser`,
+    removeCollab: `${REST_ROOT}/board/updateCollabs`,
   },
   collaborators: {
     getAvatar: `${REST_ROOT}/collaborator/getCollaboratorAvatars`,

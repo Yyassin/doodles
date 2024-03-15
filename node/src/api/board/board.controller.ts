@@ -265,6 +265,25 @@ export const handleUpdateBoard = async (req: Request, res: Response) => {
   }
 };
 
+// remove collaborator from board
+export const handleRemoveCollaborator = async (req: Request, res: Response) => {
+  try {
+    // The board ID and new parameters are in the body.
+    const { boardId, newCollabs } = req.body;
+    if (!validateId(boardId, res)) return;
+    const board = (await findBoardById(boardId)) as Board;
+
+    await updateBoard(board, { collaborators: newCollabs }, true);
+
+    return res.status(HTTP_STATUS.SUCCESS).json({});
+  } catch (error) {
+    console.error('Error updating board: ', error);
+    res
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ error: 'Failed to remove Collaborator' });
+  }
+};
+
 // Update board
 export const handleAddUserbyEmail = async (req: Request, res: Response) => {
   try {

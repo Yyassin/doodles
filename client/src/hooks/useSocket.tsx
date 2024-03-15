@@ -1,5 +1,9 @@
 import WebsocketClient from '@/WebsocketClient';
-import { UpdatedTimeMessage, useWebSocketStore } from '@/stores/WebSocketStore';
+import {
+  BoardMetaData,
+  UpdatedTimeMessage,
+  useWebSocketStore,
+} from '@/stores/WebSocketStore';
 import {
   CanvasElement,
   useCanvasElementStore,
@@ -233,7 +237,7 @@ export const useSocket = () => {
     },
     updateUpdatedTime: async (fields: UpdatedTimeMessage) => {
       setBoardMeta({ lastModified: fields.lastModified });
-      updateCanvas(fields.boardID, fields.lastModified);
+      updateCanvas(fields.boardID, { updatedAt: fields.lastModified });
 
       const boardState = await axios.get(REST.board.getBoard, {
         params: { id: fields.boardID },
@@ -266,6 +270,10 @@ export const useSocket = () => {
     },
     removeAttachedFileUrl: (ids: string[]) => {
       removeAttachedFileUrl(ids);
+    },
+    changeBoardMeta: (boardMetaData: BoardMetaData) => {
+      setBoardMeta(boardMetaData);
+      updateCanvas(boardMetaData.boardID, boardMetaData);
     },
   };
 
@@ -348,7 +356,11 @@ export const useSocket = () => {
     }
 
     //Check if the actionElementID is string[] (collection of ids)
-    if (typeof actionElementID === 'object' || action === 'addCollab') {
+    if (
+      typeof actionElementID === 'object' ||
+      action === 'addCollab' ||
+      action === 'removeCollab'
+    ) {
       socket.current?.sendMsgRoom(action, actionElementID);
       setWebsocketAction('', '');
       return;

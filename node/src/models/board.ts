@@ -74,10 +74,11 @@ export const findBoardById = async (boardId: string) =>
 export const updateBoard = async (
   board: Board,
   updatedFields: Partial<DocumentFields<Board>>,
+  isRemoveCollab = false,
 ) => {
   updatedFields.updatedAt = new Date().toUTCString();
   const { fastFireOptions: _fastFireOptions, id: _id, ...boardFields } = board;
-  if (updatedFields.collaborators !== undefined) {
+  if (updatedFields.collaborators !== undefined && !isRemoveCollab) {
     boardFields.collaborators.push(updatedFields.collaborators as string);
     delete updatedFields.collaborators;
   }

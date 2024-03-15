@@ -308,7 +308,7 @@ const CommentsSheetContent = () => {
                 fields: { serialized: state },
               });
               setBoardMeta({ lastModified: updated.data.updatedAt });
-              updateCanvas(boardMeta.id, updated.data.updatedAt);
+              updateCanvas(boardMeta.id, { updatedAt: updated.data.updatedAt });
               setWebsocketAction(
                 {
                   boardID: boardMeta.id,
