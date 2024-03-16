@@ -1,4 +1,4 @@
-<span title="floralyfe logo">
+<span title="doodles logo">
  <p align="center">
   <img width="100px" src="./client/public/doodles-icon.svg" alt="doodles-img">
  </p>
@@ -6,7 +6,7 @@
 
 <h1 align="center" style="margin-top: 0px;">✏️ doodles</h1>
 
-> **Doodles** is a virtual, collraborative, real-time whiteboard application that aims to boost productivity. The application features an intuitive interface that serves as a flexible canvas for drawing shapes, attaching images, generating them with Stable Diffusion, documenting with text-based notes, and annotating files— all of which are supported by rich customization options. The application also supports screen-sharing, and all this functionality is extended in a native desktop application, that doubles as a transparent whiteboard widget.
+> **Doodles** is a virtual, collaborative, real-time whiteboard application that aims to boost productivity. The application features an intuitive interface that serves as a flexible canvas for drawing shapes, attaching images, generating them with Stable Diffusion, documenting with text-based notes, and annotating files— all of which are supported by rich customization options. The application also supports screen-sharing, and all this functionality is extended in a native desktop application, that doubles as a transparent whiteboard widget.
 
 ## Contributors
 *Doodles* was developed throughout Fall 2023 - Winter 2024 by \
@@ -17,7 +17,7 @@
 [Zakariyya Almalki](https://github.com/zackzouk)
 
 ## Features
-The *Doodles* system enhances the efficacy of online work by streamling virtual collaboration and brainstorming for teams. To facilitate online collaboration, *Doodles* provides the functionality below.
+The *Doodles* system enhances the efficacy of online work by streamlining virtual collaboration and brainstorming for teams. To facilitate online collaboration, *Doodles* provides the functionality below.
 
 ### Functionality
 **Drawing Elements:** The system allows users to use a variety of tools to draw geometric shapes, freehand curves, insert text, attach links/files, and insert/generate images.
@@ -57,7 +57,7 @@ With Node and pnpm installed, navigate to the `client` folder and run `pnpm i` t
 
 #### Directory Structure
 
-The `/electron` directory stores the files that host the desktop application, and `/src` contains the actual frontend. Our tests are in the `tests` folder. Within `/src`, the `/components` directory holds our interface components, `/hooks` stores various React effects used in various components, and `/stores` contains various state storages. Teh remaining `/api`, `/lib`. `/ipc`, and `/firebaseDB` containing according helper and utility functions used throughout the application.
+The `/electron` directory stores the files that host the desktop application, and `/src` contains the actual frontend. Our tests are in the `tests` folder. Within `/src`, the `/components` directory holds our interface components, `/hooks` stores various React effects used in various components, and `/stores` contains various state storages. The remaining `/api`, `/lib`. `/ipc`, and `/firebaseDB` containing according helper and utility functions used throughout the application.
 
 ### Backend Node Server
 
@@ -65,7 +65,7 @@ The backend Node server serves as both a REST server to interface with Firebase,
 
 #### Directory Structure
 
-The `/test` directory houses all our unit tests, while the source code is in `/src`. The source code is split into the `/api` folder which stores our REST server routers and controller for all our database modes, the `/firebase` folder which contains Firebase connection initialization code, along with `/models` to store our table schemas. The `/lib` directory stores code relating to WebSockets and WebRTC interaction management, and make use of the utility function helpers and classes in `/utils`.
+The `/test` directory houses all our unit tests, while the source code is in `/src`. The source code is split into the `/api` folder which stores our REST server routers and controller for all our database modes, the `/firebase` folder which contains Firebase connection initialization code, along with `/models` to store our table schemas. The `/lib` directory stores code relating to WebSockets and WebRTC interaction management, and makes use of the utility function helpers and classes in `/utils`.
 
 ### Firebase Emulator
 Our node backend tests make use of a Firebase emulator. Follow these steps to install it:
