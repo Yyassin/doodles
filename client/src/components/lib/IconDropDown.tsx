@@ -51,7 +51,7 @@ export const IconDropDown = () => {
               className="text-violet11 leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium"
               delayMs={600}
             >
-              JD
+              {userFirstName[0] + userLastName[0]}
             </Avatar.Fallback>
           </Avatar.Root>
           <div className="flex flex-col">

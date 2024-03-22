@@ -110,7 +110,7 @@ const Viewport = () => {
           <ShareBoardDialog
             open={isShareDialogOpen}
             setOpen={setIsShareDialogOpen}
-            boardLink={boardMeta.shareUrl}
+            boardLink={`${window.location.href}?boardID=${boardMeta.id}`}
             users={boardMeta.users}
           />
           <EditBoardDataDialog

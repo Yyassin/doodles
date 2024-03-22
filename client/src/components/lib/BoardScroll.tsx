@@ -106,10 +106,16 @@ export const BoardScroll = () => {
   useEffect(() => {
     setBoardMeta({ title: '', id: '' });
   }, [folder]);
+  const dup = new Set<string>();
   const sortedCavases = (
     searchCanvases.length === 0 ? canvases : searchCanvases
   )
-    .filter((board) => (folder === 'Recent' ? true : folder === board.folder))
+    .filter(
+      (board) =>
+        (folder === 'Recent' ? true : folder === board.folder) &&
+        !dup.has(board.id) &&
+        dup.add(board.id),
+    )
     .sort((a, b) => {
       const dateA = new Date(a.updatedAt);
       const dateB = new Date(b.updatedAt);
@@ -144,9 +150,10 @@ export const BoardScroll = () => {
     // Rerender on isImagePlaceds change to update the thumbnail
   }, [state, fileIds]);
 
-  const isOwner =
-    boardMeta.users.find((user) => user.collabID === boardMeta.collabID)
-      ?.permission === 'owner';
+  const isOwner = boardMeta.users[0]
+    ? boardMeta.users.find((user) => user.collabID === boardMeta.collabID)
+        ?.permission === 'owner'
+    : true;
 
   return (
     <div className="w-full h-full p-4 backdrop-blur overflow-auto">

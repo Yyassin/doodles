@@ -30,58 +30,63 @@ const UserList = () => {
 
   return (
     <div className="flex items-center">
-      {Object.values(activeTenants).map((user, index) => (
-        <div
-          key={index}
-          /**
-           * Translate away from the focused avatar, if any.
-           */
-          className={`relative transition-transform transform ${
-            focusedIndex !== null && focusedIndex !== index
-              ? index > focusedIndex
-                ? 'translate-x-6 -ml-3'
-                : '-translate-x-6 -ml-3'
-              : '-ml-3'
-          } `}
-        >
-          <CanvasTooltip
-            className="radix-themes-custom-fonts"
-            content={`${user.username} ${
-              activeProducerID === user.email ? ' (Sharing Screen)' : ''
-            }`}
-            side="bottom"
-            sideOffset={5}
+      {Object.values(activeTenants).map((user, index) => {
+        return (
+          <div
+            key={index}
+            /**
+             * Translate away from the focused avatar, if any.
+             */
+            className={`relative transition-transform transform ${
+              focusedIndex !== null && focusedIndex !== index
+                ? index > focusedIndex
+                  ? 'translate-x-6 -ml-3'
+                  : '-translate-x-6 -ml-3'
+                : '-ml-3'
+            } `}
           >
-            {/* Add a blinking animation to the streamer, if any. */}
-            <Avatar
-              className={`cursor-pointer ${
-                focusedIndex === index ? 'transform scale-125' : ''
-              } ${
-                user.outlineColor ? `border-[0.2rem] ${user.outlineColor}` : ''
-              } ${
-                user.email === activeProducerID ? 'blink-active-producer' : ''
+            <CanvasTooltip
+              className="radix-themes-custom-fonts"
+              content={`${user.username} ${
+                activeProducerID === user.email ? ' (Sharing Screen)' : ''
               }`}
-              onMouseEnter={() => handleAvatarHover(index)}
-              onMouseLeave={handleAvatarLeave}
-              style={{
-                border:
-                  user.email === activeProducerID
-                    ? ''
-                    : `0.2rem solid ${user.outlineColor ?? 'white'}`,
-              }}
+              side="bottom"
+              sideOffset={5}
             >
-              <AvatarImage
-                src={
-                  boardMeta.collaboratorAvatars[
-                    extractCollabID(user.email) ?? ''
-                  ] ?? ''
-                }
-              />
-              <AvatarFallback>{user.initials}</AvatarFallback>
-            </Avatar>
-          </CanvasTooltip>
-        </div>
-      ))}
+              {/* Add a blinking animation to the streamer, if any. */}
+              <Avatar
+                className={`cursor-pointer ${
+                  focusedIndex === index ? 'transform scale-125' : ''
+                } ${
+                  user.outlineColor
+                    ? `border-[0.2rem] ${user.outlineColor}`
+                    : ''
+                } ${
+                  user.email === activeProducerID ? 'blink-active-producer' : ''
+                }`}
+                onMouseEnter={() => handleAvatarHover(index)}
+                onMouseLeave={handleAvatarLeave}
+                style={{
+                  border:
+                    user.email === activeProducerID
+                      ? ''
+                      : `0.2rem solid ${user.outlineColor ?? 'white'}`,
+                }}
+              >
+                <img
+                  src={
+                    boardMeta.collaboratorAvatars[
+                      extractCollabID(user.email) ?? ''
+                    ] ?? ''
+                  }
+                  alt=""
+                />
+                <AvatarFallback>{user.initials}</AvatarFallback>
+              </Avatar>
+            </CanvasTooltip>
+          </div>
+        );
+      })}
     </div>
   );
 };
