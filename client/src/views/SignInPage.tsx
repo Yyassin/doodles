@@ -31,9 +31,12 @@ import {
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { createStateWithRoughElement } from '@/components/lib/BoardScroll';
 import {
+  CanvasElement,
   CanvasElementState,
   useCanvasElementStore,
 } from '@/stores/CanvasElementsStore';
+import { commitImageToCache, getImageDataUrl } from '@/lib/image';
+import { BinaryFileData } from '@/types';
 
 /**
  * It is the sign in page where user either inputs email and password or
@@ -94,6 +97,11 @@ export async function getUserDetails(
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
+  editCanvasElement: (
+    id: string,
+    partialElement: Partial<CanvasElement>,
+    isLive?: boolean | undefined,
+  ) => void,
 ) {
   try {
     const user = await axios.get(REST.user.get, {
@@ -120,6 +128,7 @@ export async function getUserDetails(
       setCanvases,
       setBoardMeta,
       setCanvasElementState,
+      editCanvasElement,
     );
   } catch (error) {
     console.error('Error:', error);
@@ -141,9 +150,15 @@ export const checkURL = async (
       collabID: string;
       users: SharedUser[];
       permission: string;
+      collaboratorAvatarUrls: Record<string, string>;
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
+  editCanvasElement: (
+    id: string,
+    partialElement: Partial<CanvasElement>,
+    isLive?: boolean | undefined,
+  ) => void,
   signUp = false,
 ) => {
   const queryParams = new URLSearchParams(window.location.search);
@@ -160,6 +175,35 @@ export const checkURL = async (
       console.log('users ', board.data.users);
       console.log('permissions', board.data.permission);
       console.log(board);
+
+      const collaboratorAvatarMeta = (
+        await axios.put(REST.collaborators.getAvatar, {
+          collaboratorIds: board.data.collaborators,
+        })
+      ).data.collaborators;
+      const collaboratorAvatarUrls = await Promise.all(
+        Object.entries(
+          collaboratorAvatarMeta as {
+            id: string;
+            avatar: string;
+          },
+        ).map(async ([id, avatar]) => ({
+          id,
+          avatar: (avatar ?? '').includes('https')
+            ? avatar
+            : await fetchImageFromFirebaseStorage(
+                `profilePictures/${avatar}.jpg`,
+              ),
+        })),
+      );
+      const collaboratorAvatarUrlsMap = collaboratorAvatarUrls.reduce(
+        (acc, { id, avatar }) => {
+          id && avatar && (acc[id] = avatar);
+          return acc;
+        },
+        {} as Record<string, string>,
+      ) as Record<string, string>;
+
       setBoardMeta({
         roomID: board.data.roomID,
         title: board.data.title,
@@ -171,12 +215,43 @@ export const checkURL = async (
         collabID: board.data.collabID,
         users: board.data.users,
         permission: board.data.permission,
+        collaboratorAvatarUrls: collaboratorAvatarUrlsMap,
       });
+
+      // Fetch images from firebase storage
+      Object.entries(board.data.serialized.fileIds).forEach(
+        async ([elemId, fileId]) => {
+          const imageUrl = await fetchImageFromFirebaseStorage(
+            `boardImages/${fileId}.jpg`,
+          );
+          const dataUrl = imageUrl && (await getImageDataUrl(imageUrl));
+          if (!dataUrl)
+            throw new Error('Failed to resolve saved image dataurls');
+
+          const binary = {
+            dataURL: dataUrl,
+            id: fileId,
+            mimeType: 'image/jpeg',
+          } as BinaryFileData;
+
+          const imageElement = { id: elemId };
+          commitImageToCache(
+            {
+              ...binary,
+              lastRetrieved: Date.now(),
+            },
+            imageElement,
+            // Will set fileIds, triggering a rerender. A placeholder
+            // will be shown in the mean time.
+            editCanvasElement,
+          );
+        },
+      );
 
       setCanvasElementState(createStateWithRoughElement(board.data.serialized));
       isSharedCanvas = true;
-    } catch {
-      console.log('error');
+    } catch (e: unknown) {
+      console.log(e);
     }
 
     //remove variable from url
@@ -211,8 +286,9 @@ export default function SignInPage() {
     'setCanvases',
     'setBoardMeta',
   ]);
-  const { setCanvasElementState } = useCanvasElementStore([
+  const { setCanvasElementState, editCanvasElement } = useCanvasElementStore([
     'setCanvasElementState',
+    'editCanvasElement',
   ]);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
@@ -236,6 +312,7 @@ export default function SignInPage() {
           setCanvases,
           setBoardMeta,
           setCanvasElementState,
+          editCanvasElement,
         )
       )?.valueOf(); //get name, email, avatar of user
 
@@ -284,6 +361,7 @@ export default function SignInPage() {
               setCanvases,
               setBoardMeta,
               setCanvasElementState,
+              editCanvasElement,
             )
           ).valueOf();
 

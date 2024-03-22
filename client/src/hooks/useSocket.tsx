@@ -20,6 +20,7 @@ import axios from 'axios';
 import { REST } from '@/constants';
 import { createStateWithRoughElement } from '@/components/lib/BoardScroll';
 import { fetchImageFromFirebaseStorage } from '@/views/SignInPage';
+import { useAppStore } from '@/stores/AppStore';
 
 /**
  * Defines a hook that controls all socket related activities
@@ -112,6 +113,7 @@ export const useSocket = () => {
       'addUser',
       'updateAvatars',
     ]);
+  const { setIsViewingComments } = useAppStore(['setIsViewingComments']);
 
   const socket = useRef<WebsocketClient>();
 
@@ -298,6 +300,7 @@ export const useSocket = () => {
       if (socket.current?.room !== null) {
         socket.current?.leaveRoom();
       }
+      setIsViewingComments(false);
     } else {
       socket.current?.joinRoom(roomID, boardMeta.collabID);
     }
