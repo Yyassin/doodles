@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import CanvasTooltip from '../CanvasTooltip';
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
+import { Avatar, AvatarFallback } from '../../ui/avatar';
 import { useWebSocketStore } from '@/stores/WebSocketStore';
 import './UserList.css';
 import { useCanvasBoardStore } from '@/stores/CanavasBoardStore';
