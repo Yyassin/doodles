@@ -154,11 +154,13 @@ export const checkURL = async (
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
-  editCanvasElement: (
-    id: string,
-    partialElement: Partial<CanvasElement>,
-    isLive?: boolean | undefined,
-  ) => void,
+  editCanvasElement:
+    | null
+    | ((
+        id: string,
+        partialElement: Partial<CanvasElement>,
+        isLive?: boolean | undefined,
+      ) => void),
   signUp = false,
 ) => {
   const queryParams = new URLSearchParams(window.location.search);
@@ -235,16 +237,17 @@ export const checkURL = async (
           } as BinaryFileData;
 
           const imageElement = { id: elemId };
-          commitImageToCache(
-            {
-              ...binary,
-              lastRetrieved: Date.now(),
-            },
-            imageElement,
-            // Will set fileIds, triggering a rerender. A placeholder
-            // will be shown in the mean time.
-            editCanvasElement,
-          );
+          editCanvasElement &&
+            commitImageToCache(
+              {
+                ...binary,
+                lastRetrieved: Date.now(),
+              },
+              imageElement,
+              // Will set fileIds, triggering a rerender. A placeholder
+              // will be shown in the mean time.
+              editCanvasElement,
+            );
         },
       );
 
