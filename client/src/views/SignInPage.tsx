@@ -97,7 +97,7 @@ export async function getUserDetails(
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
-  editCanvasElement: (
+  editCanvasElement?: (
     id: string,
     partialElement: Partial<CanvasElement>,
     isLive?: boolean | undefined,
@@ -154,7 +154,7 @@ export const checkURL = async (
     }>,
   ) => void,
   setCanvasElementState: (element: CanvasElementState) => void,
-  editCanvasElement:
+  editCanvasElement?:
     | null
     | ((
         id: string,

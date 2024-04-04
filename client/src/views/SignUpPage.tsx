@@ -155,6 +155,7 @@ export default function SignUp() {
           setCanvases,
           setBoardMeta,
           setCanvasElementState,
+          null,
           true,
         )
       ).valueOf();
@@ -211,6 +212,7 @@ export default function SignUp() {
               setCanvases,
               setBoardMeta,
               setCanvasElementState,
+              null,
               true,
             )
           ).valueOf();
